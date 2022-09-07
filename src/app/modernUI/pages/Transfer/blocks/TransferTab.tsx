@@ -76,9 +76,7 @@ export const TransferTab = ({ ...rest }) => {
               {error}
             </Text>
           </Box>
-        </Box>
-      )}
-       {biconomyStatus ? (
+             {biconomyStatus ? (
         <Info label="Gas fee" value={null}
           style={{
             border: 'none'
@@ -103,6 +101,9 @@ export const TransferTab = ({ ...rest }) => {
           <SlideButton biconomyStatus={biconomyStatus} setBiconomyStatus={setBiconomyStatus}/>
       </Info>
     }
+        </Box>
+      )}
+    
       <Box margin={{ top: 'large' }}>
         <Button
           primary
