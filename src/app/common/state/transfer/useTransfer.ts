@@ -118,7 +118,7 @@ export const useTransfer = () => {
     setTransferValue(selectedIbAlluoInfo?.balance || '');
   };
 
-  const handleTransfer = async () => {
+  const handleTransfer = async (useBiconomy) => {
     setError('');
     setIsTransferring(true);
 
@@ -128,6 +128,7 @@ export const useTransfer = () => {
         transferValue,
         selectedIbAlluoInfo.decimals,
         recipientAddress,
+        useBiconomy
       );
       await fetchIbAlluosInfo();
       resetState();
