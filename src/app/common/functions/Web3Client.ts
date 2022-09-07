@@ -1712,6 +1712,7 @@ export const transferToAddress = async (
   amount,
   decimals,
   toAddress,
+  useBiconomy
 ) => {
   try {
     const abi = [
@@ -1735,7 +1736,7 @@ export const transferToAddress = async (
       'transferAssetValue(address,uint256)',
       [toAddress, amountInDecimals],
       EChain.POLYGON,
-      true,
+      useBiconomy,
     );
 
     return tx;
