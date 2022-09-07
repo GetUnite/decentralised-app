@@ -57,28 +57,28 @@ export const useTransfer = () => {
     setIbAlluosInfo([
       {
         label: 'USD',
-        address: usd.tokenAddress,
+        address: usd.ibAlluoAddress,
         balance: usd.balance,
         decimals: usd.decimals,
         type: usd.symbol,
       },
       {
         label: 'EUR',
-        address: eur.tokenAddress,
+        address: eur.ibAlluoAddress,
         balance: eur.balance,
         decimals: eur.decimals,
         type: eur.symbol,
       },
       {
         label: 'ETH',
-        address: eth.tokenAddress,
+        address: eth.ibAlluoAddress,
         balance: eth.balance,
         decimals: eth.decimals,
         type: eth.symbol,
       },
       {
         label: 'BTC',
-        address: btc.tokenAddress,
+        address: btc.ibAlluoAddress,
         balance: btc.balance,
         decimals: btc.decimals,
         type: btc.symbol,
@@ -118,7 +118,7 @@ export const useTransfer = () => {
     setTransferValue(selectedIbAlluoInfo?.balance || '');
   };
 
-  const handleTransfer = async (biconomyStatus) => {
+  const handleTransfer = async (useBiconomy) => {
     setError('');
     setIsTransferring(true);
 
@@ -128,7 +128,7 @@ export const useTransfer = () => {
         transferValue,
         selectedIbAlluoInfo.decimals,
         recipientAddress,
-        biconomyStatus,
+        useBiconomy
       );
       await fetchIbAlluosInfo();
       resetState();
