@@ -5,15 +5,12 @@ import { Biconomy } from '@biconomy/mexa';
 import { EWallets } from 'app/common/constants';
 import abiSCEth from 'app/common/constants/abiSCEth.json';
 import abiAlluo from 'app/common/constants/abiAlluo.json';
-import abiVesting from 'app/common/constants/abiVesting.json';
 import abiSCPolygon from 'app/common/constants/abiSCPolygon.json';
 import abiPolygonEUR from 'app/common/constants/abiPolygonEUR.json';
 import abiPolygonETH from 'app/common/constants/abiPolygonETH.json';
 import abiPolygonBTC from 'app/common/constants/abiPolygonBTC.json';
-import abiBufferPolygon from 'app/common/constants/abiBufferPolygon.json';
 import abiHandlerPolygon from 'app/common/constants/abiHandlerPolygon.json';
 import abiVault from 'app/common/constants/abiVault.json';
-import abiWETH from 'app/common/constants/abiWETH.json';
 import EthIbAlluoUSDAbi from 'app/common/abis/EthIbAlluoUSD.json';
 import EthIbAlluoEURAbi from 'app/common/abis/EthIbAlluoEUR.json';
 import EthIbAlluoETHAbi from 'app/common/abis/EthIbAlluoETH.json';
@@ -114,20 +111,10 @@ const EEthAddressesForBuy =
     ? EEthAddressesMainnet
     : EEthAddressesKovan;
 /***/
+
 export const isExpectedPolygonEvent = (type, depositAddress) => {
-  if (type === 'usd') {
-    return depositAddress === EPolAddresses.IBALLUOUSD;
-  }
-  if (type === 'eur') {
-    return depositAddress === EPolAddresses.IBALLUOEUR;
-  }
-  if (type === 'eth') {
-    return depositAddress === EPolAddresses.IBALLUOETH;
-  }
-  if (type === 'btc') {
-    return depositAddress === EPolAddresses.IBALLUOBTC;
-  }
-  throw Error('isExpectedPolygonEvent: Wrong coin type');
+  const ibAlluoAddress = getIbAlluoAddress(type);
+  return depositAddress === ibAlluoAddress;
 };
 
 const mutlipleProviderUrls = {
@@ -154,6 +141,22 @@ const mutlipleProviderUrls = {
   },
 };
 
+const ethereumTestnetProviderUrl = 'https://sepolia.etherscan.io/';
+const ethereumMainnetProviderUrl =
+  'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
+const ethereumProviderUrl =
+  process.env.REACT_APP_NET === 'mainnet'
+    ? ethereumMainnetProviderUrl
+    : ethereumTestnetProviderUrl;
+
+const polygonTestnetProviderUrl =
+  'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
+const polygonMainnetProviderUrl = 'https://polygon-rpc.com/';
+const polygonProviderUrl =
+  process.env.REACT_APP_NET === 'mainnet'
+    ? polygonMainnetProviderUrl
+    : polygonTestnetProviderUrl;
+
 let ethRinkebyUrl = mutlipleProviderUrls.ethereum.testnet[0];
 
 let ethKovanUrl = 'https://kovan.etherscan.io';
@@ -166,9 +169,6 @@ let ethProviderUrlForKovan =
 
 let polMainnetUrl = mutlipleProviderUrls.polygon.mainnet[0];
 let polMumbaiUrl = mutlipleProviderUrls.polygon.testnet[0];
-
-let polygonProviderUrl =
-  process.env.REACT_APP_POL_NET === 'mainnet' ? polMainnetUrl : polMumbaiUrl;
 
 declare let window: any;
 
@@ -402,6 +402,7 @@ const callContract = async (abi, address, functionSignature, params, chain) => {
   const web3ToUse = new Web3(new Web3.providers.HttpProvider(provider));
   const contract = new web3ToUse.eth.Contract(abi as any, address);
 
+  console.log(contract.methods, address, params, provider);
   try {
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.call({
@@ -424,13 +425,6 @@ let polygonProvider = new Web3(
 );
 const getEthContractInstance = () =>
   new ethProvider.eth.Contract(abiSCEth as any, EEthAddresses.PROXY);
-// let ethContractInstance = getEthContractInstance();
-const getWethContractInstance = () =>
-  new ethProviderKovanOrMain.eth.Contract(
-    abiWETH as any,
-    EEthAddressesForBuy.WETH,
-  );
-let wethContractInstance = getWethContractInstance();
 const getPolygonUSDContractInstance = () =>
   new polygonProvider.eth.Contract(
     abiSCPolygon as any,
@@ -476,16 +470,6 @@ const getEthereumContractInstance = type => {
 const getAlluoTokenInstance = () =>
   new ethProvider.eth.Contract(abiAlluo as any, EEthAddresses.ALLUO);
 let alluoTokenInstance = getAlluoTokenInstance();
-
-let vaultContractInstance = new ethProvider.eth.Contract(
-  abiVault as any,
-  EEthAddressesForBuy.VAULT,
-);
-
-let bufferContractInstance = new polygonProvider.eth.Contract(
-  abiBufferPolygon as any,
-  EPolAddresses.BUFFER,
-);
 
 const getHandlerContractInstance = () =>
   new polygonProvider.eth.Contract(
@@ -551,23 +535,6 @@ export const createPolygonProxyInstance = type => {
       EPolAddresses.IBALLUOBTC,
     );
 };
-
-function wait(delay) {
-  return new Promise(resolve => setTimeout(resolve, delay));
-}
-let triesLeft;
-function fetchRetry(url, delay, tries, fetchOptions = {}) {
-  function onError(err) {
-    triesLeft = tries - 1;
-    if (!triesLeft) {
-      throw err;
-    }
-    return wait(delay).then(() =>
-      fetchRetry(url, delay, triesLeft, fetchOptions),
-    );
-  }
-  return fetch(url, fetchOptions).catch(onError);
-}
 
 let alluoPriceInstance;
 
@@ -733,20 +700,6 @@ export const withdrawAlluo = async () => {
   return res;
 };
 
-export const claimLocked = async () => {
-  await changeNetwork(EChain.ETHEREUM);
-
-  const contractInstanceFromWallet = new web3.eth.Contract(
-    abiSCEth as any,
-    EEthAddresses.PROXY,
-  );
-
-  const res = await contractInstanceFromWallet.methods
-    .claim()
-    .send({ from: walletAddress });
-  return res;
-};
-
 const tokenInstances = {};
 export const getListSupportedTokens = async (
   type = 'usd',
@@ -830,27 +783,67 @@ export const getStableCoinInfo = async (
   type,
   chain = EChain.POLYGON,
 ) => {
-  if (chain === EChain.POLYGON) {
-    tokenInstances[tokenAddress] = new polygonProvider.eth.Contract(
-      getAbiForCoin(type),
-      tokenAddress,
-    );
-  } else {
-    tokenInstances[tokenAddress] = new ethProviderKovanOrMain.eth.Contract(
-      getAbiForCoin(type, EChain.ETHEREUM),
-      tokenAddress,
-    );
-  }
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'balanceOf',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'symbol',
+      outputs: [{ internalType: 'string', name: '', type: 'string' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'decimals',
+      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'spender', type: 'address' },
+      ],
+      name: 'allowance',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
 
-  const symbol = await tokenInstances[tokenAddress].methods.symbol().call();
-  const decimals = await tokenInstances[tokenAddress].methods.decimals().call();
-  const balance = await tokenInstances[tokenAddress].methods
-    .balanceOf(walletAddress)
-    .call();
+  const symbol = await callContract(abi, tokenAddress, 'symbol()', null, chain);
 
-  const allowance = await tokenInstances[tokenAddress].methods
-    .allowance(walletAddress, getIbAlluoAddress(type, chain))
-    .call();
+  const decimals = await callContract(
+    abi,
+    tokenAddress,
+    'decimals()',
+    null,
+    chain,
+  );
+
+  const balance = await callContract(
+    abi,
+    tokenAddress,
+    'balanceOf(address)',
+    [walletAddress],
+    chain,
+  );
+
+  const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+  const allowance = await callContract(
+    abi,
+    tokenAddress,
+    'allowance(address,address)',
+    [walletAddress, ibAlluoAddress],
+    chain,
+  );
 
   return {
     tokenAddress,
@@ -1369,15 +1362,6 @@ export const withdrawStableCoin = async (
   return tx.blockNumber;
 };
 
-export const listenToBuffer = blockNumber => {
-  const bufferInstance = new web3.eth.Contract(
-    abiBufferPolygon as any,
-    EPolAddresses.BUFFER,
-  );
-
-  return bufferInstance.events;
-};
-
 export const listenToHandler = blockNumber => {
   const handlerInstance = new web3.eth.Contract(
     abiHandlerPolygon as any,
@@ -1463,6 +1447,8 @@ export const getVlAlluoBalance = async () => {
     [walletAddress],
     EChain.ETHEREUM,
   );
+
+  console.log(balance);
 
   return Web3.utils.fromWei(balance);
 };
@@ -1663,17 +1649,58 @@ export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
 };
 
 export const getIbAlluoInfo = async type => {
-  const tokenAddress = getIbAlluoAddress(type);
-  const tokenInstance = getIbAlluoContractInstance(type);
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
+      name: 'getBalanceForTransfer',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'symbol',
+      outputs: [{ internalType: 'string', name: '', type: 'string' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'decimals',
+      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
 
-  const symbol = await tokenInstance.methods.symbol().call();
-  const decimals = await tokenInstance.methods.decimals().call();
-  const balance = await tokenInstance.methods
-    .getBalanceForTransfer(walletAddress)
-    .call();
+  const ibAlluoAddress = getIbAlluoAddress(type);
+
+  const symbol = await callContract(
+    abi,
+    ibAlluoAddress,
+    'symbol()',
+    null,
+    EChain.POLYGON,
+  );
+
+  const decimals = await callContract(
+    abi,
+    ibAlluoAddress,
+    'decimals()',
+    null,
+    EChain.POLYGON,
+  );
+
+  const balance = await callContract(
+    abi,
+    ibAlluoAddress,
+    'getBalanceForTransfer(address)',
+    [walletAddress],
+    EChain.POLYGON,
+  );
 
   return {
-    tokenAddress,
+    ibAlluoAddress,
     symbol,
     decimals,
     balance: fromDecimals(balance, decimals),
@@ -1685,7 +1712,6 @@ export const transferToAddress = async (
   amount,
   decimals,
   toAddress,
-  biconomyStatus,
 ) => {
   try {
     const abi = [
@@ -1709,7 +1735,7 @@ export const transferToAddress = async (
       'transferAssetValue(address,uint256)',
       [toAddress, amountInDecimals],
       EChain.POLYGON,
-      biconomyStatus,
+      true,
     );
 
     return tx;
