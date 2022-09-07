@@ -110,7 +110,7 @@ export const NewInput = ({
           <RangeInputValueText>{rangeInputProps.value}%</RangeInputValueText>
           <RangeInput {...rangeInputProps} />
           <MaxButton primary {...maxButtonProps}>
-            Max
+            MAX
           </MaxButton>
         </>
       );

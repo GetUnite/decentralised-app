@@ -10,7 +10,7 @@ export const Infos = ({
   ...rest
 }) => {
   const balanceAndNewValue =
-    +selectedFarm.depositDividedAmount?.first || 0 + (+inputValue || 0);
+    (+selectedFarm.depositDividedAmount?.first || 0) + (+inputValue || 0);
 
   return (
     <>
@@ -36,12 +36,10 @@ export const Infos = ({
         <Info
           label="Gas fee"
           value={null}
-          style={{
-            border: 'none',
-          }}
+          border={false}
         >
           <div style={{ fontSize: 'small' }}>
-            <span>No fees 🎉 - Paid for by Alluo via </span>
+            <span>No fees! 🎉 - Paid for by Alluo via </span>
             <a href="https://twitter.com/biconomy">Biconomy</a>
           </div>
           <SlideButton
@@ -53,9 +51,7 @@ export const Infos = ({
         <Info
           label="Gas fee"
           value={null}
-          style={{
-            borderBottom: '0px',
-          }}
+          border={false}
         >
           <div style={{ textAlign: 'right', fontSize: 'small' }}>
             View Fee in metamask.

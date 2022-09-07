@@ -1,7 +1,11 @@
 import { Box, Button, Text } from 'grommet';
+import { useCookies } from 'react-cookie';
 
 import booster from 'app/modernUI/images/booster.svg';
+
 export const BoosterFarmPresentation = ({ selectedFarm, ...rest }) => {
+  const [cookies, setCookies] = useCookies(['has_seen_boost_farms']);
+
   const rewardLabels = selectedFarm.rewards.map(reward => {
     return reward.label;
   });
@@ -18,6 +22,7 @@ export const BoosterFarmPresentation = ({ selectedFarm, ...rest }) => {
       <Button
           primary
           label='Deposit to get started'
+          onClick={() => setCookies('has_seen_boost_farms', true)}
         />
     </Box>
   );
