@@ -10,7 +10,7 @@ export const Infos = ({
   ...rest
 }) => {
   const balanceAndNewValue =
-    +selectedFarm.depositDividedAmount?.first || 0 + (+inputValue || 0);
+    (+selectedFarm.depositDividedAmount?.first || 0) + (+inputValue || 0);
 
   return (
     <>
@@ -33,16 +33,16 @@ export const Infos = ({
         }
       />
       {selectedFarm.chain === EChain.POLYGON ? (
-        <Info
-          label="Gas fee"
-          value={null}
-          style={{
-            border: 'none',
-          }}
-        >
+        <Info label="Gas fee" value={null} border={false}>
           <div style={{ fontSize: 'small' }}>
-            <span>No fees 🎉 - Paid for by Alluo via </span>
-            <a href="https://twitter.com/biconomy">Biconomy</a>
+            {biconomyStatus ? (
+              <>
+                <span>No fees 🎉 - Paid for by Alluo via </span>
+                <a href="https://twitter.com/biconomy">Biconomy</a>
+              </>
+            ) : (
+              'View Fee in metamask'
+            )}
           </div>
           <SlideButton
             biconomyStatus={biconomyStatus}
@@ -50,13 +50,7 @@ export const Infos = ({
           />
         </Info>
       ) : (
-        <Info
-          label="Gas fee"
-          value={null}
-          style={{
-            borderBottom: '0px',
-          }}
-        >
+        <Info label="Gas fee" value={null} border={false}>
           <div style={{ textAlign: 'right', fontSize: 'small' }}>
             View Fee in metamask.
           </div>

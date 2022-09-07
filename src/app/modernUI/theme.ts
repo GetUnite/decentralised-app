@@ -225,7 +225,7 @@ export const theme = deepMerge(grommet, {
 
     primary: {
       color: '#FFFFFF',
-      background: { color: '#2196f3' },
+      background: { color: '#2A73FF' },
     },
     secondary: {
       color: 'text',

@@ -12,8 +12,8 @@ export const TransferTab = ({ ...rest }) => {
   const { polygonInfoAtom, setPolygonInfoAtom, fetchTotalAssetSupply } =
     usePolygonInfoAtom();
 
-  const [biconomyStatus, setBiconomyStatus] = useState(true)
-  
+  const [biconomyStatus, setBiconomyStatus] = useState(true);
+
   const {
     error,
     transferValue,
@@ -27,7 +27,6 @@ export const TransferTab = ({ ...rest }) => {
     recipientAddress,
     handleRecipientAddressChange,
   } = useTransfer();
-
 
   const coinIcon = getCoinIcon(selectedIbAlluoInfo?.type);
   return (
@@ -76,6 +75,7 @@ export const TransferTab = ({ ...rest }) => {
               {error}
             </Text>
           </Box>
+
              {biconomyStatus ? (
         <Info label="Gas fee" value={null}
           style={{
@@ -108,7 +108,10 @@ export const TransferTab = ({ ...rest }) => {
         <Button
           primary
           disabled={
-            isTransferring || !(+(transferValue || 0) > 0) || error !== '' || recipientAddress === ''
+            isTransferring ||
+            !(+(transferValue || 0) > 0) ||
+            error !== '' ||
+            recipientAddress === ''
           }
           label="Transfer"
           onClick={() => handleTransfer(biconomyStatus)}

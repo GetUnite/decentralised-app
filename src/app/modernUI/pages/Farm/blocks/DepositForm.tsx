@@ -71,7 +71,7 @@ export const DepositForm = ({
         </>
       )}
 
-      <Box margin={{ top: 'large' }}>
+      <Box margin={{ top: 'medium' }}>
         <Button
           primary
           disabled={
