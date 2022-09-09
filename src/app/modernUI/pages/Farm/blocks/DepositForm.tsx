@@ -7,8 +7,8 @@ import { TopHeader } from './TopHeader';
 export const DepositForm = ({
   selectedFarm,
   updateFarmInfo,
-  selectStableCoin,
-  selectedStableCoin,
+  selectSupportedToken,
+  selectedSupportedToken,
   ...rest
 }) => {
   const {
@@ -22,11 +22,11 @@ export const DepositForm = ({
     handleDeposit,
     setBiconomyStatus,
     biconomyStatus,
-  } = useDepositForm({ selectedFarm, selectedStableCoin, updateFarmInfo });
+  } = useDepositForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
-      {!selectedStableCoin || isApproving || isDepositing ? (
+      {!selectedSupportedToken || isApproving || isDepositing ? (
         <Box
           align="center"
           justify="center"
@@ -44,7 +44,7 @@ export const DepositForm = ({
                 inputProps={{
                   value: depositValue || '',
                   onChange: handleDepositFieldChange,
-                  max: selectedStableCoin?.balance || 0,
+                  max: selectedSupportedToken?.balance || 0,
                 }}
                 maxButtonProps={{
                   onClick: setToMax,
@@ -52,8 +52,8 @@ export const DepositForm = ({
                 selectProps={{
                   options: selectedFarm.stableCoins || [],
                 }}
-                selectedTokenInfo={selectedStableCoin}
-                setSelectedToken={selectStableCoin}
+                selectedTokenInfo={selectedSupportedToken}
+                setSelectedToken={selectSupportedToken}
               />
               <Text color="error" size="small" margin={{ top: 'small' }}>
                 {error}
@@ -79,13 +79,13 @@ export const DepositForm = ({
           }
           label={
             +depositValue > 0
-              ? +selectedStableCoin?.allowance >= +depositValue
+              ? +selectedSupportedToken?.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +selectedStableCoin?.allowance >= +depositValue
+            +selectedSupportedToken?.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }

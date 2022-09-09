@@ -43,7 +43,7 @@ export const Menu = ({ ...rest }) => {
   const toggleModal = () => {
     setIsModalOpen(prev => !prev);
   };
-  const { isLightMode, mode, setMode, toggleMode } = useMode();
+  const { isLightMode, toggleMode } = useMode();
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -52,7 +52,7 @@ export const Menu = ({ ...rest }) => {
             direction="row"
             gap={isSmall(size) ? 'medium' : 'small'}
             align="center"
-            style={{flex:1}}
+            style={{ flex: 1 }}
             justify="end"
           >
             {((isSmall(size) && isModalOpen) || !isSmall(size)) && (
@@ -71,8 +71,6 @@ export const Menu = ({ ...rest }) => {
                   src={isLightMode ? sunIcon : moonIcon}
                   size="small"
                   justify="center"
-                  overflow="hidden"
-                  round="full"
                 />
               </Button>
             )}

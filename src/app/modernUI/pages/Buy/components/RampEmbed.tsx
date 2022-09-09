@@ -1,18 +1,14 @@
 import { useLayoutEffect } from 'react';
-
 import { useRecoilState } from 'recoil';
 import { RampInstantSDK } from '@ramp-network/ramp-instant-sdk';
 import { Box, Text } from 'grommet';
-
 import { walletAccount } from 'app/common/state/atoms';
 import { ConnectionModal } from 'app/modernUI/components';
 
 const ENV = process.env.NODE_ENV;
 
 export const RampEmbed = () => {
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
-    walletAccount,
-  );
+  const [walletAccountAtom] = useRecoilState(walletAccount);
 
   useLayoutEffect(() => {
     if (walletAccountAtom) {
@@ -28,10 +24,7 @@ export const RampEmbed = () => {
           userAddress: walletAccountAtom,
           variant: 'embedded-mobile',
           containerNode: document.getElementById('ramp-container'),
-          defaultAsset: 
-          ENV === 'development'
-            ? 'TEST_DAI'
-            : 'MATIC_DAI',
+          defaultAsset: ENV === 'development' ? 'TEST_DAI' : 'MATIC_DAI',
           fiatValue: '100',
           hostApiKey:
             ENV === 'development'

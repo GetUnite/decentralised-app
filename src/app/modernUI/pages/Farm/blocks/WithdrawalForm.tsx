@@ -1,6 +1,5 @@
 import { useWithdrawalForm } from 'app/common/state/farm';
-import { NewInput, Notification, Spinner } from 'app/modernUI/components';
-import SlideButton from 'app/modernUI/components/SlideButton';
+import { NewInput, Spinner } from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
@@ -9,8 +8,8 @@ export const WithdrawalForm = ({
   selectedFarm,
   isLoading,
   updateFarmInfo,
-  selectStableCoin,
-  selectedStableCoin,
+  selectSupportedToken,
+  selectedSupportedToken,
   ...rest
 }) => {
   const {
@@ -23,11 +22,11 @@ export const WithdrawalForm = ({
     handleWithdraw,
     biconomyStatus,
     setBiconomyStatus,
-  } = useWithdrawalForm({ selectedFarm, selectedStableCoin, updateFarmInfo });
+  } = useWithdrawalForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
-      {!selectedStableCoin || isWithdrawing || isWithdrawalRequestsLoading ? (
+      {!selectedSupportedToken || isWithdrawing || isWithdrawalRequestsLoading ? (
         <Box
           align="center"
           justify="center"
@@ -53,8 +52,8 @@ export const WithdrawalForm = ({
                 selectProps={{
                   options: selectedFarm.stableCoins || [],
                 }}
-                selectedTokenInfo={selectedStableCoin}
-                setSelectedToken={selectStableCoin}
+                selectedTokenInfo={selectedSupportedToken}
+                setSelectedToken={selectSupportedToken}
               />
               <Text color="error" size="small" margin={{ top: 'small' }}>
                 {error}

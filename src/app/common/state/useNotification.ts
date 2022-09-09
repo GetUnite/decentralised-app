@@ -1,5 +1,5 @@
 import { useRecoilState } from 'recoil';
-import { ENotificationId, notification } from 'app/common/state/atoms';
+import { notification } from 'app/common/state/atoms';
 export { ENotificationId } from 'app/common/state/atoms';
 
 export const useNotification = () => {
@@ -10,13 +10,6 @@ export const useNotification = () => {
       id: null,
       type: '',
       message: '',
-    });
-
-  const setErrorNotification = message =>
-    setNotificationAtom({
-      id: null,
-      type: 'error',
-      message,
     });
 
   const setNotification = (message, type) =>

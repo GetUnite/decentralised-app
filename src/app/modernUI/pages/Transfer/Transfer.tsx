@@ -1,5 +1,4 @@
 import { EChain } from 'app/common/functions/Web3Client';
-import { ENotificationId } from 'app/common/state/atoms';
 import { Layout, Modal, Tab } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
 import { TransferTab } from './blocks/TransferTab';
