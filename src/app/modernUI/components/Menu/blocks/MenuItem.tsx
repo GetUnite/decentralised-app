@@ -2,7 +2,7 @@ import { Box, Anchor } from 'grommet';
 import { useCurrentPath, modernUiPaths } from 'app/common/hooks';
 
 export const MenuItem = ({ ...rest }) => {
-  const { path, navigate, isStakePage, isBuyPage, isTransferPage } =
+  const {navigate, isStakePage, isBuyPage, isTransferPage } =
     useCurrentPath();
 
   return (

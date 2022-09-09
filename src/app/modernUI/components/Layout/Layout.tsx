@@ -100,6 +100,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             <Box
               width="xlarge"
               pad={{ horizontal: 'medium', vertical: 'medium' }}
+              style={{marginTop: "104px"}}
             >
               {children}
             </Box>

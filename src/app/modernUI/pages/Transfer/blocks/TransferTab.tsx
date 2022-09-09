@@ -9,8 +9,7 @@ import { useTransfer } from 'app/common/state/transfer';
 import { TopHeader } from './TopHeader';
 
 export const TransferTab = ({ ...rest }) => {
-  const { polygonInfoAtom, setPolygonInfoAtom, fetchTotalAssetSupply } =
-    usePolygonInfoAtom();
+  const { polygonInfoAtom } = usePolygonInfoAtom();
 
   const [biconomyStatus, setBiconomyStatus] = useState(true);
 
@@ -44,6 +43,7 @@ export const TransferTab = ({ ...rest }) => {
           <TopHeader ibAlluosInfo={ibAlluosInfo} />
           <Box margin={{ top: 'medium' }}>
             <NewInput
+              inputLabel="Transfer"
               coinIcon={coinIcon}
               inputProps={{
                 value: transferValue || '',

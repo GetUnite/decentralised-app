@@ -1,8 +1,6 @@
-import { useState, Ref, LegacyRef } from 'react';
-import { useRecoilState } from 'recoil';
+import { useState } from 'react';
 import styled from 'styled-components';
 import {
-  Layer,
   Box,
   Button,
   TextInput,
@@ -12,7 +10,6 @@ import {
   SelectExtendedProps,
   TextInputProps,
   RangeInput,
-  RangeInputProps,
   RangeInputExtendedProps,
 } from 'grommet';
 import { Down } from 'grommet-icons';
@@ -74,6 +71,7 @@ const RangeInputValueText = styled(Box)`
 `;
 
 interface IInputProps {
+  inputLabel?: string;
   coinIcon?: string;
   headerText?: string;
   inputProps?: TextInputProps;
@@ -87,6 +85,7 @@ interface IInputProps {
 }
 
 export const NewInput = ({
+  inputLabel,
   coinIcon,
   headerText,
   inputProps,
@@ -155,36 +154,71 @@ export const NewInput = ({
               value={selectedTokenInfo?.label}
               valueLabel={option => {
                 if (option === 'USDC' || option === 'tUSDC')
-                  return <img width="24" height="24" src={usdc} />;
+                  return <img width="24" height="24" src={usdc} alt="usdc" />;
                 if (option === 'USDT' || option === 'tUSDT')
-                  return <img width="24" height="24" src={usdt} />;
+                  return <img width="24" height="24" src={usdt} alt="usdt" />;
                 if (option === 'DAI' || option === 'tDAI')
-                  return <img width="24" height="24" src={dai} />;
+                  return <img width="24" height="24" src={dai} alt="dai" />;
 
                 if (option === 'jEUR' || option === 'tjEUR')
-                  return <img width="24" height="24" src={jeur} />;
+                  return <img width="24" height="24" src={jeur} alt="jeur" />;
                 if (option === 'EURT' || option === 'tEURT')
-                  return <img width="24" height="24" src={eurt} />;
+                  return <img width="24" height="24" src={eurt} alt="eurt" />;
                 if (option === 'EURS' || option === 'tEURS')
-                  return <img width="24" height="24" src={eurs} />;
+                  return <img width="24" height="24" src={eurs} alt="eurs" />;
                 if (option === 'agEUR' || option === 'tagEUR')
-                  return <img width="24" height="24" src={ageur} />;
+                  return <img width="24" height="24" src={ageur} alt="ageur" />;
 
                 if (option === 'WETH' || option === 'tWETH')
-                  return <img width="24" height="24" src={weth} />;
+                  return <img width="24" height="24" src={weth} alt="weth" />;
 
                 if (option === 'WBTC' || option === 'tWBTC')
-                  return <img width="24" height="24" src={wbtc} />;
+                  return <img width="24" height="24" src={wbtc} alt="wbtc" />;
 
                 if (option === 'USD')
-                  return <img width="24" height="24" src={iballuousd} />;
+                  return (
+                    <img
+                      width="24"
+                      height="24"
+                      src={iballuousd}
+                      alt="iballuousd"
+                    />
+                  );
                 if (option === 'EUR')
-                  return <img width="24" height="24" src={iballuoeur} />;
+                  return (
+                    <img
+                      width="24"
+                      height="24"
+                      src={iballuoeur}
+                      alt="iballuoeur"
+                    />
+                  );
                 if (option === 'ETH')
-                  return <img width="24" height="24" src={iballuoeth} />;
+                  return (
+                    <img
+                      width="24"
+                      height="24"
+                      src={iballuoeth}
+                      alt="iballuoeth"
+                    />
+                  );
                 if (option === 'BTC')
-                  return <img width="24" height="24" src={iballuobtc} />;
-                return <img width="24" height="24" src={coinPlaceholder} />;
+                  return (
+                    <img
+                      width="24"
+                      height="24"
+                      src={iballuobtc}
+                      alt="iballuobtc"
+                    />
+                  );
+                return (
+                  <img
+                    width="24"
+                    height="24"
+                    src={coinPlaceholder}
+                    alt="placeholder"
+                  />
+                );
               }}
               onChange={({ option }) => setSelectedToken(option)}
               labelKey="label"
@@ -201,7 +235,7 @@ export const NewInput = ({
     <>
       <Box direction="row" justify="between">
         <Text size="medium" color="soul">
-          {'Deposit ' + selectedTokenInfo?.label}
+          {(inputLabel ? inputLabel : 'Deposit') + ' ' + selectedTokenInfo?.label}
         </Text>
         <Text size="medium" color="soul">
           {!!selectedTokenInfo &&

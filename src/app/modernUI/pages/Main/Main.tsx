@@ -1,49 +1,33 @@
 import { useRecoilState } from 'recoil';
 import {
-  Page,
-  PageContent,
   Box,
   Heading,
   Paragraph,
-  Select,
-  Menu,
   Text,
   Button,
   Card,
   Grid,
-  Image,
-  Avatar,
   ResponsiveContext,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
-
 import { toExactFixed } from 'app/common/functions/utils';
 import { isSmall } from 'app/modernUI/theme';
 import { useMain } from 'app/common/state/shortcuts';
-
 import { Spinner, Layout } from 'app/modernUI/components';
 import { Assets } from './blocks';
-
 import { walletAccount } from 'app/common/state/atoms';
 
 export const Main = () => {
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  const { stablesBalances, availableFarms, isLoading, filterToOwnFarms, resetFilters } =
-    useMain();
-
-  const filteredBalances = stablesBalances.filter(
-    stablesBalance => stablesBalance.balance > 0.01,
-  );
-  const filteredBalancesText = filteredBalances.map(stablesBalance => {
-    return `${stablesBalance.sign}${(+toExactFixed(
-      stablesBalance.balance,
-      2,
-    )).toLocaleString()} available in ${stablesBalance.type}`;
-  });
-  const last = filteredBalancesText.pop();
-  const result = filteredBalancesText.join(', ') + ' and ' + last;
+  const {
+    headingData,
+    availableFarms,
+    isLoading,
+    filterToYourFarms,
+    resetFilters,
+    filterType,
+  } = useMain();
 
   const totalBalances = isLoading ? (
     <Box fill>
@@ -51,10 +35,16 @@ export const Main = () => {
     </Box>
   ) : (
     <>
-      {filteredBalances.length < 1 ? (
+      {headingData.numberOfAssets == 0 ? (
         'You don’t have available assets to farm in your wallet.'
       ) : (
-        <span>You have {result}</span>
+        <span>
+          You have {headingData.numberOfAssets}{' '}
+          {headingData.numberOfAssets > 1 ? 'assets' : 'asset'} across{' '}
+          {headingData.numberOfChainsWithAssets}{' '}
+          {headingData.numberOfChainsWithAssets > 1 ? 'networks' : 'network'}{' '}
+          available to farm.
+        </span>
       )}
     </>
   );
@@ -96,14 +86,37 @@ export const Main = () => {
                     fill
                     margin={{ top: 'large' }}
                   >
-                    <Box direction="row" justify="start" gap="small">
-                      <Button size="small" onClick={resetFilters} label="All forms" plain/>
-                      <Button size="small" onClick={filterToOwnFarms} label="Own forms" plain/>
+                    <Box
+                      direction="row"
+                      justify="start"
+                      gap="small"
+                      style={{ fontSize: '16px' }}
+                    >
+                      <Button
+                        size="small"
+                        onClick={resetFilters}
+                        label="All farms"
+                        plain
+                        style={
+                          !filterType ? { textDecoration: 'underline' } : {}
+                        }
+                      />
+                      <Button
+                        size="small"
+                        onClick={filterToYourFarms}
+                        label="Your farms"
+                        plain
+                        style={
+                          filterType == 'your'
+                            ? { textDecoration: 'underline' }
+                            : {}
+                        }
+                      />
                     </Box>
                     {!isSmall(size) && (
                       <Card
                         pad={{ horizontal: 'medium', vertical: 'none' }}
-                        height="xxsmall"
+                        height="65px"
                         background="card"
                         margin="none"
                         align="center"
@@ -111,18 +124,18 @@ export const Main = () => {
                         fill="horizontal"
                       >
                         <Grid
-                          fill
+                          fill="horizontal"
                           rows="xxsmall"
                           align="center"
                           columns={{ size: 'xsmall', count: 'fit' }}
                           pad="none"
+                          style={{ fontSize: '16px' }}
                         >
-                          <Text>asset</Text>
-                          <Text>supported tokens</Text>
-                          <Text>network</Text>
-                          <Text>TVL</Text>
-
-                          <Text>APY</Text>
+                          <span>asset</span>
+                          <span>supported tokens</span>
+                          <span>network</span>
+                          <span>TVL</span>
+                          <span>APY</span>
                         </Grid>
                       </Card>
                     )}

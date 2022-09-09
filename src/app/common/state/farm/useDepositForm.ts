@@ -3,12 +3,12 @@ import {
   approveStableCoin,
   depositStableCoin,
 } from 'app/common/functions/Web3Client';
-import { ENotificationId, useNotification } from 'app/common/state';
+import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 
 export const useDepositForm = ({
   selectedFarm,
-  selectedStableCoin,
+  selectedSupportedToken,
   updateFarmInfo,
 }) => {
   const { setNotificationt } = useNotification();
@@ -28,9 +28,9 @@ export const useDepositForm = ({
     setError('');
     setIsApproving(true);
     try {
-      const res = await approveStableCoin(
-        selectedStableCoin.value,
-        selectedStableCoin.decimals,
+      await approveStableCoin(
+        selectedSupportedToken.value,
+        selectedSupportedToken.decimals,
         selectedFarm.type,
         selectedFarm.chain,
       );
@@ -47,7 +47,7 @@ export const useDepositForm = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setError('Write a valid number');
-    } else if (+value > +selectedStableCoin?.balance) {
+    } else if (+value > +selectedSupportedToken?.balance) {
       setError('Not enough balance');
     }
     setDepositValue(value);
@@ -55,17 +55,17 @@ export const useDepositForm = ({
 
   const setToMax = () => {
     setError('');
-    setDepositValue(selectedStableCoin?.balance);
+    setDepositValue(selectedSupportedToken?.balance);
   };
 
   const handleDeposit = async () => {
     setError('');
     setIsDepositing(true);
     try {
-      const res = await depositStableCoin(
-        selectedStableCoin.value,
+      await depositStableCoin(
+        selectedSupportedToken.value,
         depositValue,
-        selectedStableCoin.decimals,
+        selectedSupportedToken.decimals,
         selectedFarm.type,
         selectedFarm.chain,
         biconomyStatus,
