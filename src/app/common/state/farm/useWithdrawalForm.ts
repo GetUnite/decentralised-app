@@ -13,12 +13,12 @@ import { useRecoilState } from 'recoil';
 
 export const useWithdrawalForm = ({
   selectedFarm,
-  selectedStableCoin,
+  selectedSupportedToken,
   updateFarmInfo,
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  const { notification, setNotification, setNotificationt } = useNotification();
+  const { setNotification, setNotificationt } = useNotification();
   const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
     useState<boolean>(false);
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -134,7 +134,7 @@ export const useWithdrawalForm = ({
     setIsWithdrawing(true);
     try {
       const res = await withdrawStableCoin(
-        selectedStableCoin.value,
+        selectedSupportedToken.value,
         withdrawValue,
         selectedFarm.type,
         selectedFarm.chain,
@@ -153,7 +153,7 @@ export const useWithdrawalForm = ({
   const setToMax = async () => {
     try {
       const res = await getUserDepositedTransferAmount(selectedFarm.type);
-      setWithdrawValue(toExactFixed(res, selectedStableCoin.decimals));
+      setWithdrawValue(toExactFixed(res, selectedSupportedToken.decimals));
     } catch (err) {
       setError(err.message);
     }

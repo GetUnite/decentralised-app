@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import {
   approveAlluoTransaction,
@@ -11,11 +11,9 @@ import { useNotification, ENotificationId, useChain } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
 
 export const useLock = () => {
-  const { notification, setNotification } = useNotification();
+  const { setNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
-    walletAccount,
-  );
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const { changeChainTo } = useChain();
 
   const [lockValue, setLockValue] = useState<string>();
@@ -78,7 +76,7 @@ export const useLock = () => {
     setSuccessNotification('');
     setIsApproving(true);
     try {
-      const res = await approveAlluoTransaction(maximumUint256Value);
+      await approveAlluoTransaction(maximumUint256Value);
 
       setAccountInformation();
     } catch (err) {
@@ -93,7 +91,7 @@ export const useLock = () => {
     setSuccessNotification('');
     setIsLocking(true);
     try {
-      const res = await lockAlluoToken(lockValue);
+      await lockAlluoToken(lockValue);
       setAccountInformation();
       setErrorNotification('');
       setLockValue(null);

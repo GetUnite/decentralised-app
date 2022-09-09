@@ -1,3 +1,4 @@
+
 import { Text } from 'grommet';
 
 export const TopHeader = ({ selectedFarm, ...rest }) => {
@@ -10,7 +11,7 @@ export const TopHeader = ({ selectedFarm, ...rest }) => {
       Your balance currently earning <br />
       {selectedFarm.interest}% APY is {selectedFarm.sign}
       {integerPart + floatPart}
-      <Text color="softText" margin={{ left: 'hair' }}>
+      <Text color="softText" margin={{ left: 'hair' }} size='18px'>
         {second}
       </Text>
     </Text>

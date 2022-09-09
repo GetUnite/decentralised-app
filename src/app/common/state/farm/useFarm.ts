@@ -4,11 +4,10 @@ import {
   EChain,
   getListSupportedTokens,
   getInterest,
-  getTokenInfo,
   getTotalAssetSupply,
   getUserDepositedAmount,
 } from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount } from 'app/common/state/atoms';
+import { walletAccount } from 'app/common/state/atoms';
 import { useChain } from 'app/common/state';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +26,7 @@ import wbtc from 'app/modernUI/images/wbtc.png';
 
 import crv from 'app/modernUI/images/crv.svg';
 import eth from 'app/modernUI/images/eth.svg';
+import steth from 'app/modernUI/images/steth.svg';
 
 export type TSelect = {
   label?: string;
@@ -49,7 +49,7 @@ export type TFarm = {
   name: string;
   sign: string;
   icons: any[];
-  stableCoins?: TSelect[];
+  supportedTokens?: TSelect[];
   interest?: string;
   totalAssetSupply?: string | number;
   depositedAmount?: string;
@@ -129,7 +129,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'ETH/StETH',
     sign: '',
-    icons: [{ src: weth }],
+    icons: [{ src: eth }, { src: steth }],
     isBooster: true,
     rewards: [
       { label: 'ETH', icon: { src: eth } },
@@ -139,17 +139,13 @@ export const initialAvailableFarmsState: Array<TFarm> = [
 ];
 
 export const useFarm = ({ id }) => {
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const navigate = useNavigate();
 
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();
-  const [selectedStableCoin, setSelectedStableCoin] = useState<TSelect>();
+  const [selectedSupportedToken, setSelectedsupportedToken] = useState<TSelect>();
 
-  const [availableFarms, setAvailableFarms] = useState<TFarm[]>(
-    initialAvailableFarmsState,
-  );
+  const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -171,15 +167,15 @@ export const useFarm = ({ id }) => {
       farm.interest = await getInterest(farm.type, farm.chain);
       farm.totalAssetSupply = await getTotalAssetSupply(farm.type, farm.chain);
       if (walletAccountAtom) {
-        farm.stableCoins = await (
+        farm.supportedTokens = await (
           await getListSupportedTokens(farm.type, farm.chain)
-        ).map(stableCoin => {
+        ).map(supportedToken => {
           return {
-            label: stableCoin.symbol,
-            value: stableCoin.tokenAddress,
-            balance: stableCoin.balance,
-            allowance: stableCoin.allowance,
-            decimals: stableCoin.decimals,
+            label: supportedToken.symbol,
+            value: supportedToken.tokenAddress,
+            balance: supportedToken.balance,
+            allowance: supportedToken.allowance,
+            decimals: supportedToken.decimals,
           };
         });
         farm.depositedAmount = await getUserDepositedAmount(
@@ -189,6 +185,7 @@ export const useFarm = ({ id }) => {
         farm.depositDividedAmount = depositDivided(farm.depositedAmount);
       }
     } catch (error) {
+      setError(error);
       console.log(error);
     }
     return farm;
@@ -197,9 +194,9 @@ export const useFarm = ({ id }) => {
   const updateFarmInfo = async () => {
     try {
       const farm = await fetchFarmInfo(selectedFarm);
-      setSelectedStableCoin(
-        farm.stableCoins?.find(
-          stableCoin => stableCoin?.value == selectedStableCoin?.value,
+      setSelectedsupportedToken(
+        farm.supportedTokens?.find(
+          supportedToken => supportedToken?.value == selectedSupportedToken?.value,
         ),
       );
       setSelectedFarm(farm);
@@ -218,8 +215,8 @@ export const useFarm = ({ id }) => {
         navigate('/');
       }
       setSelectedFarm(farm);
-      selectStableCoin(
-        farm.stableCoins?.length > 0 ? farm.stableCoins[0] : undefined,
+      selectSupportedToken(
+        farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
       );
     } catch (error) {
       console.log(error);
@@ -227,22 +224,9 @@ export const useFarm = ({ id }) => {
     setIsLoading(false);
   };
 
-  const selectStableCoin = stableCoin => {
-    setSelectedStableCoin(stableCoin);
+  const selectSupportedToken = supportedToken => {
+    setSelectedsupportedToken(supportedToken);
   };
-
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-
-    setTokenInfoAtom(tokenInfoData);
-  };
-  useEffect(() => {
-    setAccountInformation();
-  }, [walletAccountAtom]);
 
   const depositDivided = depositedAmount => {
     const dotIndex = depositedAmount.indexOf('.');
@@ -260,7 +244,7 @@ export const useFarm = ({ id }) => {
     availableFarms,
     selectedFarm,
     updateFarmInfo,
-    selectedStableCoin,
-    selectStableCoin,
+    selectedSupportedToken,
+    selectSupportedToken,
   };
 };

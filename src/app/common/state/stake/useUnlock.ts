@@ -2,7 +2,7 @@ import {
   EChain,
   getTokenInfo,
   unlockAlluo,
-  unlockAlluoAll,
+  unlockAllAlluo,
   withdrawAlluo,
 } from 'app/common/functions/Web3Client';
 import { useState, useEffect, useReducer } from 'react';
@@ -173,7 +173,7 @@ export const useUnlock = () => {
         +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
       );*/
       if (+unlockValue === 100) {
-        await unlockAlluoAll();
+        await unlockAllAlluo();
       } else {
         const res = await unlockAlluo(
           +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
