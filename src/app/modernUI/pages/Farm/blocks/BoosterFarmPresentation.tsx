@@ -3,27 +3,37 @@ import { useCookies } from 'react-cookie';
 
 import booster from 'app/modernUI/images/booster.svg';
 
-export const BoosterFarmPresentation = ({ selectedFarm, ...rest }) => {
-  const [cookies, setCookies] = useCookies(['has_seen_boost_farms']);
+export const BoosterFarmPresentation = ({
+  selectedFarm,
+  farmName,
+  ...rest
+}) => {
+  const [, setCookies] = useCookies(['has_seen_boost_farms']);
 
   const rewardLabels = selectedFarm.rewards.map(reward => {
     return reward.label;
   });
-  const last = rewardLabels.pop();
-  const result = rewardLabels.join(', ') + ' and ' + last;
-  
+  const rewardsLast = rewardLabels.pop();
+  const rewardsResult = rewardLabels.join(', ') + ' and ' + rewardsLast;
+
   return (
-    <Box gap='large' margin={{top:"20px"}}>
-      <Text textAlign="center" weight="bold" size="18px">
-        Earn X% as {result} tokens
-        <br />
+    <>
+      <Text textAlign="center" size="16px">
+        {farmName} FARM
       </Text>
-      <img src={booster} />
-      <Button
+      <Box gap="large" margin={{ top: '20px' }} align="center">
+        <Text textAlign="center" weight="bold" size="28px">
+          Earn X% as {rewardsResult} tokens
+          <br />
+        </Text>
+        <img src={booster} alt="booster" width={310} />
+        <Button
           primary
-          label='Deposit to get started'
+          label="Deposit to get started"
           onClick={() => setCookies('has_seen_boost_farms', true)}
+          style={{ width: 310 }}
         />
-    </Box>
+      </Box>
+    </>
   );
 };

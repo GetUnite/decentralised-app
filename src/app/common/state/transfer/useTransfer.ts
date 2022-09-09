@@ -123,7 +123,7 @@ export const useTransfer = () => {
     setIsTransferring(true);
 
     try {
-      const res = await transferToAddress(
+      await transferToAddress(
         selectedIbAlluoInfo.address,
         transferValue,
         selectedIbAlluoInfo.decimals,

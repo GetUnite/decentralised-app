@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import {
-  Layer,
   Box,
   Button,
-  Heading,
   Text,
   ButtonExtendedProps,
 } from 'grommet';

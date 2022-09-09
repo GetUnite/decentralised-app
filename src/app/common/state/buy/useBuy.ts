@@ -172,10 +172,9 @@ export const useBuy = () => {
       await buyAlluoWithWETH(inputValue);
       const alluoBalanceAfter = await getBalanceOfAlluoUser();
       const difference =
-        process.env.REACT_APP_ETH_NET === 'mainnet'
+        process.env.REACT_APP_NET === 'mainnet'
           ? +alluoBalanceAfter - +alluoBalanceBefore
           : 1;
-      console.log('bought alluo', difference);
       if (+tokenInfoAtom.allowance < difference)
         await approveAlluoTransaction(maximumUint256Value);
       await lockAlluoToken(difference);

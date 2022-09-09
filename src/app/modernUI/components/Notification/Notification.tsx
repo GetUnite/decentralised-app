@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
-import { Box, Text, BoxProps } from 'grommet';
+import { Box, Text } from 'grommet';
 import { useRecoilState } from 'recoil';
-import { notification, ENotificationId } from 'app/common/state/atoms';
+import { notification } from 'app/common/state/atoms';
 
 export const Notification = ({ ...rest }) => {
-  const [notificationAtom, setNotificationAtom] = useRecoilState(notification);
+  const [notificationAtom] = useRecoilState(notification);
 
   if (!notificationAtom.message) return null;
   const colors = { success: 'success', error: 'error', info: 'info' };

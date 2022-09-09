@@ -1,10 +1,10 @@
 import { AssetCard } from '../components';
-
 import { EChain } from 'app/common/functions/Web3Client';
+import { Box } from 'grommet';
 
 export const Assets = ({ availableFarms, isLoading }) => {
   return (
-    <>
+    <Box gap="18px">
       {Array.isArray(availableFarms) &&
         availableFarms.map(farmCoin => {
           return (
@@ -24,6 +24,6 @@ export const Assets = ({ availableFarms, isLoading }) => {
             />
           );
         })}
-    </>
+    </Box>
   );
 };

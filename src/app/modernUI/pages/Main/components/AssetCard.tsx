@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { Link } from 'react-router-dom';
 import { useCurrentPath } from 'app/common/hooks';
@@ -11,14 +10,9 @@ import {
   Text,
   Avatar,
 } from 'grommet';
-
 import { useNotification, ENotificationId } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
-import {
-  walletAccount,
-  farmDepositCoinType,
-  TFarmDepositCoinType,
-} from 'app/common/state/atoms';
+import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
 import { ChainBadge, Notification } from 'app/modernUI/components';
 import { EChain } from 'app/common/functions/Web3Client';
@@ -65,11 +59,9 @@ export const AssetCard = ({
   ...rest
 }: IAssetCard) => {
   const { navigate } = useCurrentPath();
-  const { notification, setNotification, resetNotification } =
-    useNotification();
+  const { setNotification } = useNotification();
 
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
 
   const tvl = isLoading
     ? 'Loading...'
@@ -145,7 +137,7 @@ export const AssetCard = ({
             <Card
               pad={{ horizontal: 'medium', vertical: 'none' }}
               margin={{ top: 'small' }}
-              height="fit"
+              height="120px"
               background="card"
               align="center"
               justify="center"
@@ -157,11 +149,14 @@ export const AssetCard = ({
                 align="center"
                 columns={{ size: 'xsmall', count: 'fit' }}
                 pad={{ top: '10px', bottom: '10px' }}
+                style={{ fontSize: '16px' }}
               >
-                <Text weight="bold">
+                <span style={{ fontWeight: 'bold' }}>
                   {name}
-                  {isBooster && <Text color="#1C1CFF"> BOOST</Text>}
-                </Text>
+                  {isBooster && (
+                    <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                  )}
+                </span>
                 <Box direction="row" gap="small">
                   {icons.map((icon, i) => (
                     <Avatar
@@ -176,9 +171,9 @@ export const AssetCard = ({
                   ))}
                 </Box>
                 <ChainBadge chain={chain} />
-                <Text>{tvl}</Text>
+                <span>{tvl}</span>
                 <Box direction="row" justify="between" align="center">
-                  <Text margin={{ right: 'small' }}>{interest}%</Text>
+                  <span>{interest}%</span>
                   <Link to={'/farm/' + id}>
                     <Button
                       disabled={!walletAccountAtom}

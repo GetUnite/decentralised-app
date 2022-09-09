@@ -1,21 +1,16 @@
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/ethereum-provider';
 import { Biconomy } from '@biconomy/mexa';
-
 import { EWallets } from 'app/common/constants';
-import abiSCEth from 'app/common/constants/abiSCEth.json';
-import abiAlluo from 'app/common/constants/abiAlluo.json';
-import abiSCPolygon from 'app/common/constants/abiSCPolygon.json';
-import abiPolygonEUR from 'app/common/constants/abiPolygonEUR.json';
-import abiPolygonETH from 'app/common/constants/abiPolygonETH.json';
-import abiPolygonBTC from 'app/common/constants/abiPolygonBTC.json';
-import abiHandlerPolygon from 'app/common/constants/abiHandlerPolygon.json';
-import abiVault from 'app/common/constants/abiVault.json';
-import EthIbAlluoUSDAbi from 'app/common/abis/EthIbAlluoUSD.json';
-import EthIbAlluoEURAbi from 'app/common/abis/EthIbAlluoEUR.json';
-import EthIbAlluoETHAbi from 'app/common/abis/EthIbAlluoETH.json';
-import EthIbAlluoBTCAbi from 'app/common/abis/EthIbAlluoBTC.json';
-
+import polygonIbAlluoUSDAbi from 'app/common/abis/polygonIbAlluoUSD.json';
+import polygonIbAlluoEURAbi from 'app/common/abis/polygonIbAlluoEUR.json';
+import polygonIbAlluoETHAbi from 'app/common/abis/polygonIbAlluoETH.json';
+import polygonIbAlluoBTCAbi from 'app/common/abis/polygonIbAlluoBTC.json';
+import ethereumIbAlluoUSDAbi from 'app/common/abis/ethereumIbAlluoUSD.json';
+import ethereumIbAlluoEURAbi from 'app/common/abis/ethereumIbAlluoEUR.json';
+import ethereumIbAlluoETHAbi from 'app/common/abis/ethereumIbAlluoETH.json';
+import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
+import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
@@ -24,10 +19,10 @@ enum EEthereumAddressesTestnet {
   IBALLUOEUR = '0xefb6CA5c2b716C259EaBFa1Fb0517B46c02FE9d1',
   IBALLUOETH = '0x9d75C26Dd3B6B1Cf5B30A5BEF78bb7B08BA8f833',
   IBALLUOBTC = '0x72b7091A4272D2d23b3e7cBec3D1df85B72d7B12',
-  VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8', //
+  VAULT = '0x1B369dE4c731d143C86cfAa811E88725905F4365',
   WETH = '0x66Ac11c106C3670988DEFDd24BC75dE786b91095',
   ALLUO = '0x8F45B571e310bCb61DDfe176C396e9109CF1b309',
-  PROXY = '0xF295EE9F1FA3Df84493Ae21e08eC2e1Ca9DebbAf', //
+  VLALLUO = '0x4bf7737515EE8862306Ddc221cE34cA9d5C91200',
   USDC = '0x0b6bb9E47179390B7Cf708b57ceF65a44a8038a9',
 }
 
@@ -39,41 +34,11 @@ enum EEthereumAddressesMainnet {
   VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
   WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
   ALLUO = '0x1e5193ccc53f25638aa22a940af899b692e10b09',
-  PROXY = '0xF295EE9F1FA3Df84493Ae21e08eC2e1Ca9DebbAf',
+  VLALLUO = '0xF295EE9F1FA3Df84493Ae21e08eC2e1Ca9DebbAf',
   USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 }
-/**To Delete */
-enum EEthAddressesRinkeby {
-  ALLUO = '0x2963fC19f29F14d81434B4bF290Ed7e94b0c0E89',
-  VESTING = '0x2CEB5c120ba472879973784dbb551a6F6ea79ab4',
-  PROXY = '0xC8ac54Dcbc2115e2d491dFC63a3E8169f4a63725',
-}
-enum EEthAddressesKovan {
-  PROXY_USD = '0xF555B595D04ee62f0EA9D0e72001D926a736A0f6',
-  PROXY_EUR = '0xeb38D2f6a745Bd3f466F3F20A617D2C615b316eE',
-  PROXY_ETH = '0x98f49aC358187116462BDEA748daD1Df480865d7',
-  PROXY_BTC = '0xb4FFDec68c297B278D757C49c5094dde53f2F878',
-  VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
-  WETH = '0xdFCeA9088c8A88A76FF74892C1457C17dfeef9C1',
-  ALLUO = '0x8fb4192942011c83df48d15800f22f7d3a6b0974',
-  LINK = '0xa36085F69e2889c224210F603D836748e7dC0088', // CHAIN LINK TOKEN
-  USDC = '0xc2569dd7d0fd715B054fBf16E75B001E5c0C1115',
-}
-enum EEthAddressesMainnet {
-  PROXY_USD = '0xf555b595d04ee62f0ea9d0e72001d926a736a0f6',
-  PROXY_EUR = '0xeb38D2f6a745Bd3f466F3F20A617D2C615b316eE',
-  PROXY_ETH = '0x98f49aC358187116462BDEA748daD1Df480865d7',
-  PROXY_BTC = '0xb4FFDec68c297B278D757C49c5094dde53f2F878',
-  VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
-  WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-  ALLUO = '0x1e5193ccc53f25638aa22a940af899b692e10b09',
-  PROXY = '0xF295EE9F1FA3Df84493Ae21e08eC2e1Ca9DebbAf',
-  LINK = '0x514910771AF9Ca656af840dff83E8264EcF986CA',
-  USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-}
-/***/
+
 enum EPolygonAddressesMumbai {
-  // PROXY = '0x8BB0660284eE22A11e9e511744d21A9e1E1b669E',
   IBALLUOUSD = '0x71402a46d78a10c8ee7e7cdef2affec8d1e312a1',
   IBALLUOEUR = '0xb1a6a9693381073168ee9A0dFcb8691F4cbf7f49',
   IBALLUOETH = '0xC7600AEECc60C72b22E28f77A584C40dD169aa2c',
@@ -81,6 +46,7 @@ enum EPolygonAddressesMumbai {
   BUFFER = '0xf9f9381fbc5225180015b1f0eab6c33dbf0b37ab',
   HANDLER = '0xF877605269bB018c96bD1c93F276F834F45Ccc3f',
 }
+
 enum EPolygonAddressesMainnet {
   IBALLUOUSD = '0xc2dbaaea2efa47ebda3e572aa0e55b742e408bf6',
   IBALLUOEUR = '0xc9d8556645853C465D1D5e7d2c81A0031F0B8a92',
@@ -90,8 +56,8 @@ enum EPolygonAddressesMainnet {
   HANDLER = '0x31a3439Ac7E6Ea7e0C0E4b846F45700c6354f8c1',
 }
 
-const EPolAddresses =
-  process.env.REACT_APP_POL_NET === 'mainnet'
+const EPolygonAddresses =
+  process.env.REACT_APP_NET === 'mainnet'
     ? EPolygonAddressesMainnet
     : EPolygonAddressesMumbai;
 
@@ -100,48 +66,7 @@ const EEthereumAddresses =
     ? EEthereumAddressesMainnet
     : EEthereumAddressesTestnet;
 
-/**To Delete */
-const EEthAddresses =
-  process.env.REACT_APP_ETH_NET === 'mainnet'
-    ? EEthAddressesMainnet
-    : EEthAddressesRinkeby;
-
-const EEthAddressesForBuy =
-  process.env.REACT_APP_ETH_NET === 'mainnet'
-    ? EEthAddressesMainnet
-    : EEthAddressesKovan;
-/***/
-
-export const isExpectedPolygonEvent = (type, depositAddress) => {
-  const ibAlluoAddress = getIbAlluoAddress(type);
-  return depositAddress === ibAlluoAddress;
-};
-
-const mutlipleProviderUrls = {
-  polygon: {
-    mainnet: [
-      'https://polygon-rpc.com/',
-      'https://polygon-mainnet.g.alchemy.com/v2/rXD0-xC6kL_3_CSI5wHfWfrOI65MJe4A',
-      'https://matic.getblock.io/mainnet/?api_key=bc31946e-bc34-4af5-a215-449e3ef5a261',
-    ],
-    testnet: [
-      'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM',
-      'https://matic.getblock.io/testnet/?api_key=bc31946e-bc34-4af5-a215-449e3ef5a261',
-    ],
-  },
-  ethereum: {
-    mainnet: [
-      'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr',
-      'https://eth.getblock.io/mainnet/?api_key=bc31946e-bc34-4af5-a215-449e3ef5a261',
-    ],
-    testnet: [
-      'https://eth.getblock.io/testnet/?api_key=bc31946e-bc34-4af5-a215-449e3ef5a261',
-      'https://eth-rinkeby.alchemyapi.io/v2/HZvZLbLvKsvsAkHX35r3LTLYEqsl4HpP',
-    ],
-  },
-};
-
-const ethereumTestnetProviderUrl = 'https://sepolia.etherscan.io/';
+const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =
@@ -157,19 +82,6 @@ const polygonProviderUrl =
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
 
-let ethRinkebyUrl = mutlipleProviderUrls.ethereum.testnet[0];
-
-let ethKovanUrl = 'https://kovan.etherscan.io';
-let ethMainnetUrl = mutlipleProviderUrls.ethereum.mainnet[0];
-let ethProviderUrl =
-  process.env.REACT_APP_ETH_NET === 'mainnet' ? ethMainnetUrl : ethRinkebyUrl;
-
-let ethProviderUrlForKovan =
-  process.env.REACT_APP_ETH_NET === 'mainnet' ? ethMainnetUrl : ethKovanUrl;
-
-let polMainnetUrl = mutlipleProviderUrls.polygon.mainnet[0];
-let polMumbaiUrl = mutlipleProviderUrls.polygon.testnet[0];
-
 declare let window: any;
 
 export enum EChain {
@@ -181,6 +93,7 @@ export enum EChainId {
   ETH_MAINNET = 1,
   ETH_RINKEBY = 4,
   ETH_KOVAN = 42,
+  ETH_SEPOLIA = 11155111,
   POL_MAINNET = 137,
   POL_MUMBAI = 80001,
 }
@@ -220,10 +133,10 @@ export const connectToMetamask = async () => {
 export const connectToWalletconnect = async () => {
   wcProvider = new WalletConnectProvider({
     rpc: {
-      [EChainId.ETH_MAINNET]: ethMainnetUrl,
-      [EChainId.ETH_RINKEBY]: ethRinkebyUrl,
-      [EChainId.POL_MAINNET]: polMainnetUrl,
-      [EChainId.POL_MUMBAI]: polMumbaiUrl,
+      [EChainId.ETH_MAINNET]: ethereumMainnetProviderUrl,
+      [EChainId.ETH_RINKEBY]: ethereumTestnetProviderUrl,
+      [EChainId.POL_MAINNET]: polygonMainnetProviderUrl,
+      [EChainId.POL_MUMBAI]: polygonTestnetProviderUrl,
     },
     qrcode: true,
   });
@@ -234,6 +147,7 @@ export const connectToWalletconnect = async () => {
 
   walletAddress = accounts[0];
   walletName = EWallets.WALLETCONNECT;
+
   return { walletAddress, provider: wcProvider };
 };
 
@@ -243,24 +157,17 @@ export const changeNetwork = async (chain: EChain, testNet?: EChainId) => {
 
     if (chain === EChain.ETHEREUM) {
       nativeCurrency = { name: 'ETH', decimals: 18, symbol: 'ETH' };
-      rpcUrls = [ethProviderUrl];
-      if (process.env.REACT_APP_ETH_NET === 'mainnet') {
-        chainId = EChainId.ETH_MAINNET;
-      } else if (process.env.REACT_APP_ETH_NET === 'rinkeby') {
-        chainId = testNet || EChainId.ETH_RINKEBY;
-      }
-    } else if (chain === EChain.POLYGON) {
+      rpcUrls = [ethereumProviderUrl];
+      chainId = process.env.REACT_APP_NET === 'mainnet' ? EChainId.ETH_MAINNET : EChainId.ETH_SEPOLIA;
+      chainName = 'Ethereum ' + process.env.REACT_APP_NET === 'mainnet' ? 'Mainnet' : 'Sepolia';
+    } 
+    else if (chain === EChain.POLYGON) {
       nativeCurrency = { name: 'MATIC', decimals: 18, symbol: 'MATIC' };
       rpcUrls = [polygonProviderUrl];
-      if (process.env.REACT_APP_POL_NET === 'mainnet') {
-        chainName = 'Polygon Mainnet';
-        chainId = EChainId.POL_MAINNET;
-      } else if (process.env.REACT_APP_POL_NET === 'mumbai') {
-        chainName = 'Polygon Mumbai';
-
-        chainId = EChainId.POL_MUMBAI;
-      }
+      chainId = process.env.REACT_APP_NET === 'mainnet' ? EChainId.POL_MAINNET : EChainId.POL_MUMBAI;
+      chainName = 'Polygon ' + process.env.REACT_APP_NET === 'mainnet' ? 'Mainnet' : 'Mumbai';
     }
+
     if ((await getCurrentChainId()) !== chainId) {
       try {
         await window.ethereum.request({
@@ -307,8 +214,7 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET ||
-      chainId === EChainId.ETH_KOVAN ||
-      chainId === EChainId.ETH_RINKEBY
+      chainId === EChainId.ETH_SEPOLIA
     ? EChain.ETHEREUM
     : null;
 };
@@ -382,6 +288,7 @@ const sendTransaction = async (
 
   const contract = new web3ToUse.eth.Contract(abi as any, address);
 
+  console.log("entrou aqui e nao devia", functionSignature);
   try {
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.send({
@@ -398,11 +305,10 @@ const sendTransaction = async (
 
 const callContract = async (abi, address, functionSignature, params, chain) => {
   const provider =
-    chain === EChain.ETHEREUM ? ethProviderUrl : polygonProviderUrl;
+    chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
   const web3ToUse = new Web3(new Web3.providers.HttpProvider(provider));
   const contract = new web3ToUse.eth.Contract(abi as any, address);
 
-  console.log(contract.methods, address, params, provider);
   try {
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.call({
@@ -411,135 +317,16 @@ const callContract = async (abi, address, functionSignature, params, chain) => {
 
     return tx;
   } catch (error) {
+    console.log(abi, address, functionSignature, params)
     // here do all error handling to readable stuff
     console.log(error);
   }
 };
 
-let ethProvider = new Web3(new Web3.providers.HttpProvider(ethProviderUrl));
-let ethProviderKovanOrMain = new Web3(
-  new Web3.providers.HttpProvider(ethProviderUrlForKovan),
-);
-let polygonProvider = new Web3(
-  new Web3.providers.HttpProvider(polygonProviderUrl),
-);
-const getEthContractInstance = () =>
-  new ethProvider.eth.Contract(abiSCEth as any, EEthAddresses.PROXY);
-const getPolygonUSDContractInstance = () =>
-  new polygonProvider.eth.Contract(
-    abiSCPolygon as any,
-    EPolAddresses.IBALLUOUSD,
-  );
-let polygonUSDContractInstance = getPolygonUSDContractInstance();
-const getPolygonEURContractInstance = () =>
-  new polygonProvider.eth.Contract(
-    abiPolygonEUR as any,
-    EPolAddresses.IBALLUOEUR,
-  );
-let polygonEURContractInstance = getPolygonEURContractInstance();
-
-const getPolygonETHContractInstance = () =>
-  new polygonProvider.eth.Contract(
-    abiPolygonETH as any,
-    EPolAddresses.IBALLUOETH,
-  );
-let polygonETHContractInstance = getPolygonETHContractInstance();
-
-const getPolygonBTCContractInstance = () =>
-  new polygonProvider.eth.Contract(
-    abiPolygonBTC as any,
-    EPolAddresses.IBALLUOBTC,
-  );
-let polygonBTCContractInstance = getPolygonBTCContractInstance();
-
-const getEthereumContractInstance = type => {
-  let abi, address;
-  switch (type) {
-    case 'usd':
-      abi = abiSCPolygon as any;
-      address = EEthAddressesForBuy.PROXY_USD;
-      break;
-
-    default:
-      break;
-  }
-
-  return new ethProviderKovanOrMain.eth.Contract(abi as any, address);
-};
-
-const getAlluoTokenInstance = () =>
-  new ethProvider.eth.Contract(abiAlluo as any, EEthAddresses.ALLUO);
-let alluoTokenInstance = getAlluoTokenInstance();
-
-const getHandlerContractInstance = () =>
-  new polygonProvider.eth.Contract(
-    abiHandlerPolygon as any,
-    EPolAddresses.HANDLER,
-  );
-let handlerContractInstance = getHandlerContractInstance();
-
-export const getIbAlluoContractInstance = (type, chain = EChain.POLYGON) => {
-  switch (chain) {
-    case EChain.ETHEREUM:
-      if (type === 'usd')
-        return new ethProviderKovanOrMain.eth.Contract(
-          EthIbAlluoUSDAbi as any,
-          EEthAddressesForBuy.PROXY_USD,
-        );
-      if (type === 'eur')
-        return new ethProviderKovanOrMain.eth.Contract(
-          EthIbAlluoEURAbi as any,
-          EEthAddressesForBuy.PROXY_EUR,
-        );
-      if (type === 'eth')
-        return new ethProviderKovanOrMain.eth.Contract(
-          EthIbAlluoETHAbi as any,
-          EEthAddressesForBuy.PROXY_ETH,
-        );
-      if (type === 'btc')
-        return new ethProviderKovanOrMain.eth.Contract(
-          EthIbAlluoBTCAbi as any,
-          EEthAddressesForBuy.PROXY_BTC,
-        );
-      return getEthereumContractInstance(type);
-      break;
-
-    case EChain.POLYGON:
-    default:
-      if (type === 'usd') return polygonUSDContractInstance;
-      if (type === 'eur') return polygonEURContractInstance;
-      if (type === 'eth') return polygonETHContractInstance;
-      if (type === 'btc') return polygonBTCContractInstance;
-      break;
-  }
-
-  throw new Error('Add instance for ' + type);
-};
-
-export const createPolygonProxyInstance = type => {
-  if (type === 'usd')
-    return new web3.eth.Contract(abiSCPolygon as any, EPolAddresses.IBALLUOUSD);
-  if (type === 'eur')
-    return new web3.eth.Contract(
-      abiPolygonEUR as any,
-      EPolAddresses.IBALLUOEUR,
-    );
-  if (type === 'eth')
-    return new web3.eth.Contract(
-      abiPolygonETH as any,
-      EPolAddresses.IBALLUOETH,
-    );
-  if (type === 'btc')
-    return new web3.eth.Contract(
-      abiPolygonBTC as any,
-      EPolAddresses.IBALLUOBTC,
-    );
-};
-
 let alluoPriceInstance;
 
 const alluoPriceUrl =
-  process.env.REACT_APP_ETH_NET === 'mainnet'
+  process.env.REACT_APP_NET === 'mainnet'
     ? 'https://protocol-mainnet.gnosis.io/api'
     : 'https://protocol-mainnet.dev.gnosisdev.com/api';
 
@@ -587,9 +374,26 @@ export const usdToAlluo = async usd => {
 export const calculateApr = async (rewardPerDistribution, totalLockedInLP) => {
   const alluoPrice = alluoPriceInstance;
   if (!alluoPrice) return 0;
-  const totalLockedLPToAlluo = await getEthContractInstance()
-    .methods.convertLpToAlluo(totalLockedInLP)
-    .call();
+
+  const abi = [
+    {
+      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+      name: 'convertLpToAlluo',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const totalLockedLPToAlluo = await callContract(
+    abi,
+    ethereumVlAlluoAddress,
+    'convertLpToAlluo(uint256)',
+    [totalLockedInLP],
+    EChain.ETHEREUM,
+  );
 
   const exactApr =
     ((+Web3.utils.fromWei(rewardPerDistribution) * alluoPrice) /
@@ -598,6 +402,11 @@ export const calculateApr = async (rewardPerDistribution, totalLockedInLP) => {
     365;
 
   return +exactApr.toFixed(2);
+};
+
+export const isExpectedPolygonEvent = (type, depositAddress) => {
+  const ibAlluoAddress = getIbAlluoAddress(type);
+  return depositAddress === ibAlluoAddress;
 };
 
 export const approveAlluoTransaction = async alluoAmount => {
@@ -613,105 +422,175 @@ export const approveAlluoTransaction = async alluoAmount => {
       type: 'function',
     },
   ];
-  const alluoTokenAmountInWei =
+
+  const alluoAmountInWei =
     alluoAmount === maximumUint256Value
       ? maximumUint256Value
       : Web3.utils.toWei(String(alluoAmount));
 
-  // TODO: Change EEthAddresses to EEthereumAddresses
   const tx = await sendTransaction(
     abi,
-    EEthAddresses.ALLUO,
+    EEthereumAddresses.ALLUO,
     'approve(address,uint256)',
-    [EEthAddresses.PROXY, alluoTokenAmountInWei],
+    [EEthereumAddresses.VLALLUO, alluoAmountInWei],
     EChain.ETHEREUM,
   );
 
   return tx;
 };
 
-export const lockAlluoToken = async (alluoAmount, testNet?: EChainId) => {
-  let res;
+export const lockAlluoToken = async alluoAmount => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+      name: 'lock',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
 
-  await changeNetwork(EChain.ETHEREUM, testNet);
-  const contractInstanceFromWallet = new web3.eth.Contract(
-    abiSCEth as any,
-    EEthAddresses.PROXY,
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const alluoAmountInWei = Web3.utils.toWei(String(alluoAmount));
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'lock(uint256)',
+    [alluoAmountInWei],
+    EChain.ETHEREUM,
   );
-  const alluoTokenAmountInWei = Web3.utils.toWei(String(alluoAmount));
 
-  res = await contractInstanceFromWallet.methods
-    .lock(alluoTokenAmountInWei)
-    .send({ from: walletAddress })
-
-    .on('transactionHash', function (hash) {
-      console.log(hash);
-    })
-    .on('error', console.error);
-
-  return res;
+  return tx;
 };
 
 export const getBalanceOfAlluoUser = async () => {
-  const alluoBalance = await alluoTokenInstance.methods
-    .balanceOf(walletAddress)
-    .call();
-  return Web3.utils.fromWei(alluoBalance);
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'balanceOf',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const alluoAddress = EEthereumAddresses.ALLUO;
+
+  const balance = await callContract(
+    abi,
+    alluoAddress,
+    'balanceOf(address)',
+    [walletAddress],
+    EChain.ETHEREUM,
+  );
+
+  return Web3.utils.fromWei(balance);
 };
 
 export const unlockAlluo = async value => {
-  await changeNetwork(EChain.ETHEREUM);
-  const contractInstanceFromWallet = new web3.eth.Contract(
-    abiSCEth as any,
-    EEthAddresses.PROXY,
-  );
-  const alluoTokenAmountInWei = Web3.utils.toWei(value + '');
-  const res = await contractInstanceFromWallet.methods
-    .unlock(alluoTokenAmountInWei)
-    .send({ from: walletAddress });
+  const abi = [
+    {
+      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+      name: 'unlock',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
 
-  return res;
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const alluoAmountInWei = Web3.utils.toWei(value + '');
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'unlock(uint256)',
+    [alluoAmountInWei],
+    EChain.ETHEREUM,
+  );
+
+  return tx;
 };
 
-export const unlockAlluoAll = async () => {
-  await changeNetwork(EChain.ETHEREUM);
-  const contractInstanceFromWallet = new web3.eth.Contract(
-    abiSCEth as any,
-    EEthAddresses.PROXY,
-  );
-  const res = await contractInstanceFromWallet.methods
-    .unlockAll()
-    .send({ from: walletAddress });
+export const unlockAllAlluo = async () => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'unlockAll',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
 
-  return res;
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'unlockAll()',
+    null,
+    EChain.ETHEREUM,
+  );
+
+  return tx;
 };
 
 export const withdrawAlluo = async () => {
-  await changeNetwork(EChain.ETHEREUM);
-  const contractInstanceFromWallet = new web3.eth.Contract(
-    abiSCEth as any,
-    EEthAddresses.PROXY,
+  const abi = [
+    {
+      inputs: [],
+      name: 'withdraw',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'withdraw()',
+    null,
+    EChain.ETHEREUM,
   );
 
-  const res = await contractInstanceFromWallet.methods
-    .withdraw()
-    .send({ from: walletAddress });
-
-  return res;
+  return tx;
 };
 
-const tokenInstances = {};
 export const getListSupportedTokens = async (
   type = 'usd',
   chain = EChain.POLYGON,
 ) => {
   try {
-    const listSupportedTokens = await getIbAlluoContractInstance(type, chain)
-      .methods.getListSupportedTokens()
-      .call();
+    const abi = [
+      {
+        inputs: [],
+        name: 'getListSupportedTokens',
+        outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+    const supportedTokenList = await callContract(
+      abi,
+      ibAlluoAddress,
+      'getListSupportedTokens()',
+      null,
+      chain,
+    );
+
     const tokensWithInfo = [];
 
-    const requests = listSupportedTokens.map(async tokenAddress => {
+    const requests = supportedTokenList.map(async tokenAddress => {
       const info = await getStableCoinInfo(tokenAddress, type, chain);
       tokensWithInfo.push(info);
     });
@@ -719,30 +598,31 @@ export const getListSupportedTokens = async (
     await Promise.allSettled(requests);
 
     tokensWithInfo.sort((a, b) => b.balance - a.balance);
+
     return tokensWithInfo;
   } catch (error) {
     console.log(error);
   }
 };
 
-const getAbiForCoin = (type, chain = EChain.POLYGON) => {
+const getIbAlluoAbi = (type, chain = EChain.POLYGON) => {
   let abi;
   switch (chain) {
     case EChain.POLYGON:
       abi = {
-        usd: abiSCPolygon as any,
-        eur: abiPolygonEUR as any,
-        eth: abiPolygonETH as any,
-        btc: abiPolygonBTC as any,
+        usd: polygonIbAlluoUSDAbi as any,
+        eur: polygonIbAlluoEURAbi as any,
+        eth: polygonIbAlluoETHAbi as any,
+        btc: polygonIbAlluoBTCAbi as any,
       };
       break;
 
     case EChain.ETHEREUM:
       abi = {
-        usd: EthIbAlluoUSDAbi as any,
-        eur: EthIbAlluoEURAbi as any,
-        eth: EthIbAlluoETHAbi as any,
-        btc: EthIbAlluoBTCAbi as any,
+        usd: ethereumIbAlluoUSDAbi as any,
+        eur: ethereumIbAlluoEURAbi as any,
+        eth: ethereumIbAlluoETHAbi as any,
+        btc: ethereumIbAlluoBTCAbi as any,
       };
       break;
     default:
@@ -751,31 +631,31 @@ const getAbiForCoin = (type, chain = EChain.POLYGON) => {
   return abi[type];
 };
 
-export const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
-  let proxyAddr;
+const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
+  let VLALLUOAddr;
   switch (chain) {
     case EChain.POLYGON:
-      proxyAddr = {
-        usd: EPolAddresses.IBALLUOUSD,
-        eur: EPolAddresses.IBALLUOEUR,
-        eth: EPolAddresses.IBALLUOETH,
-        btc: EPolAddresses.IBALLUOBTC,
+      VLALLUOAddr = {
+        usd: EPolygonAddresses.IBALLUOUSD,
+        eur: EPolygonAddresses.IBALLUOEUR,
+        eth: EPolygonAddresses.IBALLUOETH,
+        btc: EPolygonAddresses.IBALLUOBTC,
       };
       break;
 
     case EChain.ETHEREUM:
-      proxyAddr = {
-        usd: EEthAddressesForBuy.PROXY_USD,
-        eur: EEthAddressesForBuy.PROXY_EUR,
-        eth: EEthAddressesForBuy.PROXY_ETH,
-        btc: EEthAddressesForBuy.PROXY_BTC,
+      VLALLUOAddr = {
+        usd: EEthereumAddresses.IBALLUOUSD,
+        eur: EEthereumAddresses.IBALLUOEUR,
+        eth: EEthereumAddresses.IBALLUOETH,
+        btc: EEthereumAddresses.IBALLUOBTC,
       };
       break;
     default:
       break;
   }
 
-  return proxyAddr[type];
+  return VLALLUOAddr[type];
 };
 
 export const getStableCoinInfo = async (
@@ -947,17 +827,17 @@ export const approveStableCoin = async (
   type = 'usd',
   chain = EChain.POLYGON,
 ) => {
-  const proxyAddr = getIbAlluoAddress(type, chain);
+  const VLALLUOAddr = getIbAlluoAddress(type, chain);
 
   if (chain == EChain.ETHEREUM) {
-    const abi = getAbiForCoin(type, chain);
+    const abi = getIbAlluoAbi(type, chain);
     const stableCoinInstanceFromWallet = new web3.eth.Contract(
       abi,
       tokenAddress,
     );
 
     const res = await stableCoinInstanceFromWallet.methods
-      .approve(proxyAddr, maximumUint256Value)
+      .approve(VLALLUOAddr, maximumUint256Value)
       .send({ from: walletAddress });
 
     return res;
@@ -1033,7 +913,7 @@ export const approveStableCoin = async (
       types = { Permit: permit, EIP712Domain: EIP712Domain };
       message = {
         owner: walletAddress,
-        spender: proxyAddr,
+        spender: VLALLUOAddr,
         value: maximumUint256Value,
         nonce: nonce,
         deadline: maximumUint256Value,
@@ -1060,7 +940,7 @@ export const approveStableCoin = async (
       const name = await contract.methods.name().call();
       const functionSignature =
         '0x095ea7b3' +
-        web3.utils.padLeft(proxyAddr, 64).replace('0x', '') +
+        web3.utils.padLeft(VLALLUOAddr, 64).replace('0x', '') +
         'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
       const salt = web3.utils.padLeft(web3.utils.toHex(chainId), 64, '0');
 
@@ -1262,11 +1142,11 @@ export const getTotalSupplyVlAlluo = async () => {
     },
   ];
 
-  const ethProxyAddress = EEthAddresses.PROXY;
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
 
   const totalAssetSupply = await callContract(
     abi,
-    ethProxyAddress,
+    ethereumVlAlluoAddress,
     'totalSupply()',
     null,
     EChain.ETHEREUM,
@@ -1364,8 +1244,8 @@ export const withdrawStableCoin = async (
 
 export const listenToHandler = blockNumber => {
   const handlerInstance = new web3.eth.Contract(
-    abiHandlerPolygon as any,
-    EPolAddresses.HANDLER,
+    polygonHandlerAbi as any,
+    EPolygonAddresses.HANDLER,
   );
 
   return handlerInstance.events;
@@ -1374,25 +1254,101 @@ export const listenToHandler = blockNumber => {
 export const getIfUserHasWithdrawalRequest = async (
   walletAddress,
   type = 'usd',
+  chain = EChain.POLYGON,
 ) => {
-  const proxyAddr = getIbAlluoAddress(type);
-  const isUserWaiting = await handlerContractInstance.methods
-    .isUserWaiting(proxyAddr, walletAddress)
-    .call();
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'address', name: '_ibAlluo', type: 'address' },
+        { internalType: 'address', name: '_user', type: 'address' },
+      ],
+      name: 'isUserWaiting',
+      outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [{ internalType: 'address', name: '', type: 'address' }],
+      name: 'ibAlluoToWithdrawalSystems',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'lastWithdrawalRequest',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'lastSatisfiedWithdrawal',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'totalWithdrawalAmount',
+          type: 'uint256',
+        },
+        { internalType: 'bool', name: 'resolverTrigger', type: 'bool' },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [
+        { internalType: 'address', name: '_ibAlluo', type: 'address' },
+        { internalType: 'uint256', name: '_id', type: 'uint256' },
+      ],
+      name: 'getWithdrawal',
+      outputs: [
+        {
+          components: [
+            { internalType: 'address', name: 'user', type: 'address' },
+            { internalType: 'address', name: 'token', type: 'address' },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            { internalType: 'uint256', name: 'time', type: 'uint256' },
+          ],
+          internalType: 'struct LiquidityHandler.Withdrawal',
+          name: '',
+          type: 'tuple',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const polygonHandlerAddress = EPolygonAddresses.HANDLER;
+
+  const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+  const isUserWaiting = await callContract(
+    abi,
+    polygonHandlerAddress,
+    'isUserWaiting(address,address)',
+    [ibAlluoAddress, walletAddress],
+    chain,
+  );
+
   if (!isUserWaiting) return [];
-  // const ibAlluoToWithdrawalSystems =
-  const ibAlluoToWithdrawalSystems = await handlerContractInstance.methods
-    .ibAlluoToWithdrawalSystems(proxyAddr)
-    .call();
-  console.log('ibAlluoToWithdrawalSystems', ibAlluoToWithdrawalSystems);
+
+  const ibAlluoToWithdrawalSystems = await callContract(
+    abi,
+    polygonHandlerAddress,
+    'ibAlluoToWithdrawalSystems(address)',
+    [ibAlluoAddress],
+    chain,
+  );
+
   const { lastSatisfiedWithdrawal, lastWithdrawalRequest } =
     ibAlluoToWithdrawalSystems;
   const allWithdrawalRequests = [];
 
   for (let i = +lastSatisfiedWithdrawal + 1; i <= +lastWithdrawalRequest; i++) {
-    const withdrawal = handlerContractInstance.methods
-      .getWithdrawal(proxyAddr, i)
-      .call();
+    const withdrawal = await callContract(
+      abi,
+      polygonHandlerAddress,
+      'getWithdrawal(address,uint256)',
+      [ibAlluoAddress, i],
+      chain,
+    );
     allWithdrawalRequests.push(withdrawal);
   }
 
@@ -1400,6 +1356,7 @@ export const getIfUserHasWithdrawalRequest = async (
   const usersWithdrawals = allWithdrawals.filter(
     w => w.user.toLowerCase() === walletAddress.toLowerCase(),
   );
+
   return usersWithdrawals;
 };
 
@@ -1414,7 +1371,7 @@ export const getWEthBalance = async () => {
     },
   ];
 
-  const wEthAddress = EEthAddressesForBuy.WETH;
+  const wEthAddress = EEthereumAddresses.WETH;
 
   const balance = await callContract(
     abi,
@@ -1438,17 +1395,15 @@ export const getVlAlluoBalance = async () => {
     },
   ];
 
-  const ethProxyAddress = EEthAddresses.PROXY;
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
 
   const balance = await callContract(
     abi,
-    ethProxyAddress,
+    ethereumVlAlluoAddress,
     'balanceOf(address)',
     [walletAddress],
     EChain.ETHEREUM,
   );
-
-  console.log(balance);
 
   return Web3.utils.fromWei(balance);
 };
@@ -1467,8 +1422,8 @@ export const approveAlluoPurchaseInWETH = async () => {
     },
   ];
 
-  const wEthAddress = EEthAddressesForBuy.WETH;
-  const vaultAddress = EEthAddressesForBuy.VAULT;
+  const wEthAddress = EEthereumAddresses.WETH;
+  const vaultAddress = EEthereumAddresses.VAULT;
 
   try {
     const tx = await sendTransaction(
@@ -1499,8 +1454,8 @@ export const getWETHAllowance = async () => {
     },
   ];
 
-  const wEthAddress = EEthAddressesForBuy.WETH;
-  const vaultAddress = EEthAddressesForBuy.VAULT;
+  const wEthAddress = EEthereumAddresses.WETH;
+  const vaultAddress = EEthereumAddresses.VAULT;
 
   const balance = await callContract(
     abi,
@@ -1514,26 +1469,86 @@ export const getWETHAllowance = async () => {
 };
 
 export const buyAlluoWithWETH = async value => {
-  // const SOR = new sor.SOR(ethMainnetUrl, '1000000000000000000', 1, 1, '0x85be1e46283f5f438d1f864c2d925506571d544f0002000000000000000001aa')
-  await changeNetwork(EChain.ETHEREUM, EChainId.ETH_KOVAN);
-  const vaultTokenInstanceFromWallet = new web3.eth.Contract(
-    abiVault as any,
-    EEthAddressesForBuy.VAULT,
-  );
+  const abi = [
+    {
+      inputs: [
+        {
+          components: [
+            { internalType: 'bytes32', name: 'poolId', type: 'bytes32' },
+            {
+              internalType: 'enum IVault.SwapKind',
+              name: 'kind',
+              type: 'uint8',
+            },
+            {
+              internalType: 'contract IAsset',
+              name: 'assetIn',
+              type: 'address',
+            },
+            {
+              internalType: 'contract IAsset',
+              name: 'assetOut',
+              type: 'address',
+            },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            { internalType: 'bytes', name: 'userData', type: 'bytes' },
+          ],
+          internalType: 'struct IVault.SingleSwap',
+          name: 'singleSwap',
+          type: 'tuple',
+        },
+        {
+          components: [
+            { internalType: 'address', name: 'sender', type: 'address' },
+            {
+              internalType: 'bool',
+              name: 'fromInternalBalance',
+              type: 'bool',
+            },
+            {
+              internalType: 'address payable',
+              name: 'recipient',
+              type: 'address',
+            },
+            {
+              internalType: 'bool',
+              name: 'toInternalBalance',
+              type: 'bool',
+            },
+          ],
+          internalType: 'struct IVault.FundManagement',
+          name: 'funds',
+          type: 'tuple',
+        },
+        { internalType: 'uint256', name: 'limit', type: 'uint256' },
+        { internalType: 'uint256', name: 'deadline', type: 'uint256' },
+      ],
+      name: 'swap',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'amountCalculated',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'payable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVaultAddress = EEthereumAddresses.VAULT;
+
+  const ethereumWETHAddress = EEthereumAddresses.WETH.toLowerCase();
+  const ethereumAlluoAddress = EEthereumAddresses.ALLUO.toLowerCase();
 
   const swap_struct = {
     poolId:
-      process.env.REACT_APP_ETH_NET === 'mainnet'
+      process.env.REACT_APP_NET === 'mainnet'
         ? '0x85be1e46283f5f438d1f864c2d925506571d544f0002000000000000000001aa'
         : '0xb157a4395d28c024a0e2e5fa142a53b3eb726bc6000200000000000000000713',
-
     kind: 0,
-    assetIn: Web3.utils.toChecksumAddress(
-      EEthAddressesForBuy.WETH.toLowerCase(),
-    ),
-    assetOut: Web3.utils
-      .toChecksumAddress(EEthAddressesForBuy.ALLUO)
-      .toLowerCase(),
+    assetIn: Web3.utils.toChecksumAddress(ethereumWETHAddress),
+    assetOut: Web3.utils.toChecksumAddress(ethereumAlluoAddress),
     amount: String(value * Math.pow(10, 18)).toString(),
     userData: '0x',
   };
@@ -1546,9 +1561,15 @@ export const buyAlluoWithWETH = async value => {
   };
   const token_limit = String(0 * Math.pow(10, 18)).toString();
 
-  const buy = await vaultTokenInstanceFromWallet.methods
-    .swap(swap_struct, fund_struct, token_limit, deadline.toString())
-    .send({ from: walletAddress });
+  const tx = await sendTransaction(
+    abi,
+    ethereumVaultAddress,
+    'swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)',
+    [swap_struct, fund_struct, token_limit, deadline.toString()],
+    EChain.ETHEREUM,
+  );
+
+  return tx;
 };
 
 export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
@@ -1556,9 +1577,105 @@ export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
     isLoading: false,
   };
   try {
-    const getTotalLockedInLB = await getEthContractInstance()
-      .methods.totalLocked()
-      .call();
+    const alluoAbi = [
+      {
+        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+        name: 'balanceOf',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'address', name: 'spender', type: 'address' },
+        ],
+        name: 'allowance',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+    const ethereumAlluoAddress = EEthereumAddresses.ALLUO;
+
+    const vlAlluoAbi = [
+      {
+        inputs: [],
+        name: 'totalLocked',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [{ internalType: 'address', name: '_locker', type: 'address' }],
+        name: 'getClaim',
+        outputs: [{ internalType: 'uint256', name: 'reward', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [],
+        name: 'rewardPerDistribution',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: '_address', type: 'address' },
+        ],
+        name: 'getInfoByAddress',
+        outputs: [
+          { internalType: 'uint256', name: 'locked_', type: 'uint256' },
+          { internalType: 'uint256', name: 'unlockAmount_', type: 'uint256' },
+          { internalType: 'uint256', name: 'claim_', type: 'uint256' },
+          {
+            internalType: 'uint256',
+            name: 'depositUnlockTime_',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'withdrawUnlockTime_',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: '_address', type: 'address' },
+        ],
+        name: 'unlockedBalanceOf',
+        outputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [],
+        name: 'withdrawLockDuration',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+        name: 'convertLpToAlluo',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+    const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+    const getTotalLockedInLB = await callContract(
+      vlAlluoAbi,
+      ethereumVlAlluoAddress,
+      'totalLocked()',
+      null,
+      EChain.ETHEREUM,
+    );
 
     const [
       getBalanceOfAlluo,
@@ -1570,40 +1687,72 @@ export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
       getWithdrawLockDuration,
       getTotalLockedInAlluo,
     ] = await Promise.all([
-      walletAddress
-        ? getAlluoTokenInstance().methods.balanceOf(walletAddress).call()
-        : '',
-      walletAddress
-        ? getAlluoTokenInstance()
-            .methods.allowance(walletAddress, EEthAddresses.PROXY)
-            .call()
-        : '',
-      walletAddress
-        ? getEthContractInstance().methods.getClaim(walletAddress).call()
-        : '',
-      getEthContractInstance().methods.rewardPerDistribution().call(),
-      walletAddress
-        ? getEthContractInstance()
-            .methods.getInfoByAddress(walletAddress)
-            .call()
-        : '',
-      walletAddress
-        ? getEthContractInstance()
-            .methods.unlockedBalanceOf(walletAddress)
-            .call()
-        : '',
-      getEthContractInstance().methods.withdrawLockDuration().call(),
-      getEthContractInstance()
-        .methods.convertLpToAlluo(getTotalLockedInLB)
-        .call(),
+      callContract(
+        alluoAbi,
+        ethereumAlluoAddress,
+        'balanceOf(address)',
+        [walletAddress],
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        alluoAbi,
+        ethereumAlluoAddress,
+        'allowance(address,address)',
+        [walletAddress, ethereumVlAlluoAddress],
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'getClaim(address)',
+        [walletAddress],
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'rewardPerDistribution()',
+        null,
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'getInfoByAddress(address)',
+        [walletAddress],
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'unlockedBalanceOf(address)',
+        [walletAddress],
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'withdrawLockDuration()',
+        null,
+        EChain.ETHEREUM,
+      ),
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'convertLpToAlluo(uint256)',
+        [getTotalLockedInLB],
+        EChain.ETHEREUM,
+      ),
     ]);
 
     // Change all user vesting infos to human-readable allue value
-    const lockedAlluoBalanceOfUser = walletAddress
-      ? await getEthContractInstance()
-          .methods.convertLpToAlluo(getInfoByAddress.locked_)
-          .call()
-      : '0';
+    const lockedAlluoBalanceOfUser = await callContract(
+      vlAlluoAbi,
+      ethereumVlAlluoAddress,
+      'convertLpToAlluo(uint256)',
+      [getInfoByAddress.locked_],
+      EChain.ETHEREUM,
+    );
 
     const [
       claimedAlluoInUsd,
@@ -1712,7 +1861,7 @@ export const transferToAddress = async (
   amount,
   decimals,
   toAddress,
-  useBiconomy
+  useBiconomy,
 ) => {
   try {
     const abi = [

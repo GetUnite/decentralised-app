@@ -19,14 +19,14 @@ import { useCookies } from 'react-cookie';
 export const Farm = () => {
   const { id } = useParams();
   const [cookies] = useCookies(['has_seen_boost_farms']);
-  const [walletAccountAtom, setWalletAccountAtom] =
+  const [walletAccountAtom] =
     useRecoilState(walletAccount);
   const {
     selectedFarm,
     updateFarmInfo,
     isLoading,
-    selectedStableCoin,
-    selectStableCoin,
+    selectSupportedToken,
+    selectedSupportedToken,
   } = useFarm({
     id,
   });
@@ -48,10 +48,11 @@ export const Farm = () => {
           chain={selectedFarm?.chain}
           heading={farmName}
           isLoading={isLoading}
+          noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
         >
           <>
             {selectedFarm?.isBooster && !cookies.has_seen_boost_farms ? (
-              <BoosterFarmPresentation selectedFarm={selectedFarm}/>
+              <BoosterFarmPresentation selectedFarm={selectedFarm} farmName={farmName} />
             ) : (
               <Tabs>
                 <Tab title="Deposit">
@@ -59,8 +60,8 @@ export const Farm = () => {
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                     updateFarmInfo={updateFarmInfo}
-                    selectedStableCoin={selectedStableCoin}
-                    selectStableCoin={selectStableCoin}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
                   />
                 </Tab>
                 <Tab title="Withdraw">
@@ -68,8 +69,8 @@ export const Farm = () => {
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                     updateFarmInfo={updateFarmInfo}
-                    selectedStableCoin={selectedStableCoin}
-                    selectStableCoin={selectStableCoin}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
                   />
                 </Tab>
               </Tabs>
@@ -96,7 +97,7 @@ export const Farm = () => {
                 <Heading size="small" level={3} margin="none" fill>
                   <Box direction="row" justify="between" fill>
                     Rewards
-                    <Box direction="row">
+                    <Box direction="row" gap="5px">
                       {selectedFarm?.rewards.map((reward, i) => (
                         <Avatar
                           key={i}
