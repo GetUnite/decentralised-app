@@ -29,7 +29,7 @@ export const Main = () => {
     filterType,
   } = useMain();
 
-  const totalBalances = isLoading ? (
+  const headingText = isLoading ? (
     <Box fill>
       <Skeleton count={2} />
     </Box>
@@ -64,12 +64,12 @@ export const Main = () => {
               fill="horizontal"
             >
               <Box justify="center" fill direction="column">
-                <Heading margin="none" fill size={'32px'}>
+                <Heading margin="none" fill size={'36px'}>
                   {!walletAccountAtom
                     ? 'Connect your wallet to see your available assets to farm.'
-                    : totalBalances}
+                    : headingText}
                 </Heading>
-                <Paragraph margin={{ top: 'medium' }} fill>
+                <Paragraph margin={{ top: '35px' }} fill>
                   Fund your wallet using stablecoin or fiat currency here to
                   start investing. Get your yield in the same coin and withdraw
                   at any time with no cost and no lock-in period.{' '}
@@ -84,7 +84,7 @@ export const Main = () => {
                     gap="small"
                     direction="column"
                     fill
-                    margin={{ top: 'large' }}
+                    margin={{ top: '72px' }}
                   >
                     <Box
                       direction="row"

@@ -14,16 +14,16 @@ export const ChainBadge = ({ chain, ...rest }: IChainBadge) => {
     <Box justify="start" align="start">
       <Box
         background="badge"
-        height="24px"
+        height="32px"
         align="center"
         round="small"
         justify="center"
-        width="76px"
+        width="80px"
         pad="small"
         style={{ backgroundColor: backgroundColor, borderRadius: '6px' }}
         {...rest}
       >
-        <Text style={{ color: textColor }} size="small">
+        <Text style={{ color: textColor }} size="13px">
           {chainName}
         </Text>
       </Box>
