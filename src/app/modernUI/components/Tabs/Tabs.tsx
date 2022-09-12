@@ -25,6 +25,7 @@ const StyledButton = styled(Button)<ButtonExtendedProps | any>`
       ? normalizeColor('primary', props.theme)
       : normalizeColor('tabText', props.theme)};
   border-radius: 6px;
+  font-weight: bold;
 `;
 
 export const Tabs = ({ children = [], ...rest }) => {
@@ -32,10 +33,14 @@ export const Tabs = ({ children = [], ...rest }) => {
   return (
     <>
       <Box
-        background="tab"
+        border = {{
+          color: 'tabSwitchBorder',
+          size: 'xsmall',
+        }}
+        background="tabSwitch"
         direction="row"
         height="36px"
-        round="xsmall"
+        round="small"
         justify="stretch"
         pad="hair"
       >
