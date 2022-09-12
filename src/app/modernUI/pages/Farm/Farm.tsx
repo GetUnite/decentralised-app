@@ -95,8 +95,8 @@ export const Farm = () => {
             >
               <Box fill gap="small">
                 <Heading size="small" level={3} margin="none" fill>
-                  <Box direction="row" justify="between" fill>
-                    Rewards
+                  <Box direction="row" justify="between" fill >
+                    <Text size='18px'>Rewards</Text>
                     <Box direction="row" gap="5px">
                       {selectedFarm?.rewards.map((reward, i) => (
                         <Avatar
