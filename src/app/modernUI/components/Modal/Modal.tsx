@@ -33,7 +33,6 @@ export const Modal = ({
     navigate('/');
   };
 
-  console.log(noHeading);
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   return (
@@ -81,7 +80,7 @@ export const Modal = ({
                 justify="center"
                 align="center"
               >
-                <FormClose size="medium" />
+                <FormClose size="large" color='black'/>
               </Box>
             </Button>
           </Box>
