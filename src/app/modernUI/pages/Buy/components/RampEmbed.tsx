@@ -3,7 +3,7 @@ import { useRecoilState } from 'recoil';
 import { RampInstantSDK } from '@ramp-network/ramp-instant-sdk';
 import { Box, Text } from 'grommet';
 import { walletAccount } from 'app/common/state/atoms';
-import { ConnectionModal } from 'app/modernUI/components';
+import { ConnectionButton } from 'app/modernUI/components';
 
 const ENV = process.env.NODE_ENV;
 
@@ -40,7 +40,7 @@ export const RampEmbed = () => {
     return (
       <Box margin={{ top: 'large' }}>
         <Text textAlign="center" weight="bold">
-          <ConnectionModal />
+          <ConnectionButton />
         </Text>
       </Box>
     );

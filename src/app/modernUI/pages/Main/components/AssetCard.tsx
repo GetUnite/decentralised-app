@@ -14,8 +14,13 @@ import { useNotification, ENotificationId } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
 import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
-import { ChainBadge, Notification } from 'app/modernUI/components';
+import {
+  ChainBadge,
+  ConnectionButton,
+  Notification,
+} from 'app/modernUI/components';
 import { EChain } from 'app/common/functions/Web3Client';
+import { useConnection } from 'app/common/state/shortcuts';
 
 const Disabled = () => {
   return (
@@ -60,6 +65,7 @@ export const AssetCard = ({
 }: IAssetCard) => {
   const { navigate } = useCurrentPath();
   const { setNotification } = useNotification();
+  const { handleConnectWallet } = useConnection();
 
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
@@ -174,12 +180,19 @@ export const AssetCard = ({
                 <span>{tvl}</span>
                 <Box direction="row" justify="between" align="center">
                   <span>{interest}%</span>
-                  <Link to={'/farm/' + id}>
+                  {walletAccountAtom ? (
+                    <Link to={'/farm/' + id}>
+                      <Button label={'Farm'} />
+                    </Link>
+                  ) : (
                     <Button
-                      disabled={!walletAccountAtom}
-                      label={walletAccountAtom ? 'Farm' : 'Connect wallet'}
+                      style={{ borderWidth: '1px' }}
+                      size={isSmall(size) ? 'small' : undefined}
+                      label={'Connect wallet'}
+                      onClick={handleConnectWallet}
+                      {...rest}
                     />
-                  </Link>
+                  )}
                 </Box>
               </Grid>
             </Card>

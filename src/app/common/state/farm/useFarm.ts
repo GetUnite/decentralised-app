@@ -7,7 +7,7 @@ import {
   getTotalAssetSupply,
   getUserDepositedAmount,
 } from 'app/common/functions/Web3Client';
-import { walletAccount } from 'app/common/state/atoms';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useChain } from 'app/common/state';
 import { useNavigate } from 'react-router-dom';
 
@@ -140,6 +140,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
 
 export const useFarm = ({ id }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const navigate = useNavigate();
 
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();
@@ -150,11 +151,9 @@ export const useFarm = ({ id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  const { changeChainTo } = useChain();
-
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
-      changeChainTo(selectedFarm.chain);
+      setWantedChainAtom(selectedFarm.chain);
     }
   }, [walletAccountAtom, selectedFarm]);
 

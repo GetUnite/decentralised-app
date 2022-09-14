@@ -21,14 +21,13 @@ import logoIconDark from '../../images/logoIcon-dark.svg';
 import { modernUiPaths } from 'app/common/hooks';
 
 export const Layout = ({ children, notificationId = null, ...rest }) => {
-  const { alluoPriceAtom, setAlluoPriceAtom, fetchAlluoPrice } =
-    useAlluoPrice(true);
-  const navigate = useNavigate();
-  const { isLightMode, mode, setMode, toggleMode } = useMode();
+  const { isLightMode } = useMode();
+
   useEffect(() => {
     if (isLightMode) document.body.style.backgroundColor = 'white';
     else document.body.style.backgroundColor = 'black';
   }, [isLightMode]);
+  
   return (
     <ResponsiveContext.Consumer>
       {size => (

@@ -4,7 +4,7 @@ import { Menu as MenuIcon, Close } from 'grommet-icons';
 
 import { isSmall } from 'app/modernUI/theme';
 import { useMode } from 'app/common/state/shortcuts';
-import { ConnectionModal } from 'app/modernUI/components';
+import { ConnectionButton } from 'app/modernUI/components';
 import { MenuItem } from './blocks';
 
 import sunIcon from '../../images/sunIcon.svg';
@@ -56,7 +56,7 @@ export const Menu = ({ ...rest }) => {
             justify="end"
           >
             {((isSmall(size) && isModalOpen) || !isSmall(size)) && (
-              <ConnectionModal />
+              <ConnectionButton />
             )}
             {((isSmall(size) && !isModalOpen) || !isSmall(size)) && (
               <Button
