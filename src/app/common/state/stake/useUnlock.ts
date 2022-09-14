@@ -11,7 +11,7 @@ import Countdown, {
   formatTimeDelta,
   CountdownTimeDelta,
 } from 'react-countdown';
-import { tokenInfo, walletAccount } from '../atoms';
+import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification, ENotificationId, useChain } from 'app/common/state';
 
@@ -61,7 +61,7 @@ export const useUnlock = () => {
   const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
     walletAccount,
   );
-  const { changeChainTo } = useChain();
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [{ unlockValue, isUnlocking }, dispatch] = useReducer(reducer, {
     unlockValue: '',
@@ -73,7 +73,7 @@ export const useUnlock = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.ETHEREUM);
+      setWantedChainAtom(EChain.ETHEREUM);
     }
   }, [walletAccountAtom]);
 

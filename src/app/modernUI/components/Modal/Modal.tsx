@@ -1,7 +1,7 @@
 import { EChain } from 'app/common/functions/Web3Client';
 import { ENotificationId, walletAccount } from 'app/common/state/atoms';
 import { useNotification } from 'app/common/state';
-import { ChainBadge, ConnectionModal, Spinner } from 'app/modernUI/components';
+import { ChainBadge, ConnectionButton, Spinner } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, Text } from 'grommet';
 import { FormClose } from 'grommet-icons';
@@ -93,7 +93,7 @@ export const Modal = ({
             {!walletAccountAtom ? (
               <Box margin={{ vertical: 'large' }}>
                 <Text textAlign="center" weight="bold">
-                  <ConnectionModal />
+                  <ConnectionButton />
                 </Text>
               </Box>
             ) : isLoading ? (

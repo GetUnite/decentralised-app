@@ -25,7 +25,8 @@ export const useMain = () => {
     initialAvailableFarmsState,
   );
   const [filter, setFilter] = useState<any>();
-  const [filterType, setFilterType] = useState<string>(null);
+  const [viewType, setViewType] = useState<string>(null);
+  const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
 
   const [headingData, setHeadingData] = useState<THeadingData>();
 
@@ -45,6 +46,7 @@ export const useMain = () => {
     try {
       let numberOfAssets = 0;
       let chainsWithAssets = new Set();
+      let allSupportedTokensList = new Set<string>();
 
       await Promise.all(
         initialAvailableFarmsState
@@ -73,6 +75,7 @@ export const useMain = () => {
                   numberOfAssets++;
                   chainsWithAssets.add(availableFarm.chain);
                 }
+                allSupportedTokensList.add(supportedToken.symbol);
               });
             }
           }),
@@ -87,6 +90,7 @@ export const useMain = () => {
           });
         }
         setAvailableFarms(availableFarms);
+        setAllSupportedTokens(Array.from(allSupportedTokensList));
       });
     } catch (error) {
       setError(error);
@@ -95,23 +99,41 @@ export const useMain = () => {
     setIsLoading(false);
   };
 
-  const resetFilters = () => {
+  const showAllFarms = () => {
     setFilter(null);
-    setFilterType(null);
+    setViewType(null);
   };
 
-  const filterToYourFarms = () => {
-    setFilter(() => farm => farm.depositedAmount > 0);
-    setFilterType('your');
+  const showYourFarms = () => {
+    setViewType('your');
+  };
+
+  const filterByNetwork = chain => {
+    setFilter(() => farm => farm.chain == chain);
+  };
+
+  const filteredFarms = () => {
+    let filteredFarms;
+
+    filteredFarms =
+      viewType == 'your'
+        ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
+        : availableFarms;
+
+    filteredFarms = filter ? filteredFarms.filter(filter) : filteredFarms;
+
+    return filteredFarms;
   };
 
   return {
     isLoading,
     error,
-    availableFarms: filter ? availableFarms.filter(filter) : availableFarms,
+    availableFarms: filteredFarms(),
     headingData,
-    resetFilters,
-    filterToYourFarms,
-    filterType,
+    showAllFarms,
+    showYourFarms,
+    viewType,
+    filterByNetwork,
+    allSupportedTokens
   };
 };

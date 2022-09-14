@@ -15,6 +15,12 @@ export const walletAccount = atom({
   default: null,
 });
 
+export const wantedChain = atom({
+  key: 'wantedChain',
+  default: null,
+});
+
+
 type TSelectStableCoin = {
   label?: string;
   value?: string;

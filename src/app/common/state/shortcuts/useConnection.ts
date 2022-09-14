@@ -1,90 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState, useResetRecoilState } from 'recoil';
-import WalletConnectProvider from '@walletconnect/ethereum-provider';
+import { useRecoilState } from 'recoil';
+import { walletAccount } from 'app/common/state/atoms';
+import { connectToWallet } from 'app/common/functions/Web3Client';
 
-import { walletAccount, tokenInfo } from 'app/common/state/atoms';
-import { EWallets } from 'app/common/constants';
-import {
-  getTokenInfo,
-  connectToMetamask,
-  connectToWalletconnect,
-} from 'app/common/functions/Web3Client';
+export const useConnection = () => {
+  const [, setWalletAccountAtom] = useRecoilState(walletAccount);
 
-declare let window: any;
-
-export const useConnection = setIsModalOpen => {
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
-  const [, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const resetTokenInfo = useResetRecoilState(tokenInfo);
-
-  const [walletName, setWalletName] = useState<EWallets | null>();
-  const [walletConnectProvider, setWalletConnectProvider] =
-    useState<WalletConnectProvider>();
-
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-    setTokenInfoAtom(tokenInfoData);
-  };
-
-  const handleConnectMetamask = async () => {
-    try {
-      if (window.ethereum) {
-        const account = await connectToMetamask();
-
-        setWalletAccountAtom(account);
-
-        setWalletName(EWallets.METAMASK);
-        setIsModalOpen(false);
-      }
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
-
-  useEffect(() => {
-    window.ethereum?.on('accountsChanged', handleConnectMetamask);
-  }, []);
-
-  useEffect(() => {
-    if (walletAccountAtom) setAccountInformation();
-  }, [walletAccountAtom]);
-
-  const handleConnectWaletConnect = async () => {
-    try {
-      const { walletAddress, provider } = await connectToWalletconnect();
-      setWalletConnectProvider(provider);
-      setWalletAccountAtom(walletAddress);
-      setWalletName(EWallets.WALLETCONNECT);
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-  const disconnectWalletconnect = () => {
-    walletConnectProvider?.disconnect();
-    setWalletConnectProvider(null);
-  };
-  const resetAccountInfo = () => {
-    setWalletName(null);
-    setWalletAccountAtom(null);
-    // setIsModalOpen(true);
-
-    resetTokenInfo();
-  };
-  const resetAndChangeWallet = async () => {
-    disconnectWalletconnect();
-
-    resetAccountInfo();
+  const handleConnectWallet = async () => {
+    const walletAddress = await connectToWallet();
+    setWalletAccountAtom(walletAddress);
   };
 
   return {
-    walletName,
-    handleConnectMetamask,
-    handleConnectWaletConnect,
-    resetAndChangeWallet,
+    handleConnectWallet,
   };
 };
