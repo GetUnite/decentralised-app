@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { walletAccount } from 'app/common/state/atoms';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   transferToAddress,
   getIbAlluoInfo,
@@ -12,7 +12,7 @@ import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 
 export const useTransfer = () => {
   const { setNotificationt } = useNotification();
-  const { changeChainTo } = useChain();
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   type IbAlluoInfo = {
@@ -32,7 +32,7 @@ export const useTransfer = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.POLYGON);
+      setWantedChainAtom(EChain.POLYGON);
       fetchIbAlluosInfo();
     }
   }, [walletAccountAtom]);

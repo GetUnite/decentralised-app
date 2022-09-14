@@ -8,6 +8,9 @@ import {
   Card,
   Grid,
   ResponsiveContext,
+  Menu,
+  DropButton,
+  Select,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { toExactFixed } from 'app/common/functions/utils';
@@ -16,6 +19,7 @@ import { useMain } from 'app/common/state/shortcuts';
 import { Spinner, Layout } from 'app/modernUI/components';
 import { Assets } from './blocks';
 import { walletAccount } from 'app/common/state/atoms';
+import { EChain } from 'app/common/functions/Web3Client';
 
 export const Main = () => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -24,9 +28,11 @@ export const Main = () => {
     headingData,
     availableFarms,
     isLoading,
-    filterToYourFarms,
-    resetFilters,
-    filterType,
+    showAllFarms,
+    showYourFarms,
+    viewType,
+    filterByNetwork,
+    allSupportedTokens,
   } = useMain();
 
   const headingText = isLoading ? (
@@ -70,9 +76,9 @@ export const Main = () => {
                     : headingText}
                 </Heading>
                 <Paragraph margin={{ top: '35px' }} fill>
-                  Fund your wallet using stablecoin or fiat currency here to
-                  start investing. Get your yield in the same coin and withdraw
-                  at any time with no cost and no lock-in period.{' '}
+                  Fund your wallet using crypto or fiat currency here to start
+                  investing. Get your yield in the same coin and withdraw at any
+                  time with no cost and no lock-in period.{' '}
                 </Paragraph>
                 <Box
                   align="center"
@@ -86,32 +92,57 @@ export const Main = () => {
                     fill
                     margin={{ top: '72px' }}
                   >
-                    <Box
-                      direction="row"
-                      justify="start"
-                      gap="small"
-                      style={{ fontSize: '16px' }}
-                    >
-                      <Button
-                        size="small"
-                        onClick={resetFilters}
-                        label="All farms"
-                        plain
-                        style={
-                          !filterType ? { textDecoration: 'underline' } : {}
-                        }
-                      />
-                      <Button
-                        size="small"
-                        onClick={filterToYourFarms}
-                        label="Your farms"
-                        plain
-                        style={
-                          filterType == 'your'
-                            ? { textDecoration: 'underline' }
-                            : {}
-                        }
-                      />
+                    <Box direction="row" justify="between">
+                      <Box
+                        direction="row"
+                        justify="start"
+                        gap="small"
+                        style={{ fontSize: '16px' }}
+                      >
+                        <Button
+                          size="small"
+                          onClick={showAllFarms}
+                          label="All farms"
+                          plain
+                          style={
+                            !viewType ? { textDecoration: 'underline' } : {}
+                          }
+                        />
+                        {walletAccountAtom && (
+                          <Button
+                            size="small"
+                            onClick={showYourFarms}
+                            label="Your farms"
+                            plain
+                            style={
+                              viewType == 'your'
+                                ? { textDecoration: 'underline' }
+                                : {}
+                            }
+                          />
+                        )}
+                      </Box>
+                      <Box
+                        direction="row"
+                        justify="start"
+                        gap="medium"
+                        style={{ fontSize: '16px' }}
+                      >
+                        <Menu
+                          label="All Networks"
+                          plain
+                          items={[
+                            {
+                              label: 'Ethereum',
+                              onClick: () => filterByNetwork(EChain.ETHEREUM),
+                            },
+                            {
+                              label: 'Polygon',
+                              onClick: () => filterByNetwork(EChain.POLYGON),
+                            },
+                          ]}
+                        />
+                      </Box>
                     </Box>
                     {!isSmall(size) && (
                       <Card

@@ -17,7 +17,7 @@ import {
   getWEthBalance,
   lockAlluoToken,
 } from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount } from 'app/common/state/atoms';
+import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -28,7 +28,7 @@ export const useBuy = () => {
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
   const [walletAccountAtom, setWalletAccountAtom] =
     useRecoilState(walletAccount);
-  const { changeChainTo } = useChain();
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [inputValue, setInputValue] = useState<string>();
   const [isApproving, setIsApproving] = useState<boolean>(false);
@@ -65,7 +65,7 @@ export const useBuy = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.ETHEREUM);
+      setWantedChainAtom(EChain.ETHEREUM);
       fetchAlluoPriceInWETH();
       fetchTotalSupply();
       fetchWethBalance();
