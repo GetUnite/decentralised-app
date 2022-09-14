@@ -1,7 +1,6 @@
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/ethereum-provider';
 import { Biconomy } from '@biconomy/mexa';
-import { EWallets } from 'app/common/constants';
 import polygonIbAlluoUSDAbi from 'app/common/abis/polygonIbAlluoUSD.json';
 import polygonIbAlluoEURAbi from 'app/common/abis/polygonIbAlluoEUR.json';
 import polygonIbAlluoETHAbi from 'app/common/abis/polygonIbAlluoETH.json';
@@ -13,6 +12,12 @@ import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import Onboard from '@web3-onboard/core';
+import gnosisModule from '@web3-onboard/gnosis';
+import coinbaseWalletModule from '@web3-onboard/coinbase';
+import injectedModule from '@web3-onboard/injected-wallets';
+import walletConnectModule from '@web3-onboard/walletconnect';
+import logo from 'app/modernUI/images/logo.svg';
 
 enum EEthereumAddressesTestnet {
   IBALLUOUSD = '0xc622244881FF63d0b1C1Eb3cEad17F06fE066600',
@@ -82,21 +87,81 @@ const polygonProviderUrl =
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
 
-declare let window: any;
-
 export enum EChain {
   ETHEREUM,
   POLYGON,
 }
 
 export enum EChainId {
-  ETH_MAINNET = 1,
-  ETH_RINKEBY = 4,
-  ETH_KOVAN = 42,
-  ETH_SEPOLIA = 11155111,
-  POL_MAINNET = 137,
-  POL_MUMBAI = 80001,
+  ETH_MAINNET = '0x1',
+  ETH_SEPOLIA = '0xaa36a7',
+  POL_MAINNET = '0x89',
+  POL_MUMBAI = '0x13881',
 }
+
+const injected = injectedModule();
+const walletConnect = walletConnectModule({
+  qrcodeModalOptions: {
+    mobileLinks: [
+      'rainbow',
+      'metamask',
+      'argent',
+      'trust',
+      'imtoken',
+      'pillar',
+    ],
+  },
+});
+const gnosis = gnosisModule();
+const coinbase = coinbaseWalletModule();
+
+const onboard = Onboard({
+  wallets: [injected, walletConnect, gnosis, coinbase],
+  chains: [
+    {
+      id: EChainId.ETH_MAINNET,
+      token: 'ETH',
+      label: 'Ethereum Mainnet',
+      rpcUrl: ethereumMainnetProviderUrl,
+    },
+    {
+      id: EChainId.ETH_SEPOLIA,
+      token: 'ETH',
+      label: 'Ethereum Sepolia',
+      rpcUrl: ethereumTestnetProviderUrl,
+    },
+    {
+      id: EChainId.POL_MAINNET,
+      token: 'MATIC',
+      label: 'Matic Mainnet',
+      rpcUrl: polygonMainnetProviderUrl,
+    },
+    {
+      id: EChainId.POL_MUMBAI,
+      token: 'MATIC',
+      label: 'Matic Mumbai',
+      rpcUrl: polygonTestnetProviderUrl,
+    },
+  ],
+  appMetadata: {
+    name: 'Alluo',
+    icon: logo,
+    description: 'A description here',
+    recommendedInjectedWallets: [
+      { name: 'MetaMask', url: 'https://metamask.io' },
+    ],
+  },
+  accountCenter: {
+    desktop: {
+      enabled: false,
+    },
+    mobile: {
+      enabled: false,
+    },
+  },
+});
+
+declare let window: any;
 
 const permitOnlyTokenAddresses = [
   '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
@@ -114,131 +179,55 @@ const usesNoncesAddresses = [
 ];
 
 let walletAddress;
-let walletName: EWallets;
 let web3: WalletConnectProvider | any;
-let wcProvider;
 
-export const connectToMetamask = async () => {
-  const accounts = await window.ethereum.request({
-    method: 'eth_requestAccounts',
-  });
-  web3 = new Web3(window.ethereum);
-  web3.eth.handleRevert = true;
-  walletAddress = accounts[0];
-  walletName = EWallets.METAMASK;
+export const connectToWallet = async () => {
+  const wallets = await onboard.connectWallet();
 
-  return walletAddress;
-};
-
-export const connectToWalletconnect = async () => {
-  wcProvider = new WalletConnectProvider({
-    rpc: {
-      [EChainId.ETH_MAINNET]: ethereumMainnetProviderUrl,
-      [EChainId.ETH_RINKEBY]: ethereumTestnetProviderUrl,
-      [EChainId.POL_MAINNET]: polygonMainnetProviderUrl,
-      [EChainId.POL_MUMBAI]: polygonTestnetProviderUrl,
-    },
-    qrcode: true,
-  });
-
-  const accounts = await wcProvider.enable();
-
-  web3 = new Web3(wcProvider as any);
-
-  walletAddress = accounts[0];
-  walletName = EWallets.WALLETCONNECT;
-
-  return { walletAddress, provider: wcProvider };
-};
-
-export const changeNetwork = async (chain: EChain, testNet?: EChainId) => {
-  if (walletName === EWallets.METAMASK) {
-    let chainId, chainName, nativeCurrency, rpcUrls;
-
-    if (chain === EChain.ETHEREUM) {
-      nativeCurrency = { name: 'ETH', decimals: 18, symbol: 'ETH' };
-      rpcUrls = [ethereumProviderUrl];
-      chainId = process.env.REACT_APP_NET === 'mainnet' ? EChainId.ETH_MAINNET : EChainId.ETH_SEPOLIA;
-      chainName = 'Ethereum ' + process.env.REACT_APP_NET === 'mainnet' ? 'Mainnet' : 'Sepolia';
-    } 
-    else if (chain === EChain.POLYGON) {
-      nativeCurrency = { name: 'MATIC', decimals: 18, symbol: 'MATIC' };
-      rpcUrls = [polygonProviderUrl];
-      chainId = process.env.REACT_APP_NET === 'mainnet' ? EChainId.POL_MAINNET : EChainId.POL_MUMBAI;
-      chainName = 'Polygon ' + process.env.REACT_APP_NET === 'mainnet' ? 'Mainnet' : 'Mumbai';
-    }
-
-    if ((await getCurrentChainId()) !== chainId) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: Web3.utils.toHex(chainId) }],
-        });
-      } catch (err) {
-        if (err.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainName,
-                chainId: Web3.utils.toHex(chainId),
-                nativeCurrency,
-                rpcUrls,
-              },
-            ],
-          });
-        } else {
-          throw new Error(err.message);
-        }
-      }
-    }
-  } else if (
-    chain === EChain.POLYGON &&
-    walletName === EWallets.WALLETCONNECT
-  ) {
-    const netId = await web3.eth.getChainId();
-
-    if (netId !== EChainId.POL_MAINNET) {
-      throw new Error('Change your wallet network to Polygon');
-    }
+  if (wallets[0]) {
+    web3 = new Web3(wallets[0].provider as any);
+    walletAddress = wallets[0].accounts[0].address;
+    return walletAddress;
   }
 };
 
-export const getCurrentChainId = async () => {
-  const chainId = await web3?.eth.getChainId();
+export const changeNetwork = async (chain: EChain) => {
+  let chainId;
 
-  return Web3.utils.hexToNumber(chainId);
+  if (chain === EChain.ETHEREUM) {
+    chainId =
+      process.env.REACT_APP_NET === 'mainnet'
+        ? EChainId.ETH_MAINNET
+        : EChainId.ETH_SEPOLIA;
+  }
+
+  if (chain === EChain.POLYGON) {
+    chainId = chainId =
+      process.env.REACT_APP_NET === 'mainnet'
+        ? EChainId.POL_MAINNET
+        : EChainId.POL_MUMBAI;
+  }
+
+  await onboard.setChain({ chainId: chainId });
 };
 
 export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
-    : chainId === EChainId.ETH_MAINNET ||
-      chainId === EChainId.ETH_SEPOLIA
+    : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
     ? EChain.ETHEREUM
     : null;
 };
 
-export const getCurrentChain = async () => {
-  const chainId = await getCurrentChainId();
-
+export const getCurrentChainById = async chainId => {
   return getChainById(chainId);
 };
 
-export const registerChainChanged = async callback => {
-  if (walletName === EWallets.WALLETCONNECT) {
-    wcProvider.on('chainChanged', callback);
-  } else if (walletName === EWallets.METAMASK) {
-    window.ethereum.on('chainChanged', callback);
-  }
-};
-
-export const unregisterChainChanged = async callback => {
-  if (walletName === EWallets.WALLETCONNECT) {
-    wcProvider.removeListener('chainChanged', callback);
-  } else if (walletName === EWallets.METAMASK) {
-    window.ethereum.removeListener('chainChanged', callback);
-  }
+export const getCurrentChainOnWalletUpdated = async callback => {
+  const wallets = onboard.state.select('wallets');
+  wallets.subscribe(wallets => {
+    callback(wallets[0].chains[0].id);
+  });
 };
 
 export const startOrGetBiconomy = async (chain, provider) => {
@@ -288,7 +277,7 @@ const sendTransaction = async (
 
   const contract = new web3ToUse.eth.Contract(abi as any, address);
 
-  console.log("entrou aqui e nao devia", functionSignature);
+  console.log('entrou aqui e nao devia', functionSignature);
   try {
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.send({
@@ -317,7 +306,7 @@ const callContract = async (abi, address, functionSignature, params, chain) => {
 
     return tx;
   } catch (error) {
-    console.log(abi, address, functionSignature, params)
+    console.log(abi, address, functionSignature, params);
     // here do all error handling to readable stuff
     console.log(error);
   }

@@ -6,7 +6,7 @@ import {
   getTokenInfo,
   EChain,
 } from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount } from 'app/common/state/atoms';
+import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNotification, ENotificationId, useChain } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
 
@@ -14,7 +14,7 @@ export const useLock = () => {
   const { setNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
   const [walletAccountAtom] = useRecoilState(walletAccount);
-  const { changeChainTo } = useChain();
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [lockValue, setLockValue] = useState<string>();
   const [isApproving, setIsApproving] = useState<boolean>(false);
@@ -23,7 +23,7 @@ export const useLock = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.ETHEREUM);
+      setWantedChainAtom(EChain.ETHEREUM);
     }
   }, [walletAccountAtom]);
 
