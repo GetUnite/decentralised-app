@@ -82,7 +82,6 @@ export const theme = deepMerge(grommet, {
       card: { light: '#FFFFFF', dark: 'rgba(29, 29, 29, 0.8)' },
       softButton: { light: colors.BLACK_3, dark: colors.WHITE },
       tabSwitch: { light: colors.BLACK_3, dark: colors.BLACK },
-      tabSwitchBorder: { light: colors.BLACK_8, dark: colors.BLUE_80 },
       container: {
         light: 'linear-gradient(40deg, #EAF1FF 0%, #FAFAFA 30%);',
         dark: 'linear-gradient(40deg, #0B1D41 0%, #000 30%);',
