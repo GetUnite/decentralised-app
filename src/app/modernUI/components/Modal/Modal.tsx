@@ -16,6 +16,7 @@ interface IModal {
   notificationId?: ENotificationId;
   children: React.ReactNode;
   noHeading?: boolean;
+  minHeight?: string;
 }
 
 export const Modal = ({
@@ -25,6 +26,7 @@ export const Modal = ({
   isLoading = false,
   children,
   noHeading = false,
+  minHeight = "750px"
 }: IModal) => {
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ export const Modal = ({
         gap="small"
         direction="column"
         background="modal"
+        style={{minHeight: minHeight}}
         pad={{ vertical: 'medium', horizontal: 'medium' }}
       >
         <Box fill flex="grow" height="100vh">
@@ -86,7 +89,7 @@ export const Modal = ({
           </Box>
           <Box
             direction="column"
-            fill
+            fill="vertical"
             margin={{ vertical: 'medium' }}
             gap="small"
           >
@@ -100,6 +103,7 @@ export const Modal = ({
               <Box
                 align="center"
                 justify="center"
+                fill="vertical"
                 margin={{ top: 'large', bottom: 'medium' }}
               >
                 <Spinner pad="large" />

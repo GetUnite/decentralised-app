@@ -18,13 +18,12 @@ export const useWithdrawalForm = ({
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  const { setNotification, setNotificationt } = useNotification();
+  const { setNotificationt } = useNotification();
   const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
     useState<boolean>(false);
   const [withdrawValue, setWithdrawValue] = useState<string>();
   const [blockNumber, setBlockNumber] = useState<number>();
   const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [biconomyStatus, setBiconomyStatus] = useState<boolean>(true);
 
@@ -33,14 +32,6 @@ export const useWithdrawalForm = ({
       fetchIfUserHasWithdrawalRequest();
     }
   }, [walletAccountAtom]);
-
-  useEffect(() => {
-    setNotification({
-      id: ENotificationId.WITHDRAWAL,
-      type: 'success',
-      message: success,
-    });
-  }, [success]);
 
   const fetchIfUserHasWithdrawalRequest = async () => {
     resetState();
@@ -64,7 +55,7 @@ export const useWithdrawalForm = ({
         const message = `You have ${userRequestslength} ${
           userRequestslength === 1 ? 'request' : 'requests'
         } accepted, will be processed within ${remainingTime}`;
-        setSuccess(message);
+        setNotificationt(message, 'success');
       }
     } catch (err) {
       setError(err.message);
@@ -87,7 +78,7 @@ export const useWithdrawalForm = ({
             resetState();
             setWithdrawValue(null);
             setIsWithdrawing(false);
-            setSuccess('Withdrew successfully');
+            setNotificationt('Withdrew successfully', 'success');
           }
         },
       );
@@ -102,8 +93,9 @@ export const useWithdrawalForm = ({
             resetState();
             setWithdrawValue(null);
             setIsWithdrawing(false);
-            setSuccess(
+            setNotificationt(
               'Request accepted and will be processed within 24 hours',
+              'success',
             );
           }
         },
@@ -125,7 +117,6 @@ export const useWithdrawalForm = ({
 
   const resetState = () => {
     setError('');
-    setSuccess('');
     setIsWithdrawing(false);
   };
 
@@ -144,7 +135,6 @@ export const useWithdrawalForm = ({
       resetState();
       setBlockNumber(res);
     } catch (err) {
-      console.error('Error', err.message);
       resetState();
       setNotificationt(err.message, 'error');
     }
