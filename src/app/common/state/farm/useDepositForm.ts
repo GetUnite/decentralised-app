@@ -75,9 +75,8 @@ export const useDepositForm = ({
       setDepositValue(null);
       setNotificationt('Deposit successfully', 'success');
     } catch (err) {
-      console.error('Error', err.message);
       resetState();
-      setError(err.message);
+      setNotificationt(err.message, 'error');
     }
     setIsDepositing(false);
   };

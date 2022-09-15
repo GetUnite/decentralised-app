@@ -30,6 +30,7 @@ export const WithdrawalForm = ({
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
@@ -40,6 +41,7 @@ export const WithdrawalForm = ({
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
               <NewInput
+                inputLabel="Withdraw"
                 coinIcon={selectedFarm.sign}
                 inputProps={{
                   value: withdrawValue || '',

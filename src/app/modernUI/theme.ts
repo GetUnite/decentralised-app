@@ -333,7 +333,8 @@ export const theme = deepMerge(grommet, {
   },
   layer: { overlay: { background: 'container' } },
   menu: {
-    item: { gap: '10px' },
+    item: { gap: '50px' },
     icons: { color: { dark: colors.WHITE, light: colors.BLACK } },
+    group : { container: {pad: {horizontal: 'medium'}}}
   },
 });
