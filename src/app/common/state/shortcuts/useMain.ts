@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { tokenInfo, walletAccount } from 'app/common/state/atoms';
+import { walletAccount } from 'app/common/state/atoms';
 import { initialAvailableFarmsState, TFarm } from '../farm/useFarm';
 import {
   getTotalAssetSupply,
   getInterest,
-  getListSupportedTokens,
+  getSupportedTokensAdvancedInfo,
   getUserDepositedAmount,
+  getSupportedTokensList,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from '../useNotification';
 import { useCookies } from 'react-cookie';
@@ -25,6 +26,7 @@ export const useMain = () => {
     initialAvailableFarmsState,
   );
   const [filter, setFilter] = useState<any>();
+  const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
 
@@ -46,7 +48,7 @@ export const useMain = () => {
     try {
       let numberOfAssets = 0;
       let chainsWithAssets = new Set();
-      let allSupportedTokensList = new Set<string>();
+      let allSupportedTokens = new Set<string>();
 
       await Promise.all(
         initialAvailableFarmsState
@@ -60,22 +62,30 @@ export const useMain = () => {
               availableFarm.type,
               availableFarm.chain,
             );
-
+            const supportedTokensList = await getSupportedTokensList(
+              availableFarm.type,
+              availableFarm.chain,
+            );
+            supportedTokensList.map(async supportedToken => {
+              allSupportedTokens.add(supportedToken.symbol);
+            });
+            availableFarm.supportedTokens = supportedTokensList;
             if (walletAccountAtom) {
               availableFarm.depositedAmount = await getUserDepositedAmount(
                 availableFarm.type,
                 availableFarm.chain,
               );
-              const supportedTokenList = await getListSupportedTokens(
-                availableFarm.type,
-                availableFarm.chain,
-              );
-              supportedTokenList.forEach(supportedToken => {
-                if (supportedToken.balance > 0) {
+              supportedTokensList.map(async supportedToken => {
+                const advancedSupportedTokenInfo =
+                  await getSupportedTokensAdvancedInfo(
+                    supportedToken,
+                    availableFarm.type,
+                    availableFarm.chain,
+                  );
+                if (Number(advancedSupportedTokenInfo.balance) > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(availableFarm.chain);
                 }
-                allSupportedTokensList.add(supportedToken.symbol);
               });
             }
           }),
@@ -90,7 +100,7 @@ export const useMain = () => {
           });
         }
         setAvailableFarms(availableFarms);
-        setAllSupportedTokens(Array.from(allSupportedTokensList));
+        setAllSupportedTokens(Array.from(allSupportedTokens));
       });
     } catch (error) {
       setError(error);
@@ -120,7 +130,9 @@ export const useMain = () => {
         ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
         : availableFarms;
 
-    filteredFarms = filter ? filteredFarms.filter(filter) : filteredFarms;
+    filteredFarms = tokenFilter ? filteredFarms.filter(farm => farm.supportedTokens.map(supportedToken => supportedToken.symbol).includes(tokenFilter)) : filteredFarms;
+
+    //filteredFarms = filter ? filteredFarms.filter(filter) : filteredFarms;
 
     return filteredFarms;
   };
@@ -134,6 +146,7 @@ export const useMain = () => {
     showYourFarms,
     viewType,
     filterByNetwork,
-    allSupportedTokens
+    allSupportedTokens,
+    tokenFilter, setTokenFilter
   };
 };

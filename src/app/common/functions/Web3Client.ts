@@ -230,6 +230,14 @@ export const getCurrentChainOnWalletUpdated = async callback => {
   });
 };
 
+export const getCurrentChain = async () => {
+  const state = onboard.state.get();
+
+  if (state.wallets[0].chains[0]) {
+    return getCurrentChainById(state.wallets[0].chains[0].id);
+  }
+};
+
 export const startOrGetBiconomy = async (chain, provider) => {
   try {
     const biconomy = new Biconomy(provider, {
@@ -277,7 +285,6 @@ const sendTransaction = async (
 
   const contract = new web3ToUse.eth.Contract(abi as any, address);
 
-  console.log('entrou aqui e nao devia', functionSignature);
   try {
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.send({
@@ -286,8 +293,15 @@ const sendTransaction = async (
 
     return tx;
   } catch (error) {
-    // here do all error handling to readable stuff
     console.log(error);
+    if (error.code == 4001) {
+      throw 'User denied message signature';
+    }
+
+    if (error.includes('reverted by EVM')) {
+      throw 'Transaction has been reverted by the EVM';
+    }
+
     throw error;
   }
 };
@@ -395,7 +409,7 @@ export const calculateApr = async (rewardPerDistribution, totalLockedInLP) => {
 
 export const isExpectedPolygonEvent = (type, depositAddress) => {
   const ibAlluoAddress = getIbAlluoAddress(type);
-  return depositAddress === ibAlluoAddress;
+  return depositAddress.toLowerCase() === ibAlluoAddress.toLowerCase();
 };
 
 export const approveAlluoTransaction = async alluoAmount => {
@@ -552,6 +566,48 @@ export const withdrawAlluo = async () => {
   return tx;
 };
 
+export const getSupportedTokensList = async (
+  type = 'usd',
+  chain = EChain.POLYGON,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'getListSupportedTokens',
+        outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+    const supportedTokenAddressesList = await callContract(
+      abi,
+      ibAlluoAddress,
+      'getListSupportedTokens()',
+      null,
+      chain,
+    );
+
+    const supportedTokensWithBasicInfo = [];
+
+    const requests = supportedTokenAddressesList.map(async tokenAddress => {
+      const info = await getSupportedTokensBasicInfo(tokenAddress, type, chain);
+      supportedTokensWithBasicInfo.push(info);
+    });
+
+    await Promise.allSettled(requests);
+
+    supportedTokensWithBasicInfo.sort((a, b) => b.balance - a.balance);
+
+    return supportedTokensWithBasicInfo;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getListSupportedTokens = async (
   type = 'usd',
   chain = EChain.POLYGON,
@@ -645,6 +701,94 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
   }
 
   return VLALLUOAddr[type];
+};
+
+export const getSupportedTokensBasicInfo = async (
+  tokenAddress,
+  type,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'symbol',
+      outputs: [{ internalType: 'string', name: '', type: 'string' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'decimals',
+      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const symbol = await callContract(abi, tokenAddress, 'symbol()', null, chain);
+
+  const decimals = await callContract(
+    abi,
+    tokenAddress,
+    'decimals()',
+    null,
+    chain,
+  );
+
+  return {
+    tokenAddress,
+    symbol,
+    decimals,
+  };
+};
+
+export const getSupportedTokensAdvancedInfo = async (
+  supportedToken,
+  type,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'balanceOf',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'spender', type: 'address' },
+      ],
+      name: 'allowance',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const balance = await callContract(
+    abi,
+    supportedToken.tokenAddress,
+    'balanceOf(address)',
+    [walletAddress],
+    chain,
+  );
+
+  const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+  const allowance = await callContract(
+    abi,
+    supportedToken.tokenAddress,
+    'allowance(address,address)',
+    [walletAddress, ibAlluoAddress],
+    chain,
+  );
+
+  return {
+    balance: fromDecimals(balance, supportedToken.decimals),
+    allowance: fromDecimals(allowance, supportedToken.deciamls),
+  };
 };
 
 export const getStableCoinInfo = async (
@@ -1425,7 +1569,7 @@ export const approveAlluoPurchaseInWETH = async () => {
 
     return tx;
   } catch (error) {
-    throw 'Something went wrong while trying to approve alluo purchases with WETH';
+    throw error;
   }
 };
 
