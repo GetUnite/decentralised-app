@@ -8,7 +8,6 @@ import {
   getUserDepositedAmount,
 } from 'app/common/functions/Web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useChain } from 'app/common/state';
 import { useNavigate } from 'react-router-dom';
 
 import dai from 'app/modernUI/images/dai.svg';

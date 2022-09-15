@@ -6,6 +6,7 @@ import {
   EChain,
   getCurrentChainOnWalletUpdated,
   getChainById,
+  getCurrentChain,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from 'app/common/state';
 
@@ -33,17 +34,13 @@ export const useChain = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      try {
-        changeNetwork(wantedChainAtom);
-      } catch (error) {
-        console.log(error);
-      }
+      changeNetwork(wantedChainAtom);
       checkCurrentChain();
     }
   }, [wantedChainAtom]);
 
   const checkCurrentChain = async () => {
-    if (currentChain !== wantedChainAtom) {
+    if ((await getCurrentChain()) !== wantedChainAtom) {
       setNotificationt(
         `Please change your wallet network to ${
           wantedChainAtom === EChain.ETHEREUM ? 'Ethereum' : 'Polygon'

@@ -3,23 +3,19 @@ import {
   Box,
   Heading,
   Paragraph,
-  Text,
   Button,
   Card,
   Grid,
   ResponsiveContext,
-  Menu,
   DropButton,
   Select,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
-import { toExactFixed } from 'app/common/functions/utils';
 import { isSmall } from 'app/modernUI/theme';
 import { useMain } from 'app/common/state/shortcuts';
 import { Spinner, Layout } from 'app/modernUI/components';
 import { Assets } from './blocks';
 import { walletAccount } from 'app/common/state/atoms';
-import { EChain } from 'app/common/functions/Web3Client';
 
 export const Main = () => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -33,6 +29,7 @@ export const Main = () => {
     viewType,
     filterByNetwork,
     allSupportedTokens,
+    tokenFilter, setTokenFilter
   } = useMain();
 
   const headingText = isLoading ? (
@@ -128,19 +125,51 @@ export const Main = () => {
                         gap="medium"
                         style={{ fontSize: '16px' }}
                       >
-                        <Menu
+                        <Select
+                          plain
+                          options={['All Tokens' , ...allSupportedTokens]}
+                          value={tokenFilter ? tokenFilter : 'All Tokens'}
+                          onChange={({ option }) => setTokenFilter(option === 'All Tokens' ? null : option)}
+                        />
+                        <DropButton
                           label="All Networks"
                           plain
-                          items={[
-                            {
+                          dropContent={
+                            <Box
+                              margin={{ vertical: '10px' }}
+                              round={'large'}
+                              gap="12px"
+                              fill
+                            >
+                              <Button
+                                plain
+                                style={{
+                                  paddingLeft: '12px',
+                                  paddingRight: '12px',
+                                }}
+                              >
+                                All Networks
+                              </Button>
+                              <Button
+                                plain
+                                style={{
+                                  paddingLeft: '12px',
+                                  paddingRight: '12px',
+                                }}
+                              >
+                                Ethereum
+                              </Button>
+                              <Button plain>Polygon</Button>
+                              {/*
                               label: 'Ethereum',
                               onClick: () => filterByNetwork(EChain.ETHEREUM),
                             },
                             {
                               label: 'Polygon',
                               onClick: () => filterByNetwork(EChain.POLYGON),
-                            },
-                          ]}
+                            */}
+                            </Box>
+                          }
                         />
                       </Box>
                     </Box>
