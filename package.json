@@ -52,7 +52,7 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "start": "yarn run build && (cd server && yarn start)",
+    "start": "cd server && yarn start",
     "start-client": "react-scripts start",
     "build": "node --max_old_space_size=2560 node_modules/.bin/react-scripts build",
     "test": "react-scripts test",
