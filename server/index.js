@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, '..', 'build')));
 app.use(express.static('public'));
 
 app.use((req, res, next) => {
+  console.log('hello world');
   res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
 });
 
