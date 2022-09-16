@@ -8,6 +8,7 @@ import {
   getSupportedTokensAdvancedInfo,
   getUserDepositedAmount,
   getSupportedTokensList,
+  EChain,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from '../useNotification';
 import { useCookies } from 'react-cookie';
@@ -25,7 +26,7 @@ export const useMain = () => {
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>(
     initialAvailableFarmsState,
   );
-  const [filter, setFilter] = useState<any>();
+  const [networkFilter, setNetworkFilter] = useState<string>();
   const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
@@ -110,16 +111,13 @@ export const useMain = () => {
   };
 
   const showAllFarms = () => {
-    setFilter(null);
+    setNetworkFilter(null);
+    setTokenFilter(null);
     setViewType(null);
   };
 
   const showYourFarms = () => {
     setViewType('your');
-  };
-
-  const filterByNetwork = chain => {
-    setFilter(() => farm => farm.chain == chain);
   };
 
   const filteredFarms = () => {
@@ -132,7 +130,7 @@ export const useMain = () => {
 
     filteredFarms = tokenFilter ? filteredFarms.filter(farm => farm.supportedTokens.map(supportedToken => supportedToken.symbol).includes(tokenFilter)) : filteredFarms;
 
-    //filteredFarms = filter ? filteredFarms.filter(filter) : filteredFarms;
+    filteredFarms = networkFilter ? filteredFarms.filter(farm => farm.chain == (networkFilter == 'Ethereum' ? EChain.ETHEREUM : EChain.POLYGON)) : filteredFarms;
 
     return filteredFarms;
   };
@@ -145,8 +143,9 @@ export const useMain = () => {
     showAllFarms,
     showYourFarms,
     viewType,
-    filterByNetwork,
     allSupportedTokens,
-    tokenFilter, setTokenFilter
+    tokenFilter, setTokenFilter,
+    networkFilter,
+    setNetworkFilter,
   };
 };

@@ -7,7 +7,6 @@ import {
   Card,
   Grid,
   ResponsiveContext,
-  DropButton,
   Select,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
@@ -27,9 +26,11 @@ export const Main = () => {
     showAllFarms,
     showYourFarms,
     viewType,
-    filterByNetwork,
     allSupportedTokens,
-    tokenFilter, setTokenFilter
+    tokenFilter,
+    setTokenFilter,
+    networkFilter,
+    setNetworkFilter,
   } = useMain();
 
   const headingText = isLoading ? (
@@ -126,51 +127,28 @@ export const Main = () => {
                         style={{ fontSize: '16px' }}
                       >
                         <Select
+                          style={{ width: '80px', padding: 0 }}
                           plain
-                          options={['All Tokens' , ...allSupportedTokens]}
+                          options={['All Tokens', ...allSupportedTokens]}
                           value={tokenFilter ? tokenFilter : 'All Tokens'}
-                          onChange={({ option }) => setTokenFilter(option === 'All Tokens' ? null : option)}
-                        />
-                        <DropButton
-                          label="All Networks"
-                          plain
-                          dropContent={
-                            <Box
-                              margin={{ vertical: '10px' }}
-                              round={'large'}
-                              gap="12px"
-                              fill
-                            >
-                              <Button
-                                plain
-                                style={{
-                                  paddingLeft: '12px',
-                                  paddingRight: '12px',
-                                }}
-                              >
-                                All Networks
-                              </Button>
-                              <Button
-                                plain
-                                style={{
-                                  paddingLeft: '12px',
-                                  paddingRight: '12px',
-                                }}
-                              >
-                                Ethereum
-                              </Button>
-                              <Button plain>Polygon</Button>
-                              {/*
-                              label: 'Ethereum',
-                              onClick: () => filterByNetwork(EChain.ETHEREUM),
-                            },
-                            {
-                              label: 'Polygon',
-                              onClick: () => filterByNetwork(EChain.POLYGON),
-                            */}
-                            </Box>
+                          onChange={({ option }) =>
+                            setTokenFilter(
+                              option === 'All Tokens' ? null : option,
+                            )
                           }
                         />
+                        <Select
+                          style={{ width: '100px', padding: 0 }}
+                          plain
+                          options={['All Networks', 'Ethereum', 'Polygon']}
+                          value={networkFilter ? networkFilter : 'All Networks'}
+                          onChange={({ option }) =>
+                            setNetworkFilter(
+                              option === 'All Networks' ? null : option,
+                            )
+                          }
+                        />
+
                       </Box>
                     </Box>
                     {!isSmall(size) && (
@@ -223,7 +201,6 @@ export const Main = () => {
                 </Box>
               </Box>
             </Box>
-            <Box pad="large" />
           </>
         )}
       </ResponsiveContext.Consumer>

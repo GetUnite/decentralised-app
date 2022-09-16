@@ -16,7 +16,7 @@ interface IModal {
   notificationId?: ENotificationId;
   children: React.ReactNode;
   noHeading?: boolean;
-  minHeight?: string;
+  contentHeight?: string;
 }
 
 export const Modal = ({
@@ -26,7 +26,7 @@ export const Modal = ({
   isLoading = false,
   children,
   noHeading = false,
-  minHeight = "750px"
+  contentHeight,
 }: IModal) => {
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
@@ -49,13 +49,12 @@ export const Modal = ({
         gap="small"
         direction="column"
         background="modal"
-        style={{minHeight: minHeight}}
         pad={{ vertical: 'medium', horizontal: 'medium' }}
       >
         <Box fill flex="grow" height="100vh">
           <Box
             direction="row"
-            justify={!noHeading ? "between" : "end"}
+            justify={!noHeading ? 'between' : 'end'}
             align="center"
             fill="horizontal"
             gap="small"
@@ -83,14 +82,13 @@ export const Modal = ({
                 justify="center"
                 align="center"
               >
-                <FormClose size="large" color='black'/>
+                <FormClose size="large" color="black" />
               </Box>
             </Button>
           </Box>
           <Box
             direction="column"
             fill="vertical"
-            margin={{ vertical: 'medium' }}
             gap="small"
           >
             {!walletAccountAtom ? (
@@ -99,17 +97,27 @@ export const Modal = ({
                   <ConnectionButton />
                 </Text>
               </Box>
-            ) : isLoading ? (
-              <Box
-                align="center"
-                justify="center"
-                fill="vertical"
-                margin={{ top: 'large', bottom: 'medium' }}
-              >
-                <Spinner pad="large" />
-              </Box>
             ) : (
-              <>{children}</>
+              <Box
+                direction="column"
+                fill="vertical"
+                margin={{ vertical: 'medium' }}
+                gap="small"
+                style={contentHeight ? { height: contentHeight } : {}}
+              >
+                {isLoading ? (
+                  <Box
+                    align="center"
+                    justify="center"
+                    fill="vertical"
+                    margin={{ top: 'large', bottom: 'medium' }}
+                  >
+                    <Spinner pad="large" />
+                  </Box>
+                ) : (
+                  <>{children}</>
+                )}
+              </Box>
             )}
           </Box>
         </Box>
