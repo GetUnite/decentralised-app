@@ -19,7 +19,6 @@
     "invariant": "^2.2.4",
     "lodash-es": "^4.17.21",
     "react": "^17.0.2",
-    "react-app-rewired": "^2.2.1",
     "react-cookie": "^4.1.1",
     "react-countdown": "^2.3.2",
     "react-dom": "^17.0.2",
@@ -53,10 +52,11 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject",
+    "start": "yarn run build && (cd server && yarn start)",
+    "start-client": "react-scripts start",
+    "build": "node --max_old_space_size=2560 node_modules/.bin/react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "ci": "rm -rf node_modules && yarn install --frozen-lockfile"
   },
   "eslintConfig": {
