@@ -36,7 +36,7 @@ export const LockTab = ({ ...rest }) => {
           <Box margin={{ top: 'large' }}>
             {' '}
             <Text textAlign="center" weight="bold">
-              Your have{' '}
+              You have{' '}
               {(+tokenInfoAtom.lockedAlluoValueOfUser).toLocaleString()} $ALLUO
               staked
             </Text>

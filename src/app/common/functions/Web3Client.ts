@@ -302,7 +302,7 @@ const sendTransaction = async (
       throw 'Transaction has been reverted by the EVM';
     }
 
-    throw error;
+    throw 'Something went wrong with your transaction. Please try again';
   }
 };
 

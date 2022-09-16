@@ -26,7 +26,7 @@ export const BoosterFarmPresentation = ({
           Earn X% as {rewardsResult} tokens
           <br />
         </Text>
-        <img src={booster} alt="booster" width={310} />
+        <img src={booster} alt="booster" width={275} />
         <Button
           primary
           label="Deposit to get started"

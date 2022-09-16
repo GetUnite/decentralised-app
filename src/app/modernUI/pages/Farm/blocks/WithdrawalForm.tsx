@@ -73,7 +73,7 @@ export const WithdrawalForm = ({
           </Box>
         </>
       )}
-      <Box margin={{ top: 'large' }}>
+      <Box margin={{ top: 'medium' }}>
         <Button
           primary
           disabled={
