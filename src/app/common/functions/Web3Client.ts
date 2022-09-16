@@ -223,10 +223,11 @@ export const getCurrentChainById = async chainId => {
   return getChainById(chainId);
 };
 
-export const getCurrentChainOnWalletUpdated = async callback => {
+export const onWalletUpdated = async callback => {
   const wallets = onboard.state.select('wallets');
   wallets.subscribe(wallets => {
-    callback(wallets[0].chains[0].id);
+    walletAddress = wallets[0].accounts[0].address;
+    callback(wallets[0].chains[0].id, wallets[0].accounts[0].address);
   });
 };
 

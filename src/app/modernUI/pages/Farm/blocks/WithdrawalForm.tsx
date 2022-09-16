@@ -52,7 +52,7 @@ export const WithdrawalForm = ({
                   onClick: setToMax,
                 }}
                 selectProps={{
-                  options: selectedFarm.stableCoins || [],
+                  options: selectedFarm.supportedTokens || [],
                 }}
                 selectedTokenInfo={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
