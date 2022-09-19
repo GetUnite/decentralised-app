@@ -17,59 +17,11 @@ import gnosisModule from '@web3-onboard/gnosis';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import injectedModule from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import {
+  EEthereumAddresses,
+  EPolygonAddresses,
+} from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
-
-enum EEthereumAddressesTestnet {
-  IBALLUOUSD = '0xc622244881FF63d0b1C1Eb3cEad17F06fE066600',
-  IBALLUOEUR = '0xefb6CA5c2b716C259EaBFa1Fb0517B46c02FE9d1',
-  IBALLUOETH = '0x9d75C26Dd3B6B1Cf5B30A5BEF78bb7B08BA8f833',
-  IBALLUOBTC = '0x72b7091A4272D2d23b3e7cBec3D1df85B72d7B12',
-  VAULT = '0x1B369dE4c731d143C86cfAa811E88725905F4365',
-  WETH = '0x66Ac11c106C3670988DEFDd24BC75dE786b91095',
-  ALLUO = '0x8F45B571e310bCb61DDfe176C396e9109CF1b309',
-  VLALLUO = '0x4bf7737515EE8862306Ddc221cE34cA9d5C91200',
-  USDC = '0x0b6bb9E47179390B7Cf708b57ceF65a44a8038a9',
-}
-
-enum EEthereumAddressesMainnet {
-  IBALLUOUSD = '0xf555b595d04ee62f0ea9d0e72001d926a736a0f6',
-  IBALLUOEUR = '0xeb38D2f6a745Bd3f466F3F20A617D2C615b316eE',
-  IBALLUOETH = '0x98f49aC358187116462BDEA748daD1Df480865d7',
-  IBALLUOBTC = '0xb4FFDec68c297B278D757C49c5094dde53f2F878',
-  VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
-  WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-  ALLUO = '0x1e5193ccc53f25638aa22a940af899b692e10b09',
-  VLALLUO = '0xF295EE9F1FA3Df84493Ae21e08eC2e1Ca9DebbAf',
-  USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-}
-
-enum EPolygonAddressesMumbai {
-  IBALLUOUSD = '0x71402a46d78a10c8ee7e7cdef2affec8d1e312a1',
-  IBALLUOEUR = '0xb1a6a9693381073168ee9A0dFcb8691F4cbf7f49',
-  IBALLUOETH = '0xC7600AEECc60C72b22E28f77A584C40dD169aa2c',
-  IBALLUOBTC = '0xC7600AEECc60C72b22E28f77A584C40dD169aa2c',
-  BUFFER = '0xf9f9381fbc5225180015b1f0eab6c33dbf0b37ab',
-  HANDLER = '0xF877605269bB018c96bD1c93F276F834F45Ccc3f',
-}
-
-enum EPolygonAddressesMainnet {
-  IBALLUOUSD = '0xc2dbaaea2efa47ebda3e572aa0e55b742e408bf6',
-  IBALLUOEUR = '0xc9d8556645853C465D1D5e7d2c81A0031F0B8a92',
-  IBALLUOETH = '0xc677B0918a96ad258A68785C2a3955428DeA7e50',
-  IBALLUOBTC = '0xf272ff86c86529504f0d074b210e95fc4cfcdce2',
-  BUFFER = '0xa248Ba96d72005114e6C941f299D315757877c0e',
-  HANDLER = '0x31a3439Ac7E6Ea7e0C0E4b846F45700c6354f8c1',
-}
-
-const EPolygonAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
-    ? EPolygonAddressesMainnet
-    : EPolygonAddressesMumbai;
-
-const EEthereumAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
-    ? EEthereumAddressesMainnet
-    : EEthereumAddressesTestnet;
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
 const ethereumMainnetProviderUrl =
@@ -115,34 +67,36 @@ const walletConnect = walletConnectModule({
 const gnosis = gnosisModule();
 const coinbase = coinbaseWalletModule();
 
+const chains = [
+  {
+    id: EChainId.ETH_MAINNET,
+    token: 'ETH',
+    label: 'Ethereum Mainnet',
+    rpcUrl: ethereumMainnetProviderUrl,
+  },
+  {
+    id: EChainId.ETH_SEPOLIA,
+    token: 'ETH',
+    label: 'Ethereum Sepolia',
+    rpcUrl: ethereumTestnetProviderUrl,
+  },
+  {
+    id: EChainId.POL_MAINNET,
+    token: 'MATIC',
+    label: 'Matic Mainnet',
+    rpcUrl: polygonMainnetProviderUrl,
+  },
+  {
+    id: EChainId.POL_MUMBAI,
+    token: 'MATIC',
+    label: 'Matic Mumbai',
+    rpcUrl: polygonTestnetProviderUrl,
+  },
+];
+
 const onboard = Onboard({
   wallets: [],
-  chains: [
-    {
-      id: EChainId.ETH_MAINNET,
-      token: 'ETH',
-      label: 'Ethereum Mainnet',
-      rpcUrl: ethereumMainnetProviderUrl,
-    },
-    {
-      id: EChainId.ETH_SEPOLIA,
-      token: 'ETH',
-      label: 'Ethereum Sepolia',
-      rpcUrl: ethereumTestnetProviderUrl,
-    },
-    {
-      id: EChainId.POL_MAINNET,
-      token: 'MATIC',
-      label: 'Matic Mainnet',
-      rpcUrl: polygonMainnetProviderUrl,
-    },
-    {
-      id: EChainId.POL_MUMBAI,
-      token: 'MATIC',
-      label: 'Matic Mumbai',
-      rpcUrl: polygonTestnetProviderUrl,
-    },
-  ],
+  chains: chains,
   appMetadata: {
     name: 'Alluo',
     icon: logo,
@@ -188,22 +142,10 @@ const usesNoncesAddresses = [
 let walletAddress;
 let web3: WalletConnectProvider | any;
 
-export const connectToWallet = async () => {
+export const connectToWallet = async (connectOptions?) => {
   let wallets;
-  const gnosisLabel = 'Gnosis Safe';
 
-  const onboardState = onboard.state.get();
-  if (
-    onboardState.walletModules.find(
-      walletModule => walletModule.label == gnosisLabel,
-    )
-  ) {
-    wallets = await onboard.connectWallet({
-      autoSelect: { label: gnosisLabel, disableModals: true },
-    });
-  } else {
-    wallets = await onboard.connectWallet();
-  }
+  wallets = await onboard.connectWallet(connectOptions);
 
   if (wallets[0]) {
     web3 = new Web3(wallets[0].provider as any);
@@ -211,6 +153,19 @@ export const connectToWallet = async () => {
     return walletAddress;
   }
 };
+
+const gnosisLabel = 'Gnosis Safe';
+const onboardState = onboard.state.get();
+console.log(onboardState);
+if (
+  onboardState.walletModules.find(
+    walletModule => walletModule.label == gnosisLabel,
+  )
+) {
+  connectToWallet({
+    autoSelect: { label: gnosisLabel, disableModals: true },
+  });
+}
 
 export const changeNetwork = async (chain: EChain) => {
   let chainId;
@@ -229,7 +184,9 @@ export const changeNetwork = async (chain: EChain) => {
         : EChainId.POL_MUMBAI;
   }
 
-  await onboard.setChain({ chainId: chainId });
+  const success = await onboard.setChain({ chainId: chainId });
+
+  return { success, chainId };
 };
 
 export const getChainById = chainId => {
@@ -240,24 +197,26 @@ export const getChainById = chainId => {
     : null;
 };
 
-export const getCurrentChainById = async chainId => {
-  return getChainById(chainId);
-};
-
 export const onWalletUpdated = async callback => {
   const wallets = onboard.state.select('wallets');
   wallets.subscribe(wallets => {
-    walletAddress = wallets[0].accounts[0].address;
-    callback(wallets[0].chains[0].id, wallets[0].accounts[0].address);
+    if (wallets[0]) {
+      walletAddress = wallets[0].accounts[0].address;
+      callback(wallets[0].chains[0].id, wallets[0].accounts[0].address);
+    }
   });
 };
 
-export const getCurrentChain = async () => {
+export const getCurrentChainId = async () => {
   const state = onboard.state.get();
 
-  if (state.wallets[0].chains[0]) {
-    return getCurrentChainById(state.wallets[0].chains[0].id);
+  if (state.wallets[0]?.chains[0]) {
+    return state.wallets[0].chains[0].id;
   }
+};
+
+export const getChainNameById = chainId => {
+  return chains.find(chain => chain.id == chainId).label;
 };
 
 export const startOrGetBiconomy = async (chain, provider) => {
@@ -358,7 +317,7 @@ const alluoPriceUrl =
 export const getAlluoPrice = async (): Promise<number> => {
   const pathforUSDC =
     alluoPriceUrl +
-    `/v1/markets/${EEthereumAddressesMainnet.ALLUO}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
+    `/v1/markets/${EEthereumAddresses.ALLUO}-${EEthereumAddresses.USDC}/sell/1000000000000000000`;
 
   const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
 
@@ -371,7 +330,7 @@ export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
 
   const pathforWETH =
     alluoPriceUrl +
-    `/v1/markets/${EEthereumAddressesMainnet.WETH}-${EEthereumAddressesMainnet.ALLUO}/sell/${valueInDecimals}`;
+    `/v1/markets/${EEthereumAddresses.WETH}-${EEthereumAddresses.ALLUO}/sell/${valueInDecimals}`;
 
   const wethPriceObj = await fetch(pathforWETH).then(res => res.json());
   const wethPrice = wethPriceObj?.amount || 0;
@@ -616,7 +575,7 @@ export const getSupportedTokensList = async (
     const supportedTokensWithBasicInfo = [];
 
     const requests = supportedTokenAddressesList.map(async tokenAddress => {
-      const info = await getSupportedTokensBasicInfo(tokenAddress, type, chain);
+      const info = await getSupportedTokensBasicInfo(tokenAddress, chain);
       supportedTokensWithBasicInfo.push(info);
     });
 
@@ -727,7 +686,6 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
 
 export const getSupportedTokensBasicInfo = async (
   tokenAddress,
-  type,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -982,7 +940,7 @@ export const approveStableCoin = async (
   type = 'usd',
   chain = EChain.POLYGON,
 ) => {
-  const VLALLUOAddr = getIbAlluoAddress(type, chain);
+  const ibAlluoAddress = getIbAlluoAddress(type, chain);
 
   if (chain == EChain.ETHEREUM) {
     const abi = getIbAlluoAbi(type, chain);
@@ -992,7 +950,7 @@ export const approveStableCoin = async (
     );
 
     const res = await stableCoinInstanceFromWallet.methods
-      .approve(VLALLUOAddr, maximumUint256Value)
+      .approve(ibAlluoAddress, maximumUint256Value)
       .send({ from: walletAddress });
 
     return res;
@@ -1068,7 +1026,7 @@ export const approveStableCoin = async (
       types = { Permit: permit, EIP712Domain: EIP712Domain };
       message = {
         owner: walletAddress,
-        spender: VLALLUOAddr,
+        spender: ibAlluoAddress,
         value: maximumUint256Value,
         nonce: nonce,
         deadline: maximumUint256Value,
@@ -1095,7 +1053,7 @@ export const approveStableCoin = async (
       const name = await contract.methods.name().call();
       const functionSignature =
         '0x095ea7b3' +
-        web3.utils.padLeft(VLALLUOAddr, 64).replace('0x', '') +
+        web3.utils.padLeft(ibAlluoAddress, 64).replace('0x', '') +
         'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
       const salt = web3.utils.padLeft(web3.utils.toHex(chainId), 64, '0');
 
@@ -1228,6 +1186,72 @@ export const depositStableCoin = async (
     ibAlluoAddress,
     'deposit(address,uint256)',
     [tokenAddress, amountInDecimals],
+    chain,
+    useBiconomy,
+  );
+
+  return tx;
+};
+
+export const depositIntoBoosterFarm = async (
+  farmAddress,
+  tokenAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        { internalType: 'address', name: 'entryToken', type: 'address' },
+      ],
+      name: 'depositWithoutLP',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const amountInDecimals = toDecimals(amount, decimals);
+
+  const tx = await sendTransaction(
+    abi,
+    farmAddress,
+    'depositWithoutLP(uint256,address)',
+    [amountInDecimals, tokenAddress],
+    chain,
+    useBiconomy,
+  );
+
+  return tx;
+};
+
+export const approveToken = async (
+  tokenAddress,
+  spender,
+  chain = EChain.ETHEREUM,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'address', name: 'spender', type: 'address' },
+        { internalType: 'uint256', name: 'amount', type: 'uint256' },
+      ],
+      name: 'approve',
+      outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const tx = await sendTransaction(
+    abi,
+    tokenAddress,
+    'depositWithoutLP(uint256,address)',
+    [spender, maximumUint256Value],
     chain,
     useBiconomy,
   );
@@ -1390,6 +1414,80 @@ export const withdrawStableCoin = async (
     ibAlluoAddress,
     'withdraw(address,uint256)',
     [coinAddress, amountInWei],
+    chain,
+    useBiconomy,
+  );
+
+  return tx.blockNumber;
+};
+
+export const withdrawFromBoosterFarm = async (
+  farmAddress,
+  tokenAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        { internalType: 'address', name: 'receiver', type: 'address' },
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'exitToken', type: 'address' },
+      ],
+      name: 'withdrawToNonLp',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const amountInDecimals = toDecimals(amount, decimals);
+
+  const tx = await sendTransaction(
+    abi,
+    farmAddress,
+    'withdrawToNonLp(uint256,address,address,address)',
+    [amountInDecimals, , , tokenAddress],
+    chain,
+    useBiconomy,
+  );
+
+  return tx.blockNumber;
+};
+
+export const claimBoosterFarmRewards = async (
+  farmAddress,
+  tokenAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        { internalType: 'address', name: 'receiver', type: 'address' },
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'exitToken', type: 'address' },
+      ],
+      name: 'withdrawToNonLp',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const amountInDecimals = toDecimals(amount, decimals);
+
+  const tx = await sendTransaction(
+    abi,
+    farmAddress,
+    'withdrawToNonLp(uint256,address,address,address)',
+    [amountInDecimals, , , tokenAddress],
     chain,
     useBiconomy,
   );

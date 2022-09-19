@@ -37,6 +37,7 @@ export const BuyTab = ({ ...rest }) => {
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
