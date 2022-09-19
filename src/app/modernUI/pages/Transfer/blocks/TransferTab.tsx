@@ -94,7 +94,6 @@ export const TransferTab = ({ ...rest }) => {
           </Info>
         </Box>
       )}
-
       <Box margin={{ top: 'large' }}>
         <Button
           primary
