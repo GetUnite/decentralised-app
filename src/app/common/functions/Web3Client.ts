@@ -116,7 +116,7 @@ const gnosis = gnosisModule();
 const coinbase = coinbaseWalletModule();
 
 const onboard = Onboard({
-  wallets: [injected, walletConnect, gnosis, coinbase],
+  wallets: [],
   chains: [
     {
       id: EChainId.ETH_MAINNET,
@@ -161,10 +161,12 @@ const onboard = Onboard({
   },
 });
 
-const walletModulesState = onboard.state.select();
-walletModulesState.subscribe(walletModules => {
-  console.log(walletModules);
-});
+onboard.state.actions.setWalletModules([
+  injected,
+  walletConnect,
+  gnosis,
+  coinbase,
+]);
 
 declare let window: any;
 
@@ -188,18 +190,20 @@ let web3: WalletConnectProvider | any;
 
 export const connectToWallet = async () => {
   let wallets;
+
   const onboardState = onboard.state.get();
   if (
     onboardState.walletModules.find(
-      walletModule => walletModule.label == 'Gnosis',
+      walletModule => walletModule.label == 'Gnosis Safe',
     )
   ) {
-    console.log(onboardState);
-    wallets = await onboard.connectWallet({});
+    wallets = await onboard.connectWallet({
+      autoSelect: { label: 'Gnosis Safe', disableModals: true },
+    });
   } else {
     wallets = await onboard.connectWallet();
   }
-  
+
   if (wallets[0]) {
     web3 = new Web3(wallets[0].provider as any);
     walletAddress = wallets[0].accounts[0].address;
