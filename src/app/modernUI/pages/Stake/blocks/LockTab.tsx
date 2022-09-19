@@ -27,6 +27,7 @@ export const LockTab = ({ ...rest }) => {
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />

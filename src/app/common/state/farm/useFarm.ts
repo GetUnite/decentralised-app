@@ -6,6 +6,8 @@ import {
   getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount,
+  getSupportedTokensBasicInfo,
+  getSupportedTokensAdvancedInfo,
 } from 'app/common/functions/Web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +28,7 @@ import wbtc from 'app/modernUI/images/wbtc.png';
 import crv from 'app/modernUI/images/crv.svg';
 import eth from 'app/modernUI/images/eth.svg';
 import steth from 'app/modernUI/images/steth.svg';
+import { EEthereumAddresses } from 'app/common/constants/addresses';
 
 export type TSelect = {
   label?: string;
@@ -55,6 +58,8 @@ export type TFarm = {
   depositDividedAmount?: { first: any; second: any };
   isBooster?: boolean;
   rewards?: TBoostFarmRewards[];
+  farmAddress?: string;
+  supportedTokensAddresses?: string[];
 };
 
 export const initialAvailableFarmsState: Array<TFarm> = [
@@ -134,6 +139,11 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       { label: 'ETH', icon: { src: eth } },
       { label: 'CURVE.FINANCE', icon: { src: crv } },
     ],
+    farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
+    supportedTokensAddresses: [
+      '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', //WETH
+      "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" //USDC
+    ],
   },
 ];
 
@@ -143,7 +153,8 @@ export const useFarm = ({ id }) => {
   const navigate = useNavigate();
 
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();
-  const [selectedSupportedToken, setSelectedsupportedToken] = useState<TSelect>();
+  const [selectedSupportedToken, setSelectedsupportedToken] =
+    useState<TSelect>();
 
   const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
 
@@ -165,8 +176,25 @@ export const useFarm = ({ id }) => {
       farm.interest = await getInterest(farm.type, farm.chain);
       farm.totalAssetSupply = await getTotalAssetSupply(farm.type, farm.chain);
       if (walletAccountAtom) {
-        farm.supportedTokens = await (
-          await getListSupportedTokens(farm.type, farm.chain)
+        farm.supportedTokens = (
+          Array.isArray(farm.supportedTokensAddresses) &&
+          farm.supportedTokensAddresses.length > 0
+            ? await Promise.all(farm.supportedTokensAddresses.map(async supportedtoken => {
+                const supportedTokenBasicInfo =
+                  await getSupportedTokensBasicInfo(supportedtoken, farm.chain);
+                const supportedTokenAdvancedInfo =
+                  await getSupportedTokensAdvancedInfo(
+                    supportedTokenBasicInfo,
+                    farm.type,
+                    farm.chain,
+                  );
+
+                return {
+                  ...supportedTokenBasicInfo,
+                  ...supportedTokenAdvancedInfo,
+                };
+              }))
+            : await getListSupportedTokens(farm.type, farm.chain)
         ).map(supportedToken => {
           return {
             label: supportedToken.symbol,
@@ -194,7 +222,8 @@ export const useFarm = ({ id }) => {
       const farm = await fetchFarmInfo(selectedFarm);
       setSelectedsupportedToken(
         farm.supportedTokens?.find(
-          supportedToken => supportedToken?.value == selectedSupportedToken?.value,
+          supportedToken =>
+            supportedToken?.value == selectedSupportedToken?.value,
         ),
       );
       setSelectedFarm(farm);

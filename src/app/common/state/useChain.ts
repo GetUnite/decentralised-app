@@ -5,47 +5,58 @@ import {
   changeNetwork,
   EChain,
   onWalletUpdated,
-  getChainById,
-  getCurrentChain,
+  getCurrentChainId,
+  EChainId,
+  getChainNameById,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from 'app/common/state';
 
 export const useChain = () => {
   const { resetNotification, setNotificationt } = useNotification();
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(walletAccount);
+  const [walletAccountAtom, setWalletAccountAtom] =
+    useRecoilState(walletAccount);
   const [wantedChainAtom] = useRecoilState(wantedChain);
-  const [currentChain, setCurrentChain] = useState<EChain>();
+  const [wantedChainId, setWantedChainId] = useState<EChainId>();
+  const [currentChainId, setCurrentChain] = useState<EChain>();
 
   const handleWalletChanged = (chainId, walletAddress) => {
-    setCurrentChain(getChainById(chainId));
+    setCurrentChain(chainId);
     setWalletAccountAtom(walletAddress);
   };
 
   useEffect(() => {
-    if (walletAccountAtom) {
-      onWalletUpdated(handleWalletChanged);
-    }
+    onWalletUpdated(handleWalletChanged);
   }, [walletAccountAtom]);
 
   useEffect(() => {
     if (walletAccountAtom) {
       checkCurrentChain();
     }
-  }, [currentChain]);
+  }, [currentChainId]);
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeNetwork(wantedChainAtom);
-      checkCurrentChain();
+      networkChange();
     }
   }, [wantedChainAtom]);
 
-  const checkCurrentChain = async () => {
-    if ((await getCurrentChain()) !== wantedChainAtom) {
+  const networkChange = async () => {
+    const { success, chainId } = await changeNetwork(wantedChainAtom);
+    setWantedChainId(chainId);
+    if (!success) {
+      checkCurrentChain(chainId);
+    } else {
+      resetNotification();
+    }
+  };
+
+  const checkCurrentChain = async (chainId?) => {
+    const chainIdToUse = chainId != undefined ? chainId : wantedChainId;
+    if ((await getCurrentChainId()) !== chainIdToUse) {
       setNotificationt(
-        `Please change your wallet network to ${
-          wantedChainAtom === EChain.ETHEREUM ? 'Ethereum' : 'Polygon'
-        }`,
+        `Please change your wallet network to ${getChainNameById(
+          chainIdToUse,
+        )}`,
         'info',
       );
     } else {
