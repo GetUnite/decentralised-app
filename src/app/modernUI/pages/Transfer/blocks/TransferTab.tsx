@@ -34,6 +34,7 @@ export const TransferTab = ({ ...rest }) => {
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
@@ -75,35 +76,24 @@ export const TransferTab = ({ ...rest }) => {
               {error}
             </Text>
           </Box>
-
-             {biconomyStatus ? (
-        <Info label="Gas fee" value={null}
-          style={{
-            border: 'none'
-          }}
-        >
-          <div style={{fontSize: 'small'}}>
-            <span>No fees 🎉 - Paid for by Alluo via </span>
-            <a href="https://twitter.com/biconomy">Biconomy</a>
-          </div>
-          <SlideButton biconomyStatus={biconomyStatus} setBiconomyStatus={setBiconomyStatus}/>
-        </Info>
-      )
-      :
-      <Info label="Gas fee" 
-        value={null} 
-        style={{
-          borderBottom: '0px'
-        }} >
-          <div style={{ textAlign: 'right', fontSize: 'small'}}>
-            View Fee in metamask.
-          </div>
-          <SlideButton biconomyStatus={biconomyStatus} setBiconomyStatus={setBiconomyStatus}/>
-      </Info>
-    }
+          <Info label="Gas fee" value={null} border={false}>
+            <div style={{ textAlign: 'right', fontSize: 'small' }}>
+              {biconomyStatus ? (
+                <>
+                  <span>No fees 🎉 - Paid for by Alluo via </span>
+                  <a href="https://twitter.com/biconomy">Biconomy</a>
+                </>
+              ) : (
+                'View Fee in metamask'
+              )}
+            </div>
+            <SlideButton
+              biconomyStatus={biconomyStatus}
+              setBiconomyStatus={setBiconomyStatus}
+            />
+          </Info>
         </Box>
       )}
-    
       <Box margin={{ top: 'large' }}>
         <Button
           primary

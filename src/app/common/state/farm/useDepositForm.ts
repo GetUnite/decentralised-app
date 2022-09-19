@@ -1,6 +1,8 @@
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
+  approveToken,
+  depositIntoBoosterFarm,
   depositStableCoin,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from 'app/common/state';
@@ -16,7 +18,7 @@ export const useDepositForm = ({
   const [error, setError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [biconomyStatus, setBiconomyStatus] = useState<boolean>(true);
+  const [biconomyStatus, setBiconomyStatus] = useState<boolean>(false);
 
   const resetState = () => {
     setError('');
@@ -28,12 +30,21 @@ export const useDepositForm = ({
     setError('');
     setIsApproving(true);
     try {
-      await approveStableCoin(
-        selectedSupportedToken.value,
-        selectedSupportedToken.decimals,
-        selectedFarm.type,
-        selectedFarm.chain,
-      );
+      if (selectedFarm?.isBooster) {
+        await approveToken(
+          selectedSupportedToken.value,
+          selectedFarm.farmAddress,
+          selectedFarm.chain,
+          biconomyStatus,
+        );
+      } else {
+        await approveStableCoin(
+          selectedSupportedToken.value,
+          selectedSupportedToken.decimals,
+          selectedFarm.type,
+          selectedFarm.chain,
+        );
+      }
       await updateFarmInfo();
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
@@ -62,14 +73,25 @@ export const useDepositForm = ({
     setError('');
     setIsDepositing(true);
     try {
-      await depositStableCoin(
-        selectedSupportedToken.value,
-        depositValue,
-        selectedSupportedToken.decimals,
-        selectedFarm.type,
-        selectedFarm.chain,
-        biconomyStatus,
-      );
+      if (selectedFarm?.isBooster) {
+        await depositIntoBoosterFarm(
+          selectedFarm.farmAddress,
+          selectedSupportedToken.value,
+          depositValue,
+          selectedSupportedToken.decimals,
+          selectedFarm.chain,
+          biconomyStatus,
+        );
+      } else {
+        await depositStableCoin(
+          selectedSupportedToken.value,
+          depositValue,
+          selectedSupportedToken.decimals,
+          selectedFarm.type,
+          selectedFarm.chain,
+          biconomyStatus,
+        );
+      }
       await updateFarmInfo();
       resetState();
       setDepositValue(null);

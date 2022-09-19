@@ -5,6 +5,7 @@ import {
   isExpectedPolygonEvent,
   listenToHandler,
   withdrawStableCoin,
+  withdrawFromBoosterFarm
 } from 'app/common/functions/Web3Client';
 import { walletAccount } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
@@ -124,16 +125,28 @@ export const useWithdrawalForm = ({
     setError('');
     setIsWithdrawing(true);
     try {
-      const res = await withdrawStableCoin(
-        selectedSupportedToken.value,
-        withdrawValue,
-        selectedFarm.type,
-        selectedFarm.chain,
-        biconomyStatus,
-      );
+      let blockNumber;
+      if (selectedFarm?.isBooster) {
+        blockNumber = await withdrawFromBoosterFarm(
+          selectedFarm.farmAddress,
+          selectedSupportedToken.value,
+          withdrawValue,
+          selectedSupportedToken.decimals,
+          selectedFarm.chain,
+          biconomyStatus,
+        );
+      } else {
+        blockNumber = await withdrawStableCoin(
+          selectedSupportedToken.value,
+          withdrawValue,
+          selectedFarm.type,
+          selectedFarm.chain,
+          biconomyStatus,
+        );
+      }
       await updateFarmInfo();
       resetState();
-      setBlockNumber(res);
+      setBlockNumber(blockNumber);
     } catch (err) {
       resetState();
       setNotificationt(err.message, 'error');
