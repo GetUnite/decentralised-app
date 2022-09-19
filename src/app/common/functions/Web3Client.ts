@@ -161,6 +161,11 @@ const onboard = Onboard({
   },
 });
 
+const walletModulesState = onboard.state.select();
+walletModulesState.subscribe(walletModules => {
+  console.log(walletModules);
+});
+
 declare let window: any;
 
 const permitOnlyTokenAddresses = [
@@ -182,8 +187,19 @@ let walletAddress;
 let web3: WalletConnectProvider | any;
 
 export const connectToWallet = async () => {
-  const wallets = await onboard.connectWallet();
-
+  let wallets;
+  const onboardState = onboard.state.get();
+  if (
+    onboardState.walletModules.find(
+      walletModule => walletModule.label == 'Gnosis',
+    )
+  ) {
+    console.log(onboardState);
+    wallets = await onboard.connectWallet({});
+  } else {
+    wallets = await onboard.connectWallet();
+  }
+  
   if (wallets[0]) {
     web3 = new Web3(wallets[0].provider as any);
     walletAddress = wallets[0].accounts[0].address;
