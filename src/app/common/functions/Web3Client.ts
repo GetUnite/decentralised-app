@@ -190,15 +190,16 @@ let web3: WalletConnectProvider | any;
 
 export const connectToWallet = async () => {
   let wallets;
+  const gnosisLabel = 'Gnosis Safe';
 
   const onboardState = onboard.state.get();
   if (
     onboardState.walletModules.find(
-      walletModule => walletModule.label == 'Gnosis Safe',
+      walletModule => walletModule.label == gnosisLabel,
     )
   ) {
     wallets = await onboard.connectWallet({
-      autoSelect: { label: 'Gnosis Safe', disableModals: true },
+      autoSelect: { label: gnosisLabel, disableModals: true },
     });
   } else {
     wallets = await onboard.connectWallet();
