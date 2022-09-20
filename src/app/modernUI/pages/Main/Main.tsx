@@ -9,6 +9,7 @@ import {
   ResponsiveContext,
   Select,
   Menu,
+  Text,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { isSmall } from 'app/modernUI/theme';
@@ -70,11 +71,11 @@ export const Main = () => {
               fill="horizontal"
             >
               <Box justify="center" fill direction="column">
-                <Heading margin="none" fill size={'36px'}>
+                <Text size="36px" weight="bold">
                   {!walletAccountAtom
                     ? 'Connect your wallet to see your available assets to farm.'
                     : headingText}
-                </Heading>
+                </Text>
                 <Paragraph margin={{ top: '35px' }} fill>
                   Fund your wallet using crypto or fiat currency here to start
                   investing. Get your yield in the same coin and withdraw at any
@@ -87,7 +88,7 @@ export const Main = () => {
                   direction="column"
                 >
                   <Box
-                    gap="small"
+                    gap="6px"
                     direction="column"
                     fill
                     margin={{ top: '72px' }}
@@ -129,7 +130,7 @@ export const Main = () => {
                         style={{ fontSize: '16px' }}
                       >
                         <Filter
-                        style={{ width: '80px', padding: 0 }}
+                          style={{ width: '80px', padding: 0 }}
                           plain
                           options={['All Tokens', ...allSupportedTokens]}
                           value={tokenFilter ? tokenFilter : 'All Tokens'}

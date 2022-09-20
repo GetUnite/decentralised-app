@@ -4,7 +4,7 @@ import { Box } from 'grommet';
 
 export const Assets = ({ availableFarms, isLoading }) => {
   return (
-    <Box gap="18px">
+    <Box gap="6px">
       {Array.isArray(availableFarms) &&
         availableFarms.map(farmCoin => {
           return (
