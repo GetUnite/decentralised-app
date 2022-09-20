@@ -20,14 +20,16 @@ import { EChain } from 'app/common/functions/Web3Client';
 export const Farm = () => {
   const { id } = useParams();
   const [cookies] = useCookies(['has_seen_boost_farms']);
-  const [walletAccountAtom] =
-    useRecoilState(walletAccount);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const {
     selectedFarm,
     updateFarmInfo,
     isLoading,
     selectSupportedToken,
     selectedSupportedToken,
+    stableRewards,
+    setStableRewards,
+    claimRewards
   } = useFarm({
     id,
   });
@@ -50,11 +52,16 @@ export const Farm = () => {
           heading={farmName}
           isLoading={isLoading}
           noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
-          contentHeight={selectedFarm?.chain == EChain.POLYGON ? "580px" : "545px"}
+          contentHeight={
+            selectedFarm?.chain == EChain.POLYGON ? '580px' : '545px'
+          }
         >
           <>
             {selectedFarm?.isBooster && !cookies.has_seen_boost_farms ? (
-              <BoosterFarmPresentation selectedFarm={selectedFarm} farmName={farmName} />
+              <BoosterFarmPresentation
+                selectedFarm={selectedFarm}
+                farmName={farmName}
+              />
             ) : (
               <Tabs>
                 <Tab title="Deposit">
@@ -97,9 +104,9 @@ export const Farm = () => {
             >
               <Box fill gap="small">
                 <Heading size="small" level={3} margin="none" fill>
-                  <Box direction="row" justify="between" fill >
-                    <Text size='18px'>Rewards</Text>
-                    <Box direction="row" gap="5px">
+                  <Box direction="row" justify="between" fill>
+                    <Text size="18px">Rewards</Text>
+                    {/*<Box direction="row" gap="5px">
                       {selectedFarm?.rewards.map((reward, i) => (
                         <Avatar
                           key={i}
@@ -111,18 +118,25 @@ export const Farm = () => {
                           round="full"
                         />
                       ))}
-                    </Box>
+                      </Box>*/}
                   </Box>
                 </Heading>
-                <Box>
-                  <Text>CRV</Text>
-                  <Text>ETH</Text>
+                <Box direction='row' justify='between'>
+                  <Text>{stableRewards ? selectedFarm?.rewards.stableLabel : selectedFarm?.rewards.label}</Text>
+                  <Text>{stableRewards ? (selectedFarm?.rewards.stableValue + '$') : selectedFarm?.rewards.value}</Text>
                 </Box>
-                <Box>
+                <Box gap="12px">
                   <Button
                     primary
-                    label={'Withdraw rewards'}
+                    label={'Withdraw ' + (stableRewards ? selectedFarm?.rewards.stableLabel : selectedFarm?.rewards.label)}
                     style={{ borderRadius: '58px' }}
+                    onClick={claimRewards}
+                  />
+                  <Button
+                    label={stableRewards ? 'Prefer LP tokens?' : 'Prefer stable tokens?'}
+                    onClick={() => setStableRewards(!stableRewards)}
+                    plain
+                    style={{textAlign:"center", color:"#2A73FF", fontSize: "12px"}}
                   />
                 </Box>
               </Box>
