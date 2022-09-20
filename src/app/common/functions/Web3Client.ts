@@ -290,6 +290,49 @@ const sendTransaction = async (
   }
 };
 
+const sendStaticTransaction = async (
+  abi,
+  address,
+  functionSignature,
+  params,
+  chain,
+  useBiconomy = false,
+) => {
+  let web3ToUse;
+
+  try {
+    if (useBiconomy) {
+      const biconomy = await startOrGetBiconomy(
+        chain,
+        web3.eth.currentProvider,
+      );
+      web3ToUse = new Web3(biconomy);
+    } else {
+      web3ToUse = web3;
+    }
+
+    const contract = new web3ToUse.eth.Contract(abi as any, address);
+
+    const method = contract.methods[functionSignature].apply(null, params);
+    const tx = await method.estimateGas({
+      from: walletAddress,
+    });
+
+    return tx;
+  } catch (error) {
+    console.log(error);
+    if (error.code == 4001) {
+      throw 'User denied message signature';
+    }
+
+    if (error.includes('reverted by EVM')) {
+      throw 'Transaction has been reverted by the EVM';
+    }
+
+    throw 'Something went wrong with your transaction. Please try again';
+  }
+};
+
 const callContract = async (abi, address, functionSignature, params, chain) => {
   const provider =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
@@ -1231,6 +1274,33 @@ export const depositIntoBoosterFarm = async (
   return tx;
 };
 
+export const getBoosterFarmRewards = async (
+  farmAddress,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: '', type: 'address' }],
+      name: 'rewards',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const value = await sendStaticTransaction(
+    abi,
+    farmAddress,
+    'rewards(address)',
+    [walletAddress],
+    useBiconomy,
+  );
+
+  //const valueAsStable =
+
+  return { value };
+};
+
 export const approveToken = async (
   tokenAddress,
   spender,
@@ -1490,7 +1560,7 @@ export const claimBoosterFarmRewards = async (
     abi,
     farmAddress,
     'withdrawToNonLp(uint256,address,address,address)',
-    [amountInDecimals, , , tokenAddress],
+    [amountInDecimals, walletAddress, walletAddress, tokenAddress],
     chain,
     useBiconomy,
   );

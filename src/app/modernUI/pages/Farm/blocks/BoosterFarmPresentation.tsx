@@ -10,11 +10,7 @@ export const BoosterFarmPresentation = ({
 }) => {
   const [, setCookies] = useCookies(['has_seen_boost_farms']);
 
-  const rewardLabels = selectedFarm.rewards.map(reward => {
-    return reward.label;
-  });
-  const rewardsLast = rewardLabels.pop();
-  const rewardsResult = rewardLabels.join(', ') + ' and ' + rewardsLast;
+  const rewardsLabel = selectedFarm?.rewards.label + ' or ' +  selectedFarm?.rewards.stableLabel;
 
   return (
     <>
@@ -23,7 +19,7 @@ export const BoosterFarmPresentation = ({
       </Text>
       <Box gap="large" margin={{ top: '20px' }} align="center">
         <Text textAlign="center" weight="bold" size="28px">
-          Earn X% as {rewardsResult} tokens
+          Earn X% as {rewardsLabel} tokens
           <br />
         </Text>
         <img src={booster} alt="booster" width={275} />
