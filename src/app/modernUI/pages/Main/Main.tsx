@@ -8,6 +8,7 @@ import {
   Grid,
   ResponsiveContext,
   Select,
+  Menu,
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { isSmall } from 'app/modernUI/theme';
@@ -15,6 +16,7 @@ import { useMain } from 'app/common/state/shortcuts';
 import { Spinner, Layout } from 'app/modernUI/components';
 import { Assets } from './blocks';
 import { walletAccount } from 'app/common/state/atoms';
+import { Filter } from './components';
 
 export const Main = () => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -126,8 +128,8 @@ export const Main = () => {
                         gap="medium"
                         style={{ fontSize: '16px' }}
                       >
-                        <Select
-                          style={{ width: '80px', padding: 0 }}
+                        <Filter
+                        style={{ width: '80px', padding: 0 }}
                           plain
                           options={['All Tokens', ...allSupportedTokens]}
                           value={tokenFilter ? tokenFilter : 'All Tokens'}
@@ -137,7 +139,7 @@ export const Main = () => {
                             )
                           }
                         />
-                        <Select
+                        <Filter
                           style={{ width: '100px', padding: 0 }}
                           plain
                           options={['All Networks', 'Ethereum', 'Polygon']}
@@ -148,7 +150,6 @@ export const Main = () => {
                             )
                           }
                         />
-
                       </Box>
                     </Box>
                     {!isSmall(size) && (

@@ -1,5 +1,5 @@
 import { useWithdrawalForm } from 'app/common/state/farm';
-import { NewInput, Spinner } from 'app/modernUI/components';
+import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
@@ -74,7 +74,7 @@ export const WithdrawalForm = ({
         </>
       )}
       <Box margin={{ top: 'medium' }}>
-        <Button
+        <SubmitButton
           primary
           disabled={
             isWithdrawing ||

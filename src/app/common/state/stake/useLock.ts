@@ -7,7 +7,7 @@ import {
   EChain,
 } from 'app/common/functions/Web3Client';
 import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNotification, ENotificationId, useChain } from 'app/common/state';
+import { useNotification, ENotificationId } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
 
 export const useLock = () => {
