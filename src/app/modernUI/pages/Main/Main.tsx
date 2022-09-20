@@ -76,7 +76,7 @@ export const Main = () => {
                     ? 'Connect your wallet to see your available assets to farm.'
                     : headingText}
                 </Text>
-                <Paragraph margin={{ top: '35px' }} fill>
+                <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
                   Fund your wallet using crypto or fiat currency here to start
                   investing. Get your yield in the same coin and withdraw at any
                   time with no cost and no lock-in period.{' '}
