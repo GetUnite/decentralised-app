@@ -1,6 +1,6 @@
 import { tokenInfo } from 'app/common/state/atoms';
 import { useLock } from 'app/common/state/stake';
-import { Info, Input, Notification, Spinner } from 'app/modernUI/components';
+import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -80,7 +80,7 @@ export const LockTab = ({ ...rest }) => {
 
       <Box margin={{ top: 'large' }}>
         {!(+lockValue > 0) || +tokenInfoAtom.allowance < +lockValue ? (
-          <Button
+          <SubmitButton
             primary
             disabled={
               !(+lockValue > 0) ||
@@ -91,7 +91,7 @@ export const LockTab = ({ ...rest }) => {
             onClick={handleApprove}
           />
         ) : (
-          <Button
+          <SubmitButton
             disabled={tokenInfoAtom.isLoading || isApproving || isLocking}
             primary
             label="Lock"
