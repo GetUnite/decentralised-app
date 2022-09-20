@@ -1231,6 +1231,33 @@ export const depositIntoBoosterFarm = async (
   return tx;
 };
 
+export const getBoosterFarmRewards = async (
+  farmAddress,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: '', type: 'address' }],
+      name: 'rewards',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const value = await callContract(
+    abi,
+    farmAddress,
+    'rewards(address)',
+    [walletAddress],
+    useBiconomy,
+  );
+
+  //const valueAsStable =
+
+  return { value };
+};
+
 export const approveToken = async (
   tokenAddress,
   spender,
@@ -1490,7 +1517,7 @@ export const claimBoosterFarmRewards = async (
     abi,
     farmAddress,
     'withdrawToNonLp(uint256,address,address,address)',
-    [amountInDecimals, , , tokenAddress],
+    [amountInDecimals, walletAddress, walletAddress, tokenAddress],
     chain,
     useBiconomy,
   );
