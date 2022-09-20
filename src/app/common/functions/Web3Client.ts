@@ -83,13 +83,13 @@ const chains = [
   {
     id: EChainId.POL_MAINNET,
     token: 'MATIC',
-    label: 'Matic Mainnet',
+    label: 'Polygon Mainnet',
     rpcUrl: polygonMainnetProviderUrl,
   },
   {
     id: EChainId.POL_MUMBAI,
     token: 'MATIC',
-    label: 'Matic Mumbai',
+    label: 'Polygon Mumbai',
     rpcUrl: polygonTestnetProviderUrl,
   },
 ];
@@ -156,7 +156,6 @@ export const connectToWallet = async (connectOptions?) => {
 
 const gnosisLabel = 'Gnosis Safe';
 const onboardState = onboard.state.get();
-console.log(onboardState);
 if (
   onboardState.walletModules.find(
     walletModule => walletModule.label == gnosisLabel,
@@ -237,13 +236,14 @@ export const startOrGetBiconomy = async (chain, provider) => {
 };
 
 const waitForBiconomyReady = biconomy =>
-  new Promise<void>(resolve => {
+  new Promise<void>((resolve, reject) => {
     biconomy
       .onEvent(biconomy.READY, () => {
         resolve();
       })
       .onEvent(biconomy.ERROR, error => {
         console.log(error);
+        reject(error);
       });
   });
 
@@ -257,16 +257,19 @@ const sendTransaction = async (
 ) => {
   let web3ToUse;
 
-  if (useBiconomy) {
-    const biconomy = await startOrGetBiconomy(chain, web3.eth.currentProvider);
-    web3ToUse = new Web3(biconomy);
-  } else {
-    web3ToUse = web3;
-  }
-
-  const contract = new web3ToUse.eth.Contract(abi as any, address);
-
   try {
+    if (useBiconomy) {
+      const biconomy = await startOrGetBiconomy(
+        chain,
+        web3.eth.currentProvider,
+      );
+      web3ToUse = new Web3(biconomy);
+    } else {
+      web3ToUse = web3;
+    }
+
+    const contract = new web3ToUse.eth.Contract(abi as any, address);
+
     const method = contract.methods[functionSignature].apply(null, params);
     const tx = await method.send({
       from: walletAddress,
