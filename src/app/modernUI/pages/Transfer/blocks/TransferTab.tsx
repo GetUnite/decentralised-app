@@ -1,10 +1,10 @@
 import { getCoinIcon } from 'app/common/functions/getCoinIcon';
 import { usePolygonInfoAtom } from 'app/common/state/shortcuts';
-import { NewInput, Spinner } from 'app/modernUI/components';
+import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Info } from 'app/modernUI/components';
 import SlideButton from 'app/modernUI/components/SlideButton';
 import { useState } from 'react';
-import { Box, Button, Text, TextInput } from 'grommet';
+import { Box, Text, TextInput } from 'grommet';
 import { useTransfer } from 'app/common/state/transfer';
 import { TopHeader } from './TopHeader';
 
@@ -95,7 +95,7 @@ export const TransferTab = ({ ...rest }) => {
         </Box>
       )}
       <Box margin={{ top: 'large' }}>
-        <Button
+        <SubmitButton
           primary
           disabled={
             isTransferring ||

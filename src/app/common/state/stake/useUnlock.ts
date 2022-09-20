@@ -7,13 +7,13 @@ import {
 } from 'app/common/functions/Web3Client';
 import { useState, useEffect, useReducer } from 'react';
 import { useRecoilState } from 'recoil';
-import Countdown, {
+import {
   formatTimeDelta,
   CountdownTimeDelta,
 } from 'react-countdown';
 import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
-import { useNotification, ENotificationId, useChain } from 'app/common/state';
+import { useNotification, ENotificationId } from 'app/common/state';
 
 interface iState {
   unlockValue: string;
@@ -56,9 +56,9 @@ const reducer = (state: iState, action: DispatchType) => {
 };
 
 export const useUnlock = () => {
-  const { notification, setNotification } = useNotification();
+  const { setNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
+  const [walletAccountAtom] = useRecoilState(
     walletAccount,
   );
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
