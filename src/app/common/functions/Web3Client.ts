@@ -290,49 +290,6 @@ const sendTransaction = async (
   }
 };
 
-const sendStaticTransaction = async (
-  abi,
-  address,
-  functionSignature,
-  params,
-  chain,
-  useBiconomy = false,
-) => {
-  let web3ToUse;
-
-  try {
-    if (useBiconomy) {
-      const biconomy = await startOrGetBiconomy(
-        chain,
-        web3.eth.currentProvider,
-      );
-      web3ToUse = new Web3(biconomy);
-    } else {
-      web3ToUse = web3;
-    }
-
-    const contract = new web3ToUse.eth.Contract(abi as any, address);
-
-    const method = contract.methods[functionSignature].apply(null, params);
-    const tx = await method.estimateGas({
-      from: walletAddress,
-    });
-
-    return tx;
-  } catch (error) {
-    console.log(error);
-    if (error.code == 4001) {
-      throw 'User denied message signature';
-    }
-
-    if (error.includes('reverted by EVM')) {
-      throw 'Transaction has been reverted by the EVM';
-    }
-
-    throw 'Something went wrong with your transaction. Please try again';
-  }
-};
-
 const callContract = async (abi, address, functionSignature, params, chain) => {
   const provider =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
@@ -1288,7 +1245,7 @@ export const getBoosterFarmRewards = async (
     },
   ];
 
-  const value = await sendStaticTransaction(
+  const value = await callContract(
     abi,
     farmAddress,
     'rewards(address)',
