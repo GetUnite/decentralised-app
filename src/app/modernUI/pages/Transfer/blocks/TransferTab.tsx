@@ -9,9 +9,7 @@ import { useTransfer } from 'app/common/state/transfer';
 import { TopHeader } from './TopHeader';
 
 export const TransferTab = ({ ...rest }) => {
-  const { polygonInfoAtom } = usePolygonInfoAtom();
-
-  const [biconomyStatus, setBiconomyStatus] = useState(true);
+  const [biconomyStatus, setBiconomyStatus] = useState(false);
 
   const {
     error,
@@ -30,7 +28,7 @@ export const TransferTab = ({ ...rest }) => {
   const coinIcon = getCoinIcon(selectedIbAlluoInfo?.type);
   return (
     <Box fill>
-      {polygonInfoAtom.isLoading || isTransferring ? (
+      {isTransferring ? (
         <Box
           align="center"
           justify="center"
