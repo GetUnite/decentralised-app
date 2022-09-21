@@ -14,13 +14,9 @@ import { useNotification, ENotificationId } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
 import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
-import {
-  ChainBadge,
-  ConnectionButton,
-  Notification,
-} from 'app/modernUI/components';
+import { ChainBadge, Notification } from 'app/modernUI/components';
 import { EChain } from 'app/common/functions/Web3Client';
-import { useConnection } from 'app/common/state/shortcuts';
+import { useConnectionButton } from 'app/common/state/components';
 
 const Disabled = () => {
   return (
@@ -65,7 +61,7 @@ export const AssetCard = ({
 }: IAssetCard) => {
   const { navigate } = useCurrentPath();
   const { setNotification } = useNotification();
-  const { handleConnectWallet } = useConnection();
+  const { handleConnectWallet } = useConnectionButton();
 
   const [walletAccountAtom] = useRecoilState(walletAccount);
 

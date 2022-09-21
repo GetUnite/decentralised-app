@@ -1,16 +1,21 @@
 import { getCoinIcon } from 'app/common/functions/getCoinIcon';
 import { usePolygonInfoAtom } from 'app/common/state/shortcuts';
-import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
+import {
+  NewInput,
+  Spinner,
+  SubmitButton,
+  BiconomyToggle,
+  FeeInfo,
+} from 'app/modernUI/components';
 import { Info } from 'app/modernUI/components';
-import SlideButton from 'app/modernUI/components/SlideButton';
 import { useState } from 'react';
 import { Box, Text, TextInput } from 'grommet';
 import { useTransfer } from 'app/common/state/transfer';
 import { TopHeader } from './TopHeader';
+import { useRecoilState } from 'recoil';
+import { isSafeApp } from 'app/common/state/atoms';
 
 export const TransferTab = ({ ...rest }) => {
-  const [biconomyStatus, setBiconomyStatus] = useState(false);
-
   const {
     error,
     transferValue,
@@ -23,6 +28,9 @@ export const TransferTab = ({ ...rest }) => {
     ibAlluosInfo,
     recipientAddress,
     handleRecipientAddressChange,
+    isSafeAppAtom,
+    useBiconomy,
+    setUseBiconomy,
   } = useTransfer();
 
   const coinIcon = getCoinIcon(selectedIbAlluoInfo?.type);
@@ -74,22 +82,7 @@ export const TransferTab = ({ ...rest }) => {
               {error}
             </Text>
           </Box>
-          <Info label="Gas fee" value={null} border={false}>
-            <div style={{ textAlign: 'right', fontSize: 'small' }}>
-              {biconomyStatus ? (
-                <>
-                  <span>No fees 🎉 - Paid for by Alluo via </span>
-                  <a href="https://twitter.com/biconomy">Biconomy</a>
-                </>
-              ) : (
-                'View Fee in metamask'
-              )}
-            </div>
-            <SlideButton
-              biconomyStatus={biconomyStatus}
-              setBiconomyStatus={setBiconomyStatus}
-            />
-          </Info>
+          <FeeInfo biconomyToggle={!isSafeAppAtom} useBiconomy={useBiconomy} setUseBiconomy={setUseBiconomy} showWalletFee={!useBiconomy || isSafeAppAtom} />
         </Box>
       )}
       <Box margin={{ top: 'large' }}>
@@ -102,7 +95,7 @@ export const TransferTab = ({ ...rest }) => {
             recipientAddress === ''
           }
           label="Transfer"
-          onClick={() => handleTransfer(biconomyStatus)}
+          onClick={() => handleTransfer()}
         />
       </Box>
     </Box>

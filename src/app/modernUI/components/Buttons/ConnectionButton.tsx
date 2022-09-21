@@ -2,7 +2,7 @@ import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { Grommet, ResponsiveContext, Button } from 'grommet';
 import { isSmall, theme } from 'app/modernUI/theme';
-import { useConnection } from 'app/common/state/shortcuts';
+import { useConnectionButton } from 'app/common/state/components';
 import { walletAccount, mode } from 'app/common/state/atoms';
 
 const StyledButton = styled(Button)`
@@ -18,7 +18,7 @@ const StyledButton = styled(Button)`
 export const ConnectionButton = ({ ...rest }) => {
   const [modeAtom] = useRecoilState(mode);
   const [walletAccountAtom] = useRecoilState(walletAccount);
-  const { handleConnectWallet } = useConnection();
+  const { handleConnectWallet } = useConnectionButton();
 
   return (
     <ResponsiveContext.Consumer>

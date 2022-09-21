@@ -1,12 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ResponsiveContext,
-  Box,
-  Nav,
-  Image,
-  Footer,
-} from 'grommet';
+import { ResponsiveContext, Box, Nav, Image, Footer } from 'grommet';
 import { MenuItem } from '../Menu/blocks';
 import { useMode } from 'app/common/state/shortcuts';
 import { isSmall } from 'app/modernUI/theme';
@@ -98,7 +92,6 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     style={{ flex: 1 }}
                   />
                 )}
-
                 <Menu />
               </Nav>
             </Box>
@@ -106,7 +99,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             <Box
               width="xlarge"
               pad={{ horizontal: 'medium', vertical: 'medium' }}
-              style={{ marginTop: '60px', marginBottom: '123px' }}
+              style={{ marginTop: '12px', marginBottom: '123px' }}
             >
               {children}
             </Box>
@@ -118,10 +111,10 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 <a href="https://blog.alluo.io/" target="_blank">
                   <Image src={isLightMode ? medium : mediumDark} />
                 </a>
-                <a href='https://twitter.com/AlluoApp' target="_blank">
+                <a href="https://twitter.com/AlluoApp" target="_blank">
                   <Image src={isLightMode ? twitter : twitterDark} />
                 </a>
-                <a href='https://t.me/+Ir2-mWe8fQhhNzQ0' target="_blank">
+                <a href="https://t.me/+Ir2-mWe8fQhhNzQ0" target="_blank">
                   <Image src={isLightMode ? telegram : telegramDark} />
                 </a>
               </Box>
@@ -129,14 +122,20 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 <a
                   target="_blank"
                   href="https://alluo-terms-of-service.s3.eu-west-2.amazonaws.com/Alluo+-+Terms+of+Service.pdf"
-                  style={{ color: isLightMode ? 'black' : 'white', textDecoration: 'none' }}
+                  style={{
+                    color: isLightMode ? 'black' : 'white',
+                    textDecoration: 'none',
+                  }}
                 >
                   Terms and Conditions
                 </a>
                 <a
                   target="_blank"
                   href="https://www.privacypolicies.com/live/dc166d48-be35-4e1f-9d02-2c3a786e705c"
-                  style={{ color: isLightMode ? 'black' : 'white', textDecoration: 'none' }}
+                  style={{
+                    color: isLightMode ? 'black' : 'white',
+                    textDecoration: 'none',
+                  }}
                 >
                   Privacy Policy
                 </a>
