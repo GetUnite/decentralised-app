@@ -26,7 +26,7 @@ export const useWithdrawalForm = ({
   const [blockNumber, setBlockNumber] = useState<number>();
   const [error, setError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [biconomyStatus, setBiconomyStatus] = useState<boolean>(true);
+  const [useBiconomy, setUseBiconomy] = useState<boolean>(true);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -133,7 +133,7 @@ export const useWithdrawalForm = ({
           withdrawValue,
           selectedSupportedToken.decimals,
           selectedFarm.chain,
-          biconomyStatus,
+          useBiconomy,
         );
       } else {
         blockNumber = await withdrawStableCoin(
@@ -141,7 +141,7 @@ export const useWithdrawalForm = ({
           withdrawValue,
           selectedFarm.type,
           selectedFarm.chain,
-          biconomyStatus,
+          useBiconomy,
         );
       }
       await updateFarmInfo();
@@ -172,7 +172,7 @@ export const useWithdrawalForm = ({
     isWithdrawing,
     handleWithdraw,
     resetState,
-    setBiconomyStatus,
-    biconomyStatus,
+    setUseBiconomy,
+    useBiconomy,
   };
 };

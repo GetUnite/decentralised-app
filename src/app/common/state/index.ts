@@ -1,2 +1,3 @@
 export * from './useNotification';
-export * from './useChain';
+export * from './useWallet';
+export * from './useMain';

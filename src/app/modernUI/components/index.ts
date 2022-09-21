@@ -9,3 +9,4 @@ export * from './Info';
 export * from './Spinner';
 export * from './Notification';
 export * from './Modal';
+export * from './Biconomy';

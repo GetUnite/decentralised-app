@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   transferToAddress,
   getIbAlluoInfo,
   EChain,
 } from 'app/common/functions/Web3Client';
 import { useNotification, ENotificationId } from 'app/common/state';
-import { useChain } from 'app/common/state';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 
 export const useTransfer = () => {
   const { setNotificationt } = useNotification();
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
+  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
   type IbAlluoInfo = {
     type?: string;
@@ -118,7 +119,7 @@ export const useTransfer = () => {
     setTransferValue(selectedIbAlluoInfo?.balance || '');
   };
 
-  const handleTransfer = async (useBiconomy) => {
+  const handleTransfer = async () => {
     setError('');
     setIsTransferring(true);
 
@@ -128,7 +129,7 @@ export const useTransfer = () => {
         transferValue,
         selectedIbAlluoInfo.decimals,
         recipientAddress,
-        useBiconomy
+        useBiconomy,
       );
       await fetchIbAlluosInfo();
       resetState();
@@ -158,5 +159,8 @@ export const useTransfer = () => {
     recipientAddress,
     handleRecipientAddressChange,
     setSelectedIbAlluoBySymbol,
+    isSafeAppAtom,
+    useBiconomy,
+    setUseBiconomy,
   };
 };
