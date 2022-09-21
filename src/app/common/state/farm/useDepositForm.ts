@@ -18,7 +18,7 @@ export const useDepositForm = ({
   const [error, setError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [biconomyStatus, setBiconomyStatus] = useState<boolean>(false);
+  const [useBiconomy, setUseBiconomy] = useState<boolean>(false);
 
   const resetState = () => {
     setError('');
@@ -35,7 +35,7 @@ export const useDepositForm = ({
           selectedSupportedToken.value,
           selectedFarm.farmAddress,
           selectedFarm.chain,
-          biconomyStatus,
+          useBiconomy,
         );
       } else {
         await approveStableCoin(
@@ -80,7 +80,7 @@ export const useDepositForm = ({
           depositValue,
           selectedSupportedToken.decimals,
           selectedFarm.chain,
-          biconomyStatus,
+          useBiconomy,
         );
       } else {
         await depositStableCoin(
@@ -89,7 +89,7 @@ export const useDepositForm = ({
           selectedSupportedToken.decimals,
           selectedFarm.type,
           selectedFarm.chain,
-          biconomyStatus,
+          useBiconomy,
         );
       }
       await updateFarmInfo();
@@ -112,8 +112,8 @@ export const useDepositForm = ({
     handleApprove,
     isDepositing,
     handleDeposit,
-    setBiconomyStatus,
-    biconomyStatus,
+    setUseBiconomy,
+    useBiconomy,
     resetState,
   };
 };

@@ -142,29 +142,42 @@ const usesNoncesAddresses = [
 let walletAddress;
 let web3: WalletConnectProvider | any;
 
-export const connectToWallet = async (connectOptions?) => {
-  let wallets;
+export const trySafeAppConnection = async callback => {
+  const gnosisLabel = 'Gnosis Safe';
+  const onboardState = onboard.state.get();
 
-  wallets = await onboard.connectWallet(connectOptions);
-
-  if (wallets[0]) {
-    web3 = new Web3(wallets[0].provider as any);
-    walletAddress = wallets[0].accounts[0].address;
-    return walletAddress;
+  if (
+    onboardState.walletModules.find(
+      walletModule => walletModule.label == gnosisLabel,
+    )
+  ) {
+    try {
+      callback(
+        await connectToWallet({
+          autoSelect: { label: gnosisLabel, disableModals: true },
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
 };
 
-const gnosisLabel = 'Gnosis Safe';
-const onboardState = onboard.state.get();
-if (
-  onboardState.walletModules.find(
-    walletModule => walletModule.label == gnosisLabel,
-  )
-) {
-  connectToWallet({
-    autoSelect: { label: gnosisLabel, disableModals: true },
-  });
-}
+export const connectToWallet = async (connectOptions?) => {
+  let wallets;
+
+  try {
+    wallets = await onboard.connectWallet(connectOptions);
+
+    if (wallets[0]) {
+      web3 = new Web3(wallets[0].provider as any);
+      walletAddress = wallets[0].accounts[0].address;
+      return walletAddress;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const changeNetwork = async (chain: EChain) => {
   let chainId;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { walletAccount } from 'app/common/state/atoms';
-import { initialAvailableFarmsState, TFarm } from '../farm/useFarm';
+import { initialAvailableFarmsState, TFarm } from './farm/useFarm';
 import {
   getTotalAssetSupply,
   getInterest,
@@ -10,7 +10,7 @@ import {
   getSupportedTokensList,
   EChain,
 } from 'app/common/functions/Web3Client';
-import { useNotification } from '../useNotification';
+import { useNotification } from './useNotification';
 import { useCookies } from 'react-cookie';
 
 export type THeadingData = {

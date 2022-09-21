@@ -1,6 +1,6 @@
 import { useWithdrawalForm } from 'app/common/state/farm';
 import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
 
@@ -20,13 +20,19 @@ export const WithdrawalForm = ({
     isWithdrawalRequestsLoading,
     isWithdrawing,
     handleWithdraw,
-    biconomyStatus,
-    setBiconomyStatus,
-  } = useWithdrawalForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+    useBiconomy,
+    setUseBiconomy,
+  } = useWithdrawalForm({
+    selectedFarm,
+    selectedSupportedToken,
+    updateFarmInfo,
+  });
 
   return (
     <Box fill>
-      {!selectedSupportedToken || isWithdrawing || isWithdrawalRequestsLoading ? (
+      {!selectedSupportedToken ||
+      isWithdrawing ||
+      isWithdrawalRequestsLoading ? (
         <Box
           align="center"
           justify="center"
@@ -67,8 +73,8 @@ export const WithdrawalForm = ({
             <Infos
               selectedFarm={selectedFarm}
               inputValue={-1 * +withdrawValue}
-              biconomyStatus={biconomyStatus}
-              setBiconomyStatus={setBiconomyStatus}
+              useBiconomy={useBiconomy}
+              setUseBiconomy={setUseBiconomy}
             />
           </Box>
         </>

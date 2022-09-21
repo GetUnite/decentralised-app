@@ -20,6 +20,11 @@ export const wantedChain = atom({
   default: null,
 });
 
+export const isSafeApp = atom({
+  key: 'isSafeApp',
+  default: false,
+});
+
 
 type TSelectStableCoin = {
   label?: string;

@@ -13,7 +13,7 @@ import {
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { isSmall } from 'app/modernUI/theme';
-import { useMain } from 'app/common/state/shortcuts';
+import { useMain } from 'app/common/state';
 import { Spinner, Layout } from 'app/modernUI/components';
 import { Assets } from './blocks';
 import { walletAccount } from 'app/common/state/atoms';
