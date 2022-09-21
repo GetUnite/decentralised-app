@@ -34,7 +34,7 @@ export const Infos = ({
       />
       {selectedFarm.chain === EChain.POLYGON ? (
         <Info label="Gas fee" value={null} border={false}>
-          <div style={{ fontSize: 'small' }}>
+          <div style={{ textAlign: 'right', fontSize: 'small' }}>
             {biconomyStatus ? (
               <>
                 <span>No fees 🎉 - Paid for by Alluo via </span>
