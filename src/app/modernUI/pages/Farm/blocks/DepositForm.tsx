@@ -1,6 +1,6 @@
 import { useDepositForm } from 'app/common/state/farm';
 import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
 
@@ -20,8 +20,8 @@ export const DepositForm = ({
     handleApprove,
     isDepositing,
     handleDeposit,
-    setBiconomyStatus,
-    biconomyStatus,
+    setUseBiconomy,
+    useBiconomy,
   } = useDepositForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
@@ -65,8 +65,8 @@ export const DepositForm = ({
             <Infos
               selectedFarm={selectedFarm}
               inputValue={depositValue}
-              biconomyStatus={biconomyStatus}
-              setBiconomyStatus={setBiconomyStatus}
+              useBiconomy={useBiconomy}
+              setUseBiconomy={setUseBiconomy}
             />
           </Box>
         </>

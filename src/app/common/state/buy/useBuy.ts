@@ -21,7 +21,6 @@ import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { useChain } from '../useChain';
 
 export const useBuy = () => {
   const { notification, setNotification } = useNotification();

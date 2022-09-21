@@ -1,14 +1,18 @@
 import { EChain } from 'app/common/functions/Web3Client';
-import SlideButton from 'app/modernUI/components/SlideButton';
-import { Info } from 'app/modernUI/components';
+import { FeeInfo, Info } from 'app/modernUI/components';
+import { useRecoilState } from 'recoil';
+import { isSafeApp } from 'app/common/state/atoms';
+import { BiconomyToggle } from 'app/modernUI/components/Biconomy';
 
 export const Infos = ({
   selectedFarm,
   inputValue,
-  biconomyStatus,
-  setBiconomyStatus,
+  useBiconomy,
+  setUseBiconomy,
   ...rest
 }) => {
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
   const balanceAndNewValue =
     (+selectedFarm.depositDividedAmount?.first || 0) + (+inputValue || 0);
 
@@ -32,30 +36,14 @@ export const Infos = ({
           selectedFarm.sign + (+selectedFarm.totalAssetSupply).toLocaleString()
         }
       />
-      {selectedFarm.chain === EChain.POLYGON ? (
-        <Info label="Gas fee" value={null} border={false}>
-          <div style={{ textAlign: 'right', fontSize: 'small' }}>
-            {biconomyStatus ? (
-              <>
-                <span>No fees 🎉 - Paid for by Alluo via </span>
-                <a href="https://twitter.com/biconomy">Biconomy</a>
-              </>
-            ) : (
-              'View Fee in metamask'
-            )}
-          </div>
-          <SlideButton
-            biconomyStatus={biconomyStatus}
-            setBiconomyStatus={setBiconomyStatus}
-          />
-        </Info>
-      ) : (
-        <Info label="Gas fee" value={null} border={false}>
-          <div style={{ textAlign: 'right', fontSize: 'small' }}>
-            View Fee in metamask.
-          </div>
-        </Info>
-      )}
+      <FeeInfo
+        biconomyToggle={!isSafeAppAtom && selectedFarm.chain == EChain.POLYGON}
+        useBiconomy={useBiconomy}
+        setUseBiconomy={setUseBiconomy}
+        showWalletFee={
+          !useBiconomy || isSafeAppAtom || selectedFarm.chain != EChain.POLYGON
+        }
+      />
     </>
   );
 };
