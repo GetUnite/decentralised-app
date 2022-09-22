@@ -43,6 +43,9 @@ interface IAssetCard {
   disabled: boolean;
   chain: EChain;
   isBooster: boolean;
+  viewType: string;
+  balance?: string;
+  poolShare?: number;
 }
 
 export const AssetCard = ({
@@ -51,12 +54,15 @@ export const AssetCard = ({
   name,
   totalAssetSupply,
   interest,
+  balance,
   isLoading,
   sign,
   icons,
   disabled,
   chain,
   isBooster = false,
+  viewType,
+  poolShare,
   ...rest
 }: IAssetCard) => {
   const { navigate } = useCurrentPath();
@@ -153,43 +159,66 @@ export const AssetCard = ({
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
-                <span style={{ fontWeight: 'bold' }}>
-                  {name}
-                  {isBooster && (
-                    <span style={{ color: '#1C1CFF' }}> BOOST</span>
-                  )}
-                </span>
-                <Box direction="row" gap="small">
-                  {icons.map((icon, i) => (
-                    <Avatar
-                      key={i}
-                      align="center"
-                      src={icon.src}
-                      size="small"
-                      justify="center"
-                      overflow="hidden"
-                      round="full"
-                    />
-                  ))}
-                </Box>
-                <ChainBadge chain={chain} />
-                <span>{tvl}</span>
-                <Box direction="row" justify="between" align="center">
-                  <span>{interest}%</span>
-                  {walletAccountAtom ? (
-                    <Link to={'/farm/' + id}>
-                      <Button label={'Farm'} />
-                    </Link>
-                  ) : (
-                    <Button
-                      style={{ borderWidth: '1px' }}
-                      size={isSmall(size) ? 'small' : undefined}
-                      label={'Connect wallet'}
-                      onClick={handleConnectWallet}
-                      {...rest}
-                    />
-                  )}
-                </Box>
+                {viewType != 'your' ? (
+                  <>
+                    <span style={{ fontWeight: 'bold' }}>
+                      {name}
+                      {isBooster && (
+                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                      )}
+                    </span>
+                    <Box direction="row" gap="small">
+                      {icons.map((icon, i) => (
+                        <Avatar
+                          key={i}
+                          align="center"
+                          src={icon.src}
+                          size="small"
+                          justify="center"
+                          overflow="hidden"
+                          round="full"
+                        />
+                      ))}
+                    </Box>
+                    <ChainBadge chain={chain} />
+                    <span>{tvl}</span>
+                    <Box direction="row" justify="between" align="center">
+                      <span>{interest}%</span>
+                      {walletAccountAtom ? (
+                        <Link to={'/farm/' + id}>
+                          <Button label={'Farm'} />
+                        </Link>
+                      ) : (
+                        <Button
+                          style={{ borderWidth: '1px' }}
+                          size={isSmall(size) ? 'small' : undefined}
+                          label={'Connect wallet'}
+                          onClick={handleConnectWallet}
+                          {...rest}
+                        />
+                      )}
+                    </Box>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontWeight: 'bold' }}>
+                      {name}
+                      {isBooster && (
+                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                      )}
+                    </span>
+                    <ChainBadge chain={chain} />
+                    <span>{poolShare}%</span>
+                    <span>{tvl}</span>
+                    <span>{balance}</span>
+                    <Box direction="row" justify="between" align="center">
+                      <span>{interest}%</span>
+                      <Link to={'/farm/' + id}>
+                        <Button label={'Farm'} />
+                      </Link>
+                    </Box>
+                  </>
+                )}
               </Grid>
             </Card>
           )}

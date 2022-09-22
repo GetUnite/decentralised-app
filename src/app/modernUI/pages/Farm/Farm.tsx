@@ -29,7 +29,7 @@ export const Farm = () => {
     selectedSupportedToken,
     stableRewards,
     setStableRewards,
-    claimRewards
+    claimRewards,
   } = useFarm({
     id,
   });
@@ -91,52 +91,86 @@ export const Farm = () => {
           cookies.has_seen_boost_farms && (
             <Box
               round={'medium'}
-              overflow="auto"
-              width="auto"
+              overflow="hidden"
+              width="245px"
               align="start"
+              height="224px"
               justify="between"
-              height="small"
               gap="small"
               direction="column"
               background="modal"
               margin={{ top: '12px' }}
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              <Box fill gap="small">
-                <Heading size="small" level={3} margin="none" fill>
+              <Box fill>
+                <Heading
+                  size="small"
+                  level={3}
+                  margin={{ bottom: '16px', top: '0px' }}
+                  fill
+                >
                   <Box direction="row" justify="between" fill>
                     <Text size="18px">Rewards</Text>
-                    {/*<Box direction="row" gap="5px">
-                      {selectedFarm?.rewards.map((reward, i) => (
+                    <Box direction="row">
+                      {selectedFarm?.rewards?.icons?.map((icon, i) => (
                         <Avatar
                           key={i}
                           align="center"
-                          src={reward.icon.src}
+                          src={icon.src}
                           size="small"
                           justify="center"
                           overflow="hidden"
                           round="full"
+                          margin={{ left: i > 0 ? '-0.6rem' : '' }}
                         />
                       ))}
-                      </Box>*/}
+                    </Box>
                   </Box>
                 </Heading>
-                <Box direction='row' justify='between'>
-                  <Text>{stableRewards ? selectedFarm?.rewards.stableLabel : selectedFarm?.rewards.label}</Text>
-                  <Text>{stableRewards ? (selectedFarm?.rewards.stableValue + '$') : selectedFarm?.rewards.value}</Text>
+                <Box
+                  direction="row"
+                  justify="between"
+                  margin={{ bottom: '28px' }}
+                >
+                  <Text weight="bold" size="16px">
+                    {stableRewards
+                      ? selectedFarm?.rewards.stableLabel
+                      : selectedFarm?.rewards.label}
+                  </Text>
+                  <Text weight="bold" size="16px">
+                    {stableRewards
+                      ? '$' + selectedFarm?.rewards.stableValue
+                      : selectedFarm?.rewards.value}
+                  </Text>
                 </Box>
                 <Box gap="12px">
                   <Button
                     primary
-                    label={'Withdraw ' + (stableRewards ? selectedFarm?.rewards.stableLabel : selectedFarm?.rewards.label)}
-                    style={{ borderRadius: '58px' }}
+                    label={
+                      'Withdraw ' +
+                      (stableRewards
+                        ? selectedFarm?.rewards.stableLabel
+                        : selectedFarm?.rewards.label)
+                    }
+                    style={{ borderRadius: '58px', width: '197px' }}
                     onClick={claimRewards}
                   />
                   <Button
-                    label={stableRewards ? 'Prefer LP tokens?' : 'Prefer stable tokens?'}
+                    label={
+                      stableRewards
+                        ? 'Prefer ' +
+                          selectedFarm?.rewards.label +
+                          ' LP tokens?'
+                        : 'Prefer ' + selectedFarm?.rewards.stableLabel
+                    }
                     onClick={() => setStableRewards(!stableRewards)}
                     plain
-                    style={{textAlign:"center", color:"#2A73FF", fontSize: "12px"}}
+                    style={{
+                      textAlign: 'center',
+                      color: '#2A73FF',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                    }}
                   />
                 </Box>
               </Box>

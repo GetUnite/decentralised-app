@@ -2,21 +2,30 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import {
   EChain,
-  getListSupportedTokens,
   getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount,
   getSupportedTokensBasicInfo,
   getSupportedTokensAdvancedInfo,
   getBoosterFarmRewards,
-  claimBoosterFarmRewards,
+  getUserDepositedLPAmount,
+  getTotalAssets,
+  getSupportedTokensList,
+  claimBoosterFarmNonLPRewards,
+  claimBoosterFarmLPRewards,
 } from 'app/common/functions/Web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNavigate } from 'react-router-dom';
+import {
+  EEthereumAddresses,
+  EPolygonAddresses,
+} from 'app/common/constants/addresses';
+import { useNotification } from '../useNotification';
 
 import dai from 'app/modernUI/images/dai.svg';
 import usdc from 'app/modernUI/images/usdc.svg';
 import usdt from 'app/modernUI/images/usdt.svg';
+import frax from 'app/modernUI/images/frax.svg';
 
 import ageur from 'app/modernUI/images/ageur.png';
 import eurs from 'app/modernUI/images/eurs.png';
@@ -27,12 +36,6 @@ import weth from 'app/modernUI/images/weth.png';
 
 import wbtc from 'app/modernUI/images/wbtc.png';
 
-import crv from 'app/modernUI/images/crv.svg';
-import eth from 'app/modernUI/images/eth.svg';
-import steth from 'app/modernUI/images/steth.svg';
-import { EEthereumAddresses } from 'app/common/constants/addresses';
-import { useNotification } from '../useNotification';
-
 export type TSelect = {
   label?: string;
   value?: string;
@@ -42,11 +45,13 @@ export type TSelect = {
 };
 
 export type TBoostFarmRewards = {
-  icon?: any;
+  icons?: any[];
   label?: string;
   value?: number;
-  stableLabel?:string;
+  stableLabel?: string;
   stableValue?: number;
+  stableAddress?: string;
+  curvePoolAddress?: string;
 };
 
 export type TFarm = {
@@ -65,11 +70,13 @@ export type TFarm = {
   rewards?: TBoostFarmRewards;
   farmAddress?: string;
   supportedTokensAddresses?: string[];
+  poolShare?: number;
 };
 
 export const initialAvailableFarmsState: Array<TFarm> = [
   {
     id: 0,
+    farmAddress: EPolygonAddresses.IBALLUOUSD,
     type: 'usd',
     chain: EChain.POLYGON,
     name: 'US Dollar',
@@ -78,6 +85,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 1,
+    farmAddress: EPolygonAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.POLYGON,
     name: 'Euro',
@@ -86,6 +94,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 2,
+    farmAddress: EPolygonAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.POLYGON,
     name: 'Ethereum',
@@ -94,6 +103,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 3,
+    farmAddress: EPolygonAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.POLYGON,
     name: 'Bitcoin',
@@ -102,6 +112,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 4,
+    farmAddress: EEthereumAddresses.IBALLUOUSD,
     type: 'usd',
     chain: EChain.ETHEREUM,
     name: 'US Dollar',
@@ -110,6 +121,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 5,
+    farmAddress: EEthereumAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.ETHEREUM,
     name: 'Euro',
@@ -118,6 +130,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 6,
+    farmAddress: EEthereumAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.ETHEREUM,
     name: 'Ethereum',
@@ -126,6 +139,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   {
     id: 7,
+    farmAddress: EEthereumAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.ETHEREUM,
     name: 'Bitcoin',
@@ -134,17 +148,28 @@ export const initialAvailableFarmsState: Array<TFarm> = [
   },
   /*{
     id: 8,
-    type: 'eth',
-    chain: EChain.ETHEREUM,
-    name: 'ETH/StETH',
-    sign: '',
-    icons: [{ src: eth }, { src: steth }],
-    isBooster: true,
-    rewards: { label: 'CVX-ETH' },
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
+    type: 'booster',
+    chain: EChain.ETHEREUM,
+    name: 'FRAX/USDC',
+    sign: '',
+    icons: [{ src: frax }, { src: usdc }],
+    isBooster: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: [{ src: frax }, { src: usdc }],
+      stableLabel: 'USDC',
+      stableAddress: EEthereumAddresses.USDC,
+      curvePoolAddress: EEthereumAddresses.FRAXUSDCCURVEPOOL
+    },
     supportedTokensAddresses: [
-      '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', //WETH
-      '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', //USDC
+      EEthereumAddresses.USDC,
+      EEthereumAddresses.USDT,
+      EEthereumAddresses.DAI,
+      EEthereumAddresses.FRAX,
+      EEthereumAddresses.AGEUR,
+      EEthereumAddresses.EURS,
+      EEthereumAddresses.EURT,
     ],
   },*/
 ];
@@ -177,97 +202,106 @@ export const useFarm = ({ id }) => {
   }, [walletAccountAtom]);
 
   const fetchFarmInfo = async farm => {
-    try {
-      farm.interest = await getInterest(farm.type, farm.chain);
-      farm.totalAssetSupply = await getTotalAssetSupply(farm.type, farm.chain);
-      if (walletAccountAtom) {
-        farm.supportedTokens = (
-          Array.isArray(farm.supportedTokensAddresses) &&
-          farm.supportedTokensAddresses.length > 0
-            ? await Promise.all(
-                farm.supportedTokensAddresses.map(async supportedtoken => {
-                  const supportedTokenBasicInfo =
-                    await getSupportedTokensBasicInfo(
-                      supportedtoken,
-                      farm.chain,
-                    );
-                  const supportedTokenAdvancedInfo =
-                    await getSupportedTokensAdvancedInfo(
-                      supportedTokenBasicInfo,
-                      farm.type,
-                      farm.chain,
-                    );
-
-                  return {
-                    ...supportedTokenBasicInfo,
-                    ...supportedTokenAdvancedInfo,
-                  };
-                }),
-              )
-            : await getListSupportedTokens(farm.type, farm.chain)
-        ).map(supportedToken => {
-          return {
-            label: supportedToken.symbol,
-            value: supportedToken.tokenAddress,
-            balance: supportedToken.balance,
-            allowance: supportedToken.allowance,
-            decimals: supportedToken.decimals,
-          };
-        });
-        farm.depositedAmount = await getUserDepositedAmount(
-          farm.type,
-          farm.chain,
-        );
-        farm.depositDividedAmount = depositDivided(farm.depositedAmount);
-        if (farm.isBooster) {
-          //farm.rewards = getBoosterFarmRewards(farm.farmAddress);
-          farm.rewards = {
-            label: "CVX-ETH",
-            stableLabel: "USDC",
-            stableValue: 150,
-            value: 10,
-          }
-        }
-      }
-    } catch (error) {
-      setError(error);
-      console.log(error);
-    }
-    return farm;
-  };
-
-  const updateFarmInfo = async () => {
-    try {
-      const farm = await fetchFarmInfo(selectedFarm);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.find(
-          supportedToken =>
-            supportedToken?.value == selectedSupportedToken?.value,
-        ),
+    let farmInfo;
+    farmInfo = {
+      interest: await getInterest(farm.type, farm.chain),
+      totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
+      supportedTokensList: await getSupportedTokensList(farm.type, farm.chain),
+      depositedAmount: 0,
+    };
+    if (walletAccountAtom) {
+      farmInfo.depositedAmount = await getUserDepositedAmount(
+        farm.type,
+        farm.chain,
       );
-      setSelectedFarm(farm);
-    } catch (error) {
-      console.log(error);
+      farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
     }
+
+    return farmInfo;
   };
 
-  const selectFarm = async id => {
+  const fetchBoosterFarmInfo = async farm => {
+    let farmInfo;
+    farmInfo = {
+      interest: '10', //await getInterest(farm.type, farm.chain),
+      totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
+      supportedTokensList: await Promise.all(
+        farm.supportedTokensAddresses.map(async supportedtoken => {
+          return await getSupportedTokensBasicInfo(supportedtoken, farm.chain);
+        }),
+      ),
+      depositedAmount: 0,
+    };
+    if (walletAccountAtom) {
+      farmInfo.depositedAmount = await getUserDepositedLPAmount(
+        farm.farmAddress,
+        farm.chain,
+      );
+      farmInfo.rewards = {
+        ...farm.rewards,
+        ...(await getBoosterFarmRewards(farm.farmAddress, farm.rewards.curvePoolAddress, farm.chain)),
+      };
+    }
+
+    return farmInfo;
+  };
+
+  const updateFarmInfo = async farm => {
     setIsLoading(true);
+
     try {
-      const farm = await fetchFarmInfo(
-        availableFarms.find(availableFarm => availableFarm.id == id),
-      );
-      if (!farm) {
-        navigate('/');
+      let farmInfo = farm?.isBooster
+        ? await fetchBoosterFarmInfo(farm)
+        : await fetchFarmInfo(farm);
+
+      if (walletAccountAtom) {
+        farmInfo.supportedTokens = await Promise.all(
+          farmInfo.supportedTokensList.map(async supportedToken => {
+            const advancedSupportedTokenInfo =
+              await getSupportedTokensAdvancedInfo(
+                farm.farmAddress,
+                supportedToken,
+                farm.chain,
+              );
+            return {
+              label: supportedToken.symbol,
+              value: supportedToken.tokenAddress,
+              balance: advancedSupportedTokenInfo.balance,
+              allowance: advancedSupportedTokenInfo.allowance,
+              decimals: supportedToken.decimals,
+            };
+          }),
+        );
       }
-      setSelectedFarm(farm);
-      selectSupportedToken(
-        farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
+
+      setSelectedsupportedToken(
+        selectedSupportedToken
+          ? farmInfo.supportedTokens?.find(
+              supportedToken =>
+                supportedToken?.value == selectedSupportedToken?.value,
+            )
+          : farmInfo.supportedTokens?.length > 0
+          ? farmInfo.supportedTokens[0]
+          : undefined,
       );
+
+      setSelectedFarm({ ...farm, ...farmInfo });
     } catch (error) {
       console.log(error);
     }
     setIsLoading(false);
+  };
+
+  const selectFarm = async id => {
+    try {
+      const farm = availableFarms.find(availableFarm => availableFarm.id == id);
+      if (!farm) {
+        navigate('/');
+      }
+      updateFarmInfo(farm);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const selectSupportedToken = supportedToken => {
@@ -288,16 +322,18 @@ export const useFarm = ({ id }) => {
     setError('');
     try {
       if (selectedFarm?.isBooster) {
-        await claimBoosterFarmRewards(
-          selectedFarm.farmAddress,
-          selectedSupportedToken.value,
-          selectedFarm,
-          selectedSupportedToken.decimals,
-          selectedFarm.chain,
-        );
+        stableRewards
+          ? await claimBoosterFarmNonLPRewards(
+              selectedFarm.farmAddress,
+              selectedFarm.rewards.stableAddress,
+              selectedFarm.chain,
+            )
+          : await claimBoosterFarmLPRewards(
+              selectedFarm.farmAddress,
+              selectedFarm.chain,
+            );
       }
-      await updateFarmInfo();
-      setNotificationt('Deposit successfully', 'success');
+      setNotificationt('Rewards claimed successfully', 'success');
     } catch (err) {
       setNotificationt(err.message, 'error');
     }
@@ -313,6 +349,6 @@ export const useFarm = ({ id }) => {
     selectSupportedToken,
     stableRewards,
     setStableRewards,
-    claimRewards
+    claimRewards,
   };
 };

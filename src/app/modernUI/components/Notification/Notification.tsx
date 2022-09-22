@@ -13,6 +13,7 @@ export const Notification = ({ ...rest }) => {
   };
   const backgroundColor = bgColors[notificationAtom.type] || "transparent";
   const color = colors[notificationAtom.type];
+
   return (
     <Box
       background={backgroundColor}

@@ -182,6 +182,8 @@ export const connectToWallet = async (connectOptions?) => {
 export const changeNetwork = async (chain: EChain) => {
   let chainId;
 
+  if(!walletAddress) return;
+
   if (chain === EChain.ETHEREUM) {
     chainId =
       process.env.REACT_APP_NET === 'mainnet'
@@ -739,8 +741,8 @@ export const getSupportedTokensBasicInfo = async (
 };
 
 export const getSupportedTokensAdvancedInfo = async (
+  farmAddress,
   supportedToken,
-  type,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -771,19 +773,17 @@ export const getSupportedTokensAdvancedInfo = async (
     chain,
   );
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
   const allowance = await callContract(
     abi,
     supportedToken.tokenAddress,
     'allowance(address,address)',
-    [walletAddress, ibAlluoAddress],
+    [walletAddress, farmAddress],
     chain,
   );
 
   return {
     balance: fromDecimals(balance, supportedToken.decimals),
-    allowance: fromDecimals(allowance, supportedToken.deciamls),
+    allowance: allowance,
   };
 };
 
@@ -1246,9 +1246,10 @@ export const depositIntoBoosterFarm = async (
 
 export const getBoosterFarmRewards = async (
   farmAddress,
-  useBiconomy = false,
+  curvePoolAddress,
+  chain,
 ) => {
-  const abi = [
+  const farmAbi = [
     {
       inputs: [{ internalType: 'address', name: '', type: 'address' }],
       name: 'rewards',
@@ -1258,17 +1259,38 @@ export const getBoosterFarmRewards = async (
     },
   ];
 
+  const curvePoolAbi = [
+    {
+      stateMutability: 'view',
+      type: 'function',
+      name: 'calc_withdraw_one_coin',
+      inputs: [
+        { name: '_token_amount', type: 'uint256' },
+        { name: 'i', type: 'int128' },
+      ],
+      outputs: [{ name: '', type: 'uint256' }],
+    },
+  ];
+
   const value = await callContract(
-    abi,
+    farmAbi,
     farmAddress,
     'rewards(address)',
     [walletAddress],
-    useBiconomy,
+    chain,
   );
 
-  //const valueAsStable =
+  const valueAmountInDecimals = toDecimals(value, 18);
 
-  return { value };
+  const stableValue = await callContract(
+    curvePoolAbi,
+    curvePoolAddress,
+    'calc_withdraw_one_coin(uint256,int128)',
+    [valueAmountInDecimals, 1],
+    chain,
+  );
+
+  return { value, stableValue: fromDecimals(stableValue, 6) };
 };
 
 export const approveToken = async (
@@ -1329,6 +1351,28 @@ export const getUserDepositedAmount = async (
   return Web3.utils.fromWei(userDepositedAmount);
 };
 
+export const getUserDepositedLPAmount = async (farmAddress, chain) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'balanceOf',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const userDepositedLPAmount = await callContract(
+    abi,
+    farmAddress,
+    'balanceOf(address)',
+    [walletAddress],
+    chain,
+  );
+
+  return Web3.utils.fromWei(userDepositedLPAmount);
+};
+
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
   const abi = [
     {
@@ -1346,6 +1390,28 @@ export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
     abi,
     ibAlluoAddress,
     'totalAssetSupply()',
+    null,
+    chain,
+  );
+
+  return Web3.utils.fromWei(totalAssetSupply);
+};
+
+export const getTotalAssets = async (farmAddress, chain = EChain.POLYGON) => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'totalAssets',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const totalAssetSupply = await callContract(
+    abi,
+    farmAddress,
+    'totalAssets()',
     null,
     chain,
   );
@@ -1493,7 +1559,7 @@ export const withdrawFromBoosterFarm = async (
     abi,
     farmAddress,
     'withdrawToNonLp(uint256,address,address,address)',
-    [amountInDecimals, , , tokenAddress],
+    [amountInDecimals, walletAddress, walletAddress, tokenAddress],
     chain,
     useBiconomy,
   );
@@ -1501,36 +1567,54 @@ export const withdrawFromBoosterFarm = async (
   return tx.blockNumber;
 };
 
-export const claimBoosterFarmRewards = async (
+export const claimBoosterFarmLPRewards = async (
   farmAddress,
-  tokenAddress,
-  amount,
-  decimals,
   chain = EChain.POLYGON,
   useBiconomy = false,
 ) => {
   const abi = [
     {
-      inputs: [
-        { internalType: 'uint256', name: 'assets', type: 'uint256' },
-        { internalType: 'address', name: 'receiver', type: 'address' },
-        { internalType: 'address', name: 'owner', type: 'address' },
-        { internalType: 'address', name: 'exitToken', type: 'address' },
-      ],
-      name: 'withdrawToNonLp',
+      inputs: [],
+      name: 'claimRewards',
       outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
       stateMutability: 'nonpayable',
       type: 'function',
     },
   ];
 
-  const amountInDecimals = toDecimals(amount, decimals);
+  const tx = await sendTransaction(
+    abi,
+    farmAddress,
+    'claimRewards()',
+    null,
+    chain,
+    useBiconomy,
+  );
+
+  return tx.blockNumber;
+};
+
+export const claimBoosterFarmNonLPRewards = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'exitToken', type: 'address' }],
+      name: 'claimRewardsInNonLp',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
 
   const tx = await sendTransaction(
     abi,
     farmAddress,
-    'withdrawToNonLp(uint256,address,address,address)',
-    [amountInDecimals, walletAddress, walletAddress, tokenAddress],
+    'claimRewardsInNonLp(address)',
+    [tokenAddress],
     chain,
     useBiconomy,
   );
