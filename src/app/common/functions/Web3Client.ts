@@ -182,7 +182,7 @@ export const connectToWallet = async (connectOptions?) => {
 export const changeNetwork = async (chain: EChain) => {
   let chainId;
 
-  if(!walletAddress) return;
+  if (!walletAddress) return;
 
   if (chain === EChain.ETHEREUM) {
     chainId =
@@ -293,11 +293,12 @@ const sendTransaction = async (
     return tx;
   } catch (error) {
     console.log(error);
+    console.log(abi, address, functionSignature, params);
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
 
-    if (error.includes('reverted by EVM')) {
+    if (error.includes('reverted by the EVM')) {
       throw 'Transaction has been reverted by the EVM';
     }
 
@@ -1197,16 +1198,20 @@ export const depositStableCoin = async (
 
   const amountInDecimals = toDecimals(amount, decimals);
 
-  const tx = await sendTransaction(
-    abi,
-    ibAlluoAddress,
-    'deposit(address,uint256)',
-    [tokenAddress, amountInDecimals],
-    chain,
-    useBiconomy,
-  );
+  try {
+    const tx = await sendTransaction(
+      abi,
+      ibAlluoAddress,
+      'deposit(address,uint256)',
+      [tokenAddress, amountInDecimals],
+      chain,
+      useBiconomy,
+    );
 
-  return tx;
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const depositIntoBoosterFarm = async (
