@@ -1,5 +1,5 @@
 import { useDepositForm } from 'app/common/state/farm';
-import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
+import { NewInput, Spinner, SubmitButton, TokenAndValueInput } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
@@ -12,10 +12,10 @@ export const DepositForm = ({
   ...rest
 }) => {
   const {
-    error,
+    hasErrors,
+    depositValueError,
     depositValue,
     handleDepositFieldChange,
-    setToMax,
     isApproving,
     handleApprove,
     isDepositing,
@@ -40,25 +40,16 @@ export const DepositForm = ({
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
-              <NewInput
-                coinIcon={selectedFarm.sign}
-                inputProps={{
-                  value: depositValue || '',
-                  onChange: handleDepositFieldChange,
-                  max: selectedSupportedToken?.balance || 0,
-                }}
-                maxButtonProps={{
-                  onClick: setToMax,
-                }}
-                selectProps={{
-                  options: selectedFarm.supportedTokens || [],
-                }}
-                selectedTokenInfo={selectedSupportedToken}
+              <TokenAndValueInput
+                label={'Deposit ' + selectedSupportedToken.label}
+                tokenSign={selectedFarm.sign}
+                onValueChange={handleDepositFieldChange}
+                value={depositValue}
+                tokenOptions={selectedFarm.supportedTokens || []}
+                selectedToken={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
+                error={depositValueError}
               />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {error}
-              </Text>
             </Box>
           </Box>
           <Box margin={{ top: 'medium' }}>
@@ -76,7 +67,7 @@ export const DepositForm = ({
         <SubmitButton
           primary
           disabled={
-            isApproving || isDepositing || !(+depositValue > 0) || error !== ''
+            isApproving || isDepositing || !(+depositValue > 0) || hasErrors
           }
           label={
             +depositValue > 0

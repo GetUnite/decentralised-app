@@ -5,7 +5,7 @@ import {
   isExpectedPolygonEvent,
   listenToHandler,
   withdrawStableCoin,
-  withdrawFromBoosterFarm
+  withdrawFromBoosterFarm,
 } from 'app/common/functions/Web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
@@ -24,7 +24,7 @@ export const useWithdrawalForm = ({
     useState<boolean>(false);
   const [withdrawValue, setWithdrawValue] = useState<string>();
   const [blockNumber, setBlockNumber] = useState<number>();
-  const [error, setError] = useState<string>('');
+  const [withdrawValueError, setWithdrawValueError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
@@ -59,26 +59,23 @@ export const useWithdrawalForm = ({
         setNotificationt(message, 'success');
       }
     } catch (err) {
-      setError(err.message);
+      setWithdrawValueError(err.message);
     }
     setIsWithdrawalRequestsLoading(false);
   };
 
   useEffect(() => {
     let bufferListener;
-    console.log("entrou aqui", blockNumber, selectedFarm);
     if (blockNumber) {
       bufferListener = listenToHandler(blockNumber);
       bufferListener.WithdrawalSatisfied(
         { fromBlock: blockNumber },
         async function (error, event) {
           if (error) console.error(error);
-          console.log(event, blockNumber, selectedFarm);
           if (
             event.blockNumber === blockNumber &&
             isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
           ) {
-            resetState();
             setWithdrawValue(null);
             setIsWithdrawing(false);
             setNotificationt('Withdrew successfully', 'success');
@@ -93,8 +90,6 @@ export const useWithdrawalForm = ({
             event.blockNumber === blockNumber &&
             isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
           ) {
-            resetState();
-            setWithdrawValue(null);
             setIsWithdrawing(false);
             setNotificationt(
               'Request accepted and will be processed within 24 hours',
@@ -107,31 +102,30 @@ export const useWithdrawalForm = ({
     return () => {};
   }, [blockNumber]);
 
-  const handleWithdrawalFieldChange = e => {
-    const { value } = e.target;
+  const handleWithdrawalFieldChange = value => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
-      setError('Write a valid number');
+      setWithdrawValueError('Write a valid number');
     } else if (+value > +selectedFarm?.depositedAmount) {
-      setError('Not enough balance');
+      setWithdrawValueError('Not enough balance');
     }
     setWithdrawValue(value);
   };
 
   const resetState = () => {
-    setError('');
+    setWithdrawValueError('');
     setIsWithdrawing(false);
   };
 
   const handleWithdraw = async () => {
-    setError('');
     setIsWithdrawing(true);
+
     try {
       let blockNumber;
       if (selectedFarm?.isBooster) {
         blockNumber = await withdrawFromBoosterFarm(
           selectedFarm.farmAddress,
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           withdrawValue,
           selectedSupportedToken.decimals,
           selectedFarm.chain,
@@ -139,7 +133,7 @@ export const useWithdrawalForm = ({
         );
       } else {
         blockNumber = await withdrawStableCoin(
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           withdrawValue,
           selectedFarm.type,
           selectedFarm.chain,
@@ -148,33 +142,23 @@ export const useWithdrawalForm = ({
       }
       resetState();
       setBlockNumber(blockNumber);
-      await updateFarmInfo(selectedFarm);
+      await updateFarmInfo();
     } catch (err) {
       resetState();
       setNotificationt(err.message, 'error');
     }
   };
 
-  const setToMax = async () => {
-    try {
-      const res = await getUserDepositedTransferAmount(selectedFarm.type);
-      setWithdrawValue(toExactFixed(res, selectedSupportedToken.decimals));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   return {
-    notificationId: ENotificationId.WITHDRAWAL,
-    error,
+    withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
-    setToMax,
     isWithdrawalRequestsLoading,
     isWithdrawing,
     handleWithdraw,
     resetState,
     setUseBiconomy,
     useBiconomy,
+    hasErrors: withdrawValueError != '',
   };
 };
