@@ -56,7 +56,7 @@ const reducer = (state: iState, action: DispatchType) => {
 };
 
 export const useUnlock = () => {
-  const { setNotification } = useNotification();
+  const { setNotification, resetNotification} = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
   const [walletAccountAtom] = useRecoilState(
     walletAccount,
@@ -79,8 +79,7 @@ export const useUnlock = () => {
 
   const resetState = () => {
     setError('');
-    setErrorNotification('');
-    setSuccessNotification();
+    resetNotification();
     dispatch({ type: EActionType.RESETSTATE });
   };
 
