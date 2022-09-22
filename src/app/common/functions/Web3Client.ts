@@ -293,8 +293,8 @@ const sendTransaction = async (
     return tx;
   } catch (error) {
     console.log(error);
-    const a = typeof error;
     console.log(abi, address, functionSignature, params);
+    
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
