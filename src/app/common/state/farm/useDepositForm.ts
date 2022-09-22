@@ -7,18 +7,21 @@ import {
 } from 'app/common/functions/Web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { isSafeApp } from '../atoms';
 
 export const useDepositForm = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const { setNotificationt } = useNotification();
   const [depositValue, setDepositValue] = useState<string>();
   const [error, setError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState<boolean>(false);
+  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
   const resetState = () => {
     setError('');

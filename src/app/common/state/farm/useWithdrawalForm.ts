@@ -5,9 +5,9 @@ import {
   isExpectedPolygonEvent,
   listenToHandler,
   withdrawStableCoin,
-  withdrawFromBoosterFarm
+  withdrawFromBoosterFarm,
 } from 'app/common/functions/Web3Client';
-import { walletAccount } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -18,7 +18,7 @@ export const useWithdrawalForm = ({
   updateFarmInfo,
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
-
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const { setNotificationt } = useNotification();
   const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
     useState<boolean>(false);
@@ -26,7 +26,7 @@ export const useWithdrawalForm = ({
   const [blockNumber, setBlockNumber] = useState<number>();
   const [error, setError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState<boolean>(true);
+  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
   useEffect(() => {
     if (walletAccountAtom) {
