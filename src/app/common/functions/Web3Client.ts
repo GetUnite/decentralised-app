@@ -293,12 +293,17 @@ const sendTransaction = async (
     return tx;
   } catch (error) {
     console.log(error);
+    const a = typeof error;
     console.log(abi, address, functionSignature, params);
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
 
-    if (error.includes('reverted by the EVM')) {
+    if (error.code == 417) {
+      throw 'Error while estimating gas';
+    }
+
+    if (error.toString().includes('reverted by the EVM')) {
       throw 'Transaction has been reverted by the EVM';
     }
 
