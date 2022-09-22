@@ -1182,23 +1182,23 @@ export const depositStableCoin = async (
   chain = EChain.POLYGON,
   useBiconomy,
 ) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: '_token', type: 'address' },
-        { internalType: 'uint256', name: '_amount', type: 'uint256' },
-      ],
-      name: 'deposit',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-  const amountInDecimals = toDecimals(amount, decimals);
-
   try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: '_token', type: 'address' },
+          { internalType: 'uint256', name: '_amount', type: 'uint256' },
+        ],
+        name: 'deposit',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+    const amountInDecimals = toDecimals(amount, decimals);
+
     const tx = await sendTransaction(
       abi,
       ibAlluoAddress,
