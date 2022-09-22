@@ -45,6 +45,7 @@ export const DepositForm = ({
                 tokenSign={selectedFarm.sign}
                 onValueChange={handleDepositFieldChange}
                 value={depositValue}
+                maxValue={selectSupportedToken.balance}
                 tokenOptions={selectedFarm.supportedTokens || []}
                 selectedToken={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
