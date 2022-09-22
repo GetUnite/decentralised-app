@@ -19,6 +19,7 @@ import NumberFormat from 'react-number-format';
 import usdc from 'app/modernUI/images/usdc.svg';
 import usdt from 'app/modernUI/images/usdt.svg';
 import dai from 'app/modernUI/images/dai.svg';
+import frax from 'app/modernUI/images/frax.svg';
 import eurt from 'app/modernUI/images/eurt.svg';
 import eurs from 'app/modernUI/images/eurs.png';
 import jeur from 'app/modernUI/images/jeur.svg';
@@ -159,6 +160,8 @@ export const NewInput = ({
                   return <img width="24" height="24" src={usdt} alt="usdt" />;
                 if (option === 'DAI' || option === 'tDAI')
                   return <img width="24" height="24" src={dai} alt="dai" />;
+                if (option === 'FRAX' || option === 'tFRAX')
+                  return <img width="24" height="24" src={frax} alt="frax" />;
 
                 if (option === 'jEUR' || option === 'tjEUR')
                   return <img width="24" height="24" src={jeur} alt="jeur" />;
@@ -235,7 +238,9 @@ export const NewInput = ({
     <>
       <Box direction="row" justify="between">
         <Text size="medium" color="soul">
-          {(inputLabel ? inputLabel : 'Deposit') + ' ' + selectedTokenInfo?.label}
+          {(inputLabel ? inputLabel : 'Deposit') +
+            ' ' +
+            selectedTokenInfo?.label}
         </Text>
         <Text size="medium" color="soul">
           {!!selectedTokenInfo &&
