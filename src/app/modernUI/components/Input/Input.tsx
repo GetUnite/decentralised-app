@@ -28,7 +28,7 @@ import eurs from 'app/modernUI/images/eurs.png';
 import jeur from 'app/modernUI/images/jeur.svg';
 import weth from 'app/modernUI/images/weth.png';
 import wbtc from 'app/modernUI/images/wbtc.png';
-import coinPlaceholder from 'app/modernUI/images/coinPlaceholder.svg';
+import coinPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
 
 const AbsoluteBox = styled(Box)<{ isRangeInput?: boolean }>`
   position: absolute;

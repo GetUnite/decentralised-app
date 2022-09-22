@@ -1,17 +1,21 @@
+import { isSafeApp } from 'app/common/state/atoms';
+import { useRecoilState } from 'recoil';
 import { BiconomyToggle } from '../Biconomy';
 import { Info } from './Info';
 
 export const FeeInfo = ({
   showWalletFee,
-  biconomyToggle,
+  biconomyToggle = true,
   useBiconomy,
   setUseBiconomy,
   ...rest
 }) => {
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
   return (
     <Info label="Gas fee" value={null} border={false}>
       <div style={{ textAlign: 'right', fontSize: 'small' }}>
-        {showWalletFee ? (
+        {showWalletFee || isSafeAppAtom ? (
           <span>View fee in your wallet</span>
         ) : (
           <>
@@ -19,7 +23,7 @@ export const FeeInfo = ({
             <a href="https://twitter.com/biconomy">Biconomy</a>
           </>
         )}
-        {biconomyToggle && (
+        {!isSafeAppAtom && biconomyToggle && (
           <BiconomyToggle
             biconomyStatus={useBiconomy}
             setBiconomyStatus={setUseBiconomy}

@@ -21,6 +21,7 @@ import {
   EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import { useNotification } from '../useNotification';
+import { TSupportedToken } from 'app/common/typings/form';
 
 import dai from 'app/modernUI/images/dai.svg';
 import usdc from 'app/modernUI/images/usdc.svg';
@@ -35,14 +36,6 @@ import jeur from 'app/modernUI/images/jeur.svg';
 import weth from 'app/modernUI/images/weth.png';
 
 import wbtc from 'app/modernUI/images/wbtc.png';
-
-export type TSelect = {
-  label?: string;
-  value?: string;
-  decimals?: number;
-  balance?: string;
-  allowance?: string;
-};
 
 export type TBoostFarmRewards = {
   icons?: any[];
@@ -61,7 +54,7 @@ export type TFarm = {
   name: string;
   sign: string;
   icons: any[];
-  supportedTokens?: TSelect[];
+  supportedTokens?: TSupportedToken[];
   interest?: string;
   totalAssetSupply?: string | number;
   depositedAmount?: string;
@@ -182,7 +175,7 @@ export const useFarm = ({ id }) => {
 
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
-    useState<TSelect>();
+    useState<TSupportedToken>();
 
   const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
 
@@ -239,16 +232,18 @@ export const useFarm = ({ id }) => {
       );
       farmInfo.rewards = {
         ...farm.rewards,
-        ...(await getBoosterFarmRewards(farm.farmAddress, farm.rewards.curvePoolAddress, farm.chain)),
+        ...(await getBoosterFarmRewards(
+          farm.farmAddress,
+          farm.rewards.curvePoolAddress,
+          farm.chain,
+        )),
       };
     }
 
     return farmInfo;
   };
 
-  const updateFarmInfo = async farm => {
-    setIsLoading(true);
-
+  const updateFarmInfo = async (farm = selectedFarm) => {
     try {
       let farmInfo = farm?.isBooster
         ? await fetchBoosterFarmInfo(farm)
@@ -265,7 +260,7 @@ export const useFarm = ({ id }) => {
               );
             return {
               label: supportedToken.symbol,
-              value: supportedToken.tokenAddress,
+              address: supportedToken.tokenAddress,
               balance: advancedSupportedTokenInfo.balance,
               allowance: advancedSupportedTokenInfo.allowance,
               decimals: supportedToken.decimals,
@@ -278,7 +273,7 @@ export const useFarm = ({ id }) => {
         selectedSupportedToken
           ? farmInfo.supportedTokens?.find(
               supportedToken =>
-                supportedToken?.value == selectedSupportedToken?.value,
+                supportedToken?.address == selectedSupportedToken?.address,
             )
           : farmInfo.supportedTokens?.length > 0
           ? farmInfo.supportedTokens[0]
@@ -289,10 +284,10 @@ export const useFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
-    setIsLoading(false);
   };
 
   const selectFarm = async id => {
+    setIsLoading(true);
     try {
       const farm = availableFarms.find(availableFarm => availableFarm.id == id);
       if (!farm) {
@@ -302,6 +297,7 @@ export const useFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const selectSupportedToken = supportedToken => {

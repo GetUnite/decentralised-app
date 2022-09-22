@@ -11,8 +11,6 @@ export const Infos = ({
   setUseBiconomy,
   ...rest
 }) => {
-  const [isSafeAppAtom] = useRecoilState(isSafeApp);
-
   const balanceAndNewValue =
     (+selectedFarm.depositDividedAmount?.first || 0) + (+inputValue || 0);
 
@@ -28,7 +26,6 @@ export const Infos = ({
           ).toFixed(2)).toLocaleString()
         }
       />
-
       <Info label="APY" value={selectedFarm.interest + '%'} />
       <Info
         label="Pool liquidity"
@@ -37,12 +34,10 @@ export const Infos = ({
         }
       />
       <FeeInfo
-        biconomyToggle={!isSafeAppAtom && selectedFarm.chain == EChain.POLYGON}
+        biconomyToggle={selectedFarm.chain == EChain.POLYGON}
         useBiconomy={useBiconomy}
         setUseBiconomy={setUseBiconomy}
-        showWalletFee={
-          !useBiconomy || isSafeAppAtom || selectedFarm.chain != EChain.POLYGON
-        }
+        showWalletFee={!useBiconomy || selectedFarm.chain != EChain.POLYGON}
       />
     </>
   );
