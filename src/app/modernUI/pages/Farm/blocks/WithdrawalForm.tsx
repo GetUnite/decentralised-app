@@ -1,5 +1,5 @@
 import { useWithdrawalForm } from 'app/common/state/farm';
-import { NewInput, Spinner, SubmitButton } from 'app/modernUI/components';
+import { NewInput, Spinner, SubmitButton, TokenAndValueInput } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
@@ -13,10 +13,10 @@ export const WithdrawalForm = ({
   ...rest
 }) => {
   const {
-    error,
+    hasErrors,
+    withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
-    setToMax,
     isWithdrawalRequestsLoading,
     isWithdrawing,
     handleWithdraw,
@@ -46,26 +46,16 @@ export const WithdrawalForm = ({
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
-              <NewInput
-                inputLabel="Withdraw"
-                coinIcon={selectedFarm.sign}
-                inputProps={{
-                  value: withdrawValue || '',
-                  onChange: handleWithdrawalFieldChange,
-                  max: selectedFarm.depositedAmount || 0,
-                }}
-                maxButtonProps={{
-                  onClick: setToMax,
-                }}
-                selectProps={{
-                  options: selectedFarm.supportedTokens || [],
-                }}
-                selectedTokenInfo={selectedSupportedToken}
+            <TokenAndValueInput
+                label={'Withdraw ' + selectedSupportedToken.label}
+                tokenSign={selectedFarm.sign}
+                onValueChange={handleWithdrawalFieldChange}
+                value={withdrawValue}
+                tokenOptions={selectedFarm.supportedTokens || []}
+                selectedToken={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
+                error={withdrawValueError}
               />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {error}
-              </Text>
             </Box>
           </Box>
 
@@ -86,7 +76,7 @@ export const WithdrawalForm = ({
             isWithdrawing ||
             isWithdrawalRequestsLoading ||
             !+withdrawValue ||
-            error !== ''
+            hasErrors
           }
           label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
           onClick={handleWithdraw}

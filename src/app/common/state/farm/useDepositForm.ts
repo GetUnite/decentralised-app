@@ -18,68 +18,64 @@ export const useDepositForm = ({
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const { setNotificationt } = useNotification();
   const [depositValue, setDepositValue] = useState<string>();
-  const [error, setError] = useState<string>('');
+  const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
   const resetState = () => {
-    setError('');
+    setDepositValueError('');
     setIsApproving(false);
     setIsDepositing(false);
   };
 
   const handleApprove = async () => {
-    setError('');
     setIsApproving(true);
+
     try {
       if (selectedFarm?.isBooster) {
         await approveToken(
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           selectedFarm.farmAddress,
           selectedFarm.chain,
           useBiconomy,
         );
       } else {
         await approveStableCoin(
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           selectedSupportedToken.decimals,
           selectedFarm.type,
           selectedFarm.chain,
         );
       }
-      await updateFarmInfo(selectedFarm);
+      await updateFarmInfo();
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
       setNotificationt(err.message, 'error');
     }
+
     setIsApproving(false);
   };
 
-  const handleDepositFieldChange = e => {
-    const { value } = e.target;
+  const handleDepositFieldChange = value => {
+    console.log(value);
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
-      setError('Write a valid number');
+      setDepositValueError('Write a valid number');
     } else if (+value > +selectedSupportedToken?.balance) {
-      setError('Not enough balance');
+      setDepositValueError('Not enough balance');
     }
     setDepositValue(value);
   };
 
-  const setToMax = () => {
-    setError('');
-    setDepositValue(selectedSupportedToken?.balance);
-  };
-
   const handleDeposit = async () => {
-    setError('');
     setIsDepositing(true);
+
     try {
       if (selectedFarm?.isBooster) {
         await depositIntoBoosterFarm(
           selectedFarm.farmAddress,
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           depositValue,
           selectedSupportedToken.decimals,
           selectedFarm.chain,
@@ -87,7 +83,7 @@ export const useDepositForm = ({
         );
       } else {
         await depositStableCoin(
-          selectedSupportedToken.value,
+          selectedSupportedToken.address,
           depositValue,
           selectedSupportedToken.decimals,
           selectedFarm.type,
@@ -95,22 +91,21 @@ export const useDepositForm = ({
           useBiconomy,
         );
       }
-      await updateFarmInfo(selectedFarm);
       resetState();
       setDepositValue(null);
       setNotificationt('Deposit successfully', 'success');
+      await updateFarmInfo();
     } catch (err) {
       resetState();
       setNotificationt(err, 'error');
     }
+
     setIsDepositing(false);
   };
 
   return {
-    error,
     depositValue,
     handleDepositFieldChange,
-    setToMax,
     isApproving,
     handleApprove,
     isDepositing,
@@ -118,5 +113,7 @@ export const useDepositForm = ({
     setUseBiconomy,
     useBiconomy,
     resetState,
+    depositValueError,
+    hasErrors: depositValueError != '',
   };
 };

@@ -30,7 +30,7 @@ import iballuousd from 'app/modernUI/images/iballuousd.svg';
 import iballuoeur from 'app/modernUI/images/iballuoeur.svg';
 import iballuoeth from 'app/modernUI/images/iballuoeth.svg';
 import iballuobtc from 'app/modernUI/images/iballuobtc.svg';
-import coinPlaceholder from 'app/modernUI/images/coinPlaceholder.svg';
+import coinPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
 
 const AbsoluteBox = styled(Box)<{ isRangeInput?: boolean }>`
   position: absolute;
