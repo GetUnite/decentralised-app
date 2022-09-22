@@ -294,11 +294,16 @@ const sendTransaction = async (
   } catch (error) {
     console.log(error);
     console.log(abi, address, functionSignature, params);
+    
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
 
-    if (error.includes('reverted by the EVM')) {
+    if (error.code == 417) {
+      throw 'Error while estimating gas';
+    }
+
+    if (error.toString().includes('reverted by the EVM')) {
       throw 'Transaction has been reverted by the EVM';
     }
 
@@ -1182,23 +1187,23 @@ export const depositStableCoin = async (
   chain = EChain.POLYGON,
   useBiconomy,
 ) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: '_token', type: 'address' },
-        { internalType: 'uint256', name: '_amount', type: 'uint256' },
-      ],
-      name: 'deposit',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-  const amountInDecimals = toDecimals(amount, decimals);
-
   try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: '_token', type: 'address' },
+          { internalType: 'uint256', name: '_amount', type: 'uint256' },
+        ],
+        name: 'deposit',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
+
+    const amountInDecimals = toDecimals(amount, decimals);
+
     const tx = await sendTransaction(
       abi,
       ibAlluoAddress,
