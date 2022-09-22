@@ -136,8 +136,6 @@ export const UnlockTab = ({ ...rest }) => {
 
   return (
     <Box fill>
-      <Notification id={notificationId} margin={{ top: 'small' }} />
-
       {tokenInfoAtom.isLoading || isUnlocking || isWithdrawing ? (
         <Box
           align="center"

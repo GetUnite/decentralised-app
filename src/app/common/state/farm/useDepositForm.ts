@@ -48,10 +48,10 @@ export const useDepositForm = ({
           selectedFarm.chain,
         );
       }
-      await updateFarmInfo();
+      await updateFarmInfo(selectedFarm);
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
-      setError(err.message);
+      setNotificationt(err.message, 'error');
     }
     setIsApproving(false);
   };
@@ -95,13 +95,13 @@ export const useDepositForm = ({
           useBiconomy,
         );
       }
-      await updateFarmInfo();
+      await updateFarmInfo(selectedFarm);
       resetState();
       setDepositValue(null);
       setNotificationt('Deposit successfully', 'success');
     } catch (err) {
       resetState();
-      setNotificationt(err.message, 'error');
+      setNotificationt(err, 'error');
     }
     setIsDepositing(false);
   };

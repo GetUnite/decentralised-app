@@ -5,7 +5,7 @@ import {
   isExpectedPolygonEvent,
   listenToHandler,
   withdrawStableCoin,
-  withdrawFromBoosterFarm,
+  withdrawFromBoosterFarm
 } from 'app/common/functions/Web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
@@ -66,12 +66,14 @@ export const useWithdrawalForm = ({
 
   useEffect(() => {
     let bufferListener;
+    console.log("entrou aqui", blockNumber, selectedFarm);
     if (blockNumber) {
       bufferListener = listenToHandler(blockNumber);
       bufferListener.WithdrawalSatisfied(
         { fromBlock: blockNumber },
         async function (error, event) {
           if (error) console.error(error);
+          console.log(event, blockNumber, selectedFarm);
           if (
             event.blockNumber === blockNumber &&
             isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
@@ -144,9 +146,9 @@ export const useWithdrawalForm = ({
           useBiconomy,
         );
       }
-      await updateFarmInfo();
       resetState();
       setBlockNumber(blockNumber);
+      await updateFarmInfo(selectedFarm);
     } catch (err) {
       resetState();
       setNotificationt(err.message, 'error');

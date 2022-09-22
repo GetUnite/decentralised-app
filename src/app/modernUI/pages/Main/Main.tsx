@@ -171,11 +171,24 @@ export const Main = () => {
                           pad="none"
                           style={{ fontSize: '16px' }}
                         >
-                          <span>asset</span>
-                          <span>supported tokens</span>
-                          <span>network</span>
-                          <span>TVL</span>
-                          <span>APY</span>
+                          {viewType != 'your' ? (
+                            <>
+                              <span>asset</span>
+                              <span>supported tokens</span>
+                              <span>network</span>
+                              <span>TVL</span>
+                              <span>APY</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>asset</span>
+                              <span>network</span>
+                              <span>pool share</span>
+                              <span>TVL</span>
+                              <span>balance</span>
+                              <span>APY</span>
+                            </>
+                          )}
                         </Grid>
                       </Card>
                     )}
@@ -196,6 +209,7 @@ export const Main = () => {
                         <Assets
                           availableFarms={availableFarms}
                           isLoading={isLoading}
+                          viewType={viewType}
                         />
                       </>
                     )}

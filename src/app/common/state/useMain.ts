@@ -9,9 +9,13 @@ import {
   getUserDepositedAmount,
   getSupportedTokensList,
   EChain,
+  getSupportedTokensBasicInfo,
+  getTotalAssets,
+  getUserDepositedLPAmount,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from './useNotification';
 import { useCookies } from 'react-cookie';
+import { toExactFixed } from '../functions/utils';
 
 export type THeadingData = {
   numberOfAssets: number;
@@ -55,32 +59,26 @@ export const useMain = () => {
         initialAvailableFarmsState
           .filter(x => true)
           .map(async availableFarm => {
-            availableFarm.interest = await getInterest(
-              availableFarm.type,
-              availableFarm.chain,
-            );
-            availableFarm.totalAssetSupply = await getTotalAssetSupply(
-              availableFarm.type,
-              availableFarm.chain,
-            );
-            const supportedTokensList = await getSupportedTokensList(
-              availableFarm.type,
-              availableFarm.chain,
-            );
-            supportedTokensList.map(async supportedToken => {
+            const {
+              interest,
+              totalAssetSupply,
+              supportedTokens,
+              depositedAmount,
+              poolShare
+            } = availableFarm.isBooster
+              ? await fetchBoosterFarmInfo(availableFarm)
+              : await fetchFarmInfo(availableFarm);
+
+            supportedTokens.map(async supportedToken => {
               allSupportedTokens.add(supportedToken.symbol);
             });
-            availableFarm.supportedTokens = supportedTokensList;
+
             if (walletAccountAtom) {
-              availableFarm.depositedAmount = await getUserDepositedAmount(
-                availableFarm.type,
-                availableFarm.chain,
-              );
-              supportedTokensList.map(async supportedToken => {
+              supportedTokens.map(async supportedToken => {
                 const advancedSupportedTokenInfo =
                   await getSupportedTokensAdvancedInfo(
+                    availableFarm.farmAddress,
                     supportedToken,
-                    availableFarm.type,
                     availableFarm.chain,
                   );
                 if (Number(advancedSupportedTokenInfo.balance) > 0) {
@@ -89,6 +87,12 @@ export const useMain = () => {
                 }
               });
             }
+
+            availableFarm.interest = interest;
+            availableFarm.totalAssetSupply = totalAssetSupply;
+            availableFarm.supportedTokens = supportedTokens;
+            availableFarm.depositedAmount = depositedAmount;
+            availableFarm.poolShare = poolShare;
           }),
       ).then(() => {
         setHeadingData({
@@ -110,6 +114,62 @@ export const useMain = () => {
     setIsLoading(false);
   };
 
+  const fetchFarmInfo = async farm => {
+    let farmInfo;
+    farmInfo = {
+      interest: await getInterest(farm.type, farm.chain),
+      totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
+      supportedTokens: await getSupportedTokensList(farm.type, farm.chain),
+      depositedAmount: 0,
+    };
+    if (walletAccountAtom) {
+      farmInfo.depositedAmount = toExactFixed(
+        await getUserDepositedAmount(farm.type, farm.chain),
+        4,
+      );
+      farmInfo.poolShare =
+        farmInfo.depositedAmount > 0
+          ? toExactFixed(
+              Number(farmInfo.depositedAmount) /
+                Number(farmInfo.totalAssetSupply),
+              2,
+            )
+          : 0;
+    }
+
+    return farmInfo;
+  };
+
+  const fetchBoosterFarmInfo = async farm => {
+    let farmInfo;
+    farmInfo = {
+      interest: '10', //await getInterest(farm.type, farm.chain),
+      totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
+      supportedTokens: await Promise.all(
+        farm.supportedTokensAddresses.map(async supportedtoken => {
+          return await getSupportedTokensBasicInfo(supportedtoken, farm.chain);
+        }),
+      ),
+      depositedAmount: 0,
+    };
+    if (walletAccountAtom) {
+      farmInfo.depositedAmount = toExactFixed(
+        await getUserDepositedLPAmount(farm.farmAddress, farm.chain),
+        4,
+      );
+      farmInfo.poolShare =
+        farmInfo.depositedAmount > 0
+          ? toExactFixed(
+              Number(farmInfo.depositedAmount) /
+                Number(farmInfo.totalAssetSupply),
+              2,
+            )
+          : 0;
+    }
+
+    return farmInfo;
+  };
+
   const showAllFarms = () => {
     setNetworkFilter(null);
     setTokenFilter(null);
@@ -128,9 +188,21 @@ export const useMain = () => {
         ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
         : availableFarms;
 
-    filteredFarms = tokenFilter ? filteredFarms.filter(farm => farm.supportedTokens.map(supportedToken => supportedToken.symbol).includes(tokenFilter)) : filteredFarms;
+    filteredFarms = tokenFilter
+      ? filteredFarms.filter(farm =>
+          farm.supportedTokens
+            .map(supportedToken => supportedToken.symbol)
+            .includes(tokenFilter),
+        )
+      : filteredFarms;
 
-    filteredFarms = networkFilter ? filteredFarms.filter(farm => farm.chain == (networkFilter == 'Ethereum' ? EChain.ETHEREUM : EChain.POLYGON)) : filteredFarms;
+    filteredFarms = networkFilter
+      ? filteredFarms.filter(
+          farm =>
+            farm.chain ==
+            (networkFilter == 'Ethereum' ? EChain.ETHEREUM : EChain.POLYGON),
+        )
+      : filteredFarms;
 
     return filteredFarms;
   };
@@ -144,7 +216,8 @@ export const useMain = () => {
     showYourFarms,
     viewType,
     allSupportedTokens,
-    tokenFilter, setTokenFilter,
+    tokenFilter,
+    setTokenFilter,
     networkFilter,
     setNetworkFilter,
   };
