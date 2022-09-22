@@ -51,6 +51,7 @@ export const WithdrawalForm = ({
                 tokenSign={selectedFarm.sign}
                 onValueChange={handleWithdrawalFieldChange}
                 value={withdrawValue}
+                maxValue={selectedFarm.depositedAmount}
                 tokenOptions={selectedFarm.supportedTokens || []}
                 selectedToken={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
