@@ -82,7 +82,11 @@ export const TransferTab = ({ ...rest }) => {
               {error}
             </Text>
           </Box>
-          <FeeInfo biconomyToggle={!isSafeAppAtom} useBiconomy={useBiconomy} setUseBiconomy={setUseBiconomy} showWalletFee={!useBiconomy || isSafeAppAtom} />
+          <FeeInfo
+            useBiconomy={useBiconomy}
+            setUseBiconomy={setUseBiconomy}
+            showWalletFee={!useBiconomy}
+          />
         </Box>
       )}
       <Box margin={{ top: 'large' }}>
