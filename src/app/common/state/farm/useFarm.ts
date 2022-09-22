@@ -243,7 +243,21 @@ export const useFarm = ({ id }) => {
     return farmInfo;
   };
 
-  const updateFarmInfo = async (farm = selectedFarm) => {
+  const updateFarmInfo = async () =>{
+    try {
+      const farm = await getUpdatedFarmInfo(selectedFarm);
+      setSelectedsupportedToken(
+        farm.supportedTokens?.find(
+          stableCoin => stableCoin?.address == selectedSupportedToken?.address,
+        ),
+      );
+      setSelectedFarm(farm);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getUpdatedFarmInfo = async (farm = selectedFarm) => {
     try {
       let farmInfo = farm?.isBooster
         ? await fetchBoosterFarmInfo(farm)
@@ -269,18 +283,7 @@ export const useFarm = ({ id }) => {
         );
       }
 
-      setSelectedsupportedToken(
-        selectedSupportedToken
-          ? farmInfo.supportedTokens?.find(
-              supportedToken =>
-                supportedToken?.address == selectedSupportedToken?.address,
-            )
-          : farmInfo.supportedTokens?.length > 0
-          ? farmInfo.supportedTokens[0]
-          : undefined,
-      );
-
-      setSelectedFarm({ ...farm, ...farmInfo });
+      return ({ ...farm, ...farmInfo });
     } catch (error) {
       console.log(error);
     }
@@ -288,15 +291,20 @@ export const useFarm = ({ id }) => {
 
   const selectFarm = async id => {
     setIsLoading(true);
+
     try {
-      const farm = availableFarms.find(availableFarm => availableFarm.id == id);
+      const farm = await getUpdatedFarmInfo(availableFarms.find(availableFarm => availableFarm.id == id));
       if (!farm) {
         navigate('/');
       }
-      updateFarmInfo(farm);
+      setSelectedFarm(farm);
+      setSelectedsupportedToken(
+        farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
+      );
     } catch (error) {
       console.log(error);
     }
+
     setIsLoading(false);
   };
 

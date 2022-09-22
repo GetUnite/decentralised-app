@@ -58,7 +58,6 @@ export const useDepositForm = ({
   };
 
   const handleDepositFieldChange = value => {
-    console.log(value);
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setDepositValueError('Write a valid number');

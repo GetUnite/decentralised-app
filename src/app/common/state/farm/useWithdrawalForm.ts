@@ -142,7 +142,7 @@ export const useWithdrawalForm = ({
       }
       resetState();
       setBlockNumber(blockNumber);
-      await updateFarmInfo(selectedFarm);
+      await updateFarmInfo();
     } catch (err) {
       resetState();
       setNotificationt(err.message, 'error');
