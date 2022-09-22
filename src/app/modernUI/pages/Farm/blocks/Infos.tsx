@@ -1,8 +1,5 @@
 import { EChain } from 'app/common/functions/Web3Client';
 import { FeeInfo, Info } from 'app/modernUI/components';
-import { useRecoilState } from 'recoil';
-import { isSafeApp } from 'app/common/state/atoms';
-import { BiconomyToggle } from 'app/modernUI/components/Biconomy';
 
 export const Infos = ({
   selectedFarm,

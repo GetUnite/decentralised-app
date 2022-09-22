@@ -43,12 +43,14 @@ interface ITokenAndValueInput {
   setSelectedToken?: Function;
   tokenOptions: TSupportedToken[];
   error: string;
+  maxValue: string;
 }
 
 export const TokenAndValueInput = ({
   label,
   tokenSign,
   value,
+  maxValue,
   onValueChange,
   tokenOptions,
   selectedToken,
@@ -91,8 +93,10 @@ export const TokenAndValueInput = ({
             <MaxButton
               primary
               onClick={() => {
-                setFormattedValue(Number(selectedToken.balance).toLocaleString());
-                onValueChange(selectedToken?.balance);
+                setFormattedValue(
+                  Number(maxValue).toLocaleString(),
+                );
+                onValueChange(maxValue);
               }}
             >
               Max
