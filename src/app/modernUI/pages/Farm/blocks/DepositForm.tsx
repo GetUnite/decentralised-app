@@ -1,5 +1,5 @@
 import { useDepositForm } from 'app/common/state/farm';
-import { NewInput, Spinner, SubmitButton, TokenAndValueInput } from 'app/modernUI/components';
+import { NumericInput, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
@@ -40,7 +40,7 @@ export const DepositForm = ({
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
-              <TokenAndValueInput
+              <NumericInput
                 label={'Deposit ' + selectedSupportedToken.label}
                 tokenSign={selectedFarm.sign}
                 onValueChange={handleDepositFieldChange}

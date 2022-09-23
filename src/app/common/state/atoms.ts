@@ -25,6 +25,10 @@ export const isSafeApp = atom({
   default: false,
 });
 
+export const isCorrectNetwork = atom({
+  key: 'isCorrectNetwork',
+  default: false,
+});
 
 type TSelectStableCoin = {
   label?: string;
