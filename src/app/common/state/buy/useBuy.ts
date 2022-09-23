@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 export const useBuy = () => {
-  const { notification, setNotification } = useNotification();
+  const { notification, setNotification, resetNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
   const [walletAccountAtom, setWalletAccountAtom] =
     useRecoilState(walletAccount);
@@ -41,7 +41,7 @@ export const useBuy = () => {
 
   const resetState = () => {
     setError('');
-    setSuccessNotification('');
+    resetNotification();
     setIsBuying(false);
     setIsApproving(false);
   };
@@ -93,7 +93,6 @@ export const useBuy = () => {
 
   const fetchAlluoPriceInWETH = async () => {
     const price = await getAlluoPriceInWETH();
-
     const fixed = toExactFixed(price, 2);
     setAlluoPriceInWETH(fixed);
   };
@@ -130,9 +129,9 @@ export const useBuy = () => {
   };
 
   const handleApprove = async () => {
-    setErrorNotification('');
-    setSuccessNotification('');
+    resetNotification();
     setIsApproving(true);
+
     try {
       const res = await approveAlluoPurchaseInWETH();
 
@@ -142,12 +141,13 @@ export const useBuy = () => {
       resetState();
       setErrorNotification(err.message);
     }
+
     setIsApproving(false);
   };
   const handleBuyAction = async () => {
-    setErrorNotification('');
-    setSuccessNotification('');
+    resetNotification();
     setIsBuying(true);
+
     try {
       const res = await buyAlluoWithWETH(inputValue);
       setAccountInformation();
@@ -159,13 +159,14 @@ export const useBuy = () => {
       resetState();
       setErrorNotification(err.message);
     }
+
     setIsBuying(false);
   };
 
   const handleBuyAndLockAction = async () => {
-    setErrorNotification('');
-    setSuccessNotification('');
+    resetNotification();
     setIsBuying(true);
+
     try {
       const alluoBalanceBefore = await getBalanceOfAlluoUser();
       await buyAlluoWithWETH(inputValue);
@@ -186,6 +187,7 @@ export const useBuy = () => {
       resetState();
       setErrorNotification(err.message);
     }
+
     setIsBuying(false);
   };
 
