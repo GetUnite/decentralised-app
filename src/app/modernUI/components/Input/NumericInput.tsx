@@ -6,6 +6,7 @@ import { normalizeColor } from 'grommet/utils';
 import NumberFormat from 'react-number-format';
 import { TSupportedToken } from 'app/common/typings/form';
 import { TokenIcon } from '../Icons';
+import { roundNumberDown } from 'app/common/functions/utils';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
@@ -39,14 +40,14 @@ interface ITokenAndValueInput {
   tokenSign?: string;
   value: string;
   onValueChange: Function;
-  selectedToken: TSupportedToken;
+  selectedToken?: TSupportedToken;
   setSelectedToken?: Function;
-  tokenOptions: TSupportedToken[];
+  tokenOptions?: TSupportedToken[];
   error: string;
-  maxValue: string;
+  maxValue?: string;
 }
 
-export const TokenAndValueInput = ({
+export const NumericInput = ({
   label,
   tokenSign,
   value,
@@ -73,7 +74,7 @@ export const TokenAndValueInput = ({
             {!!selectedToken &&
               'Wallet: ' +
                 tokenSign +
-                (+(+selectedToken?.balance)).toLocaleString()}
+                roundNumberDown(+(+selectedToken?.balance))}
           </Text>
         </Box>
         <RelativeBox margin={{ top: 'xxsmall' }}>
@@ -90,31 +91,34 @@ export const TokenAndValueInput = ({
             }}
           />
           <AbsoluteBox direction="row" gap="xsmall">
-            <MaxButton
-              primary
-              onClick={() => {
-                setFormattedValue(
-                  Number(maxValue).toLocaleString(),
-                );
-                onValueChange(maxValue);
-              }}
-            >
-              Max
-            </MaxButton>
-            <Select
-              width="10px"
-              plain
-              icon={<Down size="small" />}
-              dropAlign={{ right: 'right', top: 'bottom' }}
-              options={tokenOptions}
-              value={selectedToken?.label}
-              valueLabel={option => {
-                return <TokenIcon label={option} />;
-              }}
-              onChange={({ option }) => setSelectedToken(option)}
-              labelKey="label"
-              valueKey="address"
-            />
+            {maxValue && (
+              <MaxButton
+                primary
+                onClick={() => {
+                  setFormattedValue(
+                    roundNumberDown(maxValue),
+                  );
+                }}
+              >
+                Max
+              </MaxButton>
+            )}
+            {tokenOptions && (
+              <Select
+                width="10px"
+                plain
+                icon={<Down size="small" />}
+                dropAlign={{ right: 'right', top: 'bottom' }}
+                options={tokenOptions}
+                value={selectedToken?.label}
+                valueLabel={option => {
+                  return <TokenIcon label={option} />;
+                }}
+                onChange={({ option }) => setSelectedToken(option)}
+                labelKey="label"
+                valueKey="address"
+              />
+            )}
           </AbsoluteBox>
         </RelativeBox>
         {error && (

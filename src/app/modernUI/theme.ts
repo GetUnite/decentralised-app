@@ -251,7 +251,7 @@ export const theme = deepMerge(grommet, {
   },
   anchor: { color: 'text' },
   select: {
-    // container: { extend: `background-color: bg` },
+     //container: { extend: `background-color: bg` },
     options: {
       text: { color: 'text' },
       container: {

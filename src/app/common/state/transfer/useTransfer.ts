@@ -6,7 +6,7 @@ import {
   getIbAlluoInfo,
   EChain,
 } from 'app/common/functions/Web3Client';
-import { useNotification, ENotificationId } from 'app/common/state';
+import { useNotification } from 'app/common/state';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 
 export const useTransfer = () => {
@@ -22,12 +22,15 @@ export const useTransfer = () => {
     balance?: string;
     decimals?: number;
     label?: string;
+    sign?: string;
   };
 
   const [selectedIbAlluo, setSelectedIbAlluo] = useState<string>('IbAlluoUSD');
   const [transferValue, setTransferValue] = useState<string>();
   const [recipientAddress, setRecipientAddress] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [transferValueError, setTransferValueError] = useState<string>('');
+  const [recipientAddressError, setRecipientAddressError] =
+    useState<string>('');
   const [isTransferring, setIsTransferring] = useState<boolean>(false);
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<IbAlluoInfo>>([]);
 
@@ -39,7 +42,8 @@ export const useTransfer = () => {
   }, [walletAccountAtom]);
 
   const resetState = () => {
-    setError('');
+    setTransferValueError('');
+    setRecipientAddressError('');
     setIsTransferring(false);
   };
 
@@ -62,6 +66,7 @@ export const useTransfer = () => {
         balance: usd.balance,
         decimals: usd.decimals,
         type: usd.symbol,
+        sign: getTokenSign(usd.symbol),
       },
       {
         label: 'EUR',
@@ -69,6 +74,7 @@ export const useTransfer = () => {
         balance: eur.balance,
         decimals: eur.decimals,
         type: eur.symbol,
+        sign: getTokenSign(eur.symbol),
       },
       {
         label: 'ETH',
@@ -76,6 +82,7 @@ export const useTransfer = () => {
         balance: eth.balance,
         decimals: eth.decimals,
         type: eth.symbol,
+        sign: getTokenSign(eth.symbol),
       },
       {
         label: 'BTC',
@@ -83,6 +90,7 @@ export const useTransfer = () => {
         balance: btc.balance,
         decimals: btc.decimals,
         type: btc.symbol,
+        sign: getTokenSign(btc.symbol),
       },
     ]);
   };
@@ -91,13 +99,12 @@ export const useTransfer = () => {
     token => token.type === selectedIbAlluo,
   );
 
-  const handleTransferValueChange = e => {
-    const { value } = e.target;
-    resetState();
+  const handleTransferValueChange = value => {
+    setTransferValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
-      setError('Write a valid number');
+      setTransferValueError('Write a valid number');
     } else if (+value > +(selectedIbAlluoInfo?.balance || 0)) {
-      setError('Not enough balance');
+      setTransferValueError('Not enough balance');
     } else {
       setTransferValue(value);
     }
@@ -105,22 +112,17 @@ export const useTransfer = () => {
 
   const handleRecipientAddressChange = e => {
     const { value } = e.target;
-    resetState();
+    setRecipientAddressError('');
     if (!addressIsValid(value)) {
-      setError('Recipient address is not valid');
+      setRecipientAddressError('Recipient address is not valid');
     } else {
-      setError('');
+      setRecipientAddressError('');
     }
     setRecipientAddress(value);
   };
 
-  const setToMax = () => {
-    setError('');
-    setTransferValue(selectedIbAlluoInfo?.balance || '');
-  };
-
   const handleTransfer = async () => {
-    setError('');
+    resetState();
     setIsTransferring(true);
 
     try {
@@ -145,13 +147,25 @@ export const useTransfer = () => {
     setIsTransferring(false);
   };
 
+  const getTokenSign = (type = 'usd') => {
+    return type === 'usd'
+      ? '$'
+      : type === 'eur'
+      ? '€'
+      : type === 'eth'
+      ? 'Ξ'
+      : type === 'btc'
+      ? '₿'
+      : '';
+  };
+
   return {
-    notificationId: ENotificationId.TRANSFER,
-    error,
+    recipientAddressError,
+    transferValueError,
+    hasErrors: recipientAddressError != '' || transferValueError != '',
     transferValue,
     selectedIbAlluoInfo,
     handleTransferValueChange,
-    setToMax,
     isTransferring,
     handleTransfer,
     resetState,
