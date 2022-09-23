@@ -103,7 +103,7 @@ export const Modal = ({
                 fill="vertical"
                 margin={{ vertical: 'medium' }}
                 gap="small"
-                style={contentHeight ? { height: contentHeight } : {}}
+                style={contentHeight ? { minHeight: contentHeight } : {}}
               >
                 {isLoading ? (
                   <Box
