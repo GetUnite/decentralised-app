@@ -1,6 +1,6 @@
 import { useWithdrawalForm } from 'app/common/state/farm';
-import { NewInput, Spinner, SubmitButton, TokenAndValueInput } from 'app/modernUI/components';
-import { Box, Text } from 'grommet';
+import { NumericInput, Spinner, SubmitButton } from 'app/modernUI/components';
+import { Box } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
 
@@ -46,7 +46,7 @@ export const WithdrawalForm = ({
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
-            <TokenAndValueInput
+              <NumericInput
                 label={'Withdraw ' + selectedSupportedToken.label}
                 tokenSign={selectedFarm.sign}
                 onValueChange={handleWithdrawalFieldChange}
