@@ -24,6 +24,7 @@ export const useLock = () => {
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      setAccountInformation();
     }
   }, [walletAccountAtom]);
 
