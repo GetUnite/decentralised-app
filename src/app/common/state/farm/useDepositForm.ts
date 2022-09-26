@@ -81,6 +81,11 @@ export const useDepositForm = ({
           useBiconomy,
         );
       } else {
+        console.log({
+          depositValue: depositValue,
+          selectedToken: selectedSupportedToken.address,
+          tokenDecimals: selectedSupportedToken.decimals,
+        });
         await depositStableCoin(
           selectedSupportedToken.address,
           depositValue,
