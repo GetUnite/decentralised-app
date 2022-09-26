@@ -1,8 +1,7 @@
-import { useState, Ref, LegacyRef } from 'react';
+import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import {
-  Layer,
   Box,
   Button,
   TextInput,
@@ -12,7 +11,6 @@ import {
   SelectExtendedProps,
   TextInputProps,
   RangeInput,
-  RangeInputProps,
   RangeInputExtendedProps,
 } from 'grommet';
 import { Down } from 'grommet-icons';
@@ -30,7 +28,7 @@ import eurs from 'app/modernUI/images/eurs.png';
 import jeur from 'app/modernUI/images/jeur.svg';
 import weth from 'app/modernUI/images/weth.png';
 import wbtc from 'app/modernUI/images/wbtc.png';
-import coinPlaceholder from 'app/modernUI/images/coinPlaceholder.svg';
+import coinPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
 
 const AbsoluteBox = styled(Box)<{ isRangeInput?: boolean }>`
   position: absolute;
@@ -112,7 +110,7 @@ export const Input = ({
           <RangeInputValueText>{rangeInputProps.value}%</RangeInputValueText>
           <RangeInput {...rangeInputProps} />
           <MaxButton primary {...maxButtonProps}>
-            Max
+            MAX
           </MaxButton>
         </>
       );
@@ -143,9 +141,7 @@ export const Input = ({
           <MaxButton
             primary
             onClick={event => {
-              setFormattedValue(
-                Number(inputProps.max).toLocaleString()
-              );
+              setFormattedValue(Number(inputProps.max).toLocaleString());
               return maxButtonProps.onClick(event);
             }}
           >
@@ -159,24 +155,33 @@ export const Input = ({
               value={selectedStableCoinAtom?.label}
               valueLabel={option => {
                 if (option === 'USDC' || option === 'tUSDC')
-                  return <img width="24" height="24" src={usdc} />;
+                  return <img width="24" height="24" src={usdc} alt="usdc" />;
                 if (option === 'USDT' || option === 'tUSDT')
-                  return <img width="24" height="24" src={usdt} />;
+                  return <img width="24" height="24" src={usdt} alt="usdt" />;
                 if (option === 'DAI' || option === 'tDAI')
-                  return <img width="24" height="24" src={dai} />;
+                  return <img width="24" height="24" src={dai} alt="dai" />;
 
                 if (option === 'jEUR' || option === 'tjEUR')
-                  return <img width="24" height="24" src={jeur} />;
+                  return <img width="24" height="24" src={jeur} alt="jeur" />;
                 if (option === 'EURT' || option === 'tEURT')
-                  return <img width="24" height="24" src={eurt} />;
+                  return <img width="24" height="24" src={eurt} alt="eurt" />;
                 if (option === 'EURS' || option === 'tEURS')
-                  return <img width="24" height="24" src={eurs} />;
-                if (option === 'WETH' || option === 'tWETH')
-                  return <img width="24" height="24" src={weth} />;
-                if (option === 'WBTC' || option === 'tWBTC')
-                  return <img width="24" height="24" src={wbtc} />;
+                  return <img width="24" height="24" src={eurs} alt="eurs" />;
 
-                return <img width="24" height="24" src={coinPlaceholder} />;
+                if (option === 'WETH' || option === 'tWETH')
+                  return <img width="24" height="24" src={weth} alt="weth" />;
+
+                if (option === 'WBTC' || option === 'tWBTC')
+                  return <img width="24" height="24" src={wbtc} alt="wbtc" />;
+
+                return (
+                  <img
+                    width="24"
+                    height="24"
+                    src={coinPlaceholder}
+                    alt="placeholder"
+                  />
+                );
               }}
               onChange={({ option }) => setselectedStableCoinAtom(option)}
               labelKey="label"

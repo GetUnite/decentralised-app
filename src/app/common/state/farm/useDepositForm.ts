@@ -1,98 +1,126 @@
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
+  approveToken,
+  depositIntoBoosterFarm,
   depositStableCoin,
+  EChain,
 } from 'app/common/functions/Web3Client';
-import { ENotificationId, useNotification } from 'app/common/state';
+import { useNotification } from 'app/common/state';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { isSafeApp } from '../atoms';
 
 export const useDepositForm = ({
   selectedFarm,
-  selectedStableCoin,
+  selectedSupportedToken,
   updateFarmInfo,
 }) => {
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const { setNotificationt } = useNotification();
   const [depositValue, setDepositValue] = useState<string>();
-  const [error, setError] = useState<string>('');
+  const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [biconomyStatus, setBiconomyStatus] = useState<boolean>(true);
+  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true);
 
   const resetState = () => {
-    setError('');
+    setDepositValueError('');
     setIsApproving(false);
     setIsDepositing(false);
   };
 
   const handleApprove = async () => {
-    setError('');
     setIsApproving(true);
+
     try {
-      const res = await approveStableCoin(
-        selectedStableCoin.value,
-        selectedStableCoin.decimals,
-        selectedFarm.type,
-        selectedFarm.chain,
-      );
+      if (selectedFarm?.isBooster) {
+        await approveToken(
+          selectedSupportedToken.address,
+          selectedFarm.farmAddress,
+          selectedFarm.chain,
+          useBiconomy,
+        );
+      } else {
+        await approveStableCoin(
+          selectedSupportedToken.address,
+          selectedSupportedToken.decimals,
+          selectedFarm.type,
+          selectedFarm.chain,
+        );
+      }
       await updateFarmInfo();
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
-      setError(err.message);
+      setNotificationt(err.message, 'error');
     }
+
     setIsApproving(false);
   };
 
-  const handleDepositFieldChange = e => {
-    const { value } = e.target;
+  const handleDepositFieldChange = value => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
-      setError('Write a valid number');
-    } else if (+value > +selectedStableCoin?.balance) {
-      setError('Not enough balance');
+      setDepositValueError('Write a valid number');
+    } else if (+value > +selectedSupportedToken?.balance) {
+      setDepositValueError('Not enough balance');
     }
     setDepositValue(value);
   };
 
-  const setToMax = () => {
-    setError('');
-    setDepositValue(selectedStableCoin?.balance);
-  };
-
   const handleDeposit = async () => {
-    setError('');
     setIsDepositing(true);
+
     try {
-      const res = await depositStableCoin(
-        selectedStableCoin.value,
-        depositValue,
-        selectedStableCoin.decimals,
-        selectedFarm.type,
-        selectedFarm.chain,
-        biconomyStatus,
-      );
-      await updateFarmInfo();
+      if (selectedFarm?.isBooster) {
+        await depositIntoBoosterFarm(
+          selectedFarm.farmAddress,
+          selectedSupportedToken.address,
+          depositValue,
+          selectedSupportedToken.decimals,
+          selectedFarm.chain,
+          useBiconomy,
+        );
+      } else {
+        console.log({
+          depositValue: depositValue,
+          depositedValue: selectedSupportedToken.balance,
+          balanceHigherThanDepositValue: selectedSupportedToken.balance >= depositValue,
+          selectedToken: selectedSupportedToken.address,
+          tokenDecimals: selectedSupportedToken.decimals,
+        });
+        await depositStableCoin(
+          selectedSupportedToken.address,
+          depositValue,
+          selectedSupportedToken.decimals,
+          selectedFarm.type,
+          selectedFarm.chain,
+          useBiconomy,
+        );
+      }
       resetState();
       setDepositValue(null);
       setNotificationt('Deposit successfully', 'success');
-    } catch (err) {
-      console.error('Error', err.message);
+      await updateFarmInfo();
+    } catch (error) {
       resetState();
-      setError(err.message);
+      setNotificationt(error, 'error');
     }
+
     setIsDepositing(false);
   };
 
   return {
-    error,
     depositValue,
     handleDepositFieldChange,
-    setToMax,
     isApproving,
     handleApprove,
     isDepositing,
     handleDeposit,
-    setBiconomyStatus,
-    biconomyStatus,
+    setUseBiconomy,
+    useBiconomy,
     resetState,
+    depositValueError,
+    hasErrors: depositValueError != '',
   };
 };

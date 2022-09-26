@@ -1,5 +1,7 @@
-export type TSelect = {
+export type TSupportedToken = {
   label?: string;
-  value?: string;
+  address?: string;
   decimals?: number;
+  balance?: string;
+  allowance?: string;
 };

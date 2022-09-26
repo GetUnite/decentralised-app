@@ -1,7 +1,7 @@
 import { toExactFixed } from 'app/common/functions/utils';
 import { tokenInfo } from 'app/common/state/atoms';
 import { useBuy } from 'app/common/state/buy';
-import { Info, Input, Notification, Spinner } from 'app/modernUI/components';
+import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -37,6 +37,7 @@ export const BuyTab = ({ ...rest }) => {
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
@@ -101,7 +102,7 @@ export const BuyTab = ({ ...rest }) => {
           />
         ) : (
           <>
-            <Button
+            <SubmitButton
               color="#BBDAFF"
               disabled={
                 !(+inputValue > 0) ||
@@ -113,7 +114,7 @@ export const BuyTab = ({ ...rest }) => {
               label={<Text color="text">Buy</Text>}
               onClick={handleBuyAction}
             />
-            <Button
+            <SubmitButton
               primary
               disabled={
                 !(+inputValue > 0) ||

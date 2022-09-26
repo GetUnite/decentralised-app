@@ -15,6 +15,21 @@ export const walletAccount = atom({
   default: null,
 });
 
+export const wantedChain = atom({
+  key: 'wantedChain',
+  default: null,
+});
+
+export const isSafeApp = atom({
+  key: 'isSafeApp',
+  default: false,
+});
+
+export const isCorrectNetwork = atom({
+  key: 'isCorrectNetwork',
+  default: true,
+});
+
 type TSelectStableCoin = {
   label?: string;
   value?: string;

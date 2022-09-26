@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import {
-  Layer,
   Box,
   Button,
-  Heading,
   Text,
   ButtonExtendedProps,
 } from 'grommet';
 import { normalizeColor } from 'grommet/utils';
+import { useRecoilState } from 'recoil';
+import { mode } from "app/common/state/atoms";
+import { colors } from 'app/modernUI/theme';
 
 const StyledButton = styled(Button)<ButtonExtendedProps | any>`
   background-color: ${props =>
@@ -24,15 +25,18 @@ const StyledButton = styled(Button)<ButtonExtendedProps | any>`
     props.selected
       ? normalizeColor('primary', props.theme)
       : normalizeColor('tabText', props.theme)};
-  border-radius: 6px;
+  border-radius: 7px;
+  font-weight: bold;
 `;
 
 export const Tabs = ({ children = [], ...rest }) => {
+  const [modeAtom] = useRecoilState(mode);
   const [selected, setSelected] = useState(0);
   return (
     <>
       <Box
-        background="tab"
+        style={{boxShadow:`inset 0px 0px 0px 1px ${modeAtom === 'light' ? colors.BLACK_8 : colors.BLUE_80}`}}
+        background="tabSwitch"
         direction="row"
         height="36px"
         round="xsmall"

@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import {
   approveAlluoTransaction,
@@ -6,17 +6,15 @@ import {
   getTokenInfo,
   EChain,
 } from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount } from 'app/common/state/atoms';
-import { useNotification, ENotificationId, useChain } from 'app/common/state';
+import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { useNotification, ENotificationId } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
 
 export const useLock = () => {
-  const { notification, setNotification } = useNotification();
+  const { setNotificationt, resetNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
-    walletAccount,
-  );
-  const { changeChainTo } = useChain();
+  const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [lockValue, setLockValue] = useState<string>();
   const [isApproving, setIsApproving] = useState<boolean>(false);
@@ -25,30 +23,15 @@ export const useLock = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.ETHEREUM);
+      setWantedChainAtom(EChain.ETHEREUM);
     }
   }, [walletAccountAtom]);
 
   const resetState = () => {
     setError('');
-    setSuccessNotification('');
+    resetNotification();
     setIsLocking(false);
     setIsApproving(false);
-  };
-
-  const setSuccessNotification = message => {
-    setNotification({
-      id: ENotificationId.LOCK,
-      type: 'success',
-      message: message,
-    });
-  };
-  const setErrorNotification = message => {
-    setNotification({
-      id: ENotificationId.LOCK,
-      type: 'error',
-      message: message,
-    });
   };
 
   const handleLockValueChange = e => {
@@ -74,35 +57,33 @@ export const useLock = () => {
   };
 
   const handleApprove = async () => {
-    setErrorNotification('');
-    setSuccessNotification('');
+    resetNotification();
     setIsApproving(true);
-    try {
-      const res = await approveAlluoTransaction(maximumUint256Value);
 
+    try {
+      await approveAlluoTransaction(maximumUint256Value);
       setAccountInformation();
     } catch (err) {
       console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      setNotificationt(err.message, 'error');
     }
+    
     setIsApproving(false);
   };
   const handleLockAction = async () => {
-    setErrorNotification('');
-    setSuccessNotification('');
+    resetNotification();
     setIsLocking(true);
+
     try {
-      const res = await lockAlluoToken(lockValue);
+      await lockAlluoToken(lockValue);
       setAccountInformation();
-      setErrorNotification('');
       setLockValue(null);
-      setSuccessNotification('Successfully locked');
+      setNotificationt('Successfully locked', 'success');
     } catch (err) {
       console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      setNotificationt(err.message, error);
     }
+
     setIsLocking(false);
   };
 
@@ -121,7 +102,6 @@ export const useLock = () => {
     handleSetLockToMax,
     handleApprove,
     handleLockAction,
-
     setToMax,
   };
 };

@@ -1,35 +1,36 @@
 import { useDepositForm } from 'app/common/state/farm';
-import { NewInput, Spinner } from 'app/modernUI/components';
-import { Box, Button, Text } from 'grommet';
+import { NumericInput, Spinner, SubmitButton } from 'app/modernUI/components';
+import { Box, Text } from 'grommet';
 import { Infos } from './Infos';
 import { TopHeader } from './TopHeader';
 
 export const DepositForm = ({
   selectedFarm,
   updateFarmInfo,
-  selectStableCoin,
-  selectedStableCoin,
+  selectSupportedToken,
+  selectedSupportedToken,
   ...rest
 }) => {
   const {
-    error,
+    hasErrors,
+    depositValueError,
     depositValue,
     handleDepositFieldChange,
-    setToMax,
     isApproving,
     handleApprove,
     isDepositing,
     handleDeposit,
-    setBiconomyStatus,
-    biconomyStatus,
-  } = useDepositForm({ selectedFarm, selectedStableCoin, updateFarmInfo });
+    setUseBiconomy,
+    useBiconomy,
+  } = useDepositForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
-      {!selectedStableCoin || isApproving || isDepositing ? (
+      {!selectedSupportedToken || isApproving || isDepositing ? (
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
@@ -39,53 +40,45 @@ export const DepositForm = ({
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
             <Box margin={{ top: 'medium' }}>
-              <NewInput
-                coinIcon={selectedFarm.sign}
-                inputProps={{
-                  value: depositValue || '',
-                  onChange: handleDepositFieldChange,
-                  max: selectedStableCoin?.balance || 0,
-                }}
-                maxButtonProps={{
-                  onClick: setToMax,
-                }}
-                selectProps={{
-                  options: selectedFarm.stableCoins || [],
-                }}
-                selectedTokenInfo={selectedStableCoin}
-                setSelectedToken={selectStableCoin}
+              <NumericInput
+                label={'Deposit ' + selectedSupportedToken.label}
+                tokenSign={selectedFarm.sign}
+                onValueChange={handleDepositFieldChange}
+                value={depositValue}
+                maxValue={selectedSupportedToken?.balance}
+                tokenOptions={selectedFarm.supportedTokens || []}
+                selectedToken={selectedSupportedToken}
+                setSelectedToken={selectSupportedToken}
+                error={depositValueError}
               />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {error}
-              </Text>
             </Box>
           </Box>
           <Box margin={{ top: 'medium' }}>
             <Infos
               selectedFarm={selectedFarm}
               inputValue={depositValue}
-              biconomyStatus={biconomyStatus}
-              setBiconomyStatus={setBiconomyStatus}
+              useBiconomy={useBiconomy}
+              setUseBiconomy={setUseBiconomy}
             />
           </Box>
         </>
       )}
 
-      <Box margin={{ top: 'large' }}>
-        <Button
+      <Box margin={{ top: 'medium' }}>
+        <SubmitButton
           primary
           disabled={
-            isApproving || isDepositing || !(+depositValue > 0) || error !== ''
+            isApproving || isDepositing || !(+depositValue > 0) || hasErrors
           }
           label={
             +depositValue > 0
-              ? +selectedStableCoin?.allowance >= +depositValue
+              ? +selectedSupportedToken?.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +selectedStableCoin?.allowance >= +depositValue
+            +selectedSupportedToken?.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }

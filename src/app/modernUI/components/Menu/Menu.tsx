@@ -4,7 +4,7 @@ import { Menu as MenuIcon, Close } from 'grommet-icons';
 
 import { isSmall } from 'app/modernUI/theme';
 import { useMode } from 'app/common/state/shortcuts';
-import { ConnectionModal } from 'app/modernUI/components';
+import { ConnectionButton } from 'app/modernUI/components';
 import { MenuItem } from './blocks';
 
 import sunIcon from '../../images/sunIcon.svg';
@@ -43,7 +43,7 @@ export const Menu = ({ ...rest }) => {
   const toggleModal = () => {
     setIsModalOpen(prev => !prev);
   };
-  const { isLightMode, mode, setMode, toggleMode } = useMode();
+  const { isLightMode, toggleMode } = useMode();
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -52,11 +52,11 @@ export const Menu = ({ ...rest }) => {
             direction="row"
             gap={isSmall(size) ? 'medium' : 'small'}
             align="center"
-            style={{flex:1}}
+            style={{ flex: 1 }}
             justify="end"
           >
             {((isSmall(size) && isModalOpen) || !isSmall(size)) && (
-              <ConnectionModal />
+              <ConnectionButton />
             )}
             {((isSmall(size) && !isModalOpen) || !isSmall(size)) && (
               <Button
@@ -71,8 +71,6 @@ export const Menu = ({ ...rest }) => {
                   src={isLightMode ? sunIcon : moonIcon}
                   size="small"
                   justify="center"
-                  overflow="hidden"
-                  round="full"
                 />
               </Button>
             )}
