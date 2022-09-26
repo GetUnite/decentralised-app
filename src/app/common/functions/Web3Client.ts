@@ -11,7 +11,12 @@ import ethereumIbAlluoETHAbi from 'app/common/abis/ethereumIbAlluoETH.json';
 import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
-import { fromDecimals, maximumUint256Value, toDecimals, toExactFixed } from './utils';
+import {
+  fromDecimals,
+  maximumUint256Value,
+  toDecimals,
+  toExactFixed,
+} from './utils';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
@@ -1205,7 +1210,11 @@ export const depositStableCoin = async (
 
     const amountInDecimals = toDecimals(amount, decimals);
 
-    console.log({amountInDecimals: amountInDecimals, tokenAddress: tokenAddress, ibAlluoAddress: ibAlluoAddress});
+    console.log({
+      amountInDecimals: amountInDecimals,
+      tokenAddress: tokenAddress,
+      ibAlluoAddress: ibAlluoAddress,
+    });
 
     const tx = await sendTransaction(
       abi,
@@ -1295,15 +1304,18 @@ export const getBoosterFarmRewards = async (
 
   const valueAmountInDecimals = toDecimals(value, 18);
 
-  const stableValue = value > 0 ? await callContract(
-    curvePoolAbi,
-    curvePoolAddress,
-    'calc_withdraw_one_coin(uint256,int128)',
-    [valueAmountInDecimals, 1],
-    chain,
-  ) : 0;
+  const stableValue =
+    value > 0
+      ? await callContract(
+          curvePoolAbi,
+          curvePoolAddress,
+          'calc_withdraw_one_coin(uint256,int128)',
+          [valueAmountInDecimals, 1],
+          chain,
+        )
+      : 0;
 
-  return { value, stableValue: stableValue ? fromDecimals(stableValue, 6) :0 };
+  return { value, stableValue: stableValue ? fromDecimals(stableValue, 6) : 0 };
 };
 
 export const approveToken = async (
@@ -1406,7 +1418,8 @@ export const getBoosterFarmInterest = async (
     },
   ];
 
-  const f = 1 -
+  const f =
+    1 -
     (await callContract(abi, farmAddress, 'adminFee()', null, chain)) / 10000;
 
   const [aJsonResult, bJsonResult] = await Promise.all([
@@ -2139,7 +2152,13 @@ export const getTokenInfo = async walletAddress => {
         [walletAddress],
         EChain.ETHEREUM,
       ),
-      ,
+      callContract(
+        vlAlluoAbi,
+        ethereumVlAlluoAddress,
+        'rewardPerDistribution()',
+        null,
+        EChain.ETHEREUM,
+      ),
       callContract(
         vlAlluoAbi,
         ethereumVlAlluoAddress,
