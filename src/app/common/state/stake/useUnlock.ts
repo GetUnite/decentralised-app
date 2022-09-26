@@ -7,10 +7,7 @@ import {
 } from 'app/common/functions/Web3Client';
 import { useState, useEffect, useReducer } from 'react';
 import { useRecoilState } from 'recoil';
-import {
-  formatTimeDelta,
-  CountdownTimeDelta,
-} from 'react-countdown';
+import { formatTimeDelta, CountdownTimeDelta } from 'react-countdown';
 import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification, ENotificationId } from 'app/common/state';
@@ -56,11 +53,9 @@ const reducer = (state: iState, action: DispatchType) => {
 };
 
 export const useUnlock = () => {
-  const { setNotification, resetNotification} = useNotification();
+  const { setNotification, resetNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom] = useRecoilState(
-    walletAccount,
-  );
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [{ unlockValue, isUnlocking }, dispatch] = useReducer(reducer, {
@@ -74,6 +69,7 @@ export const useUnlock = () => {
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      setAccountInformation();
     }
   }, [walletAccountAtom]);
 
@@ -108,11 +104,10 @@ export const useUnlock = () => {
   };
 
   const rendererForUnlock = ({ completed, days, ...timeDelta }) => {
-    const {
-      hours,
-      minutes,
-      seconds,
-    } = formatTimeDelta(timeDelta as CountdownTimeDelta, { zeroPadTime: 2 });
+    const { hours, minutes, seconds } = formatTimeDelta(
+      timeDelta as CountdownTimeDelta,
+      { zeroPadTime: 2 },
+    );
     if (completed) {
       return null;
     } else {
@@ -123,11 +118,10 @@ export const useUnlock = () => {
   };
 
   const rendererForWithdraw = ({ completed, days, ...timeDelta }) => {
-    const {
-      hours,
-      minutes,
-      seconds,
-    } = formatTimeDelta(timeDelta as CountdownTimeDelta, { zeroPadTime: 2 });
+    const { hours, minutes, seconds } = formatTimeDelta(
+      timeDelta as CountdownTimeDelta,
+      { zeroPadTime: 2 },
+    );
 
     if (completed) {
       return null;
