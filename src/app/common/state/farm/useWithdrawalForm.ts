@@ -6,6 +6,7 @@ import {
   listenToHandler,
   withdrawStableCoin,
   withdrawFromBoosterFarm,
+  EChain,
 } from 'app/common/functions/Web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { ENotificationId, useNotification } from 'app/common/state';
@@ -26,7 +27,7 @@ export const useWithdrawalForm = ({
   const [blockNumber, setBlockNumber] = useState<number>();
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -143,9 +144,9 @@ export const useWithdrawalForm = ({
       resetState();
       setBlockNumber(blockNumber);
       await updateFarmInfo();
-    } catch (err) {
+    } catch (error) {
       resetState();
-      setNotificationt(err.message, 'error');
+      setNotificationt(error, 'error');
     }
   };
 

@@ -27,7 +27,7 @@ export const isSafeApp = atom({
 
 export const isCorrectNetwork = atom({
   key: 'isCorrectNetwork',
-  default: false,
+  default: true,
 });
 
 type TSelectStableCoin = {
