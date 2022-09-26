@@ -1,6 +1,6 @@
 import { tokenInfo } from 'app/common/state/atoms';
 import { useUnlock } from 'app/common/state/stake';
-import { Info, Input, Notification, Spinner } from 'app/modernUI/components';
+import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Button, Heading, Text } from 'grommet';
 import { useState } from 'react';
 import Countdown, {
@@ -136,12 +136,11 @@ export const UnlockTab = ({ ...rest }) => {
 
   return (
     <Box fill>
-      <Notification id={notificationId} margin={{ top: 'small' }} />
-
       {tokenInfoAtom.isLoading || isUnlocking || isWithdrawing ? (
         <Box
           align="center"
           justify="center"
+          fill="vertical"
           margin={{ top: 'large', bottom: 'medium' }}
         >
           <Spinner pad="large" />
@@ -228,7 +227,7 @@ export const UnlockTab = ({ ...rest }) => {
       )}
 
       <Box margin={{ top: 'large' }} style={{ height: 52 }}>
-        <Button
+        <SubmitButton
           primary
           disabled={
             (!canWithdraw && +unlockValue === 0) || isUnlocking || isWithdrawing

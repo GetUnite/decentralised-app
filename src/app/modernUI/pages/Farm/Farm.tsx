@@ -15,18 +15,21 @@ import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { DepositForm, WithdrawalForm, BoosterFarmPresentation } from './blocks';
 import { useCookies } from 'react-cookie';
+import { EChain } from 'app/common/functions/Web3Client';
 
 export const Farm = () => {
   const { id } = useParams();
   const [cookies] = useCookies(['has_seen_boost_farms']);
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const {
     selectedFarm,
     updateFarmInfo,
     isLoading,
-    selectedStableCoin,
-    selectStableCoin,
+    selectSupportedToken,
+    selectedSupportedToken,
+    stableRewards,
+    setStableRewards,
+    claimRewards,
   } = useFarm({
     id,
   });
@@ -48,10 +51,17 @@ export const Farm = () => {
           chain={selectedFarm?.chain}
           heading={farmName}
           isLoading={isLoading}
+          noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
+          contentHeight={
+            selectedFarm?.chain == EChain.POLYGON ? '580px' : '545px'
+          }
         >
           <>
             {selectedFarm?.isBooster && !cookies.has_seen_boost_farms ? (
-              <BoosterFarmPresentation selectedFarm={selectedFarm}/>
+              <BoosterFarmPresentation
+                selectedFarm={selectedFarm}
+                farmName={farmName}
+              />
             ) : (
               <Tabs>
                 <Tab title="Deposit">
@@ -59,8 +69,8 @@ export const Farm = () => {
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                     updateFarmInfo={updateFarmInfo}
-                    selectedStableCoin={selectedStableCoin}
-                    selectStableCoin={selectStableCoin}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
                   />
                 </Tab>
                 <Tab title="Withdraw">
@@ -68,8 +78,8 @@ export const Farm = () => {
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                     updateFarmInfo={updateFarmInfo}
-                    selectedStableCoin={selectedStableCoin}
-                    selectStableCoin={selectStableCoin}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
                   />
                 </Tab>
               </Tabs>
@@ -81,45 +91,86 @@ export const Farm = () => {
           cookies.has_seen_boost_farms && (
             <Box
               round={'medium'}
-              overflow="auto"
-              width="auto"
+              overflow="hidden"
+              width="245px"
               align="start"
+              height="224px"
               justify="between"
-              height="small"
               gap="small"
               direction="column"
               background="modal"
               margin={{ top: '12px' }}
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              <Box fill gap="small">
-                <Heading size="small" level={3} margin="none" fill>
+              <Box fill>
+                <Heading
+                  size="small"
+                  level={3}
+                  margin={{ bottom: '16px', top: '0px' }}
+                  fill
+                >
                   <Box direction="row" justify="between" fill>
-                    Rewards
+                    <Text size="18px">Rewards</Text>
                     <Box direction="row">
-                      {selectedFarm?.rewards.map((reward, i) => (
+                      {selectedFarm?.rewards?.icons?.map((icon, i) => (
                         <Avatar
                           key={i}
                           align="center"
-                          src={reward.icon.src}
+                          src={icon.src}
                           size="small"
                           justify="center"
                           overflow="hidden"
                           round="full"
+                          margin={{ left: i > 0 ? '-0.6rem' : '' }}
                         />
                       ))}
                     </Box>
                   </Box>
                 </Heading>
-                <Box>
-                  <Text>CRV</Text>
-                  <Text>ETH</Text>
+                <Box
+                  direction="row"
+                  justify="between"
+                  margin={{ bottom: '28px' }}
+                >
+                  <Text weight="bold" size="16px">
+                    {stableRewards
+                      ? selectedFarm?.rewards.stableLabel
+                      : selectedFarm?.rewards.label}
+                  </Text>
+                  <Text weight="bold" size="16px">
+                    {stableRewards
+                      ? '$' + selectedFarm?.rewards.stableValue
+                      : selectedFarm?.rewards.value}
+                  </Text>
                 </Box>
-                <Box>
+                <Box gap="12px">
                   <Button
                     primary
-                    label={'Withdraw rewards'}
-                    style={{ borderRadius: '58px' }}
+                    label={
+                      'Withdraw ' +
+                      (stableRewards
+                        ? selectedFarm?.rewards.stableLabel
+                        : selectedFarm?.rewards.label)
+                    }
+                    style={{ borderRadius: '58px', width: '197px' }}
+                    onClick={claimRewards}
+                  />
+                  <Button
+                    label={
+                      stableRewards
+                        ? 'Prefer ' +
+                          selectedFarm?.rewards.label +
+                          ' LP tokens?'
+                        : 'Prefer ' + selectedFarm?.rewards.stableLabel
+                    }
+                    onClick={() => setStableRewards(!stableRewards)}
+                    plain
+                    style={{
+                      textAlign: 'center',
+                      color: '#2A73FF',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                    }}
                   />
                 </Box>
               </Box>

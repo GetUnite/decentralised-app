@@ -3,13 +3,23 @@ import fromExponential from 'from-exponential';
 
 export const maximumUint256Value =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-  
+
 export const isNumeric = (num: any) =>
   (typeof num === 'number' || (typeof num === 'string' && num.trim() !== '')) &&
   !isNaN(num as number);
-  
+
 export const generateRandomInteger = (min, max) => {
   return Math.floor(min + Math.random() * (max + 1 - min));
+};
+
+export const roundNumberDown = (num, decimals = 5) => {
+  const factorOfTen = Math.pow(10, decimals);
+  const numberFloor = Number(toExactFixed(num, decimals));
+  return (
+    numberFloor > num ? numberFloor - 1 / factorOfTen : numberFloor
+  ).toLocaleString(undefined, {
+    minimumFractionDigits: numberFloor > 0 ? decimals : 0,
+  });
 };
 
 const repeatStringNumTimes = (string: string, times: string | number) => {
@@ -125,6 +135,6 @@ export const hasCorrectDecimals = (
   return fromExponential(number) === toExactFixed(number, decimals, true);
 };
 
-export const addressIsValid =(address) =>{
+export const addressIsValid = address => {
   return Web3.utils.isAddress(address);
-}
+};

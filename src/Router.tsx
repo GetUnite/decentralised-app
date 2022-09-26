@@ -10,9 +10,12 @@ import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 // import './scrollbar-default.css';
 import './reset.css';
+import { useWallet } from 'app/common/state';
 
 export const Router = () => {
   const [modeAtom] = useRecoilState(mode);
+  useWallet();
+  
   return (
     <BrowserRouter>
         <Grommet theme={modernUITheme} themeMode={modeAtom}>

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { Link } from 'react-router-dom';
 import { useCurrentPath } from 'app/common/hooks';
@@ -11,17 +10,13 @@ import {
   Text,
   Avatar,
 } from 'grommet';
-
 import { useNotification, ENotificationId } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
-import {
-  walletAccount,
-  farmDepositCoinType,
-  TFarmDepositCoinType,
-} from 'app/common/state/atoms';
+import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
 import { ChainBadge, Notification } from 'app/modernUI/components';
 import { EChain } from 'app/common/functions/Web3Client';
+import { useConnectionButton } from 'app/common/state/components';
 
 const Disabled = () => {
   return (
@@ -48,6 +43,9 @@ interface IAssetCard {
   disabled: boolean;
   chain: EChain;
   isBooster: boolean;
+  viewType: string;
+  balance?: string;
+  poolShare?: number;
 }
 
 export const AssetCard = ({
@@ -56,20 +54,22 @@ export const AssetCard = ({
   name,
   totalAssetSupply,
   interest,
+  balance,
   isLoading,
   sign,
   icons,
   disabled,
   chain,
   isBooster = false,
+  viewType,
+  poolShare,
   ...rest
 }: IAssetCard) => {
   const { navigate } = useCurrentPath();
-  const { notification, setNotification, resetNotification } =
-    useNotification();
+  const { setNotification } = useNotification();
+  const { handleConnectWallet } = useConnectionButton();
 
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
+  const [walletAccountAtom] = useRecoilState(walletAccount);
 
   const tvl = isLoading
     ? 'Loading...'
@@ -145,7 +145,7 @@ export const AssetCard = ({
             <Card
               pad={{ horizontal: 'medium', vertical: 'none' }}
               margin={{ top: 'small' }}
-              height="fit"
+              height="120px"
               background="card"
               align="center"
               justify="center"
@@ -157,35 +157,68 @@ export const AssetCard = ({
                 align="center"
                 columns={{ size: 'xsmall', count: 'fit' }}
                 pad={{ top: '10px', bottom: '10px' }}
+                style={{ fontSize: '16px' }}
               >
-                <Text weight="bold">
-                  {name}
-                  {isBooster && <Text color="#1C1CFF"> BOOST</Text>}
-                </Text>
-                <Box direction="row" gap="small">
-                  {icons.map((icon, i) => (
-                    <Avatar
-                      key={i}
-                      align="center"
-                      src={icon.src}
-                      size="small"
-                      justify="center"
-                      overflow="hidden"
-                      round="full"
-                    />
-                  ))}
-                </Box>
-                <ChainBadge chain={chain} />
-                <Text>{tvl}</Text>
-                <Box direction="row" justify="between" align="center">
-                  <Text margin={{ right: 'small' }}>{interest}%</Text>
-                  <Link to={'/farm/' + id}>
-                    <Button
-                      disabled={!walletAccountAtom}
-                      label={walletAccountAtom ? 'Farm' : 'Connect wallet'}
-                    />
-                  </Link>
-                </Box>
+                {viewType != 'your' ? (
+                  <>
+                    <span style={{ fontWeight: 'bold' }}>
+                      {name}
+                      {isBooster && (
+                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                      )}
+                    </span>
+                    <Box direction="row" gap="small">
+                      {icons.map((icon, i) => (
+                        <Avatar
+                          key={i}
+                          align="center"
+                          src={icon.src}
+                          size="small"
+                          justify="center"
+                          overflow="hidden"
+                          round="full"
+                        />
+                      ))}
+                    </Box>
+                    <ChainBadge chain={chain} />
+                    <span>{tvl}</span>
+                    <Box direction="row" justify="between" align="center">
+                      <span>{interest}%</span>
+                      {walletAccountAtom ? (
+                        <Link to={'/farm/' + id}>
+                          <Button label={'Farm'} />
+                        </Link>
+                      ) : (
+                        <Button
+                          style={{ borderWidth: '1px' }}
+                          size={isSmall(size) ? 'small' : undefined}
+                          label={'Connect wallet'}
+                          onClick={handleConnectWallet}
+                          {...rest}
+                        />
+                      )}
+                    </Box>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontWeight: 'bold' }}>
+                      {name}
+                      {isBooster && (
+                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                      )}
+                    </span>
+                    <ChainBadge chain={chain} />
+                    <span>{poolShare}%</span>
+                    <span>{tvl}</span>
+                    <span>{balance}</span>
+                    <Box direction="row" justify="between" align="center">
+                      <span>{interest}%</span>
+                      <Link to={'/farm/' + id}>
+                        <Button label={'Farm'} />
+                      </Link>
+                    </Box>
+                  </>
+                )}
               </Grid>
             </Card>
           )}

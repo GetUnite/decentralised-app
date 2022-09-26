@@ -1,29 +1,32 @@
 import { AssetCard } from '../components';
-
 import { EChain } from 'app/common/functions/Web3Client';
+import { Box } from 'grommet';
 
-export const Assets = ({ availableFarms, isLoading }) => {
+export const Assets = ({ availableFarms, isLoading, viewType }) => {
   return (
-    <>
+    <Box gap="6px">
       {Array.isArray(availableFarms) &&
-        availableFarms.map(farmCoin => {
+        availableFarms.map(farm => {
           return (
             <AssetCard
-              id={farmCoin.id}
-              key={farmCoin.id}
-              type={farmCoin.type}
-              name={farmCoin.name}
-              totalAssetSupply={farmCoin.totalAssetSupply}
-              interest={farmCoin.interest}
+              id={farm.id}
+              key={farm.id}
+              type={farm.type}
+              name={farm.name}
+              totalAssetSupply={farm.totalAssetSupply}
+              poolShare={farm.poolShare}
+              balance={farm.depositedAmount}
+              interest={farm.interest}
               disabled={false}
-              sign={farmCoin.sign}
-              icons={farmCoin.icons}
+              sign={farm.sign}
+              icons={farm.icons}
               isLoading={isLoading}
-              chain={farmCoin.chain as EChain}
-              isBooster={farmCoin.isBooster}
+              chain={farm.chain as EChain}
+              isBooster={farm.isBooster}
+              viewType={viewType}
             />
           );
         })}
-    </>
+    </Box>
   );
 };

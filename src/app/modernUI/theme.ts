@@ -14,8 +14,9 @@ export enum colors {
   BLACK_5 = '#F2F2F2',
   BLACK_3 = '#F6F6F6',
   BLUE = '#2A73FF',
-  BLUE_30 = 'rgba(42, 115, 255, 0.3)',
+  BLUE_80 = '#282A2E',
   BLUE_40 = 'rgba(42, 115, 255, 0.4)',
+  BLUE_30 = 'rgba(42, 115, 255, 0.3)',
   BLUE_10 = 'rgba(42, 115, 255, 0.1)',
   BLUE_5 = 'rgba(42, 115, 255, 0.05)',
   SECOND_BLUE = '#C9CFEA',
@@ -80,6 +81,7 @@ export const theme = deepMerge(grommet, {
       tabText: { light: colors.BLACK_50, dark: colors.WHITE },
       card: { light: '#FFFFFF', dark: 'rgba(29, 29, 29, 0.8)' },
       softButton: { light: colors.BLACK_3, dark: colors.WHITE },
+      tabSwitch: { light: colors.BLACK_3, dark: colors.BLACK },
       container: {
         light: 'linear-gradient(40deg, #EAF1FF 0%, #FAFAFA 30%);',
         dark: 'linear-gradient(40deg, #0B1D41 0%, #000 30%);',
@@ -225,7 +227,7 @@ export const theme = deepMerge(grommet, {
 
     primary: {
       color: '#FFFFFF',
-      background: { color: '#2196f3' },
+      background: { color: '#2A73FF' },
     },
     secondary: {
       color: 'text',
@@ -249,7 +251,7 @@ export const theme = deepMerge(grommet, {
   },
   anchor: { color: 'text' },
   select: {
-    // container: { extend: `background-color: bg` },
+     //container: { extend: `background-color: bg` },
     options: {
       text: { color: 'text' },
       container: {
@@ -332,4 +334,9 @@ export const theme = deepMerge(grommet, {
     thumb: { color: 'primaryStatic' },
   },
   layer: { overlay: { background: 'container' } },
+  menu: {
+    item: { gap: '50px' },
+    icons: { color: { dark: colors.WHITE, light: colors.BLACK } },
+    group: { container: { pad: { horizontal: 'medium' } } },
+  },
 });

@@ -1,4 +1,4 @@
-import { Spinner as GrommetSpinner, Text, Box, Image } from 'grommet';
+import { Spinner as GrommetSpinner, Box, Image } from 'grommet';
 import styled from 'styled-components';
 
 import { useMode } from 'app/common/state/shortcuts';

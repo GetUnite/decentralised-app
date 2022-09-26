@@ -2,18 +2,18 @@ import {
   EChain,
   getTokenInfo,
   unlockAlluo,
-  unlockAlluoAll,
+  unlockAllAlluo,
   withdrawAlluo,
 } from 'app/common/functions/Web3Client';
 import { useState, useEffect, useReducer } from 'react';
 import { useRecoilState } from 'recoil';
-import Countdown, {
+import {
   formatTimeDelta,
   CountdownTimeDelta,
 } from 'react-countdown';
-import { tokenInfo, walletAccount } from '../atoms';
+import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
-import { useNotification, ENotificationId, useChain } from 'app/common/state';
+import { useNotification, ENotificationId } from 'app/common/state';
 
 interface iState {
   unlockValue: string;
@@ -56,12 +56,12 @@ const reducer = (state: iState, action: DispatchType) => {
 };
 
 export const useUnlock = () => {
-  const { notification, setNotification } = useNotification();
+  const { setNotification, resetNotification} = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom, setWalletAccountAtom] = useRecoilState(
+  const [walletAccountAtom] = useRecoilState(
     walletAccount,
   );
-  const { changeChainTo } = useChain();
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   const [{ unlockValue, isUnlocking }, dispatch] = useReducer(reducer, {
     unlockValue: '',
@@ -73,14 +73,13 @@ export const useUnlock = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      changeChainTo(EChain.ETHEREUM);
+      setWantedChainAtom(EChain.ETHEREUM);
     }
   }, [walletAccountAtom]);
 
   const resetState = () => {
     setError('');
-    setErrorNotification('');
-    setSuccessNotification();
+    resetNotification();
     dispatch({ type: EActionType.RESETSTATE });
   };
 
@@ -173,7 +172,7 @@ export const useUnlock = () => {
         +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
       );*/
       if (+unlockValue === 100) {
-        await unlockAlluoAll();
+        await unlockAllAlluo();
       } else {
         const res = await unlockAlluo(
           +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
