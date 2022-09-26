@@ -11,7 +11,12 @@ import ethereumIbAlluoETHAbi from 'app/common/abis/ethereumIbAlluoETH.json';
 import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
-import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import {
+  fromDecimals,
+  maximumUint256Value,
+  toDecimals,
+  toExactFixed,
+} from './utils';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
@@ -19,6 +24,7 @@ import injectedModule from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
 import {
   EEthereumAddresses,
+  EEthereumAddressesMainnet,
   EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
@@ -294,7 +300,7 @@ const sendTransaction = async (
   } catch (error) {
     console.log(error);
     console.log(abi, address, functionSignature, params);
-    
+
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
@@ -341,7 +347,7 @@ const alluoPriceUrl =
 export const getAlluoPrice = async (): Promise<number> => {
   const pathforUSDC =
     alluoPriceUrl +
-    `/v1/markets/${EEthereumAddresses.ALLUO}-${EEthereumAddresses.USDC}/sell/1000000000000000000`;
+    `/v1/markets/${EEthereumAddressesMainnet.ALLUO}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
 
   const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
 
@@ -354,7 +360,7 @@ export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
 
   const pathforWETH =
     alluoPriceUrl +
-    `/v1/markets/${EEthereumAddresses.WETH}-${EEthereumAddresses.ALLUO}/sell/${valueInDecimals}`;
+    `/v1/markets/${EEthereumAddressesMainnet.WETH}-${EEthereumAddressesMainnet.ALLUO}/sell/${valueInDecimals}`;
 
   const wethPriceObj = await fetch(pathforWETH).then(res => res.json());
   const wethPrice = wethPriceObj?.amount || 0;
@@ -1204,6 +1210,12 @@ export const depositStableCoin = async (
 
     const amountInDecimals = toDecimals(amount, decimals);
 
+    console.log({
+      amountInDecimals: amountInDecimals,
+      tokenAddress: tokenAddress,
+      ibAlluoAddress: ibAlluoAddress,
+    });
+
     const tx = await sendTransaction(
       abi,
       ibAlluoAddress,
@@ -1292,15 +1304,18 @@ export const getBoosterFarmRewards = async (
 
   const valueAmountInDecimals = toDecimals(value, 18);
 
-  const stableValue = await callContract(
-    curvePoolAbi,
-    curvePoolAddress,
-    'calc_withdraw_one_coin(uint256,int128)',
-    [valueAmountInDecimals, 1],
-    chain,
-  );
+  const stableValue =
+    value > 0
+      ? await callContract(
+          curvePoolAbi,
+          curvePoolAddress,
+          'calc_withdraw_one_coin(uint256,int128)',
+          [valueAmountInDecimals, 1],
+          chain,
+        )
+      : 0;
 
-  return { value, stableValue: fromDecimals(stableValue, 6) };
+  return { value, stableValue: stableValue ? fromDecimals(stableValue, 6) : 0 };
 };
 
 export const approveToken = async (
@@ -1381,6 +1396,41 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
   );
 
   return Web3.utils.fromWei(userDepositedLPAmount);
+};
+
+const boosterFarmInterestApiUrl =
+  'https://api-py.llama.airforce/convex/v1/pools/apr/';
+const getTotalApr = apr => {
+  return apr.baseApr + apr.crvApr + apr.cvxApr + apr.extraRewardsApr;
+};
+export const getBoosterFarmInterest = async (
+  farmAddress,
+  convexFarmIds,
+  chain,
+) => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'adminFee',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const f =
+    1 -
+    (await callContract(abi, farmAddress, 'adminFee()', null, chain)) / 10000;
+
+  const [aJsonResult, bJsonResult] = await Promise.all([
+    fetch(boosterFarmInterestApiUrl + convexFarmIds.A).then(res => res.json()),
+    fetch(boosterFarmInterestApiUrl + convexFarmIds.B).then(res => res.json()),
+  ]);
+
+  const a = getTotalApr(aJsonResult.apr[0]);
+  const b = 1 + getTotalApr(bJsonResult.apr[0]);
+
+  return toExactFixed(a * f * b * 100, 2);
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
@@ -1859,110 +1909,114 @@ export const getWETHAllowance = async () => {
 };
 
 export const buyAlluoWithWETH = async value => {
-  const abi = [
-    {
-      inputs: [
-        {
-          components: [
-            { internalType: 'bytes32', name: 'poolId', type: 'bytes32' },
-            {
-              internalType: 'enum IVault.SwapKind',
-              name: 'kind',
-              type: 'uint8',
-            },
-            {
-              internalType: 'contract IAsset',
-              name: 'assetIn',
-              type: 'address',
-            },
-            {
-              internalType: 'contract IAsset',
-              name: 'assetOut',
-              type: 'address',
-            },
-            { internalType: 'uint256', name: 'amount', type: 'uint256' },
-            { internalType: 'bytes', name: 'userData', type: 'bytes' },
-          ],
-          internalType: 'struct IVault.SingleSwap',
-          name: 'singleSwap',
-          type: 'tuple',
-        },
-        {
-          components: [
-            { internalType: 'address', name: 'sender', type: 'address' },
-            {
-              internalType: 'bool',
-              name: 'fromInternalBalance',
-              type: 'bool',
-            },
-            {
-              internalType: 'address payable',
-              name: 'recipient',
-              type: 'address',
-            },
-            {
-              internalType: 'bool',
-              name: 'toInternalBalance',
-              type: 'bool',
-            },
-          ],
-          internalType: 'struct IVault.FundManagement',
-          name: 'funds',
-          type: 'tuple',
-        },
-        { internalType: 'uint256', name: 'limit', type: 'uint256' },
-        { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      ],
-      name: 'swap',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: 'amountCalculated',
-          type: 'uint256',
-        },
-      ],
-      stateMutability: 'payable',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            components: [
+              { internalType: 'bytes32', name: 'poolId', type: 'bytes32' },
+              {
+                internalType: 'enum IVault.SwapKind',
+                name: 'kind',
+                type: 'uint8',
+              },
+              {
+                internalType: 'contract IAsset',
+                name: 'assetIn',
+                type: 'address',
+              },
+              {
+                internalType: 'contract IAsset',
+                name: 'assetOut',
+                type: 'address',
+              },
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+              { internalType: 'bytes', name: 'userData', type: 'bytes' },
+            ],
+            internalType: 'struct IVault.SingleSwap',
+            name: 'singleSwap',
+            type: 'tuple',
+          },
+          {
+            components: [
+              { internalType: 'address', name: 'sender', type: 'address' },
+              {
+                internalType: 'bool',
+                name: 'fromInternalBalance',
+                type: 'bool',
+              },
+              {
+                internalType: 'address payable',
+                name: 'recipient',
+                type: 'address',
+              },
+              {
+                internalType: 'bool',
+                name: 'toInternalBalance',
+                type: 'bool',
+              },
+            ],
+            internalType: 'struct IVault.FundManagement',
+            name: 'funds',
+            type: 'tuple',
+          },
+          { internalType: 'uint256', name: 'limit', type: 'uint256' },
+          { internalType: 'uint256', name: 'deadline', type: 'uint256' },
+        ],
+        name: 'swap',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'amountCalculated',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'payable',
+        type: 'function',
+      },
+    ];
 
-  const ethereumVaultAddress = EEthereumAddresses.VAULT;
+    const ethereumVaultAddress = EEthereumAddresses.VAULT;
 
-  const ethereumWETHAddress = EEthereumAddresses.WETH.toLowerCase();
-  const ethereumAlluoAddress = EEthereumAddresses.ALLUO.toLowerCase();
+    const ethereumWETHAddress = EEthereumAddresses.WETH.toLowerCase();
+    const ethereumAlluoAddress = EEthereumAddresses.ALLUO.toLowerCase();
 
-  const swap_struct = {
-    poolId:
-      process.env.REACT_APP_NET === 'mainnet'
-        ? '0x85be1e46283f5f438d1f864c2d925506571d544f0002000000000000000001aa'
-        : '0xb157a4395d28c024a0e2e5fa142a53b3eb726bc6000200000000000000000713',
-    kind: 0,
-    assetIn: Web3.utils.toChecksumAddress(ethereumWETHAddress),
-    assetOut: Web3.utils.toChecksumAddress(ethereumAlluoAddress),
-    amount: String(value * Math.pow(10, 18)).toString(),
-    userData: '0x',
-  };
-  const deadline = String(999999999999999999);
-  const fund_struct = {
-    sender: Web3.utils.toChecksumAddress(walletAddress),
-    recipient: Web3.utils.toChecksumAddress(walletAddress),
-    fromInternalBalance: false,
-    toInternalBalance: false,
-  };
-  const token_limit = String(0 * Math.pow(10, 18)).toString();
+    const swap_struct = {
+      poolId:
+        process.env.REACT_APP_NET === 'mainnet'
+          ? '0x85be1e46283f5f438d1f864c2d925506571d544f0002000000000000000001aa'
+          : '0xb157a4395d28c024a0e2e5fa142a53b3eb726bc6000200000000000000000713',
+      kind: 0,
+      assetIn: Web3.utils.toChecksumAddress(ethereumWETHAddress),
+      assetOut: Web3.utils.toChecksumAddress(ethereumAlluoAddress),
+      amount: String(value * Math.pow(10, 18)).toString(),
+      userData: '0x',
+    };
+    const deadline = String(999999999999999999);
+    const fund_struct = {
+      sender: Web3.utils.toChecksumAddress(walletAddress),
+      recipient: Web3.utils.toChecksumAddress(walletAddress),
+      fromInternalBalance: false,
+      toInternalBalance: false,
+    };
+    const token_limit = String(0 * Math.pow(10, 18)).toString();
 
-  const tx = await sendTransaction(
-    abi,
-    ethereumVaultAddress,
-    'swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)',
-    [swap_struct, fund_struct, token_limit, deadline.toString()],
-    EChain.ETHEREUM,
-  );
+    const tx = await sendTransaction(
+      abi,
+      ethereumVaultAddress,
+      'swap((bytes32,uint8,address,address,uint256,bytes),(address,bool,address,bool),uint256,uint256)',
+      [swap_struct, fund_struct, token_limit, deadline.toString()],
+      EChain.ETHEREUM,
+    );
 
-  return tx;
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
+export const getTokenInfo = async walletAddress => {
   let tokenInfo: TTokenInfo = {
     isLoading: false,
   };
@@ -2185,6 +2239,74 @@ export const getTokenInfo = async (walletAddress, idxOfCall = 0) => {
     console.log('error', err.message);
   }
   return { isLoading: false };
+};
+
+export const getAlluoStakingAllowance = async () => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'spender', type: 'address' },
+      ],
+      name: 'allowance',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const ethereumAlluoAddress = EEthereumAddresses.ALLUO;
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const allowance = callContract(
+    abi,
+    ethereumAlluoAddress,
+    'allowance(address,address)',
+    [walletAddress, ethereumVlAlluoAddress],
+    EChain.ETHEREUM,
+  );
+
+  return allowance;
+};
+
+export const getAlluoStakingAPR = async () => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'rewardPerDistribution',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+    {
+      inputs: [],
+      name: 'totalLocked',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const getRewardPerDistribution = callContract(
+    abi,
+    ethereumVlAlluoAddress,
+    'rewardPerDistribution()',
+    null,
+    EChain.ETHEREUM,
+  );
+
+  const getTotalLockedInLB = await callContract(
+    abi,
+    ethereumVlAlluoAddress,
+    'totalLocked()',
+    null,
+    EChain.ETHEREUM,
+  );
+
+  return calculateApr(getRewardPerDistribution, getTotalLockedInLB);
 };
 
 export const getIbAlluoInfo = async type => {
