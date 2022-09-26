@@ -21,7 +21,7 @@ enum EEthereumAddressesTestnet {
   WETH = '0x66Ac11c106C3670988DEFDd24BC75dE786b91095',
 }
 
-enum EEthereumAddressesMainnet {
+export enum EEthereumAddressesMainnet {
   IBALLUOUSD = '0xf555b595d04ee62f0ea9d0e72001d926a736a0f6',
   IBALLUOEUR = '0xeb38D2f6a745Bd3f466F3F20A617D2C615b316eE',
   IBALLUOETH = '0x98f49aC358187116462BDEA748daD1Df480865d7',
