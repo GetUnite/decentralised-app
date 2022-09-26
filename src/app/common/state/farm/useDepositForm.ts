@@ -4,6 +4,7 @@ import {
   approveToken,
   depositIntoBoosterFarm,
   depositStableCoin,
+  EChain,
 } from 'app/common/functions/Web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
@@ -21,7 +22,7 @@ export const useDepositForm = ({
   const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true);
 
   const resetState = () => {
     setDepositValueError('');
@@ -83,6 +84,8 @@ export const useDepositForm = ({
       } else {
         console.log({
           depositValue: depositValue,
+          depositedValue: selectedSupportedToken.balance,
+          balanceHigherThanDepositValue: selectedSupportedToken.balance >= depositValue,
           selectedToken: selectedSupportedToken.address,
           tokenDecimals: selectedSupportedToken.decimals,
         });
@@ -99,9 +102,9 @@ export const useDepositForm = ({
       setDepositValue(null);
       setNotificationt('Deposit successfully', 'success');
       await updateFarmInfo();
-    } catch (err) {
+    } catch (error) {
       resetState();
-      setNotificationt(err, 'error');
+      setNotificationt(error, 'error');
     }
 
     setIsDepositing(false);

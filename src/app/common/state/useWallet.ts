@@ -59,7 +59,6 @@ export const useWallet = () => {
 
   const networkChange = async () => {
     const { success, chainId } = await changeNetwork(wantedChainAtom);
-    console.log(success);
     setWantedChainId(chainId);
     if (!success) {
       checkCurrentChain(chainId);

@@ -299,18 +299,24 @@ const sendTransaction = async (
     return tx;
   } catch (error) {
     console.log(error);
-    console.log(abi, address, functionSignature, params);
+    console.log({
+      abi: abi,
+      address: address,
+      functionSignature: functionSignature,
+      params: params,
+      walletAddress: walletAddress,
+    });
 
     if (error.code == 4001) {
       throw 'User denied message signature';
     }
 
     if (error.code == 417) {
-      throw 'Error while estimating gas';
+      throw 'Error while estimating gas. Please try again';
     }
 
     if (error.toString().includes('reverted by the EVM')) {
-      throw 'Transaction has been reverted by the EVM';
+      throw 'Transaction has been reverted by the EVM. Please try again';
     }
 
     throw 'Something went wrong with your transaction. Please try again';
@@ -1561,33 +1567,37 @@ export const withdrawStableCoin = async (
   chain = EChain.POLYGON,
   useBiconomy,
 ) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: '_targetToken', type: 'address' },
-        { internalType: 'uint256', name: '_amount', type: 'uint256' },
-      ],
-      name: 'withdraw',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: '_targetToken', type: 'address' },
+          { internalType: 'uint256', name: '_amount', type: 'uint256' },
+        ],
+        name: 'withdraw',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
 
-  const amountInWei = Web3.utils.toWei(amount);
+    const amountInWei = Web3.utils.toWei(amount);
 
-  const tx = await sendTransaction(
-    abi,
-    ibAlluoAddress,
-    'withdraw(address,uint256)',
-    [coinAddress, amountInWei],
-    chain,
-    useBiconomy,
-  );
+    const tx = await sendTransaction(
+      abi,
+      ibAlluoAddress,
+      'withdraw(address,uint256)',
+      [coinAddress, amountInWei],
+      chain,
+      useBiconomy,
+    );
 
-  return tx.blockNumber;
+    return tx.blockNumber;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const withdrawFromBoosterFarm = async (
@@ -1598,33 +1608,37 @@ export const withdrawFromBoosterFarm = async (
   chain = EChain.POLYGON,
   useBiconomy = false,
 ) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'uint256', name: 'assets', type: 'uint256' },
-        { internalType: 'address', name: 'receiver', type: 'address' },
-        { internalType: 'address', name: 'owner', type: 'address' },
-        { internalType: 'address', name: 'exitToken', type: 'address' },
-      ],
-      name: 'withdrawToNonLp',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'uint256', name: 'assets', type: 'uint256' },
+          { internalType: 'address', name: 'receiver', type: 'address' },
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'address', name: 'exitToken', type: 'address' },
+        ],
+        name: 'withdrawToNonLp',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
 
-  const amountInDecimals = toDecimals(amount, decimals);
+    const amountInDecimals = toDecimals(amount, decimals);
 
-  const tx = await sendTransaction(
-    abi,
-    farmAddress,
-    'withdrawToNonLp(uint256,address,address,address)',
-    [amountInDecimals, walletAddress, walletAddress, tokenAddress],
-    chain,
-    useBiconomy,
-  );
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'withdrawToNonLp(uint256,address,address,address)',
+      [amountInDecimals, walletAddress, walletAddress, tokenAddress],
+      chain,
+      useBiconomy,
+    );
 
-  return tx.blockNumber;
+    return tx.blockNumber;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const claimBoosterFarmLPRewards = async (
