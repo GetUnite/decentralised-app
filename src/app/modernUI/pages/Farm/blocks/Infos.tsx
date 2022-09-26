@@ -33,6 +33,7 @@ export const Infos = ({
         }
       />
       {selectedFarm.chain === EChain.POLYGON ? (
+        <>
         <Info
           label="Gas fee"
           value={null}
@@ -44,11 +45,14 @@ export const Infos = ({
             <span>No fees 🎉 - Paid for by Alluo via </span>
             <a href="https://twitter.com/biconomy">Biconomy</a>
           </div>
+        </Info>
+        <div style={{ marginTop: '5px' }}>
           <SlideButton
             biconomyStatus={biconomyStatus}
             setBiconomyStatus={setBiconomyStatus}
           />
-        </Info>
+        </div>
+        </>
       ) : (
         <Info
           label="Gas fee"

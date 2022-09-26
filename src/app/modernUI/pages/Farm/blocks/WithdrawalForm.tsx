@@ -39,7 +39,7 @@ export const WithdrawalForm = ({
         <>
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
-            <Box margin={{ top: 'medium' }}>
+            <Box margin={{ top: '44px' }}>
               <NewInput
                 coinIcon={selectedFarm.sign}
                 inputProps={{
@@ -62,7 +62,7 @@ export const WithdrawalForm = ({
             </Box>
           </Box>
 
-          <Box margin={{ top: 'medium' }}>
+          <Box>
             <Infos
               selectedFarm={selectedFarm}
               inputValue={-1 * +withdrawValue}
@@ -74,6 +74,7 @@ export const WithdrawalForm = ({
       )}
       <Box margin={{ top: 'large' }}>
         <Button
+          style={{paddingTop: '12px', paddingBottom: '12px'}}
           primary
           disabled={
             isWithdrawing ||

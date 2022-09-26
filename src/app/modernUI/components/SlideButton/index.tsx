@@ -18,7 +18,6 @@ export default function SlideButton({biconomyStatus, setBiconomyStatus}) {
         justifyContent: 'flex-end',
         flexDirection: 'row',
       }}
-    
       >
       <Text
         style={{
@@ -36,9 +35,9 @@ export default function SlideButton({biconomyStatus, setBiconomyStatus}) {
           alignItems: 'center',
           fontSize: '12px'
         }}
-        >Turn off<p style={{textDecoration: 'underline', marginLeft: '5px'}}
+        >Turn off<span style={{textDecoration: 'underline', marginLeft: '5px'}}
         data-tip data-for="biconomyTip"
-        > Biconomy</p></span> 
+        > Biconomy</span></span> 
         : 
         <span
         style={{

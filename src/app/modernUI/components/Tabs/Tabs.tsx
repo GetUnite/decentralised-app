@@ -38,6 +38,7 @@ export const Tabs = ({ children = [], ...rest }) => {
         round="xsmall"
         justify="stretch"
         pad="hair"
+        margin={{top: '34px'}}
       >
         {children.map((tab, i) => (
           <Box flex direction="row" key={i}>

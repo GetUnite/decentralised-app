@@ -83,7 +83,7 @@ export const Modal = ({
           <Box
             direction="column"
             fill
-            margin={{ vertical: 'medium' }}
+            margin={{ top: 'medium' }}
             gap="small"
           >
             {!walletAccountAtom ? (

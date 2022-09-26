@@ -38,7 +38,7 @@ export const DepositForm = ({
         <>
           <Box margin={{ top: 'large' }}>
             <TopHeader selectedFarm={selectedFarm} />
-            <Box margin={{ top: 'medium' }}>
+            <Box margin={{ top: '44px' }}>
               <NewInput
                 coinIcon={selectedFarm.sign}
                 inputProps={{
@@ -60,7 +60,7 @@ export const DepositForm = ({
               </Text>
             </Box>
           </Box>
-          <Box margin={{ top: 'medium' }}>
+          <Box>
             <Infos
               selectedFarm={selectedFarm}
               inputValue={depositValue}
@@ -73,6 +73,7 @@ export const DepositForm = ({
 
       <Box margin={{ top: 'large' }}>
         <Button
+          style={{paddingTop: '12px', paddingBottom: '12px'}}
           primary
           disabled={
             isApproving || isDepositing || !(+depositValue > 0) || error !== ''
