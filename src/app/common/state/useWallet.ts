@@ -64,6 +64,7 @@ export const useWallet = () => {
       checkCurrentChain(chainId);
     } else {
       resetNotification();
+      setIsCorrectNetworkAtom(success);
     }
   };
 
