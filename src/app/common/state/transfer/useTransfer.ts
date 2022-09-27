@@ -4,10 +4,11 @@ import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   transferToAddress,
   getIbAlluoInfo,
-  EChain,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/transfer';
 import { useNotification } from 'app/common/state';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
+import { EChain } from 'app/common/constants/chains';
+import { EPolygonAddresses } from 'app/common/constants/addresses';
 
 export const useTransfer = () => {
   const { setNotificationt } = useNotification();
@@ -53,16 +54,16 @@ export const useTransfer = () => {
 
   const fetchIbAlluosInfo = async () => {
     const [usd, eur, eth, btc] = await Promise.all([
-      getIbAlluoInfo('usd'),
-      getIbAlluoInfo('eur'),
-      getIbAlluoInfo('eth'),
-      getIbAlluoInfo('btc'),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOUSD),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOEUR),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOETH),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOBTC),
     ]);
 
     setIbAlluosInfo([
       {
         label: 'USD',
-        address: usd.ibAlluoAddress,
+        address: usd.address,
         balance: usd.balance,
         decimals: usd.decimals,
         type: usd.symbol,
@@ -70,7 +71,7 @@ export const useTransfer = () => {
       },
       {
         label: 'EUR',
-        address: eur.ibAlluoAddress,
+        address: eur.address,
         balance: eur.balance,
         decimals: eur.decimals,
         type: eur.symbol,
@@ -78,7 +79,7 @@ export const useTransfer = () => {
       },
       {
         label: 'ETH',
-        address: eth.ibAlluoAddress,
+        address: eth.address,
         balance: eth.balance,
         decimals: eth.decimals,
         type: eth.symbol,
@@ -86,7 +87,7 @@ export const useTransfer = () => {
       },
       {
         label: 'BTC',
-        address: btc.ibAlluoAddress,
+        address: btc.address,
         balance: btc.balance,
         decimals: btc.decimals,
         type: btc.symbol,

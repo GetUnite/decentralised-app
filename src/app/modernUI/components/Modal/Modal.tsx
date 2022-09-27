@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/functions/Web3Client';
 import { ENotificationId, walletAccount } from 'app/common/state/atoms';
 import { useNotification } from 'app/common/state';
 import { ChainBadge, ConnectionButton, Spinner } from 'app/modernUI/components';
@@ -7,6 +6,7 @@ import { Box, Button, Heading, Text } from 'grommet';
 import { FormClose } from 'grommet-icons';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import { EChain } from 'app/common/constants/chains';
 
 interface IModal {
   size: any;

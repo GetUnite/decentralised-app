@@ -1,6 +1,6 @@
 import { AssetCard } from '../components';
-import { EChain } from 'app/common/functions/Web3Client';
 import { Box } from 'grommet';
+import { EChain } from 'app/common/constants/chains';
 
 export const Assets = ({ availableFarms, isLoading, viewType }) => {
   return (

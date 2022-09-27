@@ -1,17 +1,16 @@
-import { isNumeric, toExactFixed } from 'app/common/functions/utils';
+import { isNumeric } from 'app/common/functions/utils';
 import {
   getIfUserHasWithdrawalRequest,
-  getUserDepositedTransferAmount,
   isExpectedPolygonEvent,
   listenToHandler,
   withdrawStableCoin,
   withdrawFromBoosterFarm,
-  EChain,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
-import { ENotificationId, useNotification } from 'app/common/state';
+import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { EChain } from 'app/common/constants/chains';
 
 export const useWithdrawalForm = ({
   selectedFarm,
@@ -27,7 +26,9 @@ export const useWithdrawalForm = ({
   const [blockNumber, setBlockNumber] = useState<number>();
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(
+    isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true,
+  );
 
   useEffect(() => {
     if (walletAccountAtom) {

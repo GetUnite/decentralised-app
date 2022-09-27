@@ -15,8 +15,8 @@ import { isSmall } from 'app/modernUI/theme';
 import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
 import { ChainBadge, Notification } from 'app/modernUI/components';
-import { EChain } from 'app/common/functions/Web3Client';
 import { useConnectionButton } from 'app/common/state/components';
+import { EChain } from 'app/common/constants/chains';
 
 const Disabled = () => {
   return (
@@ -210,7 +210,7 @@ export const AssetCard = ({
                     <ChainBadge chain={chain} />
                     <span>{poolShare}%</span>
                     <span>{tvl}</span>
-                    <span>{balance}</span>
+                    <span>{sign + balance}</span>
                     <Box direction="row" justify="between" align="center">
                       <span>{interest}%</span>
                       <Link to={'/farm/' + id}>

@@ -4,11 +4,11 @@ import {
   approveAlluoTransaction,
   lockAlluoToken,
   getTokenInfo,
-  EChain,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNotification, ENotificationId } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
+import { EChain } from 'app/common/constants/chains';
 
 export const useLock = () => {
   const { setNotificationt, resetNotification } = useNotification();

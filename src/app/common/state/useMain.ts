@@ -8,14 +8,15 @@ import {
   getSupportedTokensAdvancedInfo,
   getUserDepositedAmount,
   getSupportedTokensList,
-  EChain,
   getSupportedTokensBasicInfo,
   getTotalAssets,
   getUserDepositedLPAmount,
-} from 'app/common/functions/Web3Client';
+  getBoosterFarmInterest,
+} from 'app/common/functions/web3Client';
 import { useNotification } from './useNotification';
 import { useCookies } from 'react-cookie';
 import { toExactFixed } from '../functions/utils';
+import { EChain } from '../constants/chains';
 
 export type THeadingData = {
   numberOfAssets: number;
@@ -64,7 +65,7 @@ export const useMain = () => {
               totalAssetSupply,
               supportedTokens,
               depositedAmount,
-              poolShare
+              poolShare,
             } = availableFarm.isBooster
               ? await fetchBoosterFarmInfo(availableFarm)
               : await fetchFarmInfo(availableFarm);
@@ -143,7 +144,11 @@ export const useMain = () => {
   const fetchBoosterFarmInfo = async farm => {
     let farmInfo;
     farmInfo = {
-      interest: '10', //await getInterest(farm.type, farm.chain),
+      interest: await getBoosterFarmInterest(
+        farm.farmAddress,
+        farm.convexFarmIds,
+        farm.chain,
+      ),
       totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
       supportedTokens: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {

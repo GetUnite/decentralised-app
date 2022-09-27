@@ -1,11 +1,10 @@
+import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
-  approveToken,
   depositIntoBoosterFarm,
   depositStableCoin,
-  EChain,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -22,7 +21,9 @@ export const useDepositForm = ({
   const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(
+    isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true,
+  );
 
   const resetState = () => {
     setDepositValueError('');
@@ -34,21 +35,12 @@ export const useDepositForm = ({
     setIsApproving(true);
 
     try {
-      if (selectedFarm?.isBooster) {
-        await approveToken(
-          selectedSupportedToken.address,
-          selectedFarm.farmAddress,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      } else {
-        await approveStableCoin(
-          selectedSupportedToken.address,
-          selectedSupportedToken.decimals,
-          selectedFarm.type,
-          selectedFarm.chain,
-        );
-      }
+      await approveStableCoin(
+        selectedFarm.farmAddress,
+        selectedSupportedToken.address,
+        selectedFarm.chain,
+        useBiconomy,
+      );
       await updateFarmInfo();
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
@@ -85,7 +77,8 @@ export const useDepositForm = ({
         console.log({
           depositValue: depositValue,
           depositedValue: selectedSupportedToken.balance,
-          balanceHigherThanDepositValue: selectedSupportedToken.balance >= depositValue,
+          balanceHigherThanDepositValue:
+            selectedSupportedToken.balance >= depositValue,
           selectedToken: selectedSupportedToken.address,
           tokenDecimals: selectedSupportedToken.decimals,
         });
