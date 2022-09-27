@@ -5,7 +5,7 @@ import {
   listenToHandler,
   withdrawStableCoin,
   withdrawFromBoosterFarm,
-} from 'app/common/functions/w';
+} from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';

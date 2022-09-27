@@ -12,7 +12,7 @@ import {
   getTotalAssets,
   getUserDepositedLPAmount,
   getBoosterFarmInterest,
-} from 'app/common/functions/w';
+} from 'app/common/functions/web3Client';
 import { useNotification } from './useNotification';
 import { useCookies } from 'react-cookie';
 import { toExactFixed } from '../functions/utils';

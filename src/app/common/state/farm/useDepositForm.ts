@@ -4,7 +4,7 @@ import {
   approveStableCoin,
   depositIntoBoosterFarm,
   depositStableCoin,
-} from 'app/common/functions/w';
+} from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -36,9 +36,8 @@ export const useDepositForm = ({
 
     try {
       await approveStableCoin(
+        selectedFarm.farmAddress,
         selectedSupportedToken.address,
-        selectedSupportedToken.decimals,
-        selectedFarm.type,
         selectedFarm.chain,
         useBiconomy,
       );

@@ -12,7 +12,7 @@ import {
   getCurrentChainId,
   getChainNameById,
   trySafeAppConnection,
-} from 'app/common/functions/w';
+} from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { EChain, EChainId } from '../constants/chains';
 

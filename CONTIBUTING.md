@@ -120,7 +120,7 @@ While the prerequisites above must be satisfied prior to having your pull reques
 * If possible avoid using inline styles, use Grommet UI whenever possible and styled components for more complex UI changes.
 * Keep it DRY, avoid repetitive code, and if a function is complex leave comments to help the next contributor.
 * All state should be managed in [Atom.ts](https://github.com/GetAlluo/webapp/blob/master/src/app/common/state/atoms.ts)
-* All Web3 logic should be managed in [web3Client.ts](https://github.com/GetAlluo/webapp/blob/master/src/app/common/functions/web3Client.ts)
+* All Web3 logic should be managed in [web3Client.ts](https://github.com/GetAlluo/webapp/blob/master/src/app/common/functions/web3Clienteb3Client.ts)
 * All Hooks should be managed be in the [Hooks folder](https://github.com/GetAlluo/webapp/tree/master/src/app/common/hooks) or in the [State Shortcuts folder](https://github.com/GetAlluo/webapp/tree/master/src/app/common/state/shortcuts)
 
 ### Documentation Styleguide
