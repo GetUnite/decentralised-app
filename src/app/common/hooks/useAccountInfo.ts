@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { walletAccount, tokenInfo } from 'app/common/state/atoms';
-import { getTokenInfo } from 'app/common/functions/w';
+import { getTokenInfo } from 'app/common/functions/web3Client';
 
 export const useAccountInfo = () => {
   const [walletAccountAtom] = useRecoilState(walletAccount);

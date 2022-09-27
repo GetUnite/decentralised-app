@@ -16,7 +16,7 @@ import {
   lockAlluoToken,
   getAlluoStakingAPR,
   getAlluoStakingAllowance,
-} from 'app/common/functions/w';
+} from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
