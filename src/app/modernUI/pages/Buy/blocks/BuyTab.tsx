@@ -1,39 +1,39 @@
 import { toExactFixed } from 'app/common/functions/utils';
-import { tokenInfo } from 'app/common/state/atoms';
 import { useBuy } from 'app/common/state/buy';
-import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
+import {
+  Info,
+  NumericInput,
+  Spinner,
+  SubmitButton,
+} from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
-import { useState } from 'react';
-import { useRecoilState } from 'recoil';
 
 export const BuyTab = ({ ...rest }) => {
   const {
-    notificationId,
+    isLoading,
+    alluoStakingAPR,
     wethBalance,
     vlAlluoBalance,
     allowance,
     totalSupply,
-    error,
+    inputValueError,
     inputValue,
     isApproving,
     isBuying,
-    handleValueChange,
-    handleSetLockToMax,
+    handleInputValueChange,
     handleApprove,
     handleBuyAction,
     handleBuyAndLockAction,
     alluoPriceInWETH,
-    setToMax,
+    hasErrors,
   } = useBuy();
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [reset, setReset] = useState(0);
   const alluoBeingBought = toExactFixed(
     (+inputValue || 0) * +alluoPriceInWETH,
     2,
   );
   return (
     <Box fill>
-      {tokenInfoAtom.isLoading || isApproving || isBuying ? (
+      {isLoading || isApproving || isBuying ? (
         <Box
           align="center"
           justify="center"
@@ -51,17 +51,13 @@ export const BuyTab = ({ ...rest }) => {
               $ALLUO
             </Text>
             <Box margin={{ top: 'medium' }}>
-              <Input
-                inputProps={{
-                  value: inputValue || '',
-                  onChange: handleValueChange,
-                  max: wethBalance || 0,
-                }}
-                maxButtonProps={{ onClick: setToMax }}
+              <NumericInput
+                label="Amount"
+                onValueChange={handleInputValueChange}
+                value={inputValue}
+                maxValue={wethBalance}
+                error={inputValueError}
               />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {error}
-              </Text>
             </Box>
           </Box>
           <Box margin={{ top: 'medium' }}>
@@ -93,9 +89,10 @@ export const BuyTab = ({ ...rest }) => {
             disabled={
               !(+inputValue > 0) ||
               +inputValue > +wethBalance ||
-              tokenInfoAtom.isLoading ||
+              isLoading ||
               isApproving ||
-              isBuying
+              isBuying ||
+              hasErrors
             }
             label={'Approve'}
             onClick={handleApprove}
@@ -107,9 +104,10 @@ export const BuyTab = ({ ...rest }) => {
               disabled={
                 !(+inputValue > 0) ||
                 +inputValue > +wethBalance ||
-                tokenInfoAtom.isLoading ||
+                isLoading ||
                 isApproving ||
-                isBuying
+                isBuying ||
+                hasErrors
               }
               label={<Text color="text">Buy</Text>}
               onClick={handleBuyAction}
@@ -119,12 +117,13 @@ export const BuyTab = ({ ...rest }) => {
               disabled={
                 !(+inputValue > 0) ||
                 +inputValue > +wethBalance ||
-                tokenInfoAtom.isLoading ||
+                isLoading ||
                 isApproving ||
-                isBuying
+                isBuying ||
+                hasErrors
               }
               margin={{ top: 'small' }}
-              label={`Buy & Stake to earn ${tokenInfoAtom.apr}% APR`}
+              label={`Buy & Stake to earn ${alluoStakingAPR}% APR`}
               onClick={handleBuyAndLockAction}
             />
           </>

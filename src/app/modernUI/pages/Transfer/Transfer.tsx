@@ -1,4 +1,4 @@
-import { EChain } from 'app/common/functions/Web3Client';
+import { EChain } from 'app/common/constants/chains';
 import { Layout, Modal, Tab } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
 import { TransferTab } from './blocks/TransferTab';

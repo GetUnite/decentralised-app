@@ -1,16 +1,16 @@
 import {
-  EChain,
   getTokenInfo,
   unlockAlluo,
   unlockAllAlluo,
   withdrawAlluo,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 import { useState, useEffect, useReducer } from 'react';
 import { useRecoilState } from 'recoil';
 import { formatTimeDelta, CountdownTimeDelta } from 'react-countdown';
 import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification, ENotificationId } from 'app/common/state';
+import { EChain } from 'app/common/constants/chains';
 
 interface iState {
   unlockValue: string;
@@ -91,14 +91,6 @@ export const useUnlock = () => {
     setNotification({
       id: ENotificationId.UNLOCK,
       type: 'error',
-      message,
-    });
-  };
-
-  const setInfoNotification = (message: string = ''): void => {
-    setNotification({
-      id: ENotificationId.UNLOCK,
-      type: 'info',
       message,
     });
   };

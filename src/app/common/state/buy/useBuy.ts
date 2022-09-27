@@ -7,71 +7,63 @@ import {
   approveAlluoPurchaseInWETH,
   approveAlluoTransaction,
   buyAlluoWithWETH,
-  EChain,
   getWETHAllowance,
   getAlluoPriceInWETH,
   getBalanceOfAlluoUser,
-  getTokenInfo,
   getTotalSupplyVlAlluo,
   getVlAlluoBalance,
   getWEthBalance,
   lockAlluoToken,
-} from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { ENotificationId, useNotification } from 'app/common/state';
+  getAlluoStakingAPR,
+  getAlluoStakingAllowance,
+} from 'app/common/functions/web3Client';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { EChain } from 'app/common/constants/chains';
 
 export const useBuy = () => {
-  const { notification, setNotification, resetNotification } = useNotification();
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom, setWalletAccountAtom] =
-    useRecoilState(walletAccount);
+  const { setNotificationt, resetNotification } = useNotification();
+  const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>();
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isBuying, setIsBuying] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [inputValueError, setInputValueError] = useState<string>('');
   const [wethBalance, setWethBalance] = useState<string>('');
   const [alluoPriceInWETH, setAlluoPriceInWETH] = useState<string>('');
   const [totalSupply, setTotalSupply] = useState<string>('');
   const [allowance, setAllowance] = useState<string>('');
   const [vlAlluoBalance, setVlAlluoBalance] = useState<string>('');
+  const [alluoStakingAPR, setAlluoStakingAPR] = useState<number>();
 
   const resetState = () => {
-    setError('');
     resetNotification();
     setIsBuying(false);
+    setIsLoading(false);
     setIsApproving(false);
-  };
-
-  const setSuccessNotification = message => {
-    setNotification({
-      id: ENotificationId.BUY,
-      type: 'success',
-      message: message,
-    });
-  };
-
-  const setErrorNotification = message => {
-    setNotification({
-      id: ENotificationId.BUY,
-      type: 'error',
-      message: message,
-    });
   };
 
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
-      fetchAlluoPriceInWETH();
-      fetchTotalSupply();
-      fetchWethBalance();
-      fetchAllowanceOfWETH();
-      fetchVlAlluoBalance();
+      updateBuyInfo();
     }
   }, [walletAccountAtom]);
+
+  const updateBuyInfo = async () => {
+    setIsLoading(true);
+    await fetchAlluoPriceInWETH();
+    await fetchTotalSupply();
+    await fetchWethBalance();
+    await fetchAllowanceOfWETH();
+    await fetchVlAlluoBalance();
+    await fetchAlluoStakingAPR();
+    setIsLoading(false);
+  };
 
   const fetchWethBalance = async () => {
     const balance = await getWEthBalance();
@@ -97,30 +89,17 @@ export const useBuy = () => {
     setAlluoPriceInWETH(fixed);
   };
 
-  const handleValueChange = e => {
-    const { value } = e.target;
+  const fetchAlluoStakingAPR = async () => {
+    const apr = await getAlluoStakingAPR();
+    setAlluoStakingAPR(apr);
+  };
+
+  const handleInputValueChange = value => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.'))
-      setError('Write a valid number');
-    else if (+value > +wethBalance) setError('Not enough balance');
+      setInputValueError('Write a valid number');
+    else if (+value > +wethBalance) setInputValueError('Not enough balance');
     else setInputValue(value);
-  };
-
-  const handleSetLockToMax = () => {
-    resetState();
-    setInputValue(tokenInfoAtom.alluoBalance + '');
-  };
-
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-    fetchWethBalance();
-    fetchTotalSupply();
-    fetchWethBalance();
-    fetchAllowanceOfWETH();
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-    setTokenInfoAtom(tokenInfoData);
   };
 
   const fetchAllowanceOfWETH = async () => {
@@ -129,42 +108,39 @@ export const useBuy = () => {
   };
 
   const handleApprove = async () => {
-    resetNotification();
+    resetState();
     setIsApproving(true);
 
     try {
-      const res = await approveAlluoPurchaseInWETH();
-
-      setAccountInformation();
+      await approveAlluoPurchaseInWETH();
+      await updateBuyInfo();
     } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      console.log('Error', err.message);
+      setNotificationt(err.message, 'error');
     }
 
     setIsApproving(false);
   };
+
   const handleBuyAction = async () => {
-    resetNotification();
+    resetState();
     setIsBuying(true);
 
     try {
-      const res = await buyAlluoWithWETH(inputValue);
-      setAccountInformation();
-      setErrorNotification('');
+      await buyAlluoWithWETH(inputValue);
       setInputValue(null);
-      setSuccessNotification('Successfully bought');
+      await updateBuyInfo();
+      setNotificationt('Successfully bought', 'success');
     } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      console.log('Error', err);
+      setNotificationt(err, 'error');
     }
 
     setIsBuying(false);
   };
 
   const handleBuyAndLockAction = async () => {
-    resetNotification();
+    resetState();
     setIsBuying(true);
 
     try {
@@ -175,43 +151,37 @@ export const useBuy = () => {
         process.env.REACT_APP_NET === 'mainnet'
           ? +alluoBalanceAfter - +alluoBalanceBefore
           : 1;
-      if (+tokenInfoAtom.allowance < difference)
+      const alluoStakingAllowance = await getAlluoStakingAllowance();
+      if (+alluoStakingAllowance < difference) {
         await approveAlluoTransaction(maximumUint256Value);
+      }
       await lockAlluoToken(difference);
-      setAccountInformation();
-      setErrorNotification('');
-
-      setSuccessNotification('Successfully bought and locked');
+      await updateBuyInfo();
+      setNotificationt('Successfully bought and locked', 'success');
     } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      console.log('Error', err.message);
+      setNotificationt(err.message, 'error');
     }
 
     setIsBuying(false);
   };
 
-  const setToMax = () => {
-    setError('');
-    setInputValue(wethBalance);
-  };
-
   return {
-    notificationId: ENotificationId.BUY,
+    isLoading,
+    alluoStakingAPR,
     wethBalance,
     vlAlluoBalance,
     allowance,
     totalSupply,
-    error,
+    inputValueError,
     inputValue,
     isApproving,
     isBuying,
-    handleValueChange,
-    handleSetLockToMax,
+    handleInputValueChange,
     handleApprove,
     handleBuyAction,
     handleBuyAndLockAction,
     alluoPriceInWETH,
-    setToMax,
+    hasErrors: inputValueError != '',
   };
 };
