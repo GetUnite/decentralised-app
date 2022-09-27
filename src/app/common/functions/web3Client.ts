@@ -1,14 +1,6 @@
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/ethereum-provider';
 import { Biconomy } from '@biconomy/mexa';
-import polygonIbAlluoUSDAbi from 'app/common/abis/polygonIbAlluoUSD.json';
-import polygonIbAlluoEURAbi from 'app/common/abis/polygonIbAlluoEUR.json';
-import polygonIbAlluoETHAbi from 'app/common/abis/polygonIbAlluoETH.json';
-import polygonIbAlluoBTCAbi from 'app/common/abis/polygonIbAlluoBTC.json';
-import ethereumIbAlluoUSDAbi from 'app/common/abis/ethereumIbAlluoUSD.json';
-import ethereumIbAlluoEURAbi from 'app/common/abis/ethereumIbAlluoEUR.json';
-import ethereumIbAlluoETHAbi from 'app/common/abis/ethereumIbAlluoETH.json';
-import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
 import {
@@ -28,6 +20,7 @@ import {
   EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
+import { EChainId, EChain } from 'app/common/constants/chains';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
 const ethereumMainnetProviderUrl =
@@ -45,17 +38,6 @@ const polygonProviderUrl =
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
 
-export enum EChain {
-  ETHEREUM,
-  POLYGON,
-}
-
-export enum EChainId {
-  ETH_MAINNET = '0x1',
-  ETH_SEPOLIA = '0xaa36a7',
-  POL_MAINNET = '0x89',
-  POL_MUMBAI = '0x13881',
-}
 
 const injected = injectedModule();
 const walletConnect = walletConnectModule({
@@ -128,8 +110,6 @@ onboard.state.actions.setWalletModules([
   coinbase,
 ]);
 
-declare let window: any;
-
 const permitOnlyTokenAddresses = [
   '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
   //'0x4bf7737515EE8862306Ddc221cE34cA9d5C91200',
@@ -183,10 +163,6 @@ export const connectToWallet = async (connectOptions?) => {
   } catch (error) {
     console.log(error);
   }
-};
-
-export const getCurrentWalletAddress = () => {
-  return walletAddress;
 };
 
 export const changeNetwork = async (chain: EChain) => {
@@ -243,17 +219,16 @@ export const getChainNameById = chainId => {
   return chains.find(chain => chain.id == chainId).label;
 };
 
-export const startOrGetBiconomy = async (chain, provider, contractAddress) => {
+export const startOrGetBiconomy = async (chain, provider) => {
   try {
     const biconomy = new Biconomy(provider, {
       apiKey:
         chain === EChain.ETHEREUM
           ? process.env.REACT_APP_ETHEREUM_BICONOMY_KEY
           : process.env.REACT_APP_POLYGON_BICONOMY_KEY,
-      contractAddresses: [contractAddress],
     });
 
-    await biconomy.init();
+    await waitForBiconomyReady(biconomy);
 
     return biconomy;
   } catch (error) {
@@ -261,7 +236,19 @@ export const startOrGetBiconomy = async (chain, provider, contractAddress) => {
   }
 };
 
-export const sendTransaction = async (
+const waitForBiconomyReady = biconomy =>
+  new Promise<void>((resolve, reject) => {
+    biconomy
+      .onEvent(biconomy.READY, () => {
+        resolve();
+      })
+      .onEvent(biconomy.ERROR, error => {
+        console.log(error);
+        reject(error);
+      });
+  });
+
+const sendTransaction = async (
   abi,
   address,
   functionSignature,
@@ -276,9 +263,8 @@ export const sendTransaction = async (
       const biconomy = await startOrGetBiconomy(
         chain,
         web3.eth.currentProvider,
-        address,
       );
-      web3ToUse = new Web3(biconomy.provider as any);
+      web3ToUse = new Web3(biconomy);
     } else {
       web3ToUse = web3;
     }
@@ -317,13 +303,7 @@ export const sendTransaction = async (
   }
 };
 
-export const callContract = async (
-  abi,
-  address,
-  functionSignature,
-  params,
-  chain,
-) => {
+const callContract = async (abi, address, functionSignature, params, chain) => {
   const provider =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
   const web3ToUse = new Web3(new Web3.providers.HttpProvider(provider));
@@ -667,32 +647,6 @@ export const getListSupportedTokens = async (
   }
 };
 
-const getIbAlluoAbi = (type, chain = EChain.POLYGON) => {
-  let abi;
-  switch (chain) {
-    case EChain.POLYGON:
-      abi = {
-        usd: polygonIbAlluoUSDAbi as any,
-        eur: polygonIbAlluoEURAbi as any,
-        eth: polygonIbAlluoETHAbi as any,
-        btc: polygonIbAlluoBTCAbi as any,
-      };
-      break;
-
-    case EChain.ETHEREUM:
-      abi = {
-        usd: ethereumIbAlluoUSDAbi as any,
-        eur: ethereumIbAlluoEURAbi as any,
-        eth: ethereumIbAlluoETHAbi as any,
-        btc: ethereumIbAlluoBTCAbi as any,
-      };
-      break;
-    default:
-      break;
-  }
-  return abi[type];
-};
-
 const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
   let VLALLUOAddr;
   switch (chain) {
@@ -973,11 +927,23 @@ export const approveStableCoin = async (
   decimals,
   type = 'usd',
   chain = EChain.POLYGON,
+  useBiconomy = false,
 ) => {
   const ibAlluoAddress = getIbAlluoAddress(type, chain);
 
-  if (chain == EChain.ETHEREUM) {
-    const abi = getIbAlluoAbi(type, chain);
+  if (chain == EChain.ETHEREUM || !useBiconomy) {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: 'spender', type: 'address' },
+          { internalType: 'uint256', name: 'amount', type: 'uint256' },
+        ],
+        name: 'approve',
+        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
     const stableCoinInstanceFromWallet = new web3.eth.Contract(
       abi,
       tokenAddress,
@@ -989,11 +955,7 @@ export const approveStableCoin = async (
 
     return res;
   } else {
-    const biconomy = await startOrGetBiconomy(
-      chain,
-      window.ethereum,
-      tokenAddress,
-    );
+    const biconomy = await startOrGetBiconomy(chain, web3.eth.currentProvider);
     const biconomyWeb3 = new Web3(biconomy.provider as any);
 
     const nonce = await getAddressNonce(tokenAddress, walletAddress);
@@ -2325,98 +2287,3 @@ export const getAlluoStakingAPR = async () => {
   return calculateApr(getRewardPerDistribution, getTotalLockedInLB);
 };
 
-export const getIbAlluoInfo = async address => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
-      name: 'getBalanceForTransfer',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'symbol',
-      outputs: [{ internalType: 'string', name: '', type: 'string' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'decimals',
-      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const symbol = await callContract(
-    abi,
-    address,
-    'symbol()',
-    null,
-    EChain.POLYGON,
-  );
-
-  const decimals = await callContract(
-    abi,
-    address,
-    'decimals()',
-    null,
-    EChain.POLYGON,
-  );
-
-  const balance = await callContract(
-    abi,
-    address,
-    'getBalanceForTransfer(address)',
-    [getCurrentWalletAddress()],
-    EChain.POLYGON,
-  );
-
-  return {
-    address,
-    symbol,
-    decimals,
-    balance: fromDecimals(balance, decimals),
-  };
-};
-
-export const transferToAddress = async (
-  tokenAddress,
-  amount,
-  decimals,
-  toAddress,
-  useBiconomy,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [
-          { internalType: 'address', name: 'to', type: 'address' },
-          { internalType: 'uint256', name: 'amount', type: 'uint256' },
-        ],
-        name: 'transferAssetValue',
-        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-
-    const amountInDecimals = toDecimals(amount, decimals);
-
-    const tx = await sendTransaction(
-      abi,
-      tokenAddress,
-      'transferAssetValue(address,uint256)',
-      [toAddress, amountInDecimals],
-      EChain.POLYGON,
-      useBiconomy,
-    );
-
-    return tx;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
