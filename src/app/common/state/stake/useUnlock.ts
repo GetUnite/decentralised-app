@@ -3,7 +3,7 @@ import {
   unlockAlluo,
   unlockAllAlluo,
   withdrawAlluo,
-} from 'app/common/functions/web3Client';
+} from 'app/common/functions/w';
 import { useState, useEffect, useReducer } from 'react';
 import { useRecoilState } from 'recoil';
 import { formatTimeDelta, CountdownTimeDelta } from 'react-countdown';

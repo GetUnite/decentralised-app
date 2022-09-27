@@ -4,7 +4,7 @@ import {
   callContract,
   getCurrentWalletAddress,
   sendTransaction,
-} from 'app/common/functions/web3Client';
+} from 'app/common/functions/w';
 
 export const getIbAlluoInfo = async address => {
   const abi = [

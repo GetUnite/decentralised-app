@@ -4,7 +4,7 @@ import {
   approveAlluoTransaction,
   lockAlluoToken,
   getTokenInfo,
-} from 'app/common/functions/web3Client';
+} from 'app/common/functions/w';
 import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNotification, ENotificationId } from 'app/common/state';
 import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
