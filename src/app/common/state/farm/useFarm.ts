@@ -13,7 +13,7 @@ import {
   claimBoosterFarmNonLPRewards,
   claimBoosterFarmLPRewards,
   getBoosterFarmInterest,
-} from 'app/common/functions/web3Client';
+} from 'app/common/functions/w';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useNavigate } from 'react-router-dom';
 import {

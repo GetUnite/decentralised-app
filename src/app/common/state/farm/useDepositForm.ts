@@ -4,7 +4,7 @@ import {
   approveStableCoin,
   depositIntoBoosterFarm,
   depositStableCoin,
-} from 'app/common/functions/web3Client';
+} from 'app/common/functions/w';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';

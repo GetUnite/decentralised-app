@@ -1,6 +1,6 @@
 import { useRecoilState } from 'recoil';
 import { walletAccount } from 'app/common/state/atoms';
-import { connectToWallet } from 'app/common/functions/web3Client';
+import { connectToWallet } from 'app/common/functions/w';
 
 export const useConnectionButton = () => {
   const [, setWalletAccountAtom] = useRecoilState(walletAccount);
