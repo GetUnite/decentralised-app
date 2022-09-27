@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { alluoPrice } from '../atoms';
-import { getAlluoPrice } from '../../functions/Web3Client';
+import { getAlluoPrice } from 'app/common/functions/web3Client';
 
 export const useAlluoPrice = (reload = false) => {
   const [alluoPriceAtom, setAlluoPriceAtom] = useRecoilState(alluoPrice);

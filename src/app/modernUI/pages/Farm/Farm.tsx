@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { DepositForm, WithdrawalForm, BoosterFarmPresentation } from './blocks';
 import { useCookies } from 'react-cookie';
-import { EChain } from 'app/common/functions/Web3Client';
+import { EChain } from 'app/common/constants/chains';
 
 export const Farm = () => {
   const { id } = useParams();

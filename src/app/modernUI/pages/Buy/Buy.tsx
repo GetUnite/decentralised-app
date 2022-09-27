@@ -1,8 +1,8 @@
-import { EChain } from 'app/common/functions/Web3Client';
 import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
 import { RampEmbed } from './components';
-import { BuyTab } from './partials';
+import { BuyTab } from './blocks';
+import { EChain } from 'app/common/constants/chains';
 
 export const Buy = ({ ...rest }) => {
   return (

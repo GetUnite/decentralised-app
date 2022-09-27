@@ -5,7 +5,7 @@ import { polygonInfo } from '../atoms';
 import {
   getTotalAssetSupply,
   getListSupportedTokens,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 
 export const usePolygonInfoAtom = () => {
   const [polygonInfoAtom, setPolygonInfoAtom] = useRecoilState(polygonInfo);
