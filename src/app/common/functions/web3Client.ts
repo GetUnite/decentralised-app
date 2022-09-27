@@ -290,10 +290,7 @@ export const sendTransaction = async (
 
   try {
     if (useBiconomy) {
-      const biconomy = await startBiconomy(
-        chain,
-        web3.eth.currentProvider,
-      );
+      const biconomy = await startBiconomy(chain, web3.eth.currentProvider);
 
       web3ToUse = new Web3(biconomy);
     } else {
