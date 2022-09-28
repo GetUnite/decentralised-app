@@ -14,7 +14,7 @@ import { useNotification, ENotificationId } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
 import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
 import { toExactFixed } from 'app/common/functions/utils';
-import { ChainBadge, Notification } from 'app/modernUI/components';
+import { ChainBadge, Notification, TokenIcon } from 'app/modernUI/components';
 import { useConnectionButton } from 'app/common/state/components';
 import { EChain } from 'app/common/constants/chains';
 
@@ -104,15 +104,7 @@ export const AssetCard = ({
                 <Box>
                   <Box direction="row" gap="small">
                     {icons.map((icon, i) => (
-                      <Avatar
-                        key={i}
-                        align="center"
-                        src={icon.src}
-                        size="small"
-                        justify="center"
-                        overflow="hidden"
-                        round="full"
-                      />
+                      <TokenIcon key={i} label={icon} />
                     ))}
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }}>
@@ -169,15 +161,7 @@ export const AssetCard = ({
                     </span>
                     <Box direction="row" gap="small">
                       {icons.map((icon, i) => (
-                        <Avatar
-                          key={i}
-                          align="center"
-                          src={icon.src}
-                          size="small"
-                          justify="center"
-                          overflow="hidden"
-                          round="full"
-                        />
+                        <TokenIcon key={i} label={icon} size={26}/>
                       ))}
                     </Box>
                     <ChainBadge chain={chain} />

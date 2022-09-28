@@ -2,16 +2,21 @@ import usdc from 'app/modernUI/images/usdc.svg';
 import usdt from 'app/modernUI/images/usdt.svg';
 import dai from 'app/modernUI/images/dai.svg';
 import frax from 'app/modernUI/images/frax.svg';
+
 import eurt from 'app/modernUI/images/eurt.svg';
-import eurs from 'app/modernUI/images/eurs.png';
+import eurs from 'app/modernUI/images/eurs.svg';
 import jeur from 'app/modernUI/images/jeur.svg';
-import ageur from 'app/modernUI/images/ageur.png';
-import weth from 'app/modernUI/images/weth.png';
-import wbtc from 'app/modernUI/images/wbtc.png';
+import ageur from 'app/modernUI/images/ageur.svg';
+
+import weth from 'app/modernUI/images/weth.svg';
+
+import wbtc from 'app/modernUI/images/wbtc.svg';
+
 import iballuousd from 'app/modernUI/images/iballuousd.svg';
 import iballuoeur from 'app/modernUI/images/iballuoeur.svg';
 import iballuoeth from 'app/modernUI/images/iballuoeth.svg';
 import iballuobtc from 'app/modernUI/images/iballuobtc.svg';
+
 import tokenPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
 
 export const TokenIcon = ({ label, size = 24, ...rest }) => {
