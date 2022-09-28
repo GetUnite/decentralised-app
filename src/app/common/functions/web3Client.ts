@@ -259,7 +259,6 @@ export const startBiconomy = async (chain, provider) => {
 
     await waitForBiconomyReady(biconomy);
 
-    console.log(biconomy);
     return biconomy;
   } catch (error) {
     console.log(error);
@@ -989,13 +988,33 @@ export const approveStableCoin = async (
   useBiconomy = false,
 ) => {
   if (chain == EChain.ETHEREUM || !useBiconomy) {
-    const res = await approveToken(
-      tokenAddress,
-      farmAddress,
-      chain,
-      useBiconomy,
-    );
-    return res;
+    try {
+      const abi = [
+        {
+          inputs: [
+            { internalType: 'address', name: 'spender', type: 'address' },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+          ],
+          name: 'approve',
+          outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+
+      const tx = await sendTransaction(
+        abi,
+        tokenAddress,
+        'approve(address,uint256)',
+        [farmAddress, maximumUint256Value],
+        chain,
+        useBiconomy,
+      );
+
+      return tx;
+    } catch (error) {
+      throw error;
+    }
   } else {
     const biconomy = await startBiconomy(chain, window.ethereum);
     const biconomyWeb3 = new Web3(biconomy);
@@ -1221,12 +1240,6 @@ export const depositStableCoin = async (
     const ibAlluoAddress = getIbAlluoAddress(type, chain);
 
     const amountInDecimals = toDecimals(amount, decimals);
-
-    console.log({
-      amountInDecimals: amountInDecimals,
-      tokenAddress: tokenAddress,
-      ibAlluoAddress: ibAlluoAddress,
-    });
 
     const tx = await sendTransaction(
       abi,
