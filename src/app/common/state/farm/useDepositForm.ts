@@ -44,7 +44,7 @@ export const useDepositForm = ({
       await updateFarmInfo();
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
-      setNotificationt(err.message, 'error');
+      setNotificationt(err, 'error');
     }
 
     setIsApproving(false);
@@ -74,14 +74,6 @@ export const useDepositForm = ({
           useBiconomy,
         );
       } else {
-        console.log({
-          depositValue: depositValue,
-          depositedValue: selectedSupportedToken.balance,
-          balanceHigherThanDepositValue:
-            selectedSupportedToken.balance >= depositValue,
-          selectedToken: selectedSupportedToken.address,
-          tokenDecimals: selectedSupportedToken.decimals,
-        });
         await depositStableCoin(
           selectedSupportedToken.address,
           depositValue,

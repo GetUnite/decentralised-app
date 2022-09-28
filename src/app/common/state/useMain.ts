@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { walletAccount } from 'app/common/state/atoms';
-import { initialAvailableFarmsState, TFarm } from './farm/useFarm';
+import { initialAvailableFarmsState } from './farm/useFarm';
 import {
   getTotalAssetSupply,
   getInterest,
@@ -17,6 +17,7 @@ import { useNotification } from './useNotification';
 import { useCookies } from 'react-cookie';
 import { toExactFixed } from '../functions/utils';
 import { EChain } from '../constants/chains';
+import { TFarm } from '../types/farm';
 
 export type THeadingData = {
   numberOfAssets: number;

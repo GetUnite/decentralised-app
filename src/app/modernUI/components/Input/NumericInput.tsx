@@ -4,7 +4,7 @@ import { Box, Button, TextInput, Select, Text } from 'grommet';
 import { Down } from 'grommet-icons';
 import { normalizeColor } from 'grommet/utils';
 import NumberFormat from 'react-number-format';
-import { TSupportedToken } from 'app/common/typings/form';
+import { TSupportedToken } from 'app/common/types/form';
 import { TokenIcon } from '../Icons';
 import { roundNumberDown } from 'app/common/functions/utils';
 
@@ -35,7 +35,7 @@ const MaxButton = styled(Button)`
   border-radius: 4px;
 `;
 
-interface ITokenAndValueInput {
+interface INumericInput {
   label?: string;
   tokenSign?: string;
   value: string;
@@ -58,7 +58,7 @@ export const NumericInput = ({
   setSelectedToken,
   error,
   ...rest
-}: ITokenAndValueInput) => {
+}: INumericInput) => {
   const [formattedValue, setFormattedValue] = useState('');
   const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
   const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
