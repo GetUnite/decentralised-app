@@ -21,57 +21,9 @@ import {
   EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import { useNotification } from '../useNotification';
-import { TSupportedToken } from 'app/common/typings/form';
-
-import dai from 'app/modernUI/images/dai.svg';
-import usdc from 'app/modernUI/images/usdc.svg';
-import usdt from 'app/modernUI/images/usdt.svg';
-import frax from 'app/modernUI/images/frax.svg';
-
-import ageur from 'app/modernUI/images/ageur.png';
-import eurs from 'app/modernUI/images/eurs.png';
-import eurt from 'app/modernUI/images/eurt.svg';
-import jeur from 'app/modernUI/images/jeur.svg';
-
-import weth from 'app/modernUI/images/weth.png';
-
-import wbtc from 'app/modernUI/images/wbtc.png';
+import { TSupportedToken } from 'app/common/types/form';
 import { EChain } from 'app/common/constants/chains';
-
-export type TBoostFarmRewards = {
-  icons?: any[];
-  label?: string;
-  value?: number;
-  stableLabel?: string;
-  stableValue?: number;
-  stableAddress?: string;
-  curvePoolAddress?: string;
-};
-
-export type TConvexFarmIds = {
-  A?: number;
-  B?: number;
-};
-
-export type TFarm = {
-  id: number;
-  type: string;
-  chain: EChain;
-  name: string;
-  sign: string;
-  icons: any[];
-  supportedTokens?: TSupportedToken[];
-  interest?: string;
-  totalAssetSupply?: string | number;
-  depositedAmount?: string;
-  depositDividedAmount?: { first: any; second: any };
-  isBooster?: boolean;
-  rewards?: TBoostFarmRewards;
-  farmAddress?: string;
-  supportedTokensAddresses?: string[];
-  poolShare?: number;
-  convexFarmIds?: TConvexFarmIds;
-};
+import { TFarm } from 'app/common/types/farm';
 
 export const initialAvailableFarmsState: Array<TFarm> = [
   {
@@ -81,7 +33,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'US Dollar',
     sign: '$',
-    icons: [{ src: usdc }, { src: usdt }, { src: dai }],
+    icons: ['USDC', 'USDT', 'DAI'],
   },
   {
     id: 1,
@@ -90,7 +42,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: [{ src: eurt }, { src: eurs }, { src: jeur }],
+    icons: ['EURT', 'EURS', 'jEUR'],
   },
   {
     id: 2,
@@ -99,7 +51,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Ethereum',
     sign: 'Ξ',
-    icons: [{ src: weth }],
+    icons: ['WETH'],
   },
   {
     id: 3,
@@ -108,7 +60,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Bitcoin',
     sign: '₿',
-    icons: [{ src: wbtc }],
+    icons: ['WBTC'],
   },
   {
     id: 4,
@@ -117,7 +69,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'US Dollar',
     sign: '$',
-    icons: [{ src: usdc }, { src: usdt }, { src: dai }],
+    icons: ['USDC', 'USDT', 'DAI'],
   },
   {
     id: 5,
@@ -126,7 +78,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'Euro',
     sign: '€',
-    icons: [{ src: eurt }, { src: eurs }, { src: ageur }],
+    icons: ['EURT', 'EURS', 'agEUR'],
   },
   {
     id: 6,
@@ -135,7 +87,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'Ethereum',
     sign: 'Ξ',
-    icons: [{ src: weth }],
+    icons: ['WETH'],
   },
   {
     id: 7,
@@ -144,7 +96,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'Bitcoin',
     sign: '₿',
-    icons: [{ src: wbtc }],
+    icons: ['WBTC'],
   },
   {
     id: 8,
@@ -153,11 +105,11 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'FRAX/USDC',
     sign: '',
-    icons: [{ src: frax }, { src: usdc }],
+    icons: ['FRAX', 'USDC'],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
-      icons: [{ src: frax }, { src: usdc }],
+      icons: ['FRAX', 'USDC'],
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
       curvePoolAddress: EEthereumAddresses.FRAXUSDCCURVEPOOL,

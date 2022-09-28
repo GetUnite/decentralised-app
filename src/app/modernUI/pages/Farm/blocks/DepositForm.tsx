@@ -77,10 +77,10 @@ export const DepositForm = ({
                 : 'Approve'
               : 'Enter amount'
           }
-          onClick={
-            +selectedSupportedToken?.allowance >= +depositValue
+          onClick={handleApprove
+            /*+selectedSupportedToken?.allowance >= +depositValue
               ? handleDeposit
-              : handleApprove
+              : handleApprove*/
           }
         />
       </Box>

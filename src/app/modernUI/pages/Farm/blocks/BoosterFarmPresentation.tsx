@@ -19,7 +19,7 @@ export const BoosterFarmPresentation = ({
       </Text>
       <Box gap="large" margin={{ top: '20px' }} align="center">
         <Text textAlign="center" weight="bold" size="28px">
-          Earn X% as {rewardsLabel} tokens
+          Earn {selectedFarm.interest}% as {rewardsLabel} tokens
           <br />
         </Text>
         <img src={booster} alt="booster" width={275} />
