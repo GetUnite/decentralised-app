@@ -50,9 +50,6 @@ export const Farm = () => {
           heading={farmName}
           isLoading={isLoading}
           noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
-          contentHeight={
-            selectedFarm?.chain == EChain.POLYGON ? '580px' : '545px'
-          }
         >
           <>
             <Tabs>

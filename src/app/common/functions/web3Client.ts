@@ -117,8 +117,6 @@ onboard.state.actions.setWalletModules([
   coinbase,
 ]);
 
-declare let window: any;
-
 const permitOnlyTokenAddresses = [
   '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
   //'0x4bf7737515EE8862306Ddc221cE34cA9d5C91200',
@@ -232,22 +230,6 @@ export const getChainNameById = chainId => {
   return chains.find(chain => chain.id == chainId).label;
 };
 
-export type ExternalProvider = {
-  isMetaMask?: boolean;
-  isStatus?: boolean;
-  host?: string;
-  path?: string;
-  sendAsync?: (
-    request: { method: string; params?: Array<any> },
-    callback: (error: any, response: any) => void,
-  ) => void;
-  send?: (
-    request: { method: string; params?: Array<any> },
-    callback: (error: any, response: any) => void,
-  ) => void;
-  request?: (request: { method: string; params?: Array<any> }) => Promise<any>;
-};
-
 export const startBiconomy = async (chain, provider) => {
   try {
     const biconomy = new Biconomy(provider, {
@@ -290,7 +272,6 @@ export const sendTransaction = async (
   try {
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, web3.eth.currentProvider);
-
       web3ToUse = new Web3(biconomy);
     } else {
       web3ToUse = web3;
@@ -1008,7 +989,6 @@ export const approveStableCoin = async (
         'approve(address,uint256)',
         [farmAddress, maximumUint256Value],
         chain,
-        useBiconomy,
       );
 
       return tx;
@@ -1016,7 +996,7 @@ export const approveStableCoin = async (
       throw error;
     }
   } else {
-    const biconomy = await startBiconomy(chain, window.ethereum);
+    const biconomy = await startBiconomy(chain, web3.eth.currentProvider);
     const biconomyWeb3 = new Web3(biconomy);
 
     const nonce = await getAddressNonce(tokenAddress, walletAddress);

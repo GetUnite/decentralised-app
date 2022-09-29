@@ -9,7 +9,7 @@ export const Stake = ({ ...rest }) => {
     <ResponsiveContext.Consumer>
       {size => (
         <Layout>
-          <Modal size={size} chain={EChain.ETHEREUM} heading={'Stake $ALLUO'} contentHeight="612px">
+          <Modal size={size} chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
             <Tabs>
               <Tab title="Lock">
                 <LockTab />

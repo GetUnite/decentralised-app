@@ -1,3 +1,4 @@
+import { EChain } from 'app/common/constants/chains';
 import { useDepositForm } from 'app/common/state/farm';
 import { NumericInput, Spinner, SubmitButton } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
@@ -26,44 +27,49 @@ export const DepositForm = ({
 
   return (
     <Box fill>
-      {!selectedSupportedToken || isApproving || isDepositing ? (
-        <Box
-          align="center"
-          justify="center"
-          fill="vertical"
-          margin={{ top: 'large', bottom: 'medium' }}
-        >
-          <Spinner pad="large" />
-        </Box>
-      ) : (
-        <>
-          <Box margin={{ top: 'large' }}>
-            <TopHeader selectedFarm={selectedFarm} />
+      <Box
+        style={{
+          minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
+        }}
+      >
+        {!selectedSupportedToken || isApproving || isDepositing ? (
+          <Box
+            align="center"
+            justify="center"
+            fill="vertical"
+            margin={{ top: 'large', bottom: 'medium' }}
+          >
+            <Spinner pad="large" />
+          </Box>
+        ) : (
+          <>
+            <Box margin={{ top: 'large' }}>
+              <TopHeader selectedFarm={selectedFarm} />
+              <Box margin={{ top: 'medium' }}>
+                <NumericInput
+                  label={'Deposit ' + selectedSupportedToken.label}
+                  tokenSign={selectedFarm.sign}
+                  onValueChange={handleDepositFieldChange}
+                  value={depositValue}
+                  maxValue={selectedSupportedToken?.balance}
+                  tokenOptions={selectedFarm.supportedTokens || []}
+                  selectedToken={selectedSupportedToken}
+                  setSelectedToken={selectSupportedToken}
+                  error={depositValueError}
+                />
+              </Box>
+            </Box>
             <Box margin={{ top: 'medium' }}>
-              <NumericInput
-                label={'Deposit ' + selectedSupportedToken.label}
-                tokenSign={selectedFarm.sign}
-                onValueChange={handleDepositFieldChange}
-                value={depositValue}
-                maxValue={selectedSupportedToken?.balance}
-                tokenOptions={selectedFarm.supportedTokens || []}
-                selectedToken={selectedSupportedToken}
-                setSelectedToken={selectSupportedToken}
-                error={depositValueError}
+              <Infos
+                selectedFarm={selectedFarm}
+                inputValue={depositValue}
+                useBiconomy={useBiconomy}
+                setUseBiconomy={setUseBiconomy}
               />
             </Box>
-          </Box>
-          <Box margin={{ top: 'medium' }}>
-            <Infos
-              selectedFarm={selectedFarm}
-              inputValue={depositValue}
-              useBiconomy={useBiconomy}
-              setUseBiconomy={setUseBiconomy}
-            />
-          </Box>
-        </>
-      )}
-
+          </>
+        )}
+      </Box>
       <Box margin={{ top: 'medium' }}>
         <SubmitButton
           primary
@@ -77,10 +83,10 @@ export const DepositForm = ({
                 : 'Approve'
               : 'Enter amount'
           }
-          onClick={handleApprove
-            /*+selectedSupportedToken?.allowance >= +depositValue
+          onClick={
+            +selectedSupportedToken?.allowance >= +depositValue
               ? handleDeposit
-              : handleApprove*/
+              : handleApprove
           }
         />
       </Box>
