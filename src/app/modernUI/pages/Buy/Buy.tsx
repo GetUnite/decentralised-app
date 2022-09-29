@@ -9,8 +9,7 @@ export const Buy = ({ ...rest }) => {
     <ResponsiveContext.Consumer>
       {size => (
         <Layout>
-          <Modal size={size} chain={EChain.ETHEREUM} heading={'Buy $ALLUO'} contentHeight="557px"
-          >
+          <Modal size={size} chain={EChain.ETHEREUM} heading={'Buy $ALLUO'}>
             <Tabs>
               <Tab title="$ALLUO">
                 <BuyTab />
