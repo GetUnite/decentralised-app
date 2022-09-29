@@ -15,7 +15,6 @@ import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { DepositForm, WithdrawalForm, BoosterFarmPresentation } from './blocks';
 import { useCookies } from 'react-cookie';
-import { EChain } from 'app/common/constants/chains';
 
 export const Farm = () => {
   const { id } = useParams();
@@ -52,9 +51,6 @@ export const Farm = () => {
           heading={farmName}
           isLoading={isLoading}
           noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
-          contentHeight={
-            selectedFarm?.chain == EChain.POLYGON ? '580px' : '545px'
-          }
         >
           <>
             {selectedFarm?.isBooster && !cookies.has_seen_boost_farms ? (

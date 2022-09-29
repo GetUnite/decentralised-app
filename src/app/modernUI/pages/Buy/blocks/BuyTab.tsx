@@ -33,6 +33,12 @@ export const BuyTab = ({ ...rest }) => {
   );
   return (
     <Box fill>
+      <Box
+        style={{
+          minHeight: '355px',
+        }}
+        justify="center"
+      >
       {isLoading || isApproving || isBuying ? (
         <Box
           align="center"
@@ -81,7 +87,7 @@ export const BuyTab = ({ ...rest }) => {
           </Box>
         </>
       )}
-
+</Box>
       <Box margin={{ top: 'large' }}>
         {+allowance < +inputValue ? (
           <Button
