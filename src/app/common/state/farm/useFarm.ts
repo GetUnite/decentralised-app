@@ -98,7 +98,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     sign: '₿',
     icons: ['WBTC'],
   },
-  {
+  /*{
     id: 8,
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
@@ -124,7 +124,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       EEthereumAddresses.EURT,
     ],
     convexFarmIds: { A: 100, B: 64 },
-  },
+  },*/
 ];
 
 export const useFarm = ({ id }) => {

@@ -9,5 +9,5 @@ export * from './Info';
 export * from './Spinner';
 export * from './Notification';
 export * from './Modal';
-export * from './Biconomy';
+export * from './Toggles';
 export * from './Icons';

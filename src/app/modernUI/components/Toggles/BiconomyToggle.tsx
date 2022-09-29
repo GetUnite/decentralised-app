@@ -30,10 +30,10 @@ const ReactTooltipStyledLight = styled(ReactTooltip)`
   }
 `;
 
-export function BiconomyToggle({ biconomyStatus, setBiconomyStatus }) {
+export function BiconomyToggle({ useBiconomy, setUseBiconomy }) {
   const [modeAtom] = useRecoilState(mode);
-  const biconomyStatusButton = biconomyStatus ? 'row' : 'row-reverse';
-  const biconomyStatusButtonColor = !biconomyStatus ? '#CCCCCC' : '#2A73FF';
+  const useBiconomyButton = useBiconomy ? 'row' : 'row-reverse';
+  const useBiconomyButtonColor = !useBiconomy ? '#CCCCCC' : '#2A73FF';
 
   return (
     <Box flex justify="end" direction="row">
@@ -59,19 +59,19 @@ export function BiconomyToggle({ biconomyStatus, setBiconomyStatus }) {
           </span>{' '}
           ON/OFF?
         </Text>
-        <Button onClick={() => setBiconomyStatus(!biconomyStatus)}>
+        <Button onClick={() => setUseBiconomy(!useBiconomy)}>
         <Box
           width="46px"
           height="20px"
           round="10px"
           pad="0px 7px 0px 7px"
-          background={biconomyStatusButtonColor}
-          direction={biconomyStatusButton}
+          background={useBiconomyButtonColor}
+          direction={useBiconomyButton}
           justify="between"
           align='center'
         >
           <Text size="9px" color="white">
-            {biconomyStatus ? 'ON' : 'OFF'}
+            {useBiconomy ? 'ON' : 'OFF'}
           </Text>
           <span style={{
               width: '13px',
