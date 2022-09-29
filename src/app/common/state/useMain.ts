@@ -93,7 +93,6 @@ export const useMain = () => {
             availableFarm.interest = interest;
             availableFarm.totalAssetSupply = totalAssetSupply;
             availableFarm.supportedTokens = supportedTokens;
-            console.log(supportedTokens, availableFarm.chain == EChain.POLYGON);
             availableFarm.depositedAmount = depositedAmount;
             availableFarm.poolShare = poolShare;
           }),
