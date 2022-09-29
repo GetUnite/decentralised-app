@@ -4,7 +4,7 @@ export * from './Selector';
 export * from './Menu';
 export * from './Buttons';
 export * from './Tabs';
-export * from './Input';
+export * from './Inputs';
 export * from './Info';
 export * from './Spinner';
 export * from './Notification';

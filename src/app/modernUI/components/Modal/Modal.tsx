@@ -16,7 +16,6 @@ interface IModal {
   notificationId?: ENotificationId;
   children: React.ReactNode;
   noHeading?: boolean;
-  contentHeight?: string;
 }
 
 export const Modal = ({
@@ -26,7 +25,6 @@ export const Modal = ({
   isLoading = false,
   children,
   noHeading = false,
-  contentHeight,
 }: IModal) => {
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
@@ -103,7 +101,6 @@ export const Modal = ({
                 fill="vertical"
                 margin={{ vertical: 'medium' }}
                 gap="small"
-                style={contentHeight ? { minHeight: contentHeight } : {}}
               >
                 {isLoading ? (
                   <Box
