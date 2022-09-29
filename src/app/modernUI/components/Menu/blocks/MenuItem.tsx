@@ -14,6 +14,12 @@ export const MenuItem = ({ ...rest }) => {
         onClick={() => navigate(modernUiPaths.MAIN)}
       />
       <Anchor
+        label="auto-invest"
+        size="medium"
+        weight={isBuyPage ? 'bold' : 'normal'}
+        onClick={() => navigate(modernUiPaths.AUTOINVEST)}
+      />
+      <Anchor
         label="transfer"
         size="medium"
         weight={isTransferPage ? 'bold' : 'normal'}
