@@ -1,8 +1,14 @@
 import { EChain } from 'app/common/constants/chains';
 import { useDepositForm } from 'app/common/state/farm';
-import { NumericInput, Spinner, SubmitButton } from 'app/modernUI/components';
-import { Box, Text } from 'grommet';
-import { Infos } from './Infos';
+import {
+  FeeInfo,
+  Info,
+  NumericInput,
+  ProjectedWeeklyInfo,
+  Spinner,
+  SubmitButton,
+} from 'app/modernUI/components';
+import { Box } from 'grommet';
 import { TopHeader } from './TopHeader';
 
 export const DepositForm = ({
@@ -60,11 +66,27 @@ export const DepositForm = ({
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
-              <Infos
-                selectedFarm={selectedFarm}
+              <ProjectedWeeklyInfo
+                depositedAmount={selectedFarm.depositedAmount}
                 inputValue={depositValue}
+                interest={selectedFarm.interest}
+                sign={selectedFarm.sign}
+              />
+              <Info label="APY" value={selectedFarm.interest + '%'} />
+              <Info
+                label="Pool liquidity"
+                value={
+                  selectedFarm.sign +
+                  (+selectedFarm.totalAssetSupply).toLocaleString()
+                }
+              />
+              <FeeInfo
+                biconomyToggle={selectedFarm.chain == EChain.POLYGON}
                 useBiconomy={useBiconomy}
                 setUseBiconomy={setUseBiconomy}
+                showWalletFee={
+                  !useBiconomy || selectedFarm.chain != EChain.POLYGON
+                }
               />
             </Box>
           </>
