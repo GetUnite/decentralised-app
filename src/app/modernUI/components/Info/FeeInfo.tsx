@@ -1,6 +1,6 @@
 import { isSafeApp } from 'app/common/state/atoms';
 import { useRecoilState } from 'recoil';
-import { BiconomyToggle } from '../Biconomy';
+import { BiconomyToggle } from '../Toggles';
 import { Info } from './Info';
 
 export const FeeInfo = ({
@@ -25,8 +25,8 @@ export const FeeInfo = ({
         )}
         {!isSafeAppAtom && biconomyToggle && (
           <BiconomyToggle
-            biconomyStatus={useBiconomy}
-            setBiconomyStatus={setUseBiconomy}
+            useBiconomy={useBiconomy}
+            setUseBiconomy={setUseBiconomy}
           />
         )}
       </div>

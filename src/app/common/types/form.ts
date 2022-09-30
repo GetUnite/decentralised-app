@@ -4,4 +4,5 @@ export type TSupportedToken = {
   decimals?: number;
   balance?: string;
   allowance?: string;
+  sign?: string;
 };

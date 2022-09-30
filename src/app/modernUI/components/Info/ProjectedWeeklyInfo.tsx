@@ -9,7 +9,6 @@ export const ProjectedWeeklyInfo = ({
 }) => {
   const balanceAndNewValue =
     (+depositedAmount || 0) + (+inputValue || 0);
-    console.log(balanceAndNewValue);
 
   return (
     <Info
