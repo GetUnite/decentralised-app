@@ -16,7 +16,6 @@ import { useRecoilState } from 'recoil';
 import { useCookies } from 'react-cookie';
 import { EChain } from 'app/common/constants/chains';
 import { AutoInvestTab } from './blocks/AutoInvestTab';
-import { useAutoInvest } from 'app/common/state/autoInvest';
 
 export const AutoInvest = () => {
   return (
