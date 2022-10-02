@@ -1,2 +1,2 @@
-export * from './AssetCard';
+export * from './FarmCard';
 export * from './Filter';

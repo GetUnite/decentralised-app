@@ -11,3 +11,4 @@ export * from './Notification';
 export * from './Modal';
 export * from './Toggles';
 export * from './Icons';
+export * from './Heading';
