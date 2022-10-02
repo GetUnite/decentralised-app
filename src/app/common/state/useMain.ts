@@ -18,11 +18,7 @@ import { useCookies } from 'react-cookie';
 import { toExactFixed } from '../functions/utils';
 import { EChain } from '../constants/chains';
 import { TFarm } from '../types/farm';
-
-export type THeadingData = {
-  numberOfAssets: number;
-  numberOfChainsWithAssets: number;
-};
+import { TAssetsInfo } from '../types/heading';
 
 export const useMain = () => {
   const [cookies] = useCookies(['has_seen_boost_farms']);
@@ -37,7 +33,7 @@ export const useMain = () => {
   const [viewType, setViewType] = useState<string>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
 
-  const [headingData, setHeadingData] = useState<THeadingData>();
+  const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -97,7 +93,7 @@ export const useMain = () => {
             availableFarm.poolShare = poolShare;
           }),
       ).then(() => {
-        setHeadingData({
+        setAssetsInfo({
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
@@ -217,7 +213,7 @@ export const useMain = () => {
     isLoading,
     error,
     availableFarms: filteredFarms(),
-    headingData,
+    assetsInfo,
     showAllFarms,
     showYourFarms,
     viewType,
@@ -226,5 +222,6 @@ export const useMain = () => {
     setTokenFilter,
     networkFilter,
     setNetworkFilter,
+    walletAccountAtom
   };
 };

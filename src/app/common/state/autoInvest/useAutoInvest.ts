@@ -7,194 +7,103 @@ import {
   getTotalAssetSupply,
 } from 'app/common/functions/autoInvest';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../useNotification';
 import { TSupportedToken } from 'app/common/types/form';
 import { isNumeric } from 'app/common/functions/utils';
 import { EChain } from 'app/common/constants/chains';
-import { EPolygonAddresses } from 'app/common/constants/addresses';
-import { TFarm } from 'app/common/types/farm';
+import { TAssetsInfo } from 'app/common/types/heading';
 import {
   getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
+  getSupportedTokensList,
 } from 'app/common/functions/web3Client';
-
-export type TStreamInfo = {
-  from: TSupportedToken;
-  to: TFarm;
-  allowance: string;
-};
-
-const streamFromOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.USDC, sign: '$' },
-  { address: EPolygonAddresses.USDT, sign: '$' },
-  { address: EPolygonAddresses.DAI, sign: '$' },
-];
-
-const streamToOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.IBALLUOETH, label: 'ETH', sign: 'Ξ' },
-];
+import { initialAvailableFarmsState } from 'app/common/state/farm';
 
 export const useAutoInvest = () => {
   // Atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
-  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
   const { setNotificationt } = useNotification();
 
-  // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom ? false : true);
+  // modal control
+  const [isModalToggled, setIsModalToggled] = useState<boolean>(false);
 
-  // stream from
-  const [supportedFromTokens, setSupportedFromTokens] =
-    useState<TSupportedToken[]>();
-  const [selectedSupportedFromToken, setSelectedSupportedFromToken] =
-    useState<TSupportedToken>();
+  // assets info
+  const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
-  // stream to
-  const [selectedSupportedToToken, setSelectedSupportedToToken] =
-    useState<TSupportedToken>(streamToOptions[0]);
-  const [targetFarmInfo, setTargetFarmInfo] = useState<TFarm>();
-
-  // inputs
-  const [streamValue, setStreamValue] = useState<string>();
-  const [streamValueError, setStreamValueError] = useState<string>('');
-  const [useEndDate, setUseEndDate] = useState<boolean>(false);
-  const [endDate, setEndDate] = useState<string>();
-  const [endDateError, setEndDateError] = useState<string>();
+  // streams
+  const [streams, setStreams] = useState<string>();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isStartingStream, setIsStartingStream] = useState<boolean>(false);
 
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.POLYGON);
-      updateAutoInvestInfo();
+      fetchStreamsInfo();
+      fetchAssetsInfo();
     }
   }, [walletAccountAtom]);
 
-  const handleStreamValueChange = value => {
-    setStreamValueError('');
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setStreamValueError('Write a valid number');
-    } else if (+value > +selectedSupportedFromToken?.balance) {
-      setStreamValueError('Not enough balance');
-    }
-    setStreamValue(value);
-  };
-
-  const fetchFarmInfo = async () => {
-    let farmInfo;
-    farmInfo = {
-      interest: await getInterest(selectedSupportedToToken.address),
-      totalAssetSupply: await getTotalAssetSupply(
-        selectedSupportedToToken.address,
-      ),
-      sign: selectedSupportedToToken.sign,
-    };
-    if (walletAccountAtom) {
-      farmInfo.depositedAmount = await getDepositedAmount(
-        selectedSupportedToToken.address,
-      );
-    }
-
-    return farmInfo;
-  };
-
-  const updateAutoInvestInfo = async () => {
+  const fetchAssetsInfo = async () => {
     setIsLoading(true);
+    try {
+      let numberOfAssets = 0;
+      let chainsWithAssets = new Set();
 
-    if (walletAccountAtom) {
-      const supportedTokens = await Promise.all(
-        streamFromOptions.map(async supportedToken => {
-          const basicSupportedTokenInfo = await getSupportedTokensBasicInfo(
-            supportedToken.address,
-            EChain.POLYGON,
-          );
-          const advancedSupportedTokenInfo =
-            await getSupportedTokensAdvancedInfo(
-              selectedSupportedToToken.address,
-              basicSupportedTokenInfo,
-              EChain.POLYGON,
-            );
-          return {
-            label: basicSupportedTokenInfo.symbol,
-            address: basicSupportedTokenInfo.tokenAddress,
-            balance: advancedSupportedTokenInfo.balance,
-            allowance: advancedSupportedTokenInfo.allowance,
-            decimals: basicSupportedTokenInfo.decimals,
-            sign: supportedToken.sign,
-          };
-        }),
-      );
-      setSupportedFromTokens(supportedTokens);
-      setSelectedSupportedFromToken(supportedTokens[0]);
-      setTargetFarmInfo(await fetchFarmInfo());
+      await Promise.all(
+        initialAvailableFarmsState
+          .filter(x => true)
+          .map(async farm => {
+            const supportedTokens = farm.isBooster
+              ? await Promise.all(
+                  farm.supportedTokensAddresses.map(async supportedtoken => {
+                    return await getSupportedTokensBasicInfo(
+                      supportedtoken,
+                      farm.chain,
+                    );
+                  }),
+                )
+              : await getSupportedTokensList(farm.type, farm.chain);
+
+            if (walletAccountAtom) {
+              supportedTokens.map(async supportedToken => {
+                const advancedSupportedTokenInfo =
+                  await getSupportedTokensAdvancedInfo(
+                    farm.farmAddress,
+                    supportedToken,
+                    farm.chain,
+                  );
+                if (Number(advancedSupportedTokenInfo.balance) > 0) {
+                  numberOfAssets++;
+                  chainsWithAssets.add(farm.chain);
+                }
+              });
+            }
+          }),
+      ).then(() => {
+        setAssetsInfo({
+          numberOfAssets: numberOfAssets,
+          numberOfChainsWithAssets: chainsWithAssets.size,
+        });
+      });
+    } catch (error) {
+      console.log(error);
     }
-
     setIsLoading(false);
   };
 
-  const selectSupportedFromToken = supportedFromToken => {
-    setSelectedSupportedFromToken(supportedFromToken);
-  };
-
-  const selectSupportedToToken = async supportedToToken => {
-    setSelectedSupportedToToken(supportedToToken);
-    setSelectedSupportedFromToken({
-      ...selectedSupportedFromToken,
-      allowance: await getAllowance(
-        selectedSupportedFromToken.address,
-        supportedToToken.address,
-      ),
-    });
-  };
-
-  const handleStartStream = async () => {
-    setIsStartingStream(true);
-
-    try {
-      /*await depositStableCoin(
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );*/
-      setStreamValue(null);
-      setNotificationt('Stream started successfully', 'success');
-    } catch (error) {
-      setNotificationt(error, 'error');
-    }
-
-    setIsStartingStream(false);
+  const fetchStreamsInfo = async () => {
+    setStreams('lol');
   };
 
   return {
-    selectedSupportedFromToken,
-    hasErrors: streamValueError != '' || endDateError != '',
-    streamValueError,
-    streamValue,
-    handleStreamValueChange,
     isLoading,
-    selectSupportedFromToken,
-    supportedFromTokens,
-    handleStartStream,
-    isStartingStream,
-    supportedToTokens: streamToOptions,
-    selectedSupportedToToken,
-    selectSupportedToToken,
-    targetFarmInfo,
-    setUseBiconomy,
-    useBiconomy,
-    useEndDate,
-    setUseEndDate,
-    endDate,
-    endDateError,
-    setEndDate
+    streams,
+    isModalToggled,
+    setIsModalToggled,
+    assetsInfo,
   };
 };
