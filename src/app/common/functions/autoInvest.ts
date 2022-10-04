@@ -3,7 +3,7 @@ import {
   callContract,
   getCurrentWalletAddress,
 } from 'app/common/functions/web3Client';
-import Web3 from 'web3';
+import {ethers} from 'ethers';
 import { fromDecimals } from './utils';
 
 export const getInterest = async (tokenAddress, chain = EChain.POLYGON) => {
@@ -50,7 +50,7 @@ export const getTotalAssetSupply = async (
     chain,
   );
 
-  return Web3.utils.fromWei(totalAssetSupply);
+  return ethers.utils.formatEther(totalAssetSupply);
 };
 
 export const getDepositedAmount = async (
@@ -75,7 +75,7 @@ export const getDepositedAmount = async (
     chain,
   );
 
-  return Web3.utils.fromWei(depositedAmount);
+  return ethers.utils.formatEther(depositedAmount);
 };
 
 export const getAllowance = async (

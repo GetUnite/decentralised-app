@@ -24,12 +24,13 @@ export const TransferTab = ({ ...rest }) => {
     handleRecipientAddressChange,
     useBiconomy,
     setUseBiconomy,
+    isLoading,
   } = useTransfer();
 
   return (
     <Box fill>
       <Box style={{ minHeight: '380px' }} justify="center">
-        {isTransferring ? (
+        {isLoading || isTransferring ? (
           <Box
             align="center"
             justify="center"

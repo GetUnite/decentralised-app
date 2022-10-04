@@ -9,31 +9,34 @@ import { useNotification } from 'app/common/state';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { EChain } from 'app/common/constants/chains';
 import { EPolygonAddresses } from 'app/common/constants/addresses';
+import { TIbAlluoInfo } from 'app/common/types/transfer';
 
 export const useTransfer = () => {
-  const { setNotificationt } = useNotification();
+  // atoms
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
+  // notifications
+  const { setNotificationt } = useNotification();
+
+  // biconomy
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
-  type IbAlluoInfo = {
-    type?: string;
-    address?: string;
-    balance?: string;
-    decimals?: number;
-    label?: string;
-    sign?: string;
-  };
+  // ibAlluos
+  const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);
 
+  // inputs
   const [selectedIbAlluo, setSelectedIbAlluo] = useState<string>('IbAlluoUSD');
   const [transferValue, setTransferValue] = useState<string>();
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [transferValueError, setTransferValueError] = useState<string>('');
+  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [recipientAddressError, setRecipientAddressError] =
     useState<string>('');
+
+  // loading control
   const [isTransferring, setIsTransferring] = useState<boolean>(false);
-  const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<IbAlluoInfo>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -42,17 +45,12 @@ export const useTransfer = () => {
     }
   }, [walletAccountAtom]);
 
-  const resetState = () => {
-    setTransferValueError('');
-    setRecipientAddressError('');
-    setIsTransferring(false);
-  };
-
   const setSelectedIbAlluoBySymbol = tokenInfo => {
     setSelectedIbAlluo(tokenInfo.type);
   };
 
   const fetchIbAlluosInfo = async () => {
+    setIsLoading(true);
     const [usd, eur, eth, btc] = await Promise.all([
       getIbAlluoInfo(EPolygonAddresses.IBALLUOUSD),
       getIbAlluoInfo(EPolygonAddresses.IBALLUOEUR),
@@ -94,6 +92,7 @@ export const useTransfer = () => {
         sign: getTokenSign(btc.symbol),
       },
     ]);
+    setIsLoading(false);
   };
 
   const selectedIbAlluoInfo = ibAlluosInfo?.find(
@@ -123,7 +122,6 @@ export const useTransfer = () => {
   };
 
   const handleTransfer = async () => {
-    resetState();
     setIsTransferring(true);
 
     try {
@@ -135,13 +133,11 @@ export const useTransfer = () => {
         useBiconomy,
       );
       await fetchIbAlluosInfo();
-      resetState();
       setTransferValue('');
       setRecipientAddress('');
       setNotificationt('Transfer completed successfully', 'success');
     } catch (err) {
       console.error('Error', err.message);
-      resetState();
       setNotificationt(err.message, 'error');
     }
 
@@ -169,7 +165,6 @@ export const useTransfer = () => {
     handleTransferValueChange,
     isTransferring,
     handleTransfer,
-    resetState,
     ibAlluosInfo,
     recipientAddress,
     handleRecipientAddressChange,
@@ -177,5 +172,6 @@ export const useTransfer = () => {
     isSafeAppAtom,
     useBiconomy,
     setUseBiconomy,
+    isLoading,
   };
 };

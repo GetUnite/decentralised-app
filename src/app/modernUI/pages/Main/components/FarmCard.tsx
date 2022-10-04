@@ -31,7 +31,7 @@ const Disabled = () => {
   );
 };
 
-interface IAssetCard {
+interface IFarmCard {
   id: number;
   type?: TFarmDepositCoinType;
   name: string;
@@ -48,7 +48,7 @@ interface IAssetCard {
   poolShare?: number;
 }
 
-export const AssetCard = ({
+export const FarmCard = ({
   id,
   type,
   name,
@@ -64,7 +64,7 @@ export const AssetCard = ({
   viewType,
   poolShare,
   ...rest
-}: IAssetCard) => {
+}: IFarmCard) => {
   const { navigate } = useCurrentPath();
   const { setNotification } = useNotification();
   const { handleConnectWallet } = useConnectionButton();
@@ -131,7 +131,6 @@ export const AssetCard = ({
                 </Box>
               </Box>
               <Box fill="horizontal" margin={{ top: 'medium' }} />
-              <Notification id={ENotificationId.ASSET_CARD} />
             </Card>
           ) : (
             <Card

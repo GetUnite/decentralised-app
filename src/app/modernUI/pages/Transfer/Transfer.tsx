@@ -9,7 +9,7 @@ export const Transfer = ({ ...rest }) => {
     <ResponsiveContext.Consumer>
       {size => (
         <Layout>
-          <Modal size={size} chain={EChain.POLYGON} heading={'Transfer Asset'}>
+          <Modal chain={EChain.POLYGON} heading={'Transfer Asset'}>
             <Tab title="Send">
               <TransferTab />
             </Tab>
