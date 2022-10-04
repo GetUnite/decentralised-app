@@ -1,4 +1,4 @@
-import { useMode } from 'app/common/state/shortcuts';
+import { useMode } from 'app/common/state';
 import { Box, TextInput, Text } from 'grommet';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';

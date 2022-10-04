@@ -334,8 +334,6 @@ export const callContract = async (
   }
 };
 
-let alluoPriceInstance;
-
 const alluoPriceUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? 'https://protocol-mainnet.gnosis.io/api'
@@ -348,8 +346,8 @@ export const getAlluoPrice = async (): Promise<number> => {
 
   const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
 
-  alluoPriceInstance = +fromDecimals(usdcPrice.amount, 6);
-  return alluoPriceInstance;
+  const alluoPrice = +fromDecimals(usdcPrice.amount, 6);
+  return alluoPrice;
 };
 
 export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
@@ -366,15 +364,15 @@ export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
 };
 
 const toAlluoValue = (alluoValueInWei): string =>
-  alluoValueInWei ? Web3.utils.fromWei(alluoValueInWei) : '';
+  alluoValueInWei ? ethers.utils.formatEther(alluoValueInWei) : '';
 
 export const alluoToUsd = async alluoValueInWei => {
-  const alluoPrice = alluoPriceInstance;
+  const alluoPrice = await getAlluoPrice();
   return +(+toAlluoValue(alluoValueInWei) * alluoPrice);
 };
 
 export const usdToAlluo = async usd => {
-  const alluoPrice = alluoPriceInstance;
+  const alluoPrice = await getAlluoPrice();
   const alluoBalance = usd / alluoPrice;
   const alluoBalanceInBN = Web3.utils.toBN(alluoBalance);
   const alluoBalanceInWei = Web3.utils.toWei(alluoBalanceInBN.toString());
@@ -383,7 +381,7 @@ export const usdToAlluo = async usd => {
 };
 
 export const calculateApr = async (rewardPerDistribution, totalLockedInLP) => {
-  const alluoPrice = alluoPriceInstance;
+  const alluoPrice = await getAlluoPrice();
   if (!alluoPrice) return 0;
 
   const abi = [
@@ -406,9 +404,11 @@ export const calculateApr = async (rewardPerDistribution, totalLockedInLP) => {
     EChain.ETHEREUM,
   );
 
+  console.log(totalLockedLPToAlluo, ethers.utils.formatEther(rewardPerDistribution),ethers.utils.formatEther(totalLockedLPToAlluo) )
+
   const exactApr =
-    ((+Web3.utils.fromWei(rewardPerDistribution) * alluoPrice) /
-      (+Web3.utils.fromWei(totalLockedLPToAlluo) * alluoPrice)) *
+    ((+ethers.utils.formatEther(rewardPerDistribution) * alluoPrice) /
+      (+ethers.utils.formatEther(totalLockedLPToAlluo) * alluoPrice)) *
     100 *
     365;
 
@@ -2298,7 +2298,7 @@ export const getAlluoStakingAPR = async () => {
 
   const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
 
-  const getRewardPerDistribution = callContract(
+  const rewardPerDistribution = await callContract(
     abi,
     ethereumVlAlluoAddress,
     'rewardPerDistribution()',
@@ -2306,7 +2306,7 @@ export const getAlluoStakingAPR = async () => {
     EChain.ETHEREUM,
   );
 
-  const getTotalLockedInLB = await callContract(
+  const totalLockedInLB = await callContract(
     abi,
     ethereumVlAlluoAddress,
     'totalLocked()',
@@ -2314,7 +2314,7 @@ export const getAlluoStakingAPR = async () => {
     EChain.ETHEREUM,
   );
 
-  return calculateApr(getRewardPerDistribution, getTotalLockedInLB);
+  return calculateApr(rewardPerDistribution, totalLockedInLB);
 };
 
 export const getIbAlluoInfo = async address => {

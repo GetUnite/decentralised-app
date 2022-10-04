@@ -15,7 +15,7 @@ import Skeleton from 'react-loading-skeleton';
 import { isSmall } from 'app/modernUI/theme';
 
 export const AutoInvest = () => {
-  const { streams, setIsModalVisible, isModalVisible, isLoading, assetsInfo } =
+  const { streams, setIsModalVisible, isModalVisible, isLoading, assetsInfo, walletAccountAtom } =
     useAutoInvest();
 
   return (
@@ -29,6 +29,7 @@ export const AutoInvest = () => {
               numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
             />
             <Box margin={{ top: '72px' }}>
+            {walletAccountAtom ? (<>
               {isLoading ? (
                 <Skeleton count={1} height="36px" />
               ) : (
@@ -104,6 +105,9 @@ export const AutoInvest = () => {
                   </Box>
                 )}
               </Box>
+              </>) : (<Text size="36px" weight="bold">
+                  Connect your wallet to see active streams
+                </Text>)}
             </Box>
           </Box>
         )}
