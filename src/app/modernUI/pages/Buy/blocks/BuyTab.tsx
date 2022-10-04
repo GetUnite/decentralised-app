@@ -129,7 +129,7 @@ export const BuyTab = ({ ...rest }) => {
                 hasErrors
               }
               margin={{ top: 'small' }}
-              label={`Buy & Stake to earn ${alluoStakingAPR}% APR`}
+              label={`Buy & Stake to earn ${isLoading ? 'X' : alluoStakingAPR}% APR`}
               onClick={handleBuyAndLockAction}
             />
           </>
