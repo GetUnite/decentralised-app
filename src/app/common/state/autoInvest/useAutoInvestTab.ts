@@ -11,28 +11,18 @@ import { useNotification } from '../useNotification';
 import { TSupportedToken } from 'app/common/types/form';
 import { isNumeric } from 'app/common/functions/utils';
 import { EChain } from 'app/common/constants/chains';
-import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { TFarm } from 'app/common/types/farm';
 import {
   getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
 } from 'app/common/functions/web3Client';
+import { streamFromOptions, streamToOptions } from './useAutoInvest';
 
 export type TStreamInfo = {
   from: TSupportedToken;
   to: TFarm;
   allowance: string;
 };
-
-const streamFromOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.USDC, sign: '$' },
-  { address: EPolygonAddresses.USDT, sign: '$' },
-  { address: EPolygonAddresses.DAI, sign: '$' },
-];
-
-const streamToOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.IBALLUOETH, label: 'ETH', sign: 'Ξ' },
-];
 
 export const useAutoInvestTab = () => {
   // Atoms

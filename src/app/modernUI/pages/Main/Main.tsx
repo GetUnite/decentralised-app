@@ -59,7 +59,7 @@ export const Main = () => {
                       <Box
                         direction="row"
                         justify="start"
-                        gap="small"
+                        gap="20px"
                         style={{ fontSize: '16px' }}
                       >
                         <Button
@@ -88,7 +88,7 @@ export const Main = () => {
                       <Box
                         direction="row"
                         justify="start"
-                        gap="medium"
+                        gap="20px"
                         style={{ fontSize: '16px' }}
                       >
                         <Filter

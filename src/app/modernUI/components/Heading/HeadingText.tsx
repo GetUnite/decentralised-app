@@ -13,7 +13,7 @@ export const HeadingText = ({
 
   const headingText = isLoading ? (
     <Box fill>
-      <Skeleton count={2} />
+      <Skeleton count={1} height="36px"/>
     </Box>
   ) : (
     <>

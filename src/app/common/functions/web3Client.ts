@@ -1,14 +1,7 @@
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 import WalletConnectProvider from '@walletconnect/ethereum-provider';
 import { Biconomy } from '@biconomy/mexa';
-import polygonIbAlluoUSDAbi from 'app/common/abis/polygonIbAlluoUSD.json';
-import polygonIbAlluoEURAbi from 'app/common/abis/polygonIbAlluoEUR.json';
-import polygonIbAlluoETHAbi from 'app/common/abis/polygonIbAlluoETH.json';
-import polygonIbAlluoBTCAbi from 'app/common/abis/polygonIbAlluoBTC.json';
-import ethereumIbAlluoUSDAbi from 'app/common/abis/ethereumIbAlluoUSD.json';
-import ethereumIbAlluoEURAbi from 'app/common/abis/ethereumIbAlluoEUR.json';
-import ethereumIbAlluoETHAbi from 'app/common/abis/ethereumIbAlluoETH.json';
-import ethereumIbAlluoBTCAbi from 'app/common/abis/ethereumIbAlluoBTC.json';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import { TTokenInfo } from 'app/common/state/atoms';
 import {
@@ -133,7 +126,8 @@ const usesNoncesAddresses = [
 ];
 
 let walletAddress;
-let web3: WalletConnectProvider | any;
+let walletProvider;
+let web3;
 
 export const trySafeAppConnection = async callback => {
   const gnosisLabel = 'Gnosis Safe';
@@ -163,7 +157,8 @@ export const connectToWallet = async (connectOptions?) => {
     wallets = await onboard.connectWallet(connectOptions);
 
     if (wallets[0]) {
-      web3 = new Web3(wallets[0].provider as any);
+      walletProvider = wallets[0].provider;
+      web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
       return walletAddress;
     }
@@ -271,10 +266,10 @@ export const sendTransaction = async (
 
   try {
     if (useBiconomy) {
-      const biconomy = await startBiconomy(chain, web3.eth.currentProvider);
+      const biconomy = await startBiconomy(chain, walletProvider);
       web3ToUse = new Web3(biconomy);
     } else {
-      web3ToUse = web3;
+      web3ToUse = walletProvider;
     }
 
     const contract = new web3ToUse.eth.Contract(abi as any, address);
@@ -318,18 +313,20 @@ export const callContract = async (
   params,
   chain,
 ) => {
-  const provider =
+  const providerUrl =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  const web3ToUse = new Web3(new Web3.providers.HttpProvider(provider));
-  const contract = new web3ToUse.eth.Contract(abi as any, address);
+  const ethersProvider = new ethers.providers.JsonRpcProvider(providerUrl);
+  const contract = new ethers.Contract(address, abi, ethersProvider);
 
   try {
-    const method = contract.methods[functionSignature].apply(null, params);
-    const tx = await method.call({
-      from: walletAddress,
-    });
+    const method = contract[functionSignature].apply(null, params);
+    const txResult = await method;
 
-    return tx;
+    if (ethers.BigNumber.isBigNumber(txResult)) {
+      return txResult.toString();
+    }
+
+    return txResult;
   } catch (error) {
     console.log(abi, address, functionSignature, params);
     // here do all error handling to readable stuff
@@ -661,32 +658,6 @@ export const getListSupportedTokens = async (
   }
 };
 
-const getIbAlluoAbi = (type, chain = EChain.POLYGON) => {
-  let abi;
-  switch (chain) {
-    case EChain.POLYGON:
-      abi = {
-        usd: polygonIbAlluoUSDAbi as any,
-        eur: polygonIbAlluoEURAbi as any,
-        eth: polygonIbAlluoETHAbi as any,
-        btc: polygonIbAlluoBTCAbi as any,
-      };
-      break;
-
-    case EChain.ETHEREUM:
-      abi = {
-        usd: ethereumIbAlluoUSDAbi as any,
-        eur: ethereumIbAlluoEURAbi as any,
-        eth: ethereumIbAlluoETHAbi as any,
-        btc: ethereumIbAlluoBTCAbi as any,
-      };
-      break;
-    default:
-      break;
-  }
-  return abi[type];
-};
-
 const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
   let VLALLUOAddr;
   switch (chain) {
@@ -718,38 +689,48 @@ export const getSupportedTokensBasicInfo = async (
   tokenAddress,
   chain = EChain.POLYGON,
 ) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'symbol',
-      outputs: [{ internalType: 'string', name: '', type: 'string' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'decimals',
-      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'symbol',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
 
-  const symbol = await callContract(abi, tokenAddress, 'symbol()', null, chain);
+    const symbol = await callContract(
+      abi,
+      tokenAddress,
+      'symbol()',
+      null,
+      chain,
+    );
 
-  const decimals = await callContract(
-    abi,
-    tokenAddress,
-    'decimals()',
-    null,
-    chain,
-  );
+    const decimals = await callContract(
+      abi,
+      tokenAddress,
+      'decimals()',
+      null,
+      chain,
+    );
 
-  return {
-    tokenAddress,
-    symbol,
-    decimals,
-  };
+    return {
+      tokenAddress,
+      symbol,
+      decimals,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getSupportedTokensAdvancedInfo = async (
@@ -757,46 +738,50 @@ export const getSupportedTokensAdvancedInfo = async (
   supportedToken,
   chain = EChain.POLYGON,
 ) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'balanceOf',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        { internalType: 'address', name: 'owner', type: 'address' },
-        { internalType: 'address', name: 'spender', type: 'address' },
-      ],
-      name: 'allowance',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+        name: 'balanceOf',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'address', name: 'spender', type: 'address' },
+        ],
+        name: 'allowance',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
 
-  const balance = await callContract(
-    abi,
-    supportedToken.tokenAddress,
-    'balanceOf(address)',
-    [walletAddress],
-    chain,
-  );
+    const balance = await callContract(
+      abi,
+      supportedToken.tokenAddress,
+      'balanceOf(address)',
+      [walletAddress],
+      chain,
+    );
 
-  const allowance = await callContract(
-    abi,
-    supportedToken.tokenAddress,
-    'allowance(address,address)',
-    [walletAddress, farmAddress],
-    chain,
-  );
+    const allowance = await callContract(
+      abi,
+      supportedToken.tokenAddress,
+      'allowance(address,address)',
+      [walletAddress, farmAddress],
+      chain,
+    );
 
-  return {
-    balance: fromDecimals(balance, supportedToken.decimals),
-    allowance: allowance,
-  };
+    return {
+      balance: fromDecimals(balance, supportedToken.decimals),
+      allowance: allowance,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getStableCoinInfo = async (
@@ -804,75 +789,85 @@ export const getStableCoinInfo = async (
   type,
   chain = EChain.POLYGON,
 ) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'balanceOf',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'symbol',
-      outputs: [{ internalType: 'string', name: '', type: 'string' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [],
-      name: 'decimals',
-      outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        { internalType: 'address', name: 'owner', type: 'address' },
-        { internalType: 'address', name: 'spender', type: 'address' },
-      ],
-      name: 'allowance',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+        name: 'balanceOf',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [],
+        name: 'symbol',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'address', name: 'spender', type: 'address' },
+        ],
+        name: 'allowance',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
 
-  const symbol = await callContract(abi, tokenAddress, 'symbol()', null, chain);
+    const symbol = await callContract(
+      abi,
+      tokenAddress,
+      'symbol()',
+      null,
+      chain,
+    );
 
-  const decimals = await callContract(
-    abi,
-    tokenAddress,
-    'decimals()',
-    null,
-    chain,
-  );
+    const decimals = await callContract(
+      abi,
+      tokenAddress,
+      'decimals()',
+      null,
+      chain,
+    );
 
-  const balance = await callContract(
-    abi,
-    tokenAddress,
-    'balanceOf(address)',
-    [walletAddress],
-    chain,
-  );
+    const balance = await callContract(
+      abi,
+      tokenAddress,
+      'balanceOf(address)',
+      [walletAddress],
+      chain,
+    );
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
+    const ibAlluoAddress = getIbAlluoAddress(type, chain);
 
-  const allowance = await callContract(
-    abi,
-    tokenAddress,
-    'allowance(address,address)',
-    [walletAddress, ibAlluoAddress],
-    chain,
-  );
+    const allowance = await callContract(
+      abi,
+      tokenAddress,
+      'allowance(address,address)',
+      [walletAddress, ibAlluoAddress],
+      chain,
+    );
 
-  return {
-    tokenAddress,
-    symbol,
-    decimals,
-    balance: fromDecimals(balance, decimals),
-    allowance: fromDecimals(allowance, decimals),
-  };
+    return {
+      tokenAddress,
+      symbol,
+      decimals,
+      balance: fromDecimals(balance, decimals),
+      allowance: fromDecimals(allowance, decimals),
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**
@@ -945,14 +940,14 @@ async function getAddressNonce(metaTxContractAddress, user) {
 }
 
 const getSignatureParameters = signature => {
-  if (!web3.utils.isHexStrict(signature)) {
+  if (!Web3.utils.isHexStrict(signature)) {
     throw new Error(
       'Given value "'.concat(signature, '" is not a valid hex string.'),
     );
   }
   let r = signature.slice(0, 66);
   let s = '0x'.concat(signature.slice(66, 130));
-  let v = web3.utils.hexToNumber('0x'.concat(signature.slice(130, 132)));
+  let v = Web3.utils.hexToNumber('0x'.concat(signature.slice(130, 132)));
   if (![27, 28].includes(v)) v += 27;
 
   return {
@@ -996,7 +991,7 @@ export const approveStableCoin = async (
       throw error;
     }
   } else {
-    const biconomy = await startBiconomy(chain, web3.eth.currentProvider);
+    const biconomy = await startBiconomy(chain, walletProvider);
     const biconomyWeb3 = new Web3(biconomy);
 
     const nonce = await getAddressNonce(tokenAddress, walletAddress);
@@ -1459,7 +1454,7 @@ export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
     chain,
   );
 
-  return Web3.utils.fromWei(totalAssetSupply);
+  return ethers.utils.formatEther(totalAssetSupply);
 };
 
 export const getTotalAssets = async (farmAddress, chain = EChain.POLYGON) => {

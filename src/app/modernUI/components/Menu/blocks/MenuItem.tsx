@@ -2,7 +2,7 @@ import { Box, Anchor } from 'grommet';
 import { useCurrentPath, modernUiPaths } from 'app/common/hooks';
 
 export const MenuItem = ({ ...rest }) => {
-  const {navigate, isStakePage, isBuyPage, isTransferPage } =
+  const {navigate, isStakePage, isBuyPage, isTransferPage, isAutoInvestPage } =
     useCurrentPath();
 
   return (
@@ -16,7 +16,7 @@ export const MenuItem = ({ ...rest }) => {
       <Anchor
         label="auto-invest"
         size="medium"
-        weight={isBuyPage ? 'bold' : 'normal'}
+        weight={isAutoInvestPage ? 'bold' : 'normal'}
         onClick={() => navigate(modernUiPaths.AUTOINVEST)}
       />
       <Anchor
