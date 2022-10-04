@@ -33,7 +33,7 @@ export const Farm = () => {
     id,
   });
 
-  const renderModal = size => {
+  const renderModal = () => {
     const farmName = (
       <span>
         {selectedFarm?.name}
@@ -46,7 +46,6 @@ export const Farm = () => {
       <>
         <Box></Box>
         <Modal
-          size={size}
           chain={selectedFarm?.chain}
           heading={farmName}
           isLoading={isLoading}
@@ -182,11 +181,11 @@ export const Farm = () => {
         <Layout>
           {!isSmall(size) ? (
             <Grid columns={['flex', 'auto', 'flex']} gap="small">
-              {renderModal(size)}
+              {renderModal()}
             </Grid>
           ) : (
             <Grid rows={'auto'} gap="small">
-              {renderModal(size)}
+              {renderModal()}
             </Grid>
           )}
         </Layout>

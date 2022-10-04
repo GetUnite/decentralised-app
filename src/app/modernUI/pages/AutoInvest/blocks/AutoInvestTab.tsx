@@ -8,7 +8,7 @@ import {
   DateInput,
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { useAutoInvest } from 'app/common/state/autoInvest';
+import { useAutoInvestTab } from 'app/common/state/autoInvest';
 import { RightAlignToggle } from 'app/modernUI/components/Toggles';
 
 export const AutoInvestTab = ({ ...rest }) => {
@@ -33,7 +33,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     setUseEndDate,
     endDate,
     setEndDate,
-  } = useAutoInvest();
+  } = useAutoInvestTab();
 
   return (
     <Box fill>

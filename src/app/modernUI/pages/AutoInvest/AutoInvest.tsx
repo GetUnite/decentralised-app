@@ -1,39 +1,130 @@
-import { walletAccount } from 'app/common/state/atoms';
-import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
+import { HeadingText, Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import {
-  Avatar,
   Box,
   Button,
+  Card,
   Grid,
-  Heading,
+  Layer,
   ResponsiveContext,
   Text,
 } from 'grommet';
-import { useParams } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { useCookies } from 'react-cookie';
 import { EChain } from 'app/common/constants/chains';
 import { AutoInvestTab } from './blocks/AutoInvestTab';
+import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
+import Skeleton from 'react-loading-skeleton';
+import { isSmall } from 'app/modernUI/theme';
 
 export const AutoInvest = () => {
+  const { streams, setIsModalVisible, isModalVisible, isLoading, assetsInfo } =
+    useAutoInvest();
+
   return (
-    <ResponsiveContext.Consumer>
-      {size => (
-        <Layout>
+    <Layout>
+      <ResponsiveContext.Consumer>
+        {size => (
+          <Box justify="center" fill direction="column">
+            <HeadingText
+              isLoading={isLoading}
+              numberOfAssets={assetsInfo?.numberOfAssets}
+              numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
+            />
+            <Box margin={{ top: '72px' }}>
+              {isLoading ? (
+                <Skeleton count={1} height="36px" />
+              ) : (
+                <Text size="36px" weight="bold">
+                  {0} active streams
+                </Text>
+              )}
+              <Box margin={{ top: '36px' }} gap="6px">
+                {!isSmall(size) && (
+                  <Card
+                    pad={{ horizontal: 'medium', vertical: 'none' }}
+                    height="65px"
+                    background="card"
+                    align="center"
+                    justify="center"
+                    fill="horizontal"
+                  >
+                    <Grid
+                      fill="horizontal"
+                      rows="xxsmall"
+                      align="center"
+                      columns={{ size: 'xsmall', count: 'fit' }}
+                      pad="none"
+                      style={{ fontSize: '16px' }}
+                    >
+                      <>
+                        <span>streams from</span>
+                        <span>streams to</span>
+                        <span>TVS</span>
+                        <span>flow rate</span>
+                        <span>start</span>
+                        <span>end</span>
+                        <span>funded until</span>
+                      </>
+                    </Grid>
+                  </Card>
+                )}
+                {isLoading ? (
+                  <Card
+                    pad={{ horizontal: 'medium', vertical: 'none' }}
+                    height="xsmall"
+                    background="card"
+                    margin="none"
+                    align="center"
+                    justify="center"
+                    fill="horizontal"
+                  >
+                    <Spinner pad="medium" />
+                  </Card>
+                ) : (
+                  <Box>
+                    {streams.length < 1 ? (
+                      <Card
+                        pad={{ horizontal: 'medium', vertical: 'none' }}
+                        height="xsmall"
+                        background="card"
+                        margin="none"
+                        align="center"
+                        justify="center"
+                        fill="horizontal"
+                      >
+                        <span>You don't have any stream running</span>
+                      </Card>
+                    ) : (
+                      <></>
+                    )}
+                    <Button
+                      label="Start new stream"
+                      onClick={() => setIsModalVisible(true)}
+                      style={{ width: '170px' }}
+                      margin={{top: "18px"}}
+                    />
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        )}
+      </ResponsiveContext.Consumer>
+      {isModalVisible && (
+        <Layer
+          onEsc={() => setIsModalVisible(false)}
+          onClickOutside={() => setIsModalVisible(false)}
+        >
           <Modal
-            size={size}
             chain={EChain.POLYGON}
             heading="Auto-Invest"
             isLoading={false}
+            closeAction={() => setIsModalVisible(false)}
           >
             <Tab title="Auto-Invest">
               <AutoInvestTab />
             </Tab>
           </Modal>
-        </Layout>
+        </Layer>
       )}
-    </ResponsiveContext.Consumer>
+    </Layout>
   );
 };
