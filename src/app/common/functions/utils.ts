@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { ethers } from 'ethers';
 import fromExponential from 'from-exponential';
 
 export const maximumUint256Value =
@@ -136,5 +136,5 @@ export const hasCorrectDecimals = (
 };
 
 export const addressIsValid = address => {
-  return Web3.utils.isAddress(address);
+  return ethers.utils.isAddress(address);
 };

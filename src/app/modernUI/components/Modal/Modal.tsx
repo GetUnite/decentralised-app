@@ -9,26 +9,26 @@ import { useRecoilState } from 'recoil';
 import { EChain } from 'app/common/constants/chains';
 
 interface IModal {
-  size: any;
   chain: EChain;
   heading: any;
   isLoading?: boolean;
   notificationId?: ENotificationId;
   children: React.ReactNode;
   noHeading?: boolean;
+  closeAction?: Function;
 }
 
 export const Modal = ({
-  size,
   chain,
   heading,
   isLoading = false,
   children,
   noHeading = false,
+  closeAction,
 }: IModal) => {
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
-  const toggleForm = () => {
+  const closeModal = () => {
     resetNotification();
     navigate('/');
   };
@@ -38,7 +38,6 @@ export const Modal = ({
   return (
     <Box fill justify="center" align="center">
       <Box
-        margin={isSmall(size) ? 'none' : { vertical: 'small' }}
         round={'medium'}
         overflow="auto"
         width="medium"
@@ -69,7 +68,11 @@ export const Modal = ({
                 </Box>
               </Box>
             )}
-            <Button plain fill="vertical" onClick={toggleForm}>
+            <Button
+              plain
+              fill="vertical"
+              onClick={() => (closeAction ? closeAction() : closeModal())}
+            >
               <Box
                 style={{
                   width: 32,
@@ -84,11 +87,7 @@ export const Modal = ({
               </Box>
             </Button>
           </Box>
-          <Box
-            direction="column"
-            fill="vertical"
-            gap="small"
-          >
+          <Box direction="column" fill="vertical" gap="small">
             {!walletAccountAtom ? (
               <Box margin={{ vertical: 'large' }}>
                 <Text textAlign="center" weight="bold">

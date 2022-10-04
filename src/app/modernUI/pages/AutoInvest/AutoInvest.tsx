@@ -1,26 +1,21 @@
-import { HeadingText, Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
-import { Box, Card, Grid, ResponsiveContext, Spinner, Text } from 'grommet';
+import { HeadingText, Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
+import {
+  Box,
+  Button,
+  Card,
+  Grid,
+  Layer,
+  ResponsiveContext,
+  Text,
+} from 'grommet';
 import { EChain } from 'app/common/constants/chains';
 import { AutoInvestTab } from './blocks/AutoInvestTab';
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
 import Skeleton from 'react-loading-skeleton';
 import { isSmall } from 'app/modernUI/theme';
 
-const renderModal = size => {
-  <Modal
-    size={size}
-    chain={EChain.POLYGON}
-    heading="Auto-Invest"
-    isLoading={false}
-  >
-    <Tab title="Auto-Invest">
-      <AutoInvestTab />
-    </Tab>
-  </Modal>;
-};
-
 export const AutoInvest = () => {
-  const { streams, setIsModalToggled, isModalToggled, isLoading, assetsInfo } =
+  const { streams, setIsModalVisible, isModalVisible, isLoading, assetsInfo } =
     useAutoInvest();
 
   return (
@@ -35,7 +30,7 @@ export const AutoInvest = () => {
             />
             <Box margin={{ top: '72px' }}>
               {isLoading ? (
-                <Skeleton count={1} />
+                <Skeleton count={1} height="36px" />
               ) : (
                 <Text size="36px" weight="bold">
                   {0} active streams
@@ -50,7 +45,6 @@ export const AutoInvest = () => {
                     align="center"
                     justify="center"
                     fill="horizontal"
-                    margin={{ top: '36px' }}
                   >
                     <Grid
                       fill="horizontal"
@@ -85,13 +79,52 @@ export const AutoInvest = () => {
                     <Spinner pad="medium" />
                   </Card>
                 ) : (
-                  <></>
+                  <Box>
+                    {streams.length < 1 ? (
+                      <Card
+                        pad={{ horizontal: 'medium', vertical: 'none' }}
+                        height="xsmall"
+                        background="card"
+                        margin="none"
+                        align="center"
+                        justify="center"
+                        fill="horizontal"
+                      >
+                        <span>You don't have any stream running</span>
+                      </Card>
+                    ) : (
+                      <></>
+                    )}
+                    <Button
+                      label="Start new stream"
+                      onClick={() => setIsModalVisible(true)}
+                      style={{ width: '170px' }}
+                      margin={{top: "18px"}}
+                    />
+                  </Box>
                 )}
               </Box>
             </Box>
           </Box>
         )}
       </ResponsiveContext.Consumer>
+      {isModalVisible && (
+        <Layer
+          onEsc={() => setIsModalVisible(false)}
+          onClickOutside={() => setIsModalVisible(false)}
+        >
+          <Modal
+            chain={EChain.POLYGON}
+            heading="Auto-Invest"
+            isLoading={false}
+            closeAction={() => setIsModalVisible(false)}
+          >
+            <Tab title="Auto-Invest">
+              <AutoInvestTab />
+            </Tab>
+          </Modal>
+        </Layer>
+      )}
     </Layout>
   );
 };
