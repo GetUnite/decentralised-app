@@ -1,17 +1,25 @@
 import { tokenInfo } from 'app/common/state/atoms';
 import { useUnlock } from 'app/common/state/stake';
-import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
-import { Box, Button, Heading, Text } from 'grommet';
+import {
+  Info,
+  Input, Spinner,
+  SubmitButton
+} from 'app/modernUI/components';
+import { Box, Heading, Text } from 'grommet';
 import { useState } from 'react';
 import Countdown, {
   CountdownTimeDelta,
-  formatTimeDelta,
+  formatTimeDelta
 } from 'react-countdown';
 import { useRecoilState } from 'recoil';
 
-export const UnlockTab = ({ ...rest }) => {
+export const UnlockTab = ({
+  isLoading,
+  alluoInfo,
+  updateAlluoInfo,
+  ...rest
+}) => {
   const {
-    notificationId,
     unlockValue,
     isUnlocking,
     isWithdrawing,
@@ -19,8 +27,7 @@ export const UnlockTab = ({ ...rest }) => {
     handleUnlockAction,
     withdraw,
     setToMax,
-    setAccountInformation,
-  } = useUnlock();
+  } = useUnlock({ alluoInfo, updateAlluoInfo });
 
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
 
@@ -160,7 +167,7 @@ export const UnlockTab = ({ ...rest }) => {
               <Countdown
                 date={+tokenInfoAtom.infoByAddress.depositUnlockTime_ * 1000}
                 renderer={rendererForUnlock}
-                onComplete={setAccountInformation}
+                onComplete={updateAlluoInfo}
               />
             </>
           )}
@@ -172,7 +179,7 @@ export const UnlockTab = ({ ...rest }) => {
               <Countdown
                 date={+tokenInfoAtom.infoByAddress.withdrawUnlockTime_ * 1000}
                 renderer={rendererForWithdraw}
-                onComplete={setAccountInformation}
+                onComplete={updateAlluoInfo}
               />
             </>
           )}

@@ -1,18 +1,16 @@
+import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   getIfUserHasWithdrawalRequest,
   isExpectedPolygonEvent,
-  listenToHandler,
-  withdrawStableCoin,
-  withdrawFromBoosterFarm,
+  listenToHandler, withdrawFromBoosterFarm, withdrawStableCoin
 } from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useNotification } from 'app/common/state';
+import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { EChain } from 'app/common/constants/chains';
 
-export const useWithdrawalForm = ({
+export const useWithdrawal = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,

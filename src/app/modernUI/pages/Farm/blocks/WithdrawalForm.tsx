@@ -1,12 +1,12 @@
 import { EChain } from 'app/common/constants/chains';
-import { useWithdrawalForm } from 'app/common/state/farm';
+import { useWithdrawal } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
   NumericInput,
   ProjectedWeeklyInfo,
   Spinner,
-  SubmitButton,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from './TopHeader';
@@ -29,7 +29,7 @@ export const WithdrawalForm = ({
     handleWithdraw,
     useBiconomy,
     setUseBiconomy,
-  } = useWithdrawalForm({
+  } = useWithdrawal({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,
@@ -43,7 +43,8 @@ export const WithdrawalForm = ({
         }}
         justify="center"
       >
-        {!selectedSupportedToken ||
+        {isLoading ||
+        !selectedSupportedToken ||
         isWithdrawing ||
         isWithdrawalRequestsLoading ? (
           <Box
@@ -104,6 +105,7 @@ export const WithdrawalForm = ({
         <SubmitButton
           primary
           disabled={
+            isLoading ||
             isWithdrawing ||
             isWithdrawalRequestsLoading ||
             !+withdrawValue ||

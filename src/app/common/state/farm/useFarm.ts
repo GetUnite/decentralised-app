@@ -1,29 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import {
-  getInterest,
-  getTotalAssetSupply,
-  getUserDepositedAmount,
-  getSupportedTokensBasicInfo,
-  getSupportedTokensAdvancedInfo,
-  getBoosterFarmRewards,
-  getUserDepositedLPAmount,
-  getTotalAssets,
-  getSupportedTokensList,
-  claimBoosterFarmNonLPRewards,
-  claimBoosterFarmLPRewards,
-  getBoosterFarmInterest,
-} from 'app/common/functions/web3Client';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNavigate } from 'react-router-dom';
 import {
   EEthereumAddresses,
-  EPolygonAddresses,
+  EPolygonAddresses
 } from 'app/common/constants/addresses';
-import { useNotification } from '../useNotification';
-import { TSupportedToken } from 'app/common/types/form';
 import { EChain } from 'app/common/constants/chains';
+import {
+  claimBoosterFarmLPRewards, claimBoosterFarmNonLPRewards, getBoosterFarmInterest, getBoosterFarmRewards, getInterest, getSupportedTokensAdvancedInfo, getSupportedTokensBasicInfo, getSupportedTokensList, getTotalAssets, getTotalAssetSupply,
+  getUserDepositedAmount, getUserDepositedLPAmount
+} from 'app/common/functions/web3Client';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
+import { TSupportedToken } from 'app/common/types/form';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { useNotification } from '../useNotification';
 
 export const initialAvailableFarmsState: Array<TFarm> = [
   {
@@ -209,6 +199,7 @@ export const useFarm = ({ id }) => {
   };
 
   const updateFarmInfo = async () => {
+    setIsLoading(true);
     try {
       const farm = await getUpdatedFarmInfo(selectedFarm);
       setSelectedsupportedToken(
@@ -220,6 +211,7 @@ export const useFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const getUpdatedFarmInfo = async (farm = selectedFarm) => {

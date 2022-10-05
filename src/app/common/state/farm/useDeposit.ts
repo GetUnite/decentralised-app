@@ -3,14 +3,14 @@ import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
   depositIntoBoosterFarm,
-  depositStableCoin,
+  depositStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
-export const useDepositForm = ({
+export const useDeposit = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
@@ -22,7 +22,7 @@ export const useDepositForm = ({
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(
-    isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true,
+    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
   );
 
   const resetState = () => {
@@ -50,7 +50,7 @@ export const useDepositForm = ({
     setIsApproving(false);
   };
 
-  const handleDepositFieldChange = value => {
+  const handleDepositValueChange = value => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setDepositValueError('Write a valid number');
@@ -97,7 +97,7 @@ export const useDepositForm = ({
 
   return {
     depositValue,
-    handleDepositFieldChange,
+    handleDepositValueChange,
     isApproving,
     handleApprove,
     isDepositing,

@@ -1,16 +1,14 @@
-import {
-  getTokenInfo,
-  unlockAlluo,
-  unlockAllAlluo,
-  withdrawAlluo,
-} from 'app/common/functions/web3Client';
-import { useState, useEffect, useReducer } from 'react';
-import { useRecoilState } from 'recoil';
-import { formatTimeDelta, CountdownTimeDelta } from 'react-countdown';
-import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 import { isNumeric } from 'app/common/functions/utils';
-import { useNotification, ENotificationId } from 'app/common/state';
-import { EChain } from 'app/common/constants/chains';
+import {
+  unlockAllAlluo,
+  unlockAlluo,
+  withdrawAlluo
+} from 'app/common/functions/web3Client';
+import { ENotificationId, useNotification } from 'app/common/state';
+import { useReducer, useState } from 'react';
+import { CountdownTimeDelta, formatTimeDelta } from 'react-countdown';
+import { useRecoilState } from 'recoil';
+import { tokenInfo, walletAccount, wantedChain } from '../atoms';
 
 interface iState {
   unlockValue: string;
@@ -52,7 +50,7 @@ const reducer = (state: iState, action: DispatchType) => {
   }
 };
 
-export const useUnlock = () => {
+export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
   const { setNotification, resetNotification } = useNotification();
   const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -65,13 +63,6 @@ export const useUnlock = () => {
 
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (walletAccountAtom) {
-      setWantedChainAtom(EChain.ETHEREUM);
-      setAccountInformation();
-    }
-  }, [walletAccountAtom]);
 
   const resetState = () => {
     setError('');
@@ -136,15 +127,6 @@ export const useUnlock = () => {
     else setError('Write a valid number less than or equal to your balance');
   };
 
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-    setTokenInfoAtom(tokenInfoData);
-  };
-
   const handleUnlockAction = async () => {
     setErrorNotification('');
     setSuccessNotification();
@@ -164,7 +146,7 @@ export const useUnlock = () => {
           +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
         );
       }
-      setAccountInformation();
+      await updateAlluoInfo();
       setErrorNotification('');
       dispatch({ type: EActionType.SETUNLOCKVALUE, payload: null });
       setSuccessNotification('Successfully unlocked');
@@ -183,7 +165,7 @@ export const useUnlock = () => {
       const res = await withdrawAlluo();
       dispatch({ type: EActionType.SETUNLOCKVALUE, payload: null });
       resetState();
-      setAccountInformation();
+      await updateAlluoInfo();
       setSuccessNotification('Successfully withdrew');
     } catch (err) {
       console.error('Error', err.message);
@@ -209,6 +191,5 @@ export const useUnlock = () => {
     handleUnlockAction,
     withdraw,
     setToMax,
-    setAccountInformation,
   };
 };
