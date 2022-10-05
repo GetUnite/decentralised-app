@@ -4,7 +4,7 @@ import {
   Info,
   NumericInput,
   Spinner,
-  SubmitButton,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box, Button, Text } from 'grommet';
 
@@ -23,7 +23,7 @@ export const BuyTab = ({ ...rest }) => {
     handleInputValueChange,
     handleApprove,
     handleBuyAction,
-    handleBuyAndLockAction,
+    handleBuyAndStakeAction,
     alluoPriceInWETH,
     hasErrors,
   } = useBuy();
@@ -39,55 +39,56 @@ export const BuyTab = ({ ...rest }) => {
         }}
         justify="center"
       >
-      {isLoading || isApproving || isBuying ? (
-        <Box
-          align="center"
-          justify="center"
-          fill="vertical"
-          margin={{ top: 'large', bottom: 'medium' }}
-        >
-          <Spinner pad="large" />
-        </Box>
-      ) : (
-        <>
-          <Box margin={{ top: 'large' }}>
-            {' '}
-            <Text textAlign="center" weight="bold">
-              You have {wethBalance.toLocaleString()} WETH available to buy
-              $ALLUO
-            </Text>
+        {isLoading || isApproving || isBuying ? (
+          <Box
+            align="center"
+            justify="center"
+            fill="vertical"
+            margin={{ top: 'large', bottom: 'medium' }}
+          >
+            <Spinner pad="large" />
+          </Box>
+        ) : (
+          <>
+            <Box margin={{ top: 'large' }}>
+              {' '}
+              <Text textAlign="center" weight="bold">
+                You have {wethBalance.toLocaleString()} WETH available to buy
+                $ALLUO
+              </Text>
+              <Box margin={{ top: 'medium' }}>
+                <NumericInput
+                  label="Amount"
+                  onValueChange={handleInputValueChange}
+                  value={inputValue}
+                  maxValue={wethBalance}
+                  error={inputValueError}
+                />
+              </Box>
+            </Box>
             <Box margin={{ top: 'medium' }}>
-              <NumericInput
-                label="Amount"
-                onValueChange={handleInputValueChange}
-                value={inputValue}
-                maxValue={wethBalance}
-                error={inputValueError}
+              <Info
+                label="Amount of $ALLUO"
+                value={(+alluoBeingBought).toLocaleString()}
+              />
+              <Info
+                label="Total $ALLUO locked"
+                value={(+totalSupply).toLocaleString()}
+              />
+              <Info
+                label="You percentage of total supply"
+                value={
+                  toExactFixed(
+                    ((+alluoBeingBought + +vlAlluoBalance) / +totalSupply) *
+                      100,
+                    3,
+                  ) + '%'
+                }
               />
             </Box>
-          </Box>
-          <Box margin={{ top: 'medium' }}>
-            <Info
-              label="Amount of $ALLUO"
-              value={(+alluoBeingBought).toLocaleString()}
-            />
-            <Info
-              label="Total $ALLUO locked"
-              value={(+totalSupply).toLocaleString()}
-            />
-            <Info
-              label="You percentage of total supply"
-              value={
-                toExactFixed(
-                  ((+alluoBeingBought + +vlAlluoBalance) / +totalSupply) * 100,
-                  3,
-                ) + '%'
-              }
-            />
-          </Box>
-        </>
-      )}
-</Box>
+          </>
+        )}
+      </Box>
       <Box margin={{ top: 'large' }}>
         {+allowance < +inputValue ? (
           <Button
@@ -129,8 +130,10 @@ export const BuyTab = ({ ...rest }) => {
                 hasErrors
               }
               margin={{ top: 'small' }}
-              label={`Buy & Stake to earn ${isLoading ? 'X' : alluoStakingAPR}% APR`}
-              onClick={handleBuyAndLockAction}
+              label={`Buy & Stake to earn ${
+                isLoading ? 'X' : alluoStakingAPR
+              }% APR`}
+              onClick={handleBuyAndStakeAction}
             />
           </>
         )}

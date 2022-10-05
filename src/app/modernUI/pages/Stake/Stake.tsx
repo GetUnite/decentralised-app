@@ -1,10 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
+import { useStake } from 'app/common/state/stake';
 import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
 import { LockTab } from './blocks/LockTab';
 import { UnlockTab } from './blocks/UnlockTab';
 
 export const Stake = ({ ...rest }) => {
+  const { isLoading, updateAlluoInfo, alluoInfo } = useStake();
+
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -12,10 +15,18 @@ export const Stake = ({ ...rest }) => {
           <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
             <Tabs>
               <Tab title="Lock">
-                <LockTab />
+                <LockTab
+                  isLoading={isLoading}
+                  alluoInfo={alluoInfo}
+                  updateAlluoInfo={updateAlluoInfo}
+                />
               </Tab>
               <Tab title="Unlock and Withdraw">
-                <UnlockTab />
+                <UnlockTab
+                  isLoading={isLoading}
+                  alluoInfo={alluoInfo}
+                  updateAlluoInfo={updateAlluoInfo}
+                />
               </Tab>
             </Tabs>
           </Modal>
