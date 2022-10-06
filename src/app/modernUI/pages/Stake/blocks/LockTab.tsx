@@ -24,7 +24,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
     <Box fill>
       <Box
         style={{
-          minHeight: '445px',
+          minHeight: '469px',
         }}
         justify="center"
       >
@@ -46,6 +46,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
               </Text>
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
+                  label="Lock"
                   tokenSign="$"
                   onValueChange={handleLockValueChange}
                   value={lockValue}

@@ -27,21 +27,24 @@ export const RangeInput = ({
 
         <RelativeBox
           margin={{ top: 'xxsmall' }}
-          pad={{ horizontal: '0.5em' }}
+          pad="8px"
           border={{ size: '1px', color: '#CCCCCC' }}
-          round="4px"
+          round="8px"
         >
           <Box pad={{ horizontal: '0.7em' }} justify="center">
             <Text size="14px">{value}%</Text>
           </Box>
-          <RangeBar value={value} onChange={event => onValueChange(event.target.value)} />
+          <RangeBar
+            value={value}
+            onChange={event => onValueChange(event.target.value)}
+          />
           <MaxButton
             primary
             onClick={() => {
               onValueChange(100);
             }}
           >
-            MAX
+            Max
           </MaxButton>
         </RelativeBox>
         {error && (
