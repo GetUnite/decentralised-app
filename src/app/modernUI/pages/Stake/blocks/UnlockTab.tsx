@@ -188,7 +188,6 @@ export const UnlockTab = ({
       </Box>
 
       <Box margin={{ top: 'large' }} style={{ height: 52 }}>
-        {console.log(canWithdraw, +unlockValue === 0)}
         <SubmitButton
           primary
           disabled={
