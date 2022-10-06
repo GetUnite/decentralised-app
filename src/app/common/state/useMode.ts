@@ -1,5 +1,5 @@
 import { useRecoilState } from 'recoil';
-import { mode } from '../atoms';
+import { mode } from './atoms';
 
 export const useMode = () => {
   const [modeAtom, setModeAtom] = useRecoilState(mode);

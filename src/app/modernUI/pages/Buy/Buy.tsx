@@ -1,8 +1,8 @@
+import { EChain } from 'app/common/constants/chains';
 import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
-import { RampEmbed } from './components';
 import { BuyTab } from './blocks';
-import { EChain } from 'app/common/constants/chains';
+import { RampEmbed } from './components';
 
 export const Buy = ({ ...rest }) => {
   return (
