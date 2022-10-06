@@ -76,27 +76,7 @@ export type TTokenInfo = {
   withdrawLockDuration?: number;
   userVestingInfo?: TVestingInfo;
 };
-export const tokenInfo: RecoilState<TTokenInfo> = atom({
-  key: 'tokenInfo',
-  default: {
-    isLoading: false,
-    allowance: '',
-    claimedAlluo: '',
-    claimedAlluoInUsd: 0,
-    alluoBalance: '',
-    alluoBalanceInUsd: 0,
-    apr: 0,
-    totalLocked: '',
-    totalLockedInUsd: 0,
-    infoByAddress: {},
-    lockedAlluoValueOfUser: '',
-    lockedAlluoValueOfUserInUsd: 0,
-    unlockedAlluoValueOfUser: '',
-    unlockedAlluoValueOfUserInUsd: 0,
-    withdrawLockDuration: 0,
-    userVestingInfo: {},
-  },
-});
+
 type TStableCoinInfoData = {
   symbol?: string;
   tokenAddress?: string;
