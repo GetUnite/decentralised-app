@@ -119,7 +119,7 @@ export const UnlockTab = ({
     <Box fill>
       <Box
         style={{
-          minHeight: '445px',
+          minHeight: '454px',
         }}
         justify="center"
       >
