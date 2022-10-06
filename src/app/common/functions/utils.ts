@@ -138,3 +138,7 @@ export const hasCorrectDecimals = (
 export const addressIsValid = address => {
   return ethers.utils.isAddress(address);
 };
+
+export const timerIsFinished = expectedTime => {
+  return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
+};

@@ -15,7 +15,7 @@ export const alluoToUsd = async alluoValueInWei => {
   return toExactFixed(+(+alluoValueInWei * alluoPrice), 2);
 };
 
-export const getTotalAlluoStakedInLp = async () => {
+export const getTotalAlluoLockedInLp = async () => {
   const abi = [
     {
       inputs: [],
@@ -70,7 +70,7 @@ export const getAlluoStakingAPR = async () => {
   const alluoStakingRewardPerDistribution =
     await getAlluoStakingRewardPerDistribution();
 
-  const totalAlluoStaked = await getTotalAlluoStaked();
+  const totalAlluoStaked = await getTotalAlluoLocked();
 
   const exactApr =
     (+alluoStakingRewardPerDistribution / +totalAlluoStaked) * 100 * 365;
@@ -126,6 +126,30 @@ export const getEarnedAlluo = async () => {
   return ethers.utils.formatEther(earnedAlluo);
 };
 
+export const getUnlockedAlluo = async () => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
+      name: 'unlockedBalanceOf',
+      outputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const earnedAlluo = await callContract(
+    abi,
+    ethereumVlAlluoAddress,
+    'unlockedBalanceOf(address)',
+    [getCurrentWalletAddress()],
+    EChain.ETHEREUM,
+  );
+
+  return ethers.utils.formatEther(earnedAlluo);
+};
+
 export const getAlluoStakingWalletAddressInfo = async () => {
   const abi = [
     {
@@ -167,7 +191,7 @@ export const getAlluoStakingWalletAddressInfo = async () => {
     EChain.ETHEREUM,
   );
 
-  const walletStakedAlluo = await callContract(
+  const walletLockedAlluo = await callContract(
     abi,
     ethereumVlAlluoAddress,
     'convertLpToAlluo(uint256)',
@@ -176,7 +200,13 @@ export const getAlluoStakingWalletAddressInfo = async () => {
   );
 
   return {
-    stakedInUsd: alluoToUsd(ethers.utils.formatEther(walletStakedAlluo)),
+    locked: ethers.utils.formatEther(walletLockedAlluo),
+    lockedInLp: ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
+    lockedInUsd: alluoToUsd(ethers.utils.formatEther(walletLockedAlluo)),
+    withdrawUnlockTime:
+      alluoStakingWalletAddressInfo.withdrawUnlockTime_.toString(),
+    depositUnlockTime:
+      alluoStakingWalletAddressInfo.depositUnlockTime_.toString(),
   };
 };
 
@@ -405,7 +435,7 @@ export const getAlluoStakingWalletAddressInfo = async () => {
   return { isLoading: false };
 };*/
 
-export const getTotalAlluoStaked = async () => {
+export const getTotalAlluoLocked = async () => {
   const abi = [
     {
       inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
@@ -418,21 +448,21 @@ export const getTotalAlluoStaked = async () => {
 
   const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
 
-  const totalAlluoStakedInLp = await getTotalAlluoStakedInLp();
+  const totalAlluoLockedInLp = await getTotalAlluoLockedInLp();
 
-  const totalAlluoStaked = await callContract(
+  const totalAlluoLocked = await callContract(
     abi,
     ethereumVlAlluoAddress,
     'convertLpToAlluo(uint256)',
-    [totalAlluoStakedInLp],
+    [totalAlluoLockedInLp],
     EChain.ETHEREUM,
   );
 
-  return ethers.utils.formatEther(totalAlluoStaked);
+  return ethers.utils.formatEther(totalAlluoLocked);
 };
 
-export const getTotalAlluoStakedInUsd = async () => {
-  const totalAlluoStaked = await getTotalAlluoStaked();
+export const getTotalAlluoLockedInUsd = async () => {
+  const totalAlluoStaked = await getTotalAlluoLocked();
   return await alluoToUsd(totalAlluoStaked);
 };
 
@@ -488,7 +518,7 @@ export const approveAlluoStaking = async () => {
   return tx;
 };
 
-export const stakeAlluo = async alluoAmount => {
+export const lockAlluo = async alluoAmount => {
   const abi = [
     {
       inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],

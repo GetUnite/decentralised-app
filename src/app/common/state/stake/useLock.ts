@@ -1,14 +1,9 @@
-import { approveAlluoStaking, stakeAlluo } from 'app/common/functions/stake';
+import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
-import { walletAccount } from 'app/common/state/atoms';
 import { useState } from 'react';
-import { useRecoilState } from 'recoil';
 
 export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
-  // atoms
-  const [walletAccountAtom] = useRecoilState(walletAccount);
-
   // other state control files
   const { setNotificationt, resetNotification } = useNotification();
 
@@ -21,6 +16,7 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
   const [isLocking, setIsLocking] = useState<boolean>(false);
 
   const resetState = () => {
+    resetNotification();
     setLockValueError('');
     setIsApproving(false);
     setIsLocking(false);
@@ -56,7 +52,7 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     setIsLocking(true);
 
     try {
-      await stakeAlluo(lockValue);
+      await lockAlluo(lockValue);
       await updateAlluoInfo();
       setLockValue(null);
       setNotificationt('Successfully locked', 'success');
