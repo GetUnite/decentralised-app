@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import { Box, Button, TextInput, Select, Text } from 'grommet';
-import { Down } from 'grommet-icons';
-import { normalizeColor } from 'grommet/utils';
-import NumberFormat from 'react-number-format';
-import { TSupportedToken } from 'app/common/types/form';
-import { TokenIcon } from '../Icons';
 import { roundNumberDown } from 'app/common/functions/utils';
+import { TSupportedToken } from 'app/common/types/form';
+import { Box, Select, Text, TextInput } from 'grommet';
+import { Down } from 'grommet-icons';
+import { useState } from 'react';
+import NumberFormat from 'react-number-format';
+import styled from 'styled-components';
+import { TokenIcon } from '../Icons';
+import { MaxButton } from './MaxButton';
+import { RelativeBox } from './RelativeBox';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
@@ -17,22 +18,6 @@ const AbsoluteBox = styled(Box)`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const RelativeBox = styled(Box)`
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-`;
-
-const MaxButton = styled(Button)`
-  background-color: ${props => normalizeColor('buttonMax', props.theme)};
-  font-size: 14px;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 4px;
 `;
 
 interface INumericInput {
@@ -95,9 +80,7 @@ export const NumericInput = ({
               <MaxButton
                 primary
                 onClick={() => {
-                  setFormattedValue(
-                    roundNumberDown(maxValue),
-                  );
+                  setFormattedValue(roundNumberDown(maxValue));
                 }}
               >
                 Max

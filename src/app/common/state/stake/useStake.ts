@@ -1,12 +1,14 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    getAlluoBalance,
-    getAlluoStakingAllowance,
-    getAlluoStakingAPR,
-    getAlluoStakingWalletAddressInfo,
-    getEarnedAlluo,
-    getTotalAlluoStakedInUsd
+  getAlluoBalance,
+  getAlluoStakingAllowance,
+  getAlluoStakingAPR,
+  getAlluoStakingWalletAddressInfo,
+  getEarnedAlluo,
+  getTotalAlluoLocked,
+  getUnlockedAlluo
 } from 'app/common/functions/stake';
+import { roundNumberDown } from 'app/common/functions/utils';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -14,10 +16,14 @@ import { useRecoilState } from 'recoil';
 export type TAlluoStakingInfo = {
   balance?: string;
   allowance?: string;
-  stakedInUsd?: string;
-  apr?: number;
-  totalStakedInUsd?: string;
+  locked?: string;
+  lockedInLp?: string;
+  apr?: string;
+  totalLocked?: string;
   earned?: string;
+  unlocked?: string;
+  depositUnlockTime?: string;
+  withdrawUnlockTime?: string;
 };
 
 export const useStake = () => {
@@ -42,17 +48,21 @@ export const useStake = () => {
     setIsLoading(true);
     try {
       let info: TAlluoStakingInfo = {
-        balance: await getAlluoBalance(),
+        balance: roundNumberDown(await getAlluoBalance(), 2),
         allowance: await getAlluoStakingAllowance(),
-        apr: await getAlluoStakingAPR(),
-        totalStakedInUsd: await getTotalAlluoStakedInUsd(),
-        earned: await getEarnedAlluo(),
+        apr: (await getAlluoStakingAPR()).toLocaleString(),
+        totalLocked: roundNumberDown(await getTotalAlluoLocked(), 2),
+        earned: roundNumberDown(await getEarnedAlluo(), 2),
+        unlocked: await getUnlockedAlluo(),
       };
       const alluoStakingWalletAddressInfo =
         await getAlluoStakingWalletAddressInfo();
-      info.stakedInUsd = (
-        await alluoStakingWalletAddressInfo.stakedInUsd
-      ).toString();
+      info.locked = alluoStakingWalletAddressInfo.locked;
+      info.lockedInLp = alluoStakingWalletAddressInfo.lockedInLp;
+      info.depositUnlockTime =
+        await alluoStakingWalletAddressInfo.depositUnlockTime;
+      info.withdrawUnlockTime =
+        await alluoStakingWalletAddressInfo.withdrawUnlockTime;
 
       setAlluoInfo(info);
     } catch (error) {

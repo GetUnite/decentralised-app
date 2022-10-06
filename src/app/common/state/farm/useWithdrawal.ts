@@ -3,7 +3,9 @@ import { isNumeric } from 'app/common/functions/utils';
 import {
   getIfUserHasWithdrawalRequest,
   isExpectedPolygonEvent,
-  listenToHandler, withdrawFromBoosterFarm, withdrawStableCoin
+  listenToHandler,
+  withdrawFromBoosterFarm,
+  withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -25,11 +27,11 @@ export const useWithdrawal = ({
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(
-    isSafeAppAtom || EChain.POLYGON != selectedFarm.chain ? false : true,
+    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
   );
 
   useEffect(() => {
-    if (walletAccountAtom) {
+    if (walletAccountAtom && selectedFarm) {
       fetchIfUserHasWithdrawalRequest();
     }
   }, [walletAccountAtom]);

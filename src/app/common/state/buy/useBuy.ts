@@ -12,7 +12,7 @@ import {
   approveAlluoStaking,
   getAlluoStakingAllowance,
   getAlluoStakingAPR,
-  stakeAlluo
+  lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { getAlluoPriceInWETH } from 'app/common/functions/web3Client';
@@ -153,7 +153,7 @@ export const useBuy = () => {
       if (+alluoStakingAllowance < difference) {
         await approveAlluoStaking();
       }
-      await stakeAlluo(difference);
+      await lockAlluo(difference);
       await updateBuyInfo();
       setNotificationt('Successfully bought and locked', 'success');
     } catch (err) {

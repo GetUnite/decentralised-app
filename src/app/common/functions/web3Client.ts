@@ -267,7 +267,7 @@ export const sendTransaction = async (
       const biconomy = await startBiconomy(chain, walletProvider);
       web3ToUse = new Web3(biconomy);
     } else {
-      web3ToUse = walletProvider;
+      web3ToUse = new Web3(walletProvider);
     }
 
     const contract = new web3ToUse.eth.Contract(abi as any, address);
@@ -1206,7 +1206,7 @@ export const approveToken = async (
   const tx = await sendTransaction(
     abi,
     tokenAddress,
-    'depositWithoutLP(uint256,address)',
+    'approve(address,uint256)',
     [spender, maximumUint256Value],
     chain,
     useBiconomy,
