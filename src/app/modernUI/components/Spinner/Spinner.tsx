@@ -1,7 +1,6 @@
 import { Spinner as GrommetSpinner, Box, Image } from 'grommet';
 import styled from 'styled-components';
-
-import { useMode } from 'app/common/state/shortcuts';
+import { useMode } from 'app/common/state';
 
 import logoIcon from 'app/modernUI/images/logoIcon.svg';
 import logoIconDark from 'app/modernUI/images/logoIcon-dark.svg';
@@ -17,12 +16,7 @@ const StyledImage = styled(Image)`
 export const Spinner = ({ imageProps = {}, ...rest }) => {
   const { isLightMode } = useMode();
   return (
-    <Box
-      justify="center"
-      align="center"
-      style={{ position: 'relative' }}
-      // background="red"
-    >
+    <Box justify="center" align="center" style={{ position: 'relative' }}>
       <StyledImage
         fit="contain"
         src={isLightMode ? logoIcon : logoIconDark}

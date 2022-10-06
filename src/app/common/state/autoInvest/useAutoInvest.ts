@@ -107,6 +107,7 @@ export const useAutoInvest = () => {
   };
 
   return {
+    walletAccountAtom,
     isLoading,
     streams,
     isModalVisible,

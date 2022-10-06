@@ -1,27 +1,25 @@
-import {
-  isNumeric,
-  maximumUint256Value,
-  toExactFixed,
-} from 'app/common/functions/utils';
+import { EChain } from 'app/common/constants/chains';
 import {
   approveAlluoPurchaseInWETH,
-  approveAlluoTransaction,
   buyAlluoWithWETH,
-  getWETHAllowance,
-  getAlluoPriceInWETH,
-  getBalanceOfAlluoUser,
-  getTotalSupplyVlAlluo,
+  getAlluoBalance,
   getVlAlluoBalance,
-  getWEthBalance,
-  lockAlluoToken,
-  getAlluoStakingAPR,
+  getVlAlluoTotalSupply,
+  getWETHAllowance,
+  getWEthBalance
+} from 'app/common/functions/buy';
+import {
+  approveAlluoStaking,
   getAlluoStakingAllowance,
-} from 'app/common/functions/web3Client';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
+  getAlluoStakingAPR,
+  lockAlluo
+} from 'app/common/functions/stake';
+import { isNumeric, toExactFixed } from 'app/common/functions/utils';
+import { getAlluoPriceInWETH } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { EChain } from 'app/common/constants/chains';
 
 export const useBuy = () => {
   const { setNotificationt, resetNotification } = useNotification();
@@ -72,9 +70,9 @@ export const useBuy = () => {
   };
 
   const fetchTotalSupply = async () => {
-    const balance = await getTotalSupplyVlAlluo();
-    const fixedBalance = toExactFixed(balance, 2);
-    setTotalSupply(fixedBalance);
+    const totalSupply = await getVlAlluoTotalSupply();
+    const fixedTotalSupply = toExactFixed(totalSupply, 2);
+    setTotalSupply(fixedTotalSupply);
   };
 
   const fetchVlAlluoBalance = async () => {
@@ -89,6 +87,11 @@ export const useBuy = () => {
     setAlluoPriceInWETH(fixed);
   };
 
+  const fetchAllowanceOfWETH = async () => {
+    const res = await getWETHAllowance();
+    setAllowance(res);
+  };
+
   const fetchAlluoStakingAPR = async () => {
     const apr = await getAlluoStakingAPR();
     setAlluoStakingAPR(apr);
@@ -100,11 +103,6 @@ export const useBuy = () => {
       setInputValueError('Write a valid number');
     else if (+value > +wethBalance) setInputValueError('Not enough balance');
     else setInputValue(value);
-  };
-
-  const fetchAllowanceOfWETH = async () => {
-    const res = await getWETHAllowance();
-    setAllowance(res);
   };
 
   const handleApprove = async () => {
@@ -139,23 +137,23 @@ export const useBuy = () => {
     setIsBuying(false);
   };
 
-  const handleBuyAndLockAction = async () => {
+  const handleBuyAndStakeAction = async () => {
     resetState();
     setIsBuying(true);
 
     try {
-      const alluoBalanceBefore = await getBalanceOfAlluoUser();
+      const alluoBalanceBefore = await getAlluoBalance();
       await buyAlluoWithWETH(inputValue);
-      const alluoBalanceAfter = await getBalanceOfAlluoUser();
+      const alluoBalanceAfter = await getAlluoBalance();
       const difference =
         process.env.REACT_APP_NET === 'mainnet'
           ? +alluoBalanceAfter - +alluoBalanceBefore
           : 1;
       const alluoStakingAllowance = await getAlluoStakingAllowance();
       if (+alluoStakingAllowance < difference) {
-        await approveAlluoTransaction(maximumUint256Value);
+        await approveAlluoStaking();
       }
-      await lockAlluoToken(difference);
+      await lockAlluo(difference);
       await updateBuyInfo();
       setNotificationt('Successfully bought and locked', 'success');
     } catch (err) {
@@ -180,7 +178,7 @@ export const useBuy = () => {
     handleInputValueChange,
     handleApprove,
     handleBuyAction,
-    handleBuyAndLockAction,
+    handleBuyAndStakeAction,
     alluoPriceInWETH,
     hasErrors: inputValueError != '',
   };

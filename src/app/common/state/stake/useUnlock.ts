@@ -1,214 +1,85 @@
+import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
 import {
-  getTokenInfo,
-  unlockAlluo,
   unlockAllAlluo,
-  withdrawAlluo,
+  unlockAlluo,
+  withdrawAlluo
 } from 'app/common/functions/web3Client';
-import { useState, useEffect, useReducer } from 'react';
-import { useRecoilState } from 'recoil';
-import { formatTimeDelta, CountdownTimeDelta } from 'react-countdown';
-import { tokenInfo, walletAccount, wantedChain } from '../atoms';
-import { isNumeric } from 'app/common/functions/utils';
-import { useNotification, ENotificationId } from 'app/common/state';
-import { EChain } from 'app/common/constants/chains';
+import { useNotification } from 'app/common/state';
+import { useState } from 'react';
 
-interface iState {
-  unlockValue: string;
-  isUnlocking: boolean;
-}
+export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
+  // other state control files
+  const { setNotificationt, resetNotification } = useNotification();
 
-enum EActionType {
-  SETUNLOCKVALUE = 'setUnlockValue',
-  SETISUNLOCKING = 'setIsUnlocking',
-  RESETSTATE = 'resetState',
-}
+  // inputs
+  const [unlockValue, setUnlockValue] = useState<number>(0);
+  const [unlockValueError, setUnlockValueError] = useState<string>();
 
-interface iUnlockingType {
-  type: EActionType.SETISUNLOCKING;
-  payload: boolean;
-}
+  // calculated data
+  const [projectedUnlockValue, setProjectedUnlockValue] = useState<string>('0');
 
-interface iUnlockAction {
-  type: EActionType.SETUNLOCKVALUE;
-  payload: number;
-}
-
-interface iReset {
-  type: EActionType.RESETSTATE;
-}
-
-type DispatchType = iUnlockAction | iUnlockingType | iReset;
-
-const reducer = (state: iState, action: DispatchType) => {
-  switch (action.type) {
-    case EActionType.SETUNLOCKVALUE:
-      return { ...state, unlockValue: action.payload };
-    case EActionType.SETISUNLOCKING:
-      return { ...state, isUnlocking: action.payload };
-    case EActionType.RESETSTATE:
-      return { unlockValue: '', isApproving: false, isUnlocking: false };
-    default:
-      return state;
-  }
-};
-
-export const useUnlock = () => {
-  const { setNotification, resetNotification } = useNotification();
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom] = useRecoilState(walletAccount);
-  const [, setWantedChainAtom] = useRecoilState(wantedChain);
-
-  const [{ unlockValue, isUnlocking }, dispatch] = useReducer(reducer, {
-    unlockValue: '',
-    isUnlocking: false,
-  });
-
+  // loading control
+  const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (walletAccountAtom) {
-      setWantedChainAtom(EChain.ETHEREUM);
-      setAccountInformation();
-    }
-  }, [walletAccountAtom]);
 
   const resetState = () => {
-    setError('');
     resetNotification();
-    dispatch({ type: EActionType.RESETSTATE });
+    setIsUnlocking(false);
+    setIsWithdrawing(false);
+    setUnlockValueError('');
   };
 
-  const setSuccessNotification = (message: string = '') => {
-    setNotification({
-      id: ENotificationId.UNLOCK,
-      type: 'success',
-      message,
-    });
-  };
-
-  const setErrorNotification = (message: string = ''): void => {
-    setNotification({
-      id: ENotificationId.UNLOCK,
-      type: 'error',
-      message,
-    });
-  };
-
-  const rendererForUnlock = ({ completed, days, ...timeDelta }) => {
-    const { hours, minutes, seconds } = formatTimeDelta(
-      timeDelta as CountdownTimeDelta,
-      { zeroPadTime: 2 },
-    );
-    if (completed) {
-      return null;
-    } else {
-      // Render a countdown
-
-      return { days: days > 0 && days + ' days', hours, minutes, seconds };
-    }
-  };
-
-  const rendererForWithdraw = ({ completed, days, ...timeDelta }) => {
-    const { hours, minutes, seconds } = formatTimeDelta(
-      timeDelta as CountdownTimeDelta,
-      { zeroPadTime: 2 },
-    );
-
-    if (completed) {
-      return null;
-    } else {
-      // Render a countdown
-      return { days: days > 0 && days + ' days', hours, minutes, seconds };
-    }
-  };
-
-  const handleUnlockValueChange = e => {
-    const { value } = e.target;
+  const handleUnlockValueChange = value => {
     resetState();
-
-    if (
-      isNumeric(value) ||
-      ((value === '' || value === '.') &&
-        value <= tokenInfoAtom.lockedAlluoValueOfUser)
-    )
-      dispatch({ type: EActionType.SETUNLOCKVALUE, payload: value });
-    else setError('Write a valid number less than or equal to your balance');
+    if (!(isNumeric(value) || value === '' || value === '.')) {
+      setUnlockValueError('Write a valid number');
+    }
+    setUnlockValue(value);
+    setProjectedUnlockValue(
+      roundNumberDown(((value / 100) * +alluoInfo.locked), 2),
+    );
   };
 
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-    setTokenInfoAtom(tokenInfoData);
-  };
-
-  const handleUnlockAction = async () => {
-    setErrorNotification('');
-    setSuccessNotification();
-    dispatch({ type: EActionType.SETISUNLOCKING, payload: true });
+  const handleUnlock = async () => {
+    resetState();
+    setIsUnlocking(true);
     try {
-      /*console.log(
-        'unlocking',
-        tokenInfoAtom.lockedAlluoValueOfUser,
-        tokenInfoAtom.lockedLPValueOfUser,
-        unlockValue,
-        +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
-      );*/
       if (+unlockValue === 100) {
         await unlockAllAlluo();
       } else {
-        const res = await unlockAlluo(
-          +tokenInfoAtom.lockedLPValueOfUser * (+unlockValue / 100),
-        );
+        await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
       }
-      setAccountInformation();
-      setErrorNotification('');
-      dispatch({ type: EActionType.SETUNLOCKVALUE, payload: null });
-      setSuccessNotification('Successfully unlocked');
-    } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      await updateAlluoInfo();
+      setNotificationt('Successfully unlocked', 'success');
+    } catch (error) {
+      setNotificationt(error, 'error');
     }
-    dispatch({ type: EActionType.SETISUNLOCKING, payload: false });
+    setIsUnlocking(false);
   };
 
-  const withdraw = async () => {
-    setErrorNotification('');
+  const handleWithdraw = async () => {
+    resetState();
     setIsWithdrawing(true);
     try {
-      const res = await withdrawAlluo();
-      dispatch({ type: EActionType.SETUNLOCKVALUE, payload: null });
-      resetState();
-      setAccountInformation();
-      setSuccessNotification('Successfully withdrew');
-    } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setErrorNotification(err.message);
+      await withdrawAlluo();
+      await updateAlluoInfo();
+      setNotificationt('Successfully withdrew', 'success');
+    } catch (error) {
+      console.error('Error', error);
+      setNotificationt(error, 'error');
     }
     setIsWithdrawing(false);
   };
 
-  const setToMax = () => {
-    dispatch({
-      type: EActionType.SETUNLOCKVALUE,
-      payload: 100,
-    });
-  };
-
   return {
-    notificationId: ENotificationId.UNLOCK,
     unlockValue,
+    unlockValueError,
+    projectedUnlockValue,
+    hasErrors: unlockValueError != '',
     isUnlocking,
     isWithdrawing,
     handleUnlockValueChange,
-    handleUnlockAction,
-    withdraw,
-    setToMax,
-    setAccountInformation,
+    handleUnlock,
+    handleWithdraw,
   };
 };

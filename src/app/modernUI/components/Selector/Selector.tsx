@@ -1,6 +1,6 @@
 import { Box, Text, Select, Image } from 'grommet';
 
-import { useMode } from 'app/common/state/shortcuts';
+import { useMode } from 'app/common/state';
 
 import logo from '../../images/logo.png';
 

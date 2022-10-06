@@ -1,17 +1,18 @@
 import { EChain } from 'app/common/constants/chains';
-import { useDepositForm } from 'app/common/state/farm';
+import { useDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
   NumericInput,
   ProjectedWeeklyInfo,
   Spinner,
-  SubmitButton,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from './TopHeader';
 
 export const DepositForm = ({
+  isLoading,
   selectedFarm,
   updateFarmInfo,
   selectSupportedToken,
@@ -22,14 +23,14 @@ export const DepositForm = ({
     hasErrors,
     depositValueError,
     depositValue,
-    handleDepositFieldChange,
+    handleDepositValueChange,
     isApproving,
     handleApprove,
     isDepositing,
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-  } = useDepositForm({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+  } = useDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
@@ -38,7 +39,7 @@ export const DepositForm = ({
           minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
         }}
       >
-        {!selectedSupportedToken || isApproving || isDepositing ? (
+        {isLoading || !selectedSupportedToken || isApproving || isDepositing ? (
           <Box
             align="center"
             justify="center"
@@ -55,7 +56,7 @@ export const DepositForm = ({
                 <NumericInput
                   label={'Deposit ' + selectedSupportedToken.label}
                   tokenSign={selectedFarm.sign}
-                  onValueChange={handleDepositFieldChange}
+                  onValueChange={handleDepositValueChange}
                   value={depositValue}
                   maxValue={selectedSupportedToken?.balance}
                   tokenOptions={selectedFarm.supportedTokens || []}
@@ -96,7 +97,11 @@ export const DepositForm = ({
         <SubmitButton
           primary
           disabled={
-            isApproving || isDepositing || !(+depositValue > 0) || hasErrors
+            isLoading ||
+            isApproving ||
+            isDepositing ||
+            !(+depositValue > 0) ||
+            hasErrors
           }
           label={
             +depositValue > 0

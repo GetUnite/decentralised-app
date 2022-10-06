@@ -9,12 +9,12 @@ import {
   Grid,
   Heading,
   ResponsiveContext,
-  Text,
+  Text
 } from 'grommet';
+import { useCookies } from 'react-cookie';
 import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { DepositForm, WithdrawalForm, BoosterFarmPresentation } from './blocks';
-import { useCookies } from 'react-cookie';
+import { BoosterFarmPresentation, DepositForm, WithdrawalForm } from './blocks';
 
 export const Farm = () => {
   const { id } = useParams();
@@ -48,7 +48,7 @@ export const Farm = () => {
         <Modal
           chain={selectedFarm?.chain}
           heading={farmName}
-          isLoading={isLoading}
+          showChainBadge={!isLoading}
           noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
         >
           <>
