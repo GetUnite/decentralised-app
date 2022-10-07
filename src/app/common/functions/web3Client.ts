@@ -17,6 +17,7 @@ import { EChain, EChainId } from '../constants/chains';
 import {
   fromDecimals,
   maximumUint256Value,
+  roundNumberDown,
   toDecimals,
   toExactFixed
 } from './utils';
@@ -1182,7 +1183,7 @@ export const getBoosterFarmRewards = async (
   const valueAmountInDecimals = fromDecimals(value, 18);
 
   return {
-    value: valueAmountInDecimals,
+    value: roundNumberDown(valueAmountInDecimals, 7),
     stableValue: stableValue ? fromDecimals(stableValue, 6) : 0,
   };
 };
