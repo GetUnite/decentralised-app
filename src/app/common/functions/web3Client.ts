@@ -1139,8 +1139,8 @@ export const getBoosterFarmRewards = async (
 ) => {
   const farmAbi = [
     {
-      inputs: [{ internalType: 'address', name: '', type: 'address' }],
-      name: 'rewards',
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'earned',
       outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
       stateMutability: 'view',
       type: 'function',
@@ -1163,7 +1163,7 @@ export const getBoosterFarmRewards = async (
   const value = await callContract(
     farmAbi,
     farmAddress,
-    'rewards(address)',
+    'earned(address)',
     [walletAddress],
     chain,
   );
@@ -1482,26 +1482,30 @@ export const claimBoosterFarmLPRewards = async (
   chain = EChain.POLYGON,
   useBiconomy = false,
 ) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'claimRewards',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'claimRewards',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
 
-  const tx = await sendTransaction(
-    abi,
-    farmAddress,
-    'claimRewards()',
-    null,
-    chain,
-    useBiconomy,
-  );
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewards()',
+      null,
+      chain,
+      useBiconomy,
+    );
 
-  return tx.blockNumber;
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const claimBoosterFarmNonLPRewards = async (
@@ -1510,26 +1514,32 @@ export const claimBoosterFarmNonLPRewards = async (
   chain = EChain.POLYGON,
   useBiconomy = false,
 ) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: 'exitToken', type: 'address' }],
-      name: 'claimRewardsInNonLp',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: 'exitToken', type: 'address' },
+        ],
+        name: 'claimRewardsInNonLp',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
 
-  const tx = await sendTransaction(
-    abi,
-    farmAddress,
-    'claimRewardsInNonLp(address)',
-    [tokenAddress],
-    chain,
-    useBiconomy,
-  );
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewardsInNonLp(address)',
+      [tokenAddress],
+      chain,
+      useBiconomy,
+    );
 
-  return tx.blockNumber;
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const listenToHandler = blockNumber => {
