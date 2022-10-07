@@ -1,9 +1,8 @@
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
+import { Layout, Modal, Tab, Tabs, TokenIcon } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import {
-  Avatar,
   Box,
   Button,
   Grid,
@@ -108,14 +107,9 @@ export const Farm = () => {
                     <Text size="18px">Rewards</Text>
                     <Box direction="row">
                       {selectedFarm?.rewards?.icons?.map((icon, i) => (
-                        <Avatar
+                        <TokenIcon
                           key={i}
-                          align="center"
-                          src={icon.src}
-                          size="small"
-                          justify="center"
-                          overflow="hidden"
-                          round="full"
+                          label={icon}
                           margin={{ left: i > 0 ? '-0.6rem' : '' }}
                         />
                       ))}
