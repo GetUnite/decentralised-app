@@ -1181,7 +1181,10 @@ export const getBoosterFarmRewards = async (
         )
       : 0;
 
-  return { value, stableValue: stableValue ? fromDecimals(stableValue, 6) : 0 };
+  return {
+    value: valueAmountInDecimals,
+    stableValue: stableValue ? fromDecimals(stableValue, 6) : 0,
+  };
 };
 
 export const approveToken = async (
