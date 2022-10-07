@@ -1168,18 +1168,18 @@ export const getBoosterFarmRewards = async (
     chain,
   );
 
-  const valueAmountInDecimals = toDecimals(value, 18);
-
   const stableValue =
     value > 0
       ? await callContract(
           curvePoolAbi,
           curvePoolAddress,
           'calc_withdraw_one_coin(uint256,int128)',
-          [valueAmountInDecimals, 1],
+          [value, 1],
           chain,
         )
       : 0;
+
+  const valueAmountInDecimals = fromDecimals(value, 18);
 
   return {
     value: valueAmountInDecimals,
