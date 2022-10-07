@@ -1195,7 +1195,7 @@ export const getBoosterFarmRewards = async (
   };
 };
 
-export const approve = async (
+export const approveToken = async (
   tokenAddress,
   spender,
   chain = EChain.ETHEREUM,
