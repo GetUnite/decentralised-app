@@ -1181,6 +1181,13 @@ export const getBoosterFarmRewards = async (
       : 0;
 
   const valueAmountInDecimals = fromDecimals(value, 18);
+  console.log(
+    value,
+    valueAmountInDecimals,
+    roundNumberDown(valueAmountInDecimals, 7),
+    stableValue,
+    fromDecimals(stableValue || 0, 6),
+  );
 
   return {
     value: roundNumberDown(valueAmountInDecimals, 7),
@@ -1188,7 +1195,7 @@ export const getBoosterFarmRewards = async (
   };
 };
 
-export const approveToken = async (
+export const approve = async (
   tokenAddress,
   spender,
   chain = EChain.ETHEREUM,
