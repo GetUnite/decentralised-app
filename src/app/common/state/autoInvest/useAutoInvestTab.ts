@@ -1,22 +1,23 @@
-import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { EChain } from 'app/common/constants/chains';
 import {
-  getAllowance,
   getDepositedAmount,
   getInterest,
-  getTotalAssetSupply,
+  getTotalAssetSupply
 } from 'app/common/functions/autoInvest';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNotification } from '../useNotification';
-import { TSupportedToken } from 'app/common/types/form';
 import { isNumeric } from 'app/common/functions/utils';
-import { EChain } from 'app/common/constants/chains';
-import { TFarm } from 'app/common/types/farm';
 import {
-  getSupportedTokensAdvancedInfo,
-  getSupportedTokensBasicInfo,
+  approve,
+  getAllowance,
+  getBalanceOf,
+  getSupportedTokensBasicInfo
 } from 'app/common/functions/web3Client';
-import { streamFromOptions, streamToOptions } from './useAutoInvest';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TFarm } from 'app/common/types/farm';
+import { TSupportedToken } from 'app/common/types/form';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { useNotification } from '../useNotification';
+import { streamOptions, streamToOptions } from './useAutoInvest';
 
 export type TStreamInfo = {
   from: TSupportedToken;
@@ -36,6 +37,9 @@ export const useAutoInvestTab = () => {
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom ? false : true);
 
+  // keep allowance separated since it changes everytime etiher the "from" or "to" changes
+  const [allowance, setAllowance] = useState<string>();
+
   // stream from
   const [supportedFromTokens, setSupportedFromTokens] =
     useState<TSupportedToken[]>();
@@ -43,8 +47,10 @@ export const useAutoInvestTab = () => {
     useState<TSupportedToken>();
 
   // stream to
+  const [supportedToTokens, setSupportedToTokens] =
+    useState<TSupportedToken[]>();
   const [selectedSupportedToToken, setSelectedSupportedToToken] =
-    useState<TSupportedToken>(streamToOptions[0]);
+    useState<TSupportedToken>();
   const [targetFarmInfo, setTargetFarmInfo] = useState<TFarm>();
 
   // inputs
@@ -57,6 +63,7 @@ export const useAutoInvestTab = () => {
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isStartingStream, setIsStartingStream] = useState<boolean>(false);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -64,6 +71,59 @@ export const useAutoInvestTab = () => {
       updateAutoInvestInfo();
     }
   }, [walletAccountAtom]);
+
+  useEffect(() => {
+    if (walletAccountAtom && selectedSupportedFromToken) {
+      updateSupportedToTokens(selectedSupportedFromToken);
+    }
+  }, [selectedSupportedFromToken]);
+
+  useEffect(() => {
+    if (
+      walletAccountAtom &&
+      selectedSupportedFromToken &&
+      selectedSupportedToToken
+    ) {
+      updateAllowance();
+    }
+  }, [selectedSupportedFromToken, selectedSupportedToToken]);
+
+  const updateSupportedToTokens = async selectedFromToken => {
+    // streaming data of the selected from token
+    const streamOption = streamOptions.find(streamOption =>
+      streamOption.from
+        .map(option => option.address)
+        .includes(selectedFromToken.address),
+    );
+
+    // the addresses to which the from token can stream to
+    const toAddresses = streamOption.to;
+
+    // if there is a stream from the new "from" to the already selected "to" only update the allowance
+    if (toAddresses.includes(selectedSupportedToToken?.address)) {
+      return;
+    }
+
+    const toSupportedtokens = streamToOptions.filter(supportedToken =>
+      toAddresses.includes(supportedToken.address),
+    );
+
+    setSupportedToTokens(toSupportedtokens);
+
+    // select the first of to tokens
+    setSelectedSupportedToToken(toSupportedtokens[0]);
+
+    setTargetFarmInfo(await fetchFarmInfo(toSupportedtokens[0]));
+  };
+
+  const updateAllowance = async () => {
+    setAllowance(
+      await getAllowance(
+        selectedSupportedFromToken.address,
+        selectedSupportedToToken.address,
+      ),
+    );
+  };
 
   const handleStreamValueChange = value => {
     setStreamValueError('');
@@ -75,18 +135,16 @@ export const useAutoInvestTab = () => {
     setStreamValue(value);
   };
 
-  const fetchFarmInfo = async () => {
+  const fetchFarmInfo = async selectedToToken => {
     let farmInfo;
     farmInfo = {
-      interest: await getInterest(selectedSupportedToToken.address),
-      totalAssetSupply: await getTotalAssetSupply(
-        selectedSupportedToToken.address,
-      ),
-      sign: selectedSupportedToToken.sign,
+      interest: await getInterest(selectedToToken.address),
+      totalAssetSupply: await getTotalAssetSupply(selectedToToken.address),
+      sign: selectedToToken.sign,
     };
     if (walletAccountAtom) {
       farmInfo.depositedAmount = await getDepositedAmount(
-        selectedSupportedToToken.address,
+        selectedToToken.address,
       );
     }
 
@@ -97,31 +155,34 @@ export const useAutoInvestTab = () => {
     setIsLoading(true);
 
     if (walletAccountAtom) {
-      const supportedTokens = await Promise.all(
-        streamFromOptions.map(async supportedToken => {
+      let supportedFromTokensArray = [];
+
+      for (const streamOption of streamOptions) {
+        for (const supportedToken of streamOption.from) {
           const basicSupportedTokenInfo = await getSupportedTokensBasicInfo(
             supportedToken.address,
             EChain.POLYGON,
           );
-          const advancedSupportedTokenInfo =
-            await getSupportedTokensAdvancedInfo(
-              selectedSupportedToToken.address,
-              basicSupportedTokenInfo,
-              EChain.POLYGON,
-            );
-          return {
-            label: basicSupportedTokenInfo.symbol,
+          supportedFromTokensArray.push({
+            label: supportedToken.label,
             address: basicSupportedTokenInfo.tokenAddress,
-            balance: advancedSupportedTokenInfo.balance,
-            allowance: advancedSupportedTokenInfo.allowance,
+            balance: await getBalanceOf(
+              basicSupportedTokenInfo.tokenAddress,
+              basicSupportedTokenInfo.decimals,
+            ),
             decimals: basicSupportedTokenInfo.decimals,
             sign: supportedToken.sign,
-          };
-        }),
-      );
-      setSupportedFromTokens(supportedTokens);
-      setSelectedSupportedFromToken(supportedTokens[0]);
-      setTargetFarmInfo(await fetchFarmInfo());
+          });
+        }
+      }
+
+      // set the from supported tokens and the first as the default selected
+      setSupportedFromTokens(supportedFromTokensArray);
+      const selectedSupportedToken = supportedFromTokensArray[0];
+      setSelectedSupportedFromToken(selectedSupportedToken);
+
+      // updates supported to tokens
+      await updateSupportedToTokens(selectedSupportedToken);
     }
 
     setIsLoading(false);
@@ -133,13 +194,25 @@ export const useAutoInvestTab = () => {
 
   const selectSupportedToToken = async supportedToToken => {
     setSelectedSupportedToToken(supportedToToken);
-    setSelectedSupportedFromToken({
-      ...selectedSupportedFromToken,
-      allowance: await getAllowance(
+    setTargetFarmInfo(await fetchFarmInfo(supportedToToken));
+  };
+
+  const handleApprove = async () => {
+    setIsApproving(true);
+
+    try {
+      await approve(
         selectedSupportedFromToken.address,
-        supportedToToken.address,
-      ),
-    });
+        selectedSupportedToToken.address,
+        EChain.POLYGON,
+      );
+      await updateAllowance();
+      setNotificationt('Approved successfully', 'success');
+    } catch (err) {
+      setNotificationt(err, 'error');
+    }
+
+    setIsApproving(false);
   };
 
   const handleStartStream = async () => {
@@ -174,7 +247,7 @@ export const useAutoInvestTab = () => {
     supportedFromTokens,
     handleStartStream,
     isStartingStream,
-    supportedToTokens: streamToOptions,
+    supportedToTokens,
     selectedSupportedToToken,
     selectSupportedToToken,
     targetFarmInfo,
@@ -184,6 +257,9 @@ export const useAutoInvestTab = () => {
     setUseEndDate,
     endDate,
     endDateError,
-    setEndDate
+    setEndDate,
+    allowance,
+    isApproving,
+    handleApprove,
   };
 };

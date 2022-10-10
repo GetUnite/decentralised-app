@@ -1,4 +1,13 @@
-import { HeadingText, Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
+import { EChain } from 'app/common/constants/chains';
+import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
+import {
+  HeadingText,
+  Layout,
+  Modal,
+  Spinner,
+  Tab
+} from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
 import {
   Box,
   Button,
@@ -6,17 +15,21 @@ import {
   Grid,
   Layer,
   ResponsiveContext,
-  Text,
+  Text
 } from 'grommet';
-import { EChain } from 'app/common/constants/chains';
-import { AutoInvestTab } from './blocks/AutoInvestTab';
-import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
 import Skeleton from 'react-loading-skeleton';
-import { isSmall } from 'app/modernUI/theme';
+import { AutoInvestTab } from './blocks/AutoInvestTab';
+import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
-  const { streams, setIsModalVisible, isModalVisible, isLoading, assetsInfo, walletAccountAtom } =
-    useAutoInvest();
+  const {
+    streams,
+    setIsModalVisible,
+    isModalVisible,
+    isLoading,
+    assetsInfo,
+    walletAccountAtom,
+  } = useAutoInvest();
 
   return (
     <Layout>
@@ -29,59 +42,46 @@ export const AutoInvest = () => {
               numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
             />
             <Box margin={{ top: '72px' }}>
-            {walletAccountAtom ? (<>
-              {isLoading ? (
-                <Skeleton count={1} height="36px" />
-              ) : (
-                <Text size="36px" weight="bold">
-                  {0} active streams
-                </Text>
-              )}
-              <Box margin={{ top: '36px' }} gap="6px">
-                {!isSmall(size) && (
-                  <Card
-                    pad={{ horizontal: 'medium', vertical: 'none' }}
-                    height="65px"
-                    background="card"
-                    align="center"
-                    justify="center"
-                    fill="horizontal"
-                  >
-                    <Grid
-                      fill="horizontal"
-                      rows="xxsmall"
-                      align="center"
-                      columns={{ size: 'xsmall', count: 'fit' }}
-                      pad="none"
-                      style={{ fontSize: '16px' }}
-                    >
-                      <>
-                        <span>streams from</span>
-                        <span>streams to</span>
-                        <span>TVS</span>
-                        <span>flow rate</span>
-                        <span>start</span>
-                        <span>end</span>
-                        <span>funded until</span>
-                      </>
-                    </Grid>
-                  </Card>
-                )}
-                {isLoading ? (
-                  <Card
-                    pad={{ horizontal: 'medium', vertical: 'none' }}
-                    height="xsmall"
-                    background="card"
-                    margin="none"
-                    align="center"
-                    justify="center"
-                    fill="horizontal"
-                  >
-                    <Spinner pad="medium" />
-                  </Card>
-                ) : (
-                  <Box>
-                    {streams.length < 1 ? (
+              {walletAccountAtom ? (
+                <>
+                  {isLoading ? (
+                    <Skeleton count={1} height="36px" />
+                  ) : (
+                    <Text size="36px" weight="bold">
+                      {0} active streams
+                    </Text>
+                  )}
+                  <Box margin={{ top: '36px' }} gap="6px">
+                    {!isSmall(size) && (
+                      <Card
+                        pad={{ horizontal: 'medium', vertical: 'none' }}
+                        height="65px"
+                        background="card"
+                        align="center"
+                        justify="center"
+                        fill="horizontal"
+                      >
+                        <Grid
+                          fill="horizontal"
+                          rows="xxsmall"
+                          align="center"
+                          columns={{ size: 'xsmall', count: 'fit' }}
+                          pad="none"
+                          style={{ fontSize: '16px' }}
+                        >
+                          <>
+                            <span>streams from</span>
+                            <span>streams to</span>
+                            <span>TVS</span>
+                            <span>flow rate</span>
+                            <span>start</span>
+                            <span>end</span>
+                            <span>funded until</span>
+                          </>
+                        </Grid>
+                      </Card>
+                    )}
+                    {isLoading ? (
                       <Card
                         pad={{ horizontal: 'medium', vertical: 'none' }}
                         height="xsmall"
@@ -91,23 +91,54 @@ export const AutoInvest = () => {
                         justify="center"
                         fill="horizontal"
                       >
-                        <span>You don't have any stream running</span>
+                        <Spinner pad="medium" />
                       </Card>
                     ) : (
-                      <></>
+                      <Box>
+                        {console.log(streams)}
+                        {streams.length < 1 ? (
+                          <Card
+                            pad={{ horizontal: 'medium', vertical: 'none' }}
+                            height="xsmall"
+                            background="card"
+                            margin="none"
+                            align="center"
+                            justify="center"
+                            fill="horizontal"
+                          >
+                            <span>You don't have any stream running</span>
+                          </Card>
+                        ) : (
+                          <>
+                            {Array.isArray(streams) &&
+                              streams.map((stream, index) => {
+                                return (
+                                  <StreamCard
+                                    key={index}
+                                    from={stream.from}
+                                    to={stream.to}
+                                    flowPerMinute={stream.flowPerMinute}
+                                    startDate={stream.startDate}
+                                  />
+                                );
+                              })}
+                          </>
+                        )}
+                        <Button
+                          label="Start new stream"
+                          onClick={() => setIsModalVisible(true)}
+                          style={{ width: '170px' }}
+                          margin={{ top: '18px' }}
+                        />
+                      </Box>
                     )}
-                    <Button
-                      label="Start new stream"
-                      onClick={() => setIsModalVisible(true)}
-                      style={{ width: '170px' }}
-                      margin={{top: "18px"}}
-                    />
                   </Box>
-                )}
-              </Box>
-              </>) : (<Text size="36px" weight="bold">
+                </>
+              ) : (
+                <Text size="36px" weight="bold">
                   Connect your wallet to see active streams
-                </Text>)}
+                </Text>
+              )}
             </Box>
           </Box>
         )}

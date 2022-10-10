@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
-import {
-  transferToAddress,
-  getIbAlluoInfo,
-} from 'app/common/functions/transfer';
-import { useNotification } from 'app/common/state';
-import { addressIsValid, isNumeric } from 'app/common/functions/utils';
-import { EChain } from 'app/common/constants/chains';
 import { EPolygonAddresses } from 'app/common/constants/addresses';
+import { EChain } from 'app/common/constants/chains';
+import {
+  getIbAlluoInfo, transferToAddress
+} from 'app/common/functions/transfer';
+import { addressIsValid, isNumeric } from 'app/common/functions/utils';
+import { useNotification } from 'app/common/state';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TIbAlluoInfo } from 'app/common/types/transfer';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 export const useTransfer = () => {
   // atoms
@@ -136,9 +135,9 @@ export const useTransfer = () => {
       setTransferValue('');
       setRecipientAddress('');
       setNotificationt('Transfer completed successfully', 'success');
-    } catch (err) {
-      console.error('Error', err.message);
-      setNotificationt(err.message, 'error');
+    } catch (error) {
+      console.error(error);
+      setNotificationt(error, 'error');
     }
 
     setIsTransferring(false);
