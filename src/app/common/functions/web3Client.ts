@@ -1181,16 +1181,9 @@ export const getBoosterFarmRewards = async (
       : 0;
 
   const valueAmountInDecimals = fromDecimals(value, 18);
-  console.log(
-    value,
-    valueAmountInDecimals,
-    roundNumberDown(valueAmountInDecimals, 7),
-    stableValue,
-    fromDecimals(stableValue || 0, 6),
-  );
 
   return {
-    value: roundNumberDown(valueAmountInDecimals, 7),
+    value: roundNumberDown(valueAmountInDecimals, 8),
     stableValue: stableValue ? fromDecimals(stableValue, 6) : 0,
   };
 };
