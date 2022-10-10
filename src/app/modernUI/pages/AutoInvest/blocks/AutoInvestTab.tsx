@@ -1,15 +1,15 @@
-import {
-  Spinner,
-  SubmitButton,
-  StreamInput,
-  Info,
-  FeeInfo,
-  ProjectedWeeklyInfo,
-  DateInput,
-} from 'app/modernUI/components';
-import { Box } from 'grommet';
 import { useAutoInvestTab } from 'app/common/state/autoInvest';
+import {
+  DateInput,
+  FeeInfo,
+  Info,
+  ProjectedWeeklyInfo,
+  Spinner,
+  StreamInput,
+  SubmitButton
+} from 'app/modernUI/components';
 import { RightAlignToggle } from 'app/modernUI/components/Toggles';
+import { Box } from 'grommet';
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
@@ -33,12 +33,15 @@ export const AutoInvestTab = ({ ...rest }) => {
     setUseEndDate,
     endDate,
     setEndDate,
+    allowance,
+    handleApprove,
+    isApproving,
   } = useAutoInvestTab();
 
   return (
     <Box fill>
       <Box style={{ minHeight: '382px' }} justify="center">
-        {isLoading || isStartingStream ? (
+        {isLoading || isStartingStream || isApproving ? (
           <Box
             align="center"
             justify="center"
@@ -106,7 +109,9 @@ export const AutoInvestTab = ({ ...rest }) => {
           primary
           disabled={isStartingStream || !(+(streamValue || 0) > 0) || hasErrors}
           label="Start stream"
-          onClick={() => handleStartStream()}
+          onClick={
+            +allowance > +streamValue ? handleStartStream : handleApprove
+          }
         />
       </Box>
     </Box>

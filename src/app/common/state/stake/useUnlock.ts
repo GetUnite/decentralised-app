@@ -1,9 +1,5 @@
+import { unlockAllAlluo, unlockAlluo, withdrawAlluo } from 'app/common/functions/stake';
 import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
-import {
-  unlockAllAlluo,
-  unlockAlluo,
-  withdrawAlluo
-} from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 
@@ -36,7 +32,7 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     }
     setUnlockValue(value);
     setProjectedUnlockValue(
-      roundNumberDown(((value / 100) * +alluoInfo.locked), 2),
+      roundNumberDown((value / 100) * +alluoInfo.locked, 2),
     );
   };
 

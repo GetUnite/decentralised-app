@@ -1,9 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
 import {
   callContract,
-  getCurrentWalletAddress,
+  getCurrentWalletAddress
 } from 'app/common/functions/web3Client';
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
+import { EPolygonAddresses } from '../constants/addresses';
 import { fromDecimals } from './utils';
 
 export const getInterest = async (tokenAddress, chain = EChain.POLYGON) => {
@@ -78,38 +79,46 @@ export const getDepositedAmount = async (
   return ethers.utils.formatEther(depositedAmount);
 };
 
-export const getAllowance = async (
-  tokenAddress,
-  spenderAddress,
+export const getStreamFlow = async (
+  superFluidToken,
+  ricochetMarketContract,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
     {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'balanceOf',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
       inputs: [
-        { internalType: 'address', name: 'owner', type: 'address' },
-        { internalType: 'address', name: 'spender', type: 'address' },
+        {
+          internalType: 'contract ISuperfluidToken',
+          name: 'token',
+          type: 'address',
+        },
+        { internalType: 'address', name: 'sender', type: 'address' },
+        { internalType: 'address', name: 'receiver', type: 'address' },
       ],
-      name: 'allowance',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      name: 'getFlow',
+      outputs: [
+        { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+        { internalType: 'int96', name: 'flowRate', type: 'int96' },
+        { internalType: 'uint256', name: 'deposit', type: 'uint256' },
+        { internalType: 'uint256', name: 'owedDeposit', type: 'uint256' },
+      ],
       stateMutability: 'view',
       type: 'function',
     },
   ];
 
-  const allowance = await callContract(
+  const ethereumRicochetStreamsAddress = EPolygonAddresses.RICOCHETSTREAMS;
+
+  const flow = await callContract(
     abi,
-    tokenAddress,
-    'allowance(address,address)',
-    [getCurrentWalletAddress(), spenderAddress],
+    ethereumRicochetStreamsAddress,
+    'getFlow(address,address,address)',
+    [superFluidToken, getCurrentWalletAddress(), ricochetMarketContract],
     chain,
   );
 
-  return allowance;
+  return {
+    flowPerMinute: flow.flowRate.toNumber() * 60,
+    timestamp: flow.timestamp.toString(),
+  };
 };

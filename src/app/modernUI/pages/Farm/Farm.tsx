@@ -1,6 +1,6 @@
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Tab, Tabs, TokenIcon } from 'app/modernUI/components';
+import { Layout, Modal, Spinner, Tab, Tabs, TokenIcon } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import {
   Box,
@@ -28,6 +28,7 @@ export const Farm = () => {
     stableRewards,
     setStableRewards,
     claimRewards,
+    isClamingRewards,
   } = useFarm({
     id,
   });
@@ -96,73 +97,79 @@ export const Farm = () => {
               margin={{ top: '12px' }}
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              <Box fill>
-                <Heading
-                  size="small"
-                  level={3}
-                  margin={{ bottom: '16px', top: '0px' }}
-                  fill
-                >
-                  <Box direction="row" justify="between" fill>
-                    <Text size="18px">Rewards</Text>
-                    <Box direction="row">
-                      {selectedFarm?.rewards?.icons?.map((icon, i) => (
-                        <TokenIcon
-                          key={i}
-                          label={icon}
-                          margin={{ left: i > 0 ? '-0.6rem' : '' }}
-                        />
-                      ))}
+              {isClamingRewards ? (
+                <Box align="center" justify="center" fill>
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <Box fill>
+                  <Heading
+                    size="small"
+                    level={3}
+                    margin={{ bottom: '16px', top: '0px' }}
+                    fill
+                  >
+                    <Box direction="row" justify="between" fill>
+                      <Text size="18px">Rewards</Text>
+                      <Box direction="row">
+                        {selectedFarm?.rewards?.icons?.map((icon, i) => (
+                          <TokenIcon
+                            key={i}
+                            label={icon}
+                            style={i > 0 ? { marginLeft: '-0.6rem' } : {}}
+                          />
+                        ))}
+                      </Box>
                     </Box>
-                  </Box>
-                </Heading>
-                <Box
-                  direction="row"
-                  justify="between"
-                  margin={{ bottom: '28px' }}
-                >
-                  <Text weight="bold" size="16px">
-                    {stableRewards
-                      ? selectedFarm?.rewards.stableLabel
-                      : selectedFarm?.rewards.label}
-                  </Text>
-                  <Text weight="bold" size="16px">
-                    {stableRewards
-                      ? '$' + selectedFarm?.rewards.stableValue
-                      : selectedFarm?.rewards.value}
-                  </Text>
-                </Box>
-                <Box gap="12px">
-                  <Button
-                    primary
-                    label={
-                      'Withdraw ' +
-                      (stableRewards
+                  </Heading>
+                  <Box
+                    direction="row"
+                    justify="between"
+                    margin={{ bottom: '28px' }}
+                  >
+                    <Text weight="bold" size="16px">
+                      {stableRewards
                         ? selectedFarm?.rewards.stableLabel
-                        : selectedFarm?.rewards.label)
-                    }
-                    style={{ borderRadius: '58px', width: '197px' }}
-                    onClick={claimRewards}
-                  />
-                  <Button
-                    label={
-                      stableRewards
-                        ? 'Prefer ' +
-                          selectedFarm?.rewards.label +
-                          ' LP tokens?'
-                        : 'Prefer ' + selectedFarm?.rewards.stableLabel
-                    }
-                    onClick={() => setStableRewards(!stableRewards)}
-                    plain
-                    style={{
-                      textAlign: 'center',
-                      color: '#2A73FF',
-                      fontSize: '12px',
-                      fontWeight: 500,
-                    }}
-                  />
+                        : selectedFarm?.rewards.label}
+                    </Text>
+                    <Text weight="bold" size="16px">
+                      {stableRewards
+                        ? '$' + selectedFarm?.rewards.stableValue
+                        : selectedFarm?.rewards.value}
+                    </Text>
+                  </Box>
+                  <Box gap="12px">
+                    <Button
+                      primary
+                      label={
+                        'Withdraw ' +
+                        (stableRewards
+                          ? selectedFarm?.rewards.stableLabel
+                          : selectedFarm?.rewards.label)
+                      }
+                      style={{ borderRadius: '58px', width: '197px' }}
+                      onClick={claimRewards}
+                    />
+                    <Button
+                      label={
+                        stableRewards
+                          ? 'Prefer ' +
+                            selectedFarm?.rewards.label +
+                            ' LP tokens?'
+                          : 'Prefer ' + selectedFarm?.rewards.stableLabel
+                      }
+                      onClick={() => setStableRewards(!stableRewards)}
+                      plain
+                      style={{
+                        textAlign: 'center',
+                        color: '#2A73FF',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Box>
                 </Box>
-              </Box>
+              )}
             </Box>
           )}
       </>

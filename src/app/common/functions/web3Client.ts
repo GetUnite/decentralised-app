@@ -261,24 +261,36 @@ export const sendTransaction = async (
   chain,
   useBiconomy = false,
 ) => {
-  let web3ToUse;
+  let provider;
 
   try {
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, walletProvider);
-      web3ToUse = new Web3(biconomy);
+      provider = new ethers.providers.Web3Provider(biconomy);
     } else {
-      web3ToUse = new Web3(walletProvider);
+      provider = new ethers.providers.Web3Provider(walletProvider);
     }
 
-    const contract = new web3ToUse.eth.Contract(abi as any, address);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(address, abi as any, signer);
 
-    const method = contract.methods[functionSignature].apply(null, params);
-    const tx = await method.send({
-      from: walletAddress,
-    });
+    const gasEstimationPromise = contract.estimateGas[functionSignature].apply(
+      null,
+      params,
+    );
+    const gasEstimation = +(await gasEstimationPromise).toString();
+    const gasLimit = Math.floor(gasEstimation + gasEstimation * 0.25);
 
-    return tx;
+    const method = contract[functionSignature].apply(null, [
+      ...params,
+      { gasLimit: gasLimit },
+    ]);
+
+    const tx = await method;
+
+    const receipt = await tx.wait();
+
+    return receipt;
   } catch (error) {
     console.log(error);
     console.log({
@@ -289,15 +301,17 @@ export const sendTransaction = async (
       walletAddress: walletAddress,
     });
 
-    if (error.code == 4001) {
-      throw 'User denied message signature';
-    }
-
     if (error.code == 417) {
       throw 'Error while estimating gas. Please try again';
     }
 
-    if (error.toString().includes('reverted by the EVM')) {
+    const errorString = error.toString();
+
+    if (errorString.includes('Error: user rejected signing')) {
+      throw 'User denied message signature';
+    }
+
+    if (errorString.includes('reverted by the EVM')) {
       throw 'Transaction has been reverted by the EVM. Please try again';
     }
 
@@ -365,80 +379,6 @@ export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
 export const isExpectedPolygonEvent = (type, depositAddress) => {
   const ibAlluoAddress = getIbAlluoAddress(type);
   return depositAddress.toLowerCase() === ibAlluoAddress.toLowerCase();
-};
-
-export const unlockAlluo = async value => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
-      name: 'unlock',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
-  const alluoAmountInWei = Web3.utils.toWei(value + '');
-
-  const tx = await sendTransaction(
-    abi,
-    ethereumVlAlluoAddress,
-    'unlock(uint256)',
-    [alluoAmountInWei],
-    EChain.ETHEREUM,
-  );
-
-  return tx;
-};
-
-export const unlockAllAlluo = async () => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'unlockAll',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
-  const tx = await sendTransaction(
-    abi,
-    ethereumVlAlluoAddress,
-    'unlockAll()',
-    null,
-    EChain.ETHEREUM,
-  );
-
-  return tx;
-};
-
-export const withdrawAlluo = async () => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'withdraw',
-      outputs: [],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
-  const tx = await sendTransaction(
-    abi,
-    ethereumVlAlluoAddress,
-    'withdraw()',
-    null,
-    EChain.ETHEREUM,
-  );
-
-  return tx;
 };
 
 export const getSupportedTokensList = async (
@@ -1135,7 +1075,6 @@ export const depositIntoBoosterFarm = async (
 
 export const getBoosterFarmRewards = async (
   farmAddress,
-  curvePoolAddress,
   chain,
 ) => {
   const farmAbi = [
@@ -1160,6 +1099,8 @@ export const getBoosterFarmRewards = async (
       outputs: [{ name: '', type: 'uint256' }],
     },
   ];
+  
+  const curvePoolAddress = EEthereumAddresses.CURVEPOOL;
 
   const value = await callContract(
     farmAbi,
@@ -1188,7 +1129,7 @@ export const getBoosterFarmRewards = async (
   };
 };
 
-export const approveToken = async (
+export const approve = async (
   tokenAddress,
   spender,
   chain = EChain.ETHEREUM,
@@ -1217,6 +1158,61 @@ export const approveToken = async (
   );
 
   return tx;
+};
+
+export const getBalanceOf = async (
+  tokenAddress,
+  tokenDecimals,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'balanceOf',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const balance = await callContract(
+    abi,
+    tokenAddress,
+    'balanceOf(address)',
+    [walletAddress],
+    chain,
+  );
+
+  return fromDecimals(balance, tokenDecimals);
+};
+
+export const getAllowance = async (
+  tokenAddress,
+  spenderAddress,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'spender', type: 'address' },
+      ],
+      name: 'allowance',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const allowance = await callContract(
+    abi,
+    tokenAddress,
+    'allowance(address,address)',
+    [walletAddress, spenderAddress],
+    chain,
+  );
+
+  return allowance;
 };
 
 export const getUserDepositedAmount = async (
