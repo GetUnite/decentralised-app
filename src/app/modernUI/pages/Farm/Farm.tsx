@@ -29,6 +29,7 @@ export const Farm = () => {
     setStableRewards,
     claimRewards,
     isClamingRewards,
+    isLoadingRewards
   } = useFarm({
     id,
   });
@@ -97,7 +98,7 @@ export const Farm = () => {
               margin={{ top: '12px' }}
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isClamingRewards ? (
+              {isClamingRewards || isLoadingRewards ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
