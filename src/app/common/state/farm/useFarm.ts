@@ -194,6 +194,7 @@ export const useFarm = ({ id }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
+  const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
 
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
@@ -248,10 +249,7 @@ export const useFarm = ({ id }) => {
       farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
       farmInfo.rewards = {
         ...farm.rewards,
-        ...(await getBoosterFarmRewards(
-          farm.farmAddress,
-          farm.chain,
-        )),
+        ...(await getBoosterFarmRewards(farm.farmAddress, farm.chain)),
       };
     }
 
@@ -341,6 +339,23 @@ export const useFarm = ({ id }) => {
     return { first: balanceFirstPart, second: balanceSecondPart };
   };
 
+  const updateRewardsInfo = async () => {
+    setIsLoadingRewards(true);
+    try {
+      const updatedRewards = {
+        ...selectedFarm.rewards,
+        ...(await getBoosterFarmRewards(
+          selectedFarm.farmAddress,
+          selectedFarm.chain,
+        )),
+      };
+      setSelectedFarm({ ...selectedFarm, rewards: updatedRewards });
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoadingRewards(false);
+  };
+
   const claimRewards = async () => {
     setIsClamingRewards(true);
     try {
@@ -356,6 +371,7 @@ export const useFarm = ({ id }) => {
               selectedFarm.chain,
             );
       }
+      await updateRewardsInfo();
       setNotificationt('Rewards claimed successfully', 'success');
     } catch (error) {
       setNotificationt(error, 'error');
@@ -373,6 +389,7 @@ export const useFarm = ({ id }) => {
     stableRewards,
     setStableRewards,
     claimRewards,
-    isClamingRewards
+    isClamingRewards,
+    isLoadingRewards
   };
 };
