@@ -4,8 +4,18 @@ import {
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  claimBoosterFarmLPRewards, claimBoosterFarmNonLPRewards, getBoosterFarmInterest, getBoosterFarmRewards, getInterest, getSupportedTokensAdvancedInfo, getSupportedTokensBasicInfo, getSupportedTokensList, getTotalAssets, getTotalAssetSupply,
-  getUserDepositedAmount, getUserDepositedLPAmount
+  claimBoosterFarmLPRewards,
+  claimBoosterFarmNonLPRewards,
+  getBoosterFarmInterest,
+  getBoosterFarmRewards,
+  getInterest,
+  getSupportedTokensAdvancedInfo,
+  getSupportedTokensBasicInfo,
+  getSupportedTokensList,
+  getTotalAssets,
+  getTotalAssetSupply,
+  getUserDepositedAmount,
+  getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
@@ -102,7 +112,6 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       icons: ['FRAX', 'USDC'],
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
-      curvePoolAddress: EEthereumAddresses.FRAXUSDCCURVEPOOL,
     },
     supportedTokensAddresses: [
       EEthereumAddresses.USDC,
@@ -114,6 +123,58 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       EEthereumAddresses.EURT,
     ],
     convexFarmIds: { A: 100, B: 64 },
+  },
+  {
+    id: 9,
+    farmAddress: EEthereumAddresses.CVXETHVAULT,
+    type: 'booster',
+    chain: EChain.ETHEREUM,
+    name: 'CVX/ETH',
+    sign: '',
+    icons: ['CVX', 'ETH'],
+    isBooster: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    supportedTokensAddresses: [
+      EEthereumAddresses.USDC,
+      EEthereumAddresses.USDT,
+      EEthereumAddresses.DAI,
+      EEthereumAddresses.FRAX,
+      EEthereumAddresses.AGEUR,
+      EEthereumAddresses.EURS,
+      EEthereumAddresses.EURT,
+    ],
+    convexFarmIds: { A: 64, B: 64 },
+  },
+  {
+    id: 10,
+    farmAddress: EEthereumAddresses.STETHETHVAULT,
+    type: 'booster',
+    chain: EChain.ETHEREUM,
+    name: 'stETH/ETH',
+    sign: '',
+    icons: ['stETH', 'ETH'],
+    isBooster: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['stETH', 'ETH'],
+      stableLabel: 'USDC',
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    supportedTokensAddresses: [
+      EEthereumAddresses.USDC,
+      EEthereumAddresses.USDT,
+      EEthereumAddresses.DAI,
+      EEthereumAddresses.FRAX,
+      EEthereumAddresses.AGEUR,
+      EEthereumAddresses.EURS,
+      EEthereumAddresses.EURT,
+    ],
+    convexFarmIds: { A: 25, B: 64 },
   },
 ];
 
@@ -132,7 +193,7 @@ export const useFarm = ({ id }) => {
   const [stableRewards, setStableRewards] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+  const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
 
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
@@ -189,7 +250,6 @@ export const useFarm = ({ id }) => {
         ...farm.rewards,
         ...(await getBoosterFarmRewards(
           farm.farmAddress,
-          farm.rewards.curvePoolAddress,
           farm.chain,
         )),
       };
@@ -282,7 +342,7 @@ export const useFarm = ({ id }) => {
   };
 
   const claimRewards = async () => {
-    setError('');
+    setIsClamingRewards(true);
     try {
       if (selectedFarm?.isBooster) {
         stableRewards
@@ -297,14 +357,14 @@ export const useFarm = ({ id }) => {
             );
       }
       setNotificationt('Rewards claimed successfully', 'success');
-    } catch (err) {
-      setNotificationt(err.message, 'error');
+    } catch (error) {
+      setNotificationt(error, 'error');
     }
+    setIsClamingRewards(false);
   };
 
   return {
     isLoading,
-    error,
     availableFarms,
     selectedFarm,
     updateFarmInfo,
@@ -313,5 +373,6 @@ export const useFarm = ({ id }) => {
     stableRewards,
     setStableRewards,
     claimRewards,
+    isClamingRewards
   };
 };

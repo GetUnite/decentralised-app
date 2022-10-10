@@ -1,6 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  approveToken,
+  approve,
   callContract,
   getAlluoPrice,
   getCurrentWalletAddress,
@@ -210,231 +210,6 @@ export const getAlluoStakingWalletAddressInfo = async () => {
   };
 };
 
-/*export const getTokenInfo = async walletAddress => {
-  let tokenInfo: TTokenInfo = {
-    isLoading: false,
-  };
-  try {
-    const alluoAbi = [
-      {
-        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [
-          { internalType: 'address', name: 'owner', type: 'address' },
-          { internalType: 'address', name: 'spender', type: 'address' },
-        ],
-        name: 'allowance',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-    const ethereumAlluoAddress = EEthereumAddresses.ALLUO;
-
-    const vlAlluoAbi = [
-      {
-        inputs: [],
-        name: 'totalLocked',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [{ internalType: 'address', name: '_locker', type: 'address' }],
-        name: 'getClaim',
-        outputs: [{ internalType: 'uint256', name: 'reward', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [],
-        name: 'rewardPerDistribution',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [
-          { internalType: 'address', name: '_address', type: 'address' },
-        ],
-        name: 'getInfoByAddress',
-        outputs: [
-          { internalType: 'uint256', name: 'locked_', type: 'uint256' },
-          { internalType: 'uint256', name: 'unlockAmount_', type: 'uint256' },
-          { internalType: 'uint256', name: 'claim_', type: 'uint256' },
-          {
-            internalType: 'uint256',
-            name: 'depositUnlockTime_',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'withdrawUnlockTime_',
-            type: 'uint256',
-          },
-        ],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [
-          { internalType: 'address', name: '_address', type: 'address' },
-        ],
-        name: 'unlockedBalanceOf',
-        outputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [],
-        name: 'withdrawLockDuration',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
-        name: 'convertLpToAlluo',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-    const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
-    const getTotalLockedInLB = await callContract(
-      vlAlluoAbi,
-      ethereumVlAlluoAddress,
-      'totalLocked()',
-      null,
-      EChain.ETHEREUM,
-    );
-
-    const [
-      getBalanceOfAlluo,
-      getAllowance,
-      getEarnedAlluo,
-      getRewardPerDistribution,
-      getInfoByAddress,
-      getUnlockedBalanceOf,
-      getWithdrawLockDuration,
-      getTotalLockedInAlluo,
-    ] = await Promise.all([
-      callContract(
-        alluoAbi,
-        ethereumAlluoAddress,
-        'balanceOf(address)',
-        [walletAddress],
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        alluoAbi,
-        ethereumAlluoAddress,
-        'allowance(address,address)',
-        [walletAddress, ethereumVlAlluoAddress],
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'getClaim(address)',
-        [walletAddress],
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'rewardPerDistribution()',
-        null,
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'getInfoByAddress(address)',
-        [walletAddress],
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'unlockedBalanceOf(address)',
-        [walletAddress],
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'withdrawLockDuration()',
-        null,
-        EChain.ETHEREUM,
-      ),
-      callContract(
-        vlAlluoAbi,
-        ethereumVlAlluoAddress,
-        'convertLpToAlluo(uint256)',
-        [getTotalLockedInLB],
-        EChain.ETHEREUM,
-      ),
-    ]);
-
-    // Change all user vesting infos to human-readable allue value
-    const lockedAlluoBalanceOfUser = await callContract(
-      vlAlluoAbi,
-      ethereumVlAlluoAddress,
-      'convertLpToAlluo(uint256)',
-      [getInfoByAddress.locked_],
-      EChain.ETHEREUM,
-    );
-
-    const [
-      claimedAlluoInUsd,
-      alluoBalanceInUsd,
-      apr,
-      totalLockedInUsd,
-      lockedAlluoValueOfUserInUsd,
-      unlockedAlluoValueOfUserInUsd,
-    ] = await Promise.all([
-      alluoToUsd(getEarnedAlluo),
-      alluoToUsd(getBalanceOfAlluo),
-      calculateApr(getRewardPerDistribution, getTotalLockedInLB),
-      alluoToUsd(getTotalLockedInAlluo),
-      alluoToUsd(lockedAlluoBalanceOfUser),
-      alluoToUsd(getUnlockedBalanceOf),
-    ]);
-    tokenInfo = {
-      isLoading: false,
-      allowance: toAlluoValue(getAllowance),
-      claimedAlluo: toAlluoValue(getEarnedAlluo),
-      claimedAlluoInUsd,
-      alluoBalance: toAlluoValue(getBalanceOfAlluo),
-      alluoBalanceInUsd,
-      apr,
-      totalLocked: toAlluoValue(getTotalLockedInAlluo),
-      totalLockedInUsd,
-      infoByAddress: getInfoByAddress,
-      lockedLPValueOfUser: !!walletAddress
-        ? Web3.utils.fromWei(getInfoByAddress.locked_)
-        : null,
-      lockedAlluoValueOfUser: toAlluoValue(lockedAlluoBalanceOfUser),
-      lockedAlluoValueOfUserInUsd,
-      unlockedAlluoValueOfUser: toAlluoValue(getUnlockedBalanceOf),
-      unlockedAlluoValueOfUserInUsd,
-      withdrawLockDuration: getWithdrawLockDuration,
-    };
-
-    return tokenInfo;
-  } catch (err) {
-    console.log('error', err.message);
-  }
-  return { isLoading: false };
-};*/
-
 export const getTotalAlluoLocked = async () => {
   const abi = [
     {
@@ -496,20 +271,7 @@ export const getAlluoStakingAllowance = async () => {
 };
 
 export const approveAlluoStaking = async () => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: 'spender', type: 'address' },
-        { internalType: 'uint256', name: 'amount', type: 'uint256' },
-      ],
-      name: 'approve',
-      outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const tx = await approveToken(
+  const tx = await approve(
     EEthereumAddresses.ALLUO,
     EEthereumAddresses.VLALLUO,
     EChain.ETHEREUM,
@@ -538,6 +300,80 @@ export const lockAlluo = async alluoAmount => {
     ethereumVlAlluoAddress,
     'lock(uint256)',
     [alluoAmountInWei],
+    EChain.ETHEREUM,
+  );
+
+  return tx;
+};
+
+export const unlockAlluo = async value => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
+      name: 'unlock',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const alluoAmountInWei = ethers.utils.parseUnits(value + '');
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'unlock(uint256)',
+    [alluoAmountInWei],
+    EChain.ETHEREUM,
+  );
+
+  return tx;
+};
+
+export const unlockAllAlluo = async () => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'unlockAll',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'unlockAll()',
+    null,
+    EChain.ETHEREUM,
+  );
+
+  return tx;
+};
+
+export const withdrawAlluo = async () => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'withdraw',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'withdraw()',
+    null,
     EChain.ETHEREUM,
   );
 

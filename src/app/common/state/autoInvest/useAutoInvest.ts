@@ -1,25 +1,56 @@
-import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNotification } from '../useNotification';
+import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
-import { TAssetsInfo } from 'app/common/types/heading';
+import { getStreamFlow } from 'app/common/functions/autoInvest';
 import {
   getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
-  getSupportedTokensList,
+  getSupportedTokensList
 } from 'app/common/functions/web3Client';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { initialAvailableFarmsState } from 'app/common/state/farm';
 import { TSupportedToken } from 'app/common/types/form';
-import { EPolygonAddresses } from 'app/common/constants/addresses';
+import { TAssetsInfo } from 'app/common/types/heading';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
-export const streamFromOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.USDC, sign: '$' },
-  { address: EPolygonAddresses.USDT, sign: '$' },
-  { address: EPolygonAddresses.DAI, sign: '$' },
+export const streamOptions: any = [
+  {
+    label: 'USD',
+    stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    from: [
+      { address: EPolygonAddresses.USDC, label: 'USDC', sign: '$' },
+      { address: EPolygonAddresses.DAI, label: 'DAI', sign: '$' },
+      { address: EPolygonAddresses.USDT, label: 'USDT', sign: '$' },
+    ],
+    to: [EPolygonAddresses.IBALLUOETH, EPolygonAddresses.IBALLUOBTC],
+    ricochetMarketContracts: [
+      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'ETH' },
+      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'BTC' },
+    ],
+  },
+  {
+    label: 'BTC',
+    stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    from: [{ address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' }],
+    to: [EPolygonAddresses.IBALLUOUSD],
+    ricochetMarketContracts: [
+      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'USD' },
+    ],
+  },
+  {
+    label: 'ETH',
+    stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    from: [{ address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' }],
+    to: [EPolygonAddresses.IBALLUOUSD],
+    ricochetMarketContracts: [
+      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'USD' },
+    ],
+  },
 ];
 
 export const streamToOptions: TSupportedToken[] = [
+  { address: EPolygonAddresses.IBALLUOUSD, label: 'USD', sign: '$' },
+  { address: EPolygonAddresses.IBALLUOBTC, label: 'BTC', sign: '₿' },
   { address: EPolygonAddresses.IBALLUOETH, label: 'ETH', sign: 'Ξ' },
 ];
 
@@ -35,7 +66,7 @@ export const useAutoInvest = () => {
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
   // streams
-  const [streams, setStreams] = useState<string[]>();
+  const [streams, setStreams] = useState<any>();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -43,8 +74,8 @@ export const useAutoInvest = () => {
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.POLYGON);
+      updateAutoInvestInfo();
     }
-    updateAutoInvestInfo();
   }, [walletAccountAtom]);
 
   const updateAutoInvestInfo = async () => {
@@ -63,7 +94,6 @@ export const useAutoInvest = () => {
         initialAvailableFarmsState
           .filter(x => true)
           .map(async farm => {
-            console.log("entra aqui sem stress")
             const supportedTokens = farm.isBooster
               ? await Promise.all(
                   farm.supportedTokensAddresses.map(async supportedtoken => {
@@ -75,7 +105,6 @@ export const useAutoInvest = () => {
                 )
               : await getSupportedTokensList(farm.type, farm.chain);
 
-            console.log(supportedTokens);
             if (walletAccountAtom) {
               supportedTokens.map(async supportedToken => {
                 const advancedSupportedTokenInfo =
@@ -103,7 +132,29 @@ export const useAutoInvest = () => {
   };
 
   const fetchStreamsInfo = async () => {
-    setStreams([]);
+    const streamPromise = new Promise(resolve => {
+      let streamsArray = [];
+
+      streamOptions.forEach(async streamOption => {
+        await streamOption.ricochetMarketContracts.forEach(
+          async ricochetMarketContract => {
+            const streamFlow = await getStreamFlow(
+              streamOption.stIbAlluoAddress,
+              ricochetMarketContract.address,
+            );
+            streamsArray.push({
+              from: streamOption.label,
+              to: ricochetMarketContract.label,
+              flow: streamFlow.flowPerMinute,
+              start: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
+            });
+          },
+        );
+      });
+
+      resolve(streamsArray);
+    });
+    setStreams(await streamPromise);
   };
 
   return {
