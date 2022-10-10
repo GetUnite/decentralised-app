@@ -2,6 +2,7 @@ import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { getStreamFlow } from 'app/common/functions/autoInvest';
 import {
+  getBalanceOf,
   getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
   getSupportedTokensList
@@ -17,6 +18,7 @@ export const streamOptions: any = [
   {
     label: 'USD',
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
     from: [
       { address: EPolygonAddresses.USDC, label: 'USDC', sign: '$' },
       { address: EPolygonAddresses.DAI, label: 'DAI', sign: '$' },
@@ -30,6 +32,7 @@ export const streamOptions: any = [
   },
   {
     label: 'BTC',
+    ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
     from: [{ address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' }],
     to: [EPolygonAddresses.IBALLUOUSD],
@@ -39,6 +42,7 @@ export const streamOptions: any = [
   },
   {
     label: 'ETH',
+    ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
     from: [{ address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' }],
     to: [EPolygonAddresses.IBALLUOUSD],
@@ -142,12 +146,26 @@ export const useAutoInvest = () => {
               streamOption.stIbAlluoAddress,
               ricochetMarketContract.address,
             );
-            streamsArray.push({
-              from: streamOption.label,
-              to: ricochetMarketContract.label,
-              flow: streamFlow.flowPerMinute,
-              start: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
-            });
+            if (streamFlow.flowPerSecond > 0) {
+              const ibAlluoBalance = await getBalanceOf(
+                streamOption.ibAlluoAddress,
+                18,
+                EChain.POLYGON,
+              );
+              const remainingFundedMiliseconds =
+                (+ibAlluoBalance / streamFlow.flowPerSecond) * 1000;
+              streamsArray.push({
+                from: streamOption.label,
+                to: ricochetMarketContract.label,
+                flow: streamFlow.flowPerMinute,
+                start: new Date(
+                  streamFlow.timestamp * 1000,
+                ).toLocaleDateString(),
+                fundedUntil: new Date(
+                  new Date().getTime() + remainingFundedMiliseconds,
+                ).toLocaleDateString(),
+              });
+            }
           },
         );
       });

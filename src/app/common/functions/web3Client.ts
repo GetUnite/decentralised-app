@@ -1073,10 +1073,7 @@ export const depositIntoBoosterFarm = async (
   return tx;
 };
 
-export const getBoosterFarmRewards = async (
-  farmAddress,
-  chain,
-) => {
+export const getBoosterFarmRewards = async (farmAddress, chain) => {
   const farmAbi = [
     {
       inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
@@ -1099,7 +1096,7 @@ export const getBoosterFarmRewards = async (
       outputs: [{ name: '', type: 'uint256' }],
     },
   ];
-  
+
   const curvePoolAddress = EEthereumAddresses.CURVEPOOL;
 
   const value = await callContract(
@@ -1215,6 +1212,57 @@ export const getAllowance = async (
   return allowance;
 };
 
+export const getDecimals = async (tokenAddress, chain = EChain.POLYGON) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+
+    const decimals = await callContract(
+      abi,
+      tokenAddress,
+      'decimals()',
+      null,
+      chain,
+    );
+
+    return decimals;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSymbol = async (tokenAddress, chain = EChain.POLYGON) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'symbol',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
+
+    const symbol = await callContract(
+      abi,
+      tokenAddress,
+      'symbol()',
+      null,
+      chain,
+    );
+
+    return symbol;
+  } catch (error) {
+    throw error;
+  }
+};
 export const getUserDepositedAmount = async (
   type = 'usd',
   chain = EChain.POLYGON,
@@ -1497,7 +1545,7 @@ export const claimBoosterFarmLPRewards = async (
       abi,
       farmAddress,
       'claimRewards()',
-      null,
+      [],
       chain,
       useBiconomy,
     );

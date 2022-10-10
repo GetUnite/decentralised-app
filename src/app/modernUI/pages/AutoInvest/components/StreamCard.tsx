@@ -7,6 +7,7 @@ interface IStreamCard {
   flowPerMinute: string;
   startDate: string;
   endDate?: string;
+  fundedUntil?: string;
 }
 
 export const StreamCard = ({
@@ -15,6 +16,7 @@ export const StreamCard = ({
   flowPerMinute,
   startDate,
   endDate,
+  fundedUntil,
   ...rest
 }: IStreamCard) => {
   return (
@@ -45,9 +47,11 @@ export const StreamCard = ({
                 <span style={{ fontWeight: '500' }}>
                   <TokenIcon label={to} /> {to} Farm
                 </span>
+                <span>{endDate || '∞'}</span>
                 <span>{flowPerMinute}/m</span>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
+                <span>{fundedUntil}</span>
               </>
             </Grid>
           </Card>
