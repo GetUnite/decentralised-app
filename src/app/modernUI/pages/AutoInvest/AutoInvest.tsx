@@ -95,7 +95,6 @@ export const AutoInvest = () => {
                       </Card>
                     ) : (
                       <Box>
-                        {console.log(streams)}
                         {streams.length < 1 ? (
                           <Card
                             pad={{ horizontal: 'medium', vertical: 'none' }}
@@ -119,6 +118,7 @@ export const AutoInvest = () => {
                                     to={stream.to}
                                     flowPerMinute={stream.flowPerMinute}
                                     startDate={stream.startDate}
+                                    fundedUntil={stream.fundedUntil}
                                   />
                                 );
                               })}

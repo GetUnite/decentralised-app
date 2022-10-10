@@ -118,6 +118,7 @@ export const getStreamFlow = async (
   );
 
   return {
+    flowPerSecond: flow.flowRate,
     flowPerMinute: flow.flowRate.toNumber() * 60,
     timestamp: flow.timestamp.toString(),
   };

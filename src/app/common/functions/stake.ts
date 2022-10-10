@@ -349,7 +349,7 @@ export const unlockAllAlluo = async () => {
     abi,
     ethereumVlAlluoAddress,
     'unlockAll()',
-    null,
+    [],
     EChain.ETHEREUM,
   );
 
@@ -373,7 +373,7 @@ export const withdrawAlluo = async () => {
     abi,
     ethereumVlAlluoAddress,
     'withdraw()',
-    null,
+    [],
     EChain.ETHEREUM,
   );
 
