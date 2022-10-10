@@ -1,21 +1,24 @@
-import usdc from 'app/modernUI/images/usdc.svg';
-import usdt from 'app/modernUI/images/usdt.svg';
 import dai from 'app/modernUI/images/dai.svg';
 import frax from 'app/modernUI/images/frax.svg';
+import usdc from 'app/modernUI/images/usdc.svg';
+import usdt from 'app/modernUI/images/usdt.svg';
 
-import eurt from 'app/modernUI/images/eurt.svg';
-import eurs from 'app/modernUI/images/eurs.svg';
-import jeur from 'app/modernUI/images/jeur.svg';
 import ageur from 'app/modernUI/images/ageur.svg';
+import eurs from 'app/modernUI/images/eurs.svg';
+import eurt from 'app/modernUI/images/eurt.svg';
+import jeur from 'app/modernUI/images/jeur.svg';
 
 import weth from 'app/modernUI/images/weth.svg';
 
 import wbtc from 'app/modernUI/images/wbtc.svg';
 
-import iballuousd from 'app/modernUI/images/iballuousd.svg';
-import iballuoeur from 'app/modernUI/images/iballuoeur.svg';
-import iballuoeth from 'app/modernUI/images/iballuoeth.svg';
+import cvx from 'app/modernUI/images/cvx.svg';
+import steth from 'app/modernUI/images/steth.svg';
+
 import iballuobtc from 'app/modernUI/images/iballuobtc.svg';
+import iballuoeth from 'app/modernUI/images/iballuoeth.svg';
+import iballuoeur from 'app/modernUI/images/iballuoeur.svg';
+import iballuousd from 'app/modernUI/images/iballuousd.svg';
 
 import tokenPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
 
@@ -73,6 +76,14 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       src = wbtc;
       break;
 
+    case 'stETH':
+      src = steth;
+      break;
+      
+    case 'CVX':
+      src = cvx;
+      break;
+
     case 'USD':
       src = iballuousd;
       break;
@@ -90,8 +101,8 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       break;
 
     default:
-      src =tokenPlaceholder;
+      src = tokenPlaceholder;
       break;
   }
-  return <img width={size} height={size} src={src} alt="tokenIcon" />;
+  return <img width={size} height={size} src={src} alt="tokenIcon" {...rest}/>;
 };
