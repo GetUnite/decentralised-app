@@ -257,7 +257,7 @@ export const sendTransaction = async (
   abi,
   address,
   functionSignature,
-  params,
+  params = [],
   chain,
   useBiconomy = false,
 ) => {
