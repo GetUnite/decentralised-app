@@ -1,12 +1,12 @@
-import {TSupportedToken} from './form';
 import { EChain } from 'app/common/constants/chains';
+import { TSupportedToken } from './form';
 
 export type TBoostFarmRewards = {
     icons?: any[];
     label?: string;
-    value?: number;
+    value?: string;
     stableLabel?: string;
-    stableValue?: number;
+    stableValue?: string;
     stableAddress?: string;
     curvePoolAddress?: string;
   };

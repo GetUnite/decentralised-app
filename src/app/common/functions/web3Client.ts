@@ -307,7 +307,7 @@ export const sendTransaction = async (
 
     const errorString = error.toString();
 
-    if (errorString.includes('Error: user rejected signing')) {
+    if (errorString.includes('user rejected transaction')) {
       throw 'User denied message signature';
     }
 
@@ -1122,7 +1122,7 @@ export const getBoosterFarmRewards = async (farmAddress, chain) => {
 
   return {
     value: roundNumberDown(valueAmountInDecimals, 8),
-    stableValue: stableValue ? fromDecimals(stableValue, 6) : 0,
+    stableValue: stableValue ? fromDecimals(stableValue, 6) : "0",
   };
 };
 
