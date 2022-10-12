@@ -1,22 +1,14 @@
-import { useRecoilState } from 'recoil';
-import { Link } from 'react-router-dom';
-import { useCurrentPath } from 'app/common/hooks';
-import {
-  ResponsiveContext,
-  Box,
-  Card,
-  Grid,
-  Button,
-  Text,
-  Avatar,
-} from 'grommet';
-import { useNotification, ENotificationId } from 'app/common/state';
-import { isSmall } from 'app/modernUI/theme';
-import { walletAccount, TFarmDepositCoinType } from 'app/common/state/atoms';
-import { toExactFixed } from 'app/common/functions/utils';
-import { ChainBadge, Notification, TokenIcon } from 'app/modernUI/components';
-import { useConnectionButton } from 'app/common/state/components';
 import { EChain } from 'app/common/constants/chains';
+import { toExactFixed } from 'app/common/functions/utils';
+import { useCurrentPath } from 'app/common/hooks';
+import { ENotificationId, useNotification } from 'app/common/state';
+import { TFarmDepositCoinType, walletAccount } from 'app/common/state/atoms';
+import { useConnectionButton } from 'app/common/state/components';
+import { ChainBadge, TokenIcon } from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
+import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
+import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 
 const Disabled = () => {
   return (
@@ -160,13 +152,13 @@ export const FarmCard = ({
                     </span>
                     <Box direction="row" gap="small">
                       {icons.map((icon, i) => (
-                        <TokenIcon key={i} label={icon} size={26}/>
+                        <TokenIcon key={i} label={icon} size={26} />
                       ))}
                     </Box>
                     <ChainBadge chain={chain} />
                     <span>{tvl}</span>
-                    <Box direction="row" justify="between" align="center">
-                      <span>{interest}%</span>
+                    <span>{interest}%</span>
+                    <Box pad={{left: "20px"}}>
                       {walletAccountAtom ? (
                         <Link to={'/farm/' + id}>
                           <Button label={'Farm'} />
@@ -194,8 +186,8 @@ export const FarmCard = ({
                     <span>{poolShare}%</span>
                     <span>{tvl}</span>
                     <span>{sign + balance}</span>
-                    <Box direction="row" justify="between" align="center">
-                      <span>{interest}%</span>
+                    <span>{interest}%</span>
+                    <Box>
                       <Link to={'/farm/' + id}>
                         <Button label={'Farm'} />
                       </Link>
