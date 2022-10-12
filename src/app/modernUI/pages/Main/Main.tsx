@@ -155,7 +155,6 @@ export const Main = () => {
                                   isAsc={sortDirectionIsAsc}
                                 />
                               </Box>
-                              <Box></Box>
                             </>
                           ) : (
                             <>
