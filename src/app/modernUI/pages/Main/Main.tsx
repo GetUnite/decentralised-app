@@ -1,8 +1,13 @@
-import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
-import { isSmall } from 'app/modernUI/theme';
-import { useMain } from 'app/common/state';
-import { Spinner, Layout, HeadingText } from 'app/modernUI/components';
 import { EChain } from 'app/common/constants/chains';
+import { useMain } from 'app/common/state';
+import {
+  HeadingText,
+  Layout,
+  SortIcon,
+  Spinner
+} from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
+import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
 import { FarmCard, Filter } from './components';
 
 export const Main = () => {
@@ -19,6 +24,8 @@ export const Main = () => {
     networkFilter,
     setNetworkFilter,
     walletAccountAtom,
+    sortBy,
+    sortDirectionIsAsc,
   } = useMain();
 
   return (
@@ -139,16 +146,49 @@ export const Main = () => {
                               <span>supported tokens</span>
                               <span>network</span>
                               <span>TVL</span>
-                              <span>APY</span>
+                              <Box gap="4px" direction="row">
+                                <span>APY</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('apy', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
+                              <Box></Box>
                             </>
                           ) : (
                             <>
                               <span>asset</span>
                               <span>network</span>
-                              <span>pool share</span>
+                              <Box gap="4px" direction="row">
+                                <span>pool share</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('pool share', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
                               <span>TVL</span>
-                              <span>balance</span>
-                              <span>APY</span>
+                              <Box gap="4px" direction="row">
+                                <span>balance</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('balance', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
+                              <Box gap="4px" direction="row">
+                                <span>APY</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('apy', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
                             </>
                           )}
                         </Grid>

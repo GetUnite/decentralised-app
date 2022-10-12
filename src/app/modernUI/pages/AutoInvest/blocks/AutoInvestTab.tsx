@@ -36,6 +36,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     allowance,
     handleApprove,
     isApproving,
+    isFetchingFarmInfo,
   } = useAutoInvestTab();
 
   return (
@@ -80,26 +81,34 @@ export const AutoInvestTab = ({ ...rest }) => {
                 />
               )}
             </Box>
-            <Box margin={{ top: 'medium' }}>
-              <ProjectedWeeklyInfo
-                depositedAmount={targetFarmInfo.depositedAmount}
-                inputValue={streamValueError}
-                interest={targetFarmInfo.interest}
-                sign={targetFarmInfo.sign}
-              />
-              <Info label="APY" value={targetFarmInfo.interest + '%'} />
-              <Info
-                label="Pool liquidity"
-                value={
-                  targetFarmInfo.sign +
-                  (+targetFarmInfo.totalAssetSupply).toLocaleString()
-                }
-              />
-              <FeeInfo
-                useBiconomy={useBiconomy}
-                setUseBiconomy={setUseBiconomy}
-                showWalletFee={!useBiconomy}
-              />
+            <Box margin={{ top: 'medium' }} style={{minHeight:"224px"}} justify="center">
+              {isFetchingFarmInfo ? (
+                <Box align="center" justify="center" fill="vertical">
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <>
+                  <ProjectedWeeklyInfo
+                    depositedAmount={targetFarmInfo.depositedAmount}
+                    inputValue={streamValueError}
+                    interest={targetFarmInfo.interest}
+                    sign={targetFarmInfo.sign}
+                  />
+                  <Info label="APY" value={targetFarmInfo.interest + '%'} />
+                  <Info
+                    label="Pool liquidity"
+                    value={
+                      targetFarmInfo.sign +
+                      (+targetFarmInfo.totalAssetSupply).toLocaleString()
+                    }
+                  />
+                  <FeeInfo
+                    useBiconomy={useBiconomy}
+                    setUseBiconomy={setUseBiconomy}
+                    showWalletFee={!useBiconomy}
+                  />
+                </>
+              )}
             </Box>
           </Box>
         )}
@@ -107,10 +116,10 @@ export const AutoInvestTab = ({ ...rest }) => {
       <Box margin={{ top: 'large' }}>
         <SubmitButton
           primary
-          disabled={isStartingStream || !(+(streamValue || 0) > 0) || hasErrors}
+          disabled={false}
           label="Start stream"
           onClick={
-            +allowance > +streamValue ? handleStartStream : handleApprove
+            handleStartStream 
           }
         />
       </Box>

@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { walletAccount } from 'app/common/state/atoms';
-import { initialAvailableFarmsState } from './farm/useFarm';
 import {
-  getTotalAssetSupply,
+  getBoosterFarmInterest,
   getInterest,
   getSupportedTokensAdvancedInfo,
-  getUserDepositedAmount,
-  getSupportedTokensList,
   getSupportedTokensBasicInfo,
+  getSupportedTokensList,
   getTotalAssets,
-  getUserDepositedLPAmount,
-  getBoosterFarmInterest,
+  getTotalAssetSupply,
+  getUserDepositedAmount,
+  getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
-import { useNotification } from './useNotification';
+import { walletAccount } from 'app/common/state/atoms';
+import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { toExactFixed } from '../functions/utils';
+import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
+import { toExactFixed } from '../functions/utils';
 import { TFarm } from '../types/farm';
 import { TAssetsInfo } from '../types/heading';
+import { initialAvailableFarmsState } from './farm/useFarm';
+import { useNotification } from './useNotification';
 
 export const useMain = () => {
   const [cookies] = useCookies(['has_seen_boost_farms']);
@@ -31,6 +31,8 @@ export const useMain = () => {
   const [networkFilter, setNetworkFilter] = useState<string>();
   const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
+  const [sortField, setSortField] = useState<string>(null);
+  const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
 
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
@@ -134,7 +136,7 @@ export const useMain = () => {
             )
           : 0;
     }
-
+    
     return farmInfo;
   };
 
@@ -182,6 +184,11 @@ export const useMain = () => {
     setViewType('your');
   };
 
+  const sortBy = (field, isAsc) => {
+    setSortField(field);
+    setSortDirectionIsAsc(isAsc);
+  };
+
   const filteredFarms = () => {
     let filteredFarms;
 
@@ -206,6 +213,48 @@ export const useMain = () => {
         )
       : filteredFarms;
 
+    if (sortField) {
+      switch (sortField) {
+        case 'apy':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.interest > +a.interest
+                ? 1
+                : -1
+              : +a.interest > +b.interest
+              ? 1
+              : -1;
+          });
+          break;
+
+        case 'pool share':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.poolShare > +a.poolShare
+                ? 1
+                : -1
+              : +a.poolShare > +b.poolShare
+              ? 1
+              : -1;
+          });
+          break;
+          
+        case 'balance':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.balance > +a.balance
+                ? 1
+                : -1
+              : +a.balance > +b.balance
+              ? 1
+              : -1;
+          });
+          break;
+
+        default:
+          break;
+      }
+    }
     return filteredFarms;
   };
 
@@ -222,6 +271,8 @@ export const useMain = () => {
     setTokenFilter,
     networkFilter,
     setNetworkFilter,
-    walletAccountAtom
+    walletAccountAtom,
+    sortBy,
+    sortDirectionIsAsc,
   };
 };
