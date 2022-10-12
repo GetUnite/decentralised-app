@@ -1,4 +1,5 @@
 import { Biconomy } from '@biconomy/mexa';
+import { Framework } from '@superfluid-finance/sdk-core';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
@@ -319,6 +320,12 @@ export const sendTransaction = async (
   }
 };
 
+const getReadOnlyProvider = chain => {
+  const providerUrl =
+    chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
+  return new ethers.providers.JsonRpcProvider(providerUrl);
+};
+
 export const callContract = async (
   abi,
   address,
@@ -326,9 +333,7 @@ export const callContract = async (
   params,
   chain,
 ) => {
-  const providerUrl =
-    chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  const ethersProvider = new ethers.providers.JsonRpcProvider(providerUrl);
+  const ethersProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, ethersProvider);
 
   try {
@@ -1122,7 +1127,7 @@ export const getBoosterFarmRewards = async (farmAddress, chain) => {
 
   return {
     value: roundNumberDown(valueAmountInDecimals, 8),
-    stableValue: stableValue ? fromDecimals(stableValue, 6) : "0",
+    stableValue: stableValue ? fromDecimals(stableValue, 6) : '0',
   };
 };
 
@@ -1706,4 +1711,19 @@ export const getIfUserHasWithdrawalRequest = async (
   );
 
   return usersWithdrawals;
+};
+
+export const getSuperfluidFramework = async (chain) => {
+  try {
+    const superfluid = await Framework.create({
+      chainId: parseInt(await getCurrentChainId()),
+      provider: walletProvider,
+    });
+
+    const signer = walletProvider.getSigner();
+
+    return { superfluid, signer, provider: getReadOnlyProvider(chain) };
+  } catch (error) {
+    throw error;
+  }
 };
