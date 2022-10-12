@@ -157,8 +157,9 @@ export const FarmCard = ({
                     </Box>
                     <ChainBadge chain={chain} />
                     <span>{tvl}</span>
+                    <Box direction="row" justify="between" align="center">
                     <span>{interest}%</span>
-                    <Box pad={{left: "20px"}}>
+                    
                       {walletAccountAtom ? (
                         <Link to={'/farm/' + id}>
                           <Button label={'Farm'} />
