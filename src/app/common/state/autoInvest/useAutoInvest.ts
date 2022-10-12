@@ -24,7 +24,16 @@ export const streamOptions: any = [
       { address: EPolygonAddresses.DAI, label: 'DAI', sign: '$' },
       { address: EPolygonAddresses.USDT, label: 'USDT', sign: '$' },
     ],
-    to: [EPolygonAddresses.IBALLUOETH, EPolygonAddresses.IBALLUOBTC],
+    to: [
+      {
+        ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
+        stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+      },
+      {
+        ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+        stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+      },
+    ],
     ricochetMarketContracts: [
       { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'ETH' },
       { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'BTC' },
@@ -35,7 +44,12 @@ export const streamOptions: any = [
     ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
     from: [{ address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' }],
-    to: [EPolygonAddresses.IBALLUOUSD],
+    to: [
+      {
+        ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+        stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+      },
+    ],
     ricochetMarketContracts: [
       { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'USD' },
     ],
@@ -45,7 +59,12 @@ export const streamOptions: any = [
     ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
     from: [{ address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' }],
-    to: [EPolygonAddresses.IBALLUOUSD],
+    to: [
+      {
+        ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+        stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+      },
+    ],
     ricochetMarketContracts: [
       { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'USD' },
     ],
