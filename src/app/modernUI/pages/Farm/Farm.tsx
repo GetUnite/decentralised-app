@@ -95,7 +95,6 @@ export const Farm = () => {
               gap="small"
               direction="column"
               background="modal"
-              margin={{ top: '12px' }}
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
               {isClamingRewards || isLoadingRewards ? (

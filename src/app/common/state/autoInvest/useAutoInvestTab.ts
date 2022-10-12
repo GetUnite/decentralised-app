@@ -2,7 +2,8 @@ import { EChain } from 'app/common/constants/chains';
 import {
   getDepositedAmount,
   getInterest,
-  getTotalAssetSupply
+  getTotalAssetSupply,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
@@ -18,12 +19,6 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
 import { streamOptions, streamToOptions } from './useAutoInvest';
-
-export type TStreamInfo = {
-  from: TSupportedToken;
-  to: TFarm;
-  allowance: string;
-};
 
 export const useAutoInvestTab = () => {
   // Atoms
@@ -63,6 +58,7 @@ export const useAutoInvestTab = () => {
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isStartingStream, setIsStartingStream] = useState<boolean>(false);
+  const [isFetchingFarmInfo, setIsFetchingFarmInfo] = useState<boolean>(false);
   const [isApproving, setIsApproving] = useState<boolean>(false);
 
   useEffect(() => {
@@ -97,7 +93,7 @@ export const useAutoInvestTab = () => {
     );
 
     // the addresses to which the from token can stream to
-    const toAddresses = streamOption.to;
+    const toAddresses = streamOption.to.map(so => so.ibAlluoAddress);
 
     // if there is a stream from the new "from" to the already selected "to" only update the allowance
     if (toAddresses.includes(selectedSupportedToToken?.address)) {
@@ -194,7 +190,9 @@ export const useAutoInvestTab = () => {
 
   const selectSupportedToToken = async supportedToToken => {
     setSelectedSupportedToToken(supportedToToken);
+    setIsFetchingFarmInfo(true);
     setTargetFarmInfo(await fetchFarmInfo(supportedToToken));
+    setIsFetchingFarmInfo(false);
   };
 
   const handleApprove = async () => {
@@ -219,14 +217,22 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
-      /*await depositStableCoin(
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );*/
+      const selectedStreamOption = streamOptions.find(
+        streamOption =>
+          streamOption.from
+            .map(so => so.address)
+            .includes(selectedSupportedFromToken.address) &&
+          streamOption.to.map(so => so.ibAlluoAddress).includes(selectedSupportedToToken.address),
+      );
+      await startStream(
+        selectedStreamOption.ibAlluoAddress,
+        selectedStreamOption.stIbAlluoAddress,
+        selectedStreamOption.to.find(
+          sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
+        ).stIbAlluoAddress,
+        +streamValue / 2592000,
+        endDate ? new Date(endDate).getTime() : null
+      );
       setStreamValue(undefined);
       setNotificationt('Stream started successfully', 'success');
     } catch (error) {
@@ -261,5 +267,6 @@ export const useAutoInvestTab = () => {
     allowance,
     isApproving,
     handleApprove,
+    isFetchingFarmInfo,
   };
 };
