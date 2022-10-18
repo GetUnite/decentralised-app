@@ -2,13 +2,12 @@ import { EChain } from 'app/common/constants/chains';
 import {
   callContract,
   getBalanceOf,
-  getCurrentWalletAddress,
-  getSuperfluidFramework,
+  getCurrentWalletAddress, getDecimals, getReadOnlyProvider, getSuperfluidFramework,
   sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
 import { EPolygonAddresses } from '../constants/addresses';
-import { fromDecimals } from './utils';
+import { fromDecimals, toDecimals } from './utils';
 
 export const getInterest = async (tokenAddress, chain = EChain.POLYGON) => {
   const abi = [
@@ -84,7 +83,7 @@ export const getDepositedAmount = async (
 
 export const getStreamFlow = async (
   superFluidToken,
-  ricochetMarketContract,
+  ricochetMarketAddress,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -116,7 +115,7 @@ export const getStreamFlow = async (
     abi,
     ethereumRicochetStreamsAddress,
     'getFlow(address,address,address)',
-    [superFluidToken, getCurrentWalletAddress(), ricochetMarketContract],
+    [superFluidToken, getCurrentWalletAddress(), ricochetMarketAddress],
     chain,
   );
 
@@ -154,19 +153,59 @@ const getRicochetStreamIndexes = (inputAddress, outputAddress) => {
   }
 };
 
+export const depositIntoAlluo = async (
+  tokenAddress,
+  ibAlluoAddress,
+  amount,
+  useBiconomy,
+  chain = EChain.POLYGON,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: '_token', type: 'address' },
+          { internalType: 'uint256', name: '_amount', type: 'uint256' },
+        ],
+        name: 'deposit',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const decimals = getDecimals(tokenAddress);
+    const amountInDecimals = toDecimals(amount, decimals);
+
+    const tx = await sendTransaction(
+      abi,
+      ibAlluoAddress,
+      'deposit(address,uint256)',
+      [tokenAddress, amountInDecimals],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const startStream = async (
   ibAlluoInputAddress,
   superfluidInputAddress,
   superfluidOutputAddress,
-  ricochetMarketContract,
+  ricochetMarketAddress,
   flowRatePerSecond,
   endDateTimestamp = null,
+  useBiconomy,
 ) => {
   try {
-    const { superfluid, signer, provider } = await getSuperfluidFramework(
-      EChain.POLYGON,
-    );
+    const provider = getReadOnlyProvider(EChain.POLYGON);
     const walletAddress = getCurrentWalletAddress();
+
+    const superfluidFramework = await getSuperfluidFramework();
 
     const subsidyAddress = EPolygonAddresses.RICOCHETSUBSIDY;
     const { subsidyIndex, inputIndex, outputIndex } = getRicochetStreamIndexes(
@@ -177,9 +216,16 @@ export const startStream = async (
 
     let operations = [];
 
-    const outputAddressSubscription = await superfluid.idaV1.getSubscription({
+    console.log({
       superToken: superfluidOutputAddress,
-      publisher: ricochetMarketContract,
+      publisher: ricochetMarketAddress,
+      indexId: outputIndex,
+      subscriber: walletAddress,
+      providerOrSigner: provider,
+  })
+    const outputAddressSubscription = await superfluidFramework.idaV1.getSubscription({
+      superToken: superfluidOutputAddress,
+      publisher: ricochetMarketAddress,
       indexId: outputIndex.toString(),
       subscriber: walletAddress,
       providerOrSigner: provider,
@@ -187,18 +233,18 @@ export const startStream = async (
 
     if (!outputAddressSubscription.approved) {
       operations.push(
-        superfluid.idaV1.approveSubscription({
+        superfluidFramework.idaV1.approveSubscription({
           superToken: superfluidOutputAddress,
           indexId: outputIndex.toString(),
-          publisher: ricochetMarketContract,
+          publisher: ricochetMarketAddress,
           userData,
         }),
       );
     }
 
-    const subsidyAddressSubscription = await superfluid.idaV1.getSubscription({
+    const subsidyAddressSubscription = await superfluidFramework.idaV1.getSubscription({
       superToken: subsidyAddress,
-      publisher: ricochetMarketContract,
+      publisher: ricochetMarketAddress,
       indexId: subsidyIndex.toString(),
       subscriber: walletAddress,
       providerOrSigner: provider,
@@ -206,16 +252,16 @@ export const startStream = async (
 
     if (!subsidyAddressSubscription.approved) {
       operations.push(
-        superfluid.idaV1.approveSubscription({
+        superfluidFramework.idaV1.approveSubscription({
           superToken: subsidyAddress,
           indexId: subsidyIndex.toString(),
-          publisher: ricochetMarketContract,
+          publisher: ricochetMarketAddress,
           userData,
         }),
       );
     }
 
-    const flowOperatorData = await superfluid.cfaV1.getFlowOperatorData({
+    const flowOperatorData = await superfluidFramework.cfaV1.getFlowOperatorData({
       superToken: superfluidInputAddress,
       flowOperator: ibAlluoInputAddress,
       sender: walletAddress,
@@ -227,7 +273,7 @@ export const startStream = async (
       +flowOperatorData.flowRateAllowance < 365 * 246060 * flowRatePerSecond
     ) {
       operations.push(
-        superfluid.cfaV1.authorizeFlowOperatorWithFullControl({
+        superfluidFramework.cfaV1.authorizeFlowOperatorWithFullControl({
           superToken: superfluidInputAddress,
           flowOperator: ibAlluoInputAddress,
           userData: userData,
@@ -235,9 +281,46 @@ export const startStream = async (
       );
     }
 
-    await superfluid.batchCall(operations).exec(signer);
+    const superfluidAbi = [
+      {
+        inputs: [
+          {
+            components: [
+              {
+                internalType: 'uint32',
+                name: 'operationType',
+                type: 'uint32',
+              },
+              { internalType: 'address', name: 'target', type: 'address' },
+              { internalType: 'bytes', name: 'data', type: 'bytes' },
+            ],
+            internalType: 'struct ISuperfluid.Operation[]',
+            name: 'operations',
+            type: 'tuple[]',
+          },
+        ],
+        name: 'forwardBatchCall',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
 
-    const abi = [
+    const superfluidAddress = EPolygonAddresses.SUPERFLUID;
+
+    console.log( operations.map(async x => (await x.populateTransactionPromise)));
+    await sendTransaction(
+      superfluidAbi,
+      superfluidAddress,
+      'forwardBatchCall((uint32,address,bytes)[])',
+      [operations],
+      EChain.POLYGON,
+      useBiconomy,
+    );
+
+    //await superfluidFramework.batchCall(operations).exec(signer);
+
+    const ibAlluoAbi = [
       {
         inputs: [
           { internalType: 'address', name: 'receiver', type: 'address' },
@@ -273,19 +356,21 @@ export const startStream = async (
     if (endDateTimestamp) {
       params.push(endDateTimestamp);
       tx = await sendTransaction(
-        abi,
+        ibAlluoAbi,
         ibAlluoInputAddress,
         'createFlow(address,int96,uint256,uint256)',
         params,
         EChain.POLYGON,
+        useBiconomy,
       );
     } else {
       tx = await sendTransaction(
-        abi,
+        ibAlluoAbi,
         ibAlluoInputAddress,
         'createFlow(address,int96,uint256)',
         params,
         EChain.POLYGON,
+        useBiconomy,
       );
     }
 

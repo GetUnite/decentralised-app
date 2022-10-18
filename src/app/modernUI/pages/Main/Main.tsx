@@ -13,7 +13,7 @@ import { FarmCard, Filter } from './components';
 export const Main = () => {
   const {
     assetsInfo,
-    availableFarms,
+    filteredFarms,
     isLoading,
     showAllFarms,
     showYourFarms,
@@ -207,8 +207,8 @@ export const Main = () => {
                       </Card>
                     ) : (
                       <Box gap="6px">
-                        {Array.isArray(availableFarms) &&
-                          availableFarms.map(farm => {
+                        {Array.isArray(filteredFarms) &&
+                          filteredFarms.map(farm => {
                             return (
                               <FarmCard
                                 id={farm.id}

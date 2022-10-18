@@ -9,6 +9,7 @@ export type TBoostFarmRewards = {
     stableValue?: string;
     stableAddress?: string;
     curvePoolAddress?: string;
+    pendingValue?: string;
   };
   
   export type TConvexFarmIds = {
@@ -31,7 +32,7 @@ export type TBoostFarmRewards = {
     isBooster?: boolean;
     rewards?: TBoostFarmRewards;
     farmAddress?: string;
-    supportedTokensAddresses?: string[];
+    supportedTokensAddresses?: TSupportedToken[];
     poolShare?: number;
     convexFarmIds?: TConvexFarmIds;
   };
