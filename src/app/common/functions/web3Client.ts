@@ -157,7 +157,7 @@ export const connectToWallet = async (connectOptions?) => {
     wallets = await onboard.connectWallet(connectOptions);
 
     if (wallets[0]) {
-      walletProvider = wallets[0].provider;
+      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
       web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
       return walletAddress;
@@ -254,6 +254,10 @@ const waitForBiconomyReady = biconomy =>
       });
   });
 
+export const getProvider = chain => {
+  return walletProvider;
+};
+
 export const sendTransaction = async (
   abi,
   address,
@@ -269,7 +273,7 @@ export const sendTransaction = async (
       const biconomy = await startBiconomy(chain, walletProvider);
       provider = new ethers.providers.Web3Provider(biconomy);
     } else {
-      provider = new ethers.providers.Web3Provider(walletProvider);
+      provider = walletProvider;
     }
 
     const signer = provider.getSigner();
@@ -320,7 +324,7 @@ export const sendTransaction = async (
   }
 };
 
-const getReadOnlyProvider = chain => {
+export const getReadOnlyProvider = chain => {
   const providerUrl =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
   return new ethers.providers.JsonRpcProvider(providerUrl);
@@ -333,8 +337,8 @@ export const callContract = async (
   params,
   chain,
 ) => {
-  const ethersProvider = getReadOnlyProvider(chain);
-  const contract = new ethers.Contract(address, abi, ethersProvider);
+  const readOnlyProvider = getReadOnlyProvider(chain);
+  const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
   try {
     const method = contract[functionSignature].apply(null, params);
@@ -352,14 +356,25 @@ export const callContract = async (
   }
 };
 
-const alluoPriceUrl =
+const marketApiURl =
   process.env.REACT_APP_NET === 'mainnet'
     ? 'https://protocol-mainnet.gnosis.io/api'
     : 'https://protocol-mainnet.dev.gnosisdev.com/api';
 
+export const getTokenUSDCPrice = async (tokenAddress): Promise<number> => {
+  const pathforUSDC =
+    marketApiURl +
+    `/v1/markets/${tokenAddress}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
+
+  const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
+
+  const price = +fromDecimals(usdcPrice.amount, 6);
+  return price;
+};
+
 export const getAlluoPrice = async (): Promise<number> => {
   const pathforUSDC =
-    alluoPriceUrl +
+    marketApiURl +
     `/v1/markets/${EEthereumAddressesMainnet.ALLUO}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
 
   const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
@@ -372,7 +387,7 @@ export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
   const valueInDecimals = toDecimals(value, 18);
 
   const pathforWETH =
-    alluoPriceUrl +
+    marketApiURl +
     `/v1/markets/${EEthereumAddressesMainnet.WETH}-${EEthereumAddressesMainnet.ALLUO}/sell/${valueInDecimals}`;
 
   const wethPriceObj = await fetch(pathforWETH).then(res => res.json());
@@ -471,10 +486,10 @@ export const getListSupportedTokens = async (
 };
 
 const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
-  let VLALLUOAddr;
+  let ibAlluoAddresses;
   switch (chain) {
     case EChain.POLYGON:
-      VLALLUOAddr = {
+      ibAlluoAddresses = {
         usd: EPolygonAddresses.IBALLUOUSD,
         eur: EPolygonAddresses.IBALLUOEUR,
         eth: EPolygonAddresses.IBALLUOETH,
@@ -483,7 +498,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
       break;
 
     case EChain.ETHEREUM:
-      VLALLUOAddr = {
+      ibAlluoAddresses = {
         usd: EEthereumAddresses.IBALLUOUSD,
         eur: EEthereumAddresses.IBALLUOEUR,
         eth: EEthereumAddresses.IBALLUOETH,
@@ -494,7 +509,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
       break;
   }
 
-  return VLALLUOAddr[type];
+  return ibAlluoAddresses[type];
 };
 
 export const getSupportedTokensBasicInfo = async (
@@ -1268,6 +1283,7 @@ export const getSymbol = async (tokenAddress, chain = EChain.POLYGON) => {
     throw error;
   }
 };
+
 export const getUserDepositedAmount = async (
   type = 'usd',
   chain = EChain.POLYGON,
@@ -1606,7 +1622,7 @@ export const listenToHandler = blockNumber => {
 
 export const getIfUserHasWithdrawalRequest = async (
   walletAddress,
-  type = 'usd',
+  farmAddress,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1670,13 +1686,11 @@ export const getIfUserHasWithdrawalRequest = async (
 
   const polygonHandlerAddress = EPolygonAddresses.HANDLER;
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
   const isUserWaiting = await callContract(
     abi,
     polygonHandlerAddress,
     'isUserWaiting(address,address)',
-    [ibAlluoAddress, walletAddress],
+    [farmAddress, walletAddress],
     chain,
   );
 
@@ -1686,7 +1700,7 @@ export const getIfUserHasWithdrawalRequest = async (
     abi,
     polygonHandlerAddress,
     'ibAlluoToWithdrawalSystems(address)',
-    [ibAlluoAddress],
+    [farmAddress],
     chain,
   );
 
@@ -1699,7 +1713,7 @@ export const getIfUserHasWithdrawalRequest = async (
       abi,
       polygonHandlerAddress,
       'getWithdrawal(address,uint256)',
-      [ibAlluoAddress, i],
+      [farmAddress, i],
       chain,
     );
     allWithdrawalRequests.push(withdrawal);
@@ -1713,16 +1727,14 @@ export const getIfUserHasWithdrawalRequest = async (
   return usersWithdrawals;
 };
 
-export const getSuperfluidFramework = async (chain) => {
+export const getSuperfluidFramework = async () => {
   try {
     const superfluid = await Framework.create({
       chainId: parseInt(await getCurrentChainId()),
       provider: walletProvider,
     });
 
-    const signer = walletProvider.getSigner();
-
-    return { superfluid, signer, provider: getReadOnlyProvider(chain) };
+    return superfluid;
   } catch (error) {
     throw error;
   }
