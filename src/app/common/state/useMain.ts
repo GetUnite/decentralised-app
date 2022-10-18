@@ -58,7 +58,7 @@ export const useMain = () => {
 
   useEffect(() => {
     filterFarms();
-  }, [availableFarms, viewType, sortField, sortDirectionIsAsc]);
+  }, [availableFarms, viewType, sortField, sortDirectionIsAsc, isSafeAppAtom]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
@@ -271,9 +271,11 @@ export const useMain = () => {
       }
     }
 
+    console.log({isSafeAppAtom, wallet: walletAccountAtom})
     if (isSafeAppAtom && walletAccountAtom) {
       const chainId = await getCurrentChainId();
       const chain = await getChainById(chainId);
+      console.log({chain: chain, chainId: chainId})
 
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }
