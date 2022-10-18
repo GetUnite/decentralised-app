@@ -139,6 +139,16 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 >
                   Privacy Policy
                 </a>
+                <a
+                  target="_blank"
+                  href="https://docs.alluo.com"
+                  style={{
+                    color: isLightMode ? 'black' : 'white',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Documentation
+                </a>
               </Box>
             </Footer>
           </Box>
