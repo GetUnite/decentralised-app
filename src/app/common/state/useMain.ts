@@ -1,5 +1,7 @@
 import {
   getBoosterFarmInterest,
+  getChainById,
+  getCurrentChainId,
   getInterest,
   getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
@@ -9,7 +11,7 @@ import {
   getUserDepositedAmount,
   getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
-import { walletAccount } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
@@ -21,9 +23,14 @@ import { initialAvailableFarmsState } from './farm/useFarm';
 import { useNotification } from './useNotification';
 
 export const useMain = () => {
+  // react
   const [cookies] = useCookies(['has_seen_boost_farms']);
-  const { resetNotification } = useNotification();
+
+  // atoms
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
+
+  const { resetNotification } = useNotification();
 
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>(
     initialAvailableFarmsState,
@@ -34,6 +41,7 @@ export const useMain = () => {
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm>();
 
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
@@ -47,6 +55,10 @@ export const useMain = () => {
   useEffect(() => {
     fetchFarmsInfo();
   }, [walletAccountAtom]);
+
+  useEffect(() => {
+    filterFarms();
+  }, [availableFarms, viewType, sortField, sortDirectionIsAsc]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
@@ -136,7 +148,7 @@ export const useMain = () => {
             )
           : 0;
     }
-    
+
     return farmInfo;
   };
 
@@ -151,7 +163,10 @@ export const useMain = () => {
       totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
       supportedTokens: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
-          return await getSupportedTokensBasicInfo(supportedtoken, farm.chain);
+          return await getSupportedTokensBasicInfo(
+            supportedtoken.address,
+            farm.chain,
+          );
         }),
       ),
       depositedAmount: 0,
@@ -189,7 +204,7 @@ export const useMain = () => {
     setSortDirectionIsAsc(isAsc);
   };
 
-  const filteredFarms = () => {
+  const filterFarms = async () => {
     let filteredFarms;
 
     filteredFarms =
@@ -238,7 +253,7 @@ export const useMain = () => {
               : -1;
           });
           break;
-          
+
         case 'balance':
           filteredFarms = filteredFarms.sort(function (a, b) {
             return sortDirectionIsAsc
@@ -255,13 +270,21 @@ export const useMain = () => {
           break;
       }
     }
-    return filteredFarms;
+
+    if (isSafeAppAtom && walletAccountAtom) {
+      const chainId = await getCurrentChainId();
+      const chain = await getChainById(chainId);
+
+      filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
+    }
+
+    setFilteredFarms(filteredFarms);
   };
 
   return {
     isLoading,
     error,
-    availableFarms: filteredFarms(),
+    filteredFarms,
     assetsInfo,
     showAllFarms,
     showYourFarms,

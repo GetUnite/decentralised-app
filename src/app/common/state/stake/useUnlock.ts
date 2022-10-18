@@ -1,4 +1,4 @@
-import { unlockAllAlluo, unlockAlluo, withdrawAlluo } from 'app/common/functions/stake';
+import { unlockAllAlluo, unlockAlluo } from 'app/common/functions/stake';
 import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
@@ -16,12 +16,10 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
 
   // loading control
   const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
 
   const resetState = () => {
     resetNotification();
     setIsUnlocking(false);
-    setIsWithdrawing(false);
     setUnlockValueError('');
   };
 
@@ -45,26 +43,12 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
       } else {
         await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
       }
-      await updateAlluoInfo();
       setNotificationt('Successfully unlocked', 'success');
+      await updateAlluoInfo();
     } catch (error) {
       setNotificationt(error, 'error');
     }
     setIsUnlocking(false);
-  };
-
-  const handleWithdraw = async () => {
-    resetState();
-    setIsWithdrawing(true);
-    try {
-      await withdrawAlluo();
-      await updateAlluoInfo();
-      setNotificationt('Successfully withdrew', 'success');
-    } catch (error) {
-      console.error('Error', error);
-      setNotificationt(error, 'error');
-    }
-    setIsWithdrawing(false);
   };
 
   return {
@@ -73,9 +57,7 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     projectedUnlockValue,
     hasErrors: unlockValueError != '',
     isUnlocking,
-    isWithdrawing,
     handleUnlockValueChange,
     handleUnlock,
-    handleWithdraw,
   };
 };

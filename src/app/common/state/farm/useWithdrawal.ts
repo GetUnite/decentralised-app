@@ -17,18 +17,27 @@ export const useWithdrawal = ({
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
+  // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
+  // other state control files
   const { setNotificationt } = useNotification();
-  const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
-    useState<boolean>(false);
-  const [withdrawValue, setWithdrawValue] = useState<string>();
-  const [blockNumber, setBlockNumber] = useState<number>();
-  const [withdrawValueError, setWithdrawValueError] = useState<string>('');
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+
+  // biconomy
   const [useBiconomy, setUseBiconomy] = useState(
     isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
   );
+
+  // inputs
+  const [withdrawValue, setWithdrawValue] = useState<string>();
+  const [withdrawValueError, setWithdrawValueError] = useState<string>('');
+
+  // loading control
+  const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
+    useState<boolean>(false);
+  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [blockNumber, setBlockNumber] = useState<number>();
 
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
@@ -37,12 +46,15 @@ export const useWithdrawal = ({
   }, [walletAccountAtom]);
 
   const fetchIfUserHasWithdrawalRequest = async () => {
+    // This method of getting if the user already has an withdraw request only works for iballuo farms which are now not the only ones....
+    if(selectedFarm.type == 'booster')return;
     resetState();
     setIsWithdrawalRequestsLoading(true);
     try {
       const userRequests = await getIfUserHasWithdrawalRequest(
         walletAccountAtom,
-        selectedFarm.type,
+        selectedFarm.farmAddress,
+        selectedFarm.chain
       );
       const userRequestslength = userRequests.length;
       if (userRequestslength > 0) {
@@ -150,7 +162,7 @@ export const useWithdrawal = ({
       setNotificationt(error, 'error');
     }
 
-    setIsWithdrawing(false)
+    setIsWithdrawing(false);
   };
 
   return {
@@ -163,6 +175,6 @@ export const useWithdrawal = ({
     resetState,
     setUseBiconomy,
     useBiconomy,
-    hasErrors: withdrawValueError != '',
+    hasErrors: withdrawValueError != ''
   };
 };

@@ -28,15 +28,15 @@ export const streamOptions: any = [
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+        label: "ETH"
       },
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+        label: "BTC"
       },
-    ],
-    ricochetMarketContracts: [
-      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'ETH' },
-      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'BTC' },
     ],
   },
   {
@@ -48,10 +48,9 @@ export const streamOptions: any = [
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+        label:"USD"
       },
-    ],
-    ricochetMarketContracts: [
-      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC, label: 'USD' },
     ],
   },
   {
@@ -63,10 +62,9 @@ export const streamOptions: any = [
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+        label: "USD"
       },
-    ],
-    ricochetMarketContracts: [
-      { address: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH, label: 'USD' },
     ],
   },
 ];
@@ -159,11 +157,11 @@ export const useAutoInvest = () => {
       let streamsArray = [];
 
       streamOptions.forEach(async streamOption => {
-        await streamOption.ricochetMarketContracts.forEach(
-          async ricochetMarketContract => {
+        await streamOption.to.map(so => { return {address: so.ricochetMarketAddress, label: so.label}}).forEach(
+          async ricochetMarket => {
             const streamFlow = await getStreamFlow(
               streamOption.stIbAlluoAddress,
-              ricochetMarketContract.address,
+              ricochetMarket.address,
             );
             if (streamFlow.flowPerSecond > 0) {
               const ibAlluoBalance = await getBalanceOf(
@@ -175,7 +173,7 @@ export const useAutoInvest = () => {
                 (+ibAlluoBalance / streamFlow.flowPerSecond) * 1000;
               streamsArray.push({
                 from: streamOption.label,
-                to: ricochetMarketContract.label,
+                to: ricochetMarket.label,
                 flow: streamFlow.flowPerMinute,
                 start: new Date(
                   streamFlow.timestamp * 1000,

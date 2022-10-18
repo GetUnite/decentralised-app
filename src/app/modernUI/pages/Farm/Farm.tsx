@@ -1,23 +1,22 @@
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Spinner, Tab, Tabs, TokenIcon } from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
 import {
-  Box,
-  Button,
-  Grid,
-  Heading,
-  ResponsiveContext,
-  Text
-} from 'grommet';
-import { useCookies } from 'react-cookie';
+  Layout,
+  Modal,
+  Spinner,
+  Tab,
+  Tabs,
+  TokenIcon
+} from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
+import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
 import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { BoosterFarmPresentation, DepositForm, WithdrawalForm } from './blocks';
 
 export const Farm = () => {
   const { id } = useParams();
-  const [cookies] = useCookies(['has_seen_boost_farms']);
+
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const {
     selectedFarm,
@@ -25,11 +24,18 @@ export const Farm = () => {
     isLoading,
     selectSupportedToken,
     selectedSupportedToken,
-    stableRewards,
-    setStableRewards,
+    seeRewardsAsStable,
+    setSeeRewardsAsStable,
     claimRewards,
     isClamingRewards,
-    isLoadingRewards
+    isLoadingRewards,
+    showBoosterFarmPresentation,
+    showTabs,
+    previousHarvestDate,
+    nextHarvestDate,
+    showBoosterWithdrawalConfirmation,
+    startBoosterWithdrawalConfirmation,
+    cancelBoosterWithdrawalConfirmation,
   } = useFarm({
     id,
   });
@@ -50,15 +56,16 @@ export const Farm = () => {
           chain={selectedFarm?.chain}
           heading={farmName}
           showChainBadge={!isLoading}
-          noHeading={selectedFarm?.isBooster && !cookies.has_seen_boost_farms}
+          noHeading={!showTabs}
         >
           <>
-            {selectedFarm?.isBooster && !cookies.has_seen_boost_farms ? (
+            {showBoosterFarmPresentation && (
               <BoosterFarmPresentation
                 selectedFarm={selectedFarm}
                 farmName={farmName}
               />
-            ) : (
+            )}
+            {showTabs && (
               <Tabs>
                 <Tab title="Deposit">
                   <DepositForm
@@ -76,15 +83,24 @@ export const Farm = () => {
                     updateFarmInfo={updateFarmInfo}
                     selectedSupportedToken={selectedSupportedToken}
                     selectSupportedToken={selectSupportedToken}
+                    nextHarvestDate={nextHarvestDate}
+                    showBoosterWithdrawalConfirmation={
+                      showBoosterWithdrawalConfirmation
+                    }
+                    startBoosterWithdrawalConfirmation={
+                      startBoosterWithdrawalConfirmation
+                    }
+                    cancelBoosterWithdrawalConfirmation={
+                      cancelBoosterWithdrawalConfirmation
+                    }
                   />
                 </Tab>
               </Tabs>
             )}
           </>
         </Modal>
-        {selectedFarm?.isBooster &&
-          walletAccountAtom &&
-          cookies.has_seen_boost_farms && (
+        {showTabs && walletAccountAtom && !isLoading && (
+          <Box gap="22px">
             <Box
               round={'medium'}
               overflow="hidden"
@@ -97,7 +113,7 @@ export const Farm = () => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isClamingRewards || isLoadingRewards ? (
+              {isLoading || isClamingRewards || isLoadingRewards ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
@@ -128,12 +144,12 @@ export const Farm = () => {
                     margin={{ bottom: '28px' }}
                   >
                     <Text weight="bold" size="16px">
-                      {stableRewards
+                      {seeRewardsAsStable
                         ? selectedFarm?.rewards.stableLabel
                         : selectedFarm?.rewards.label}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {stableRewards
+                      {seeRewardsAsStable
                         ? '$' + selectedFarm?.rewards.stableValue
                         : selectedFarm?.rewards.value}
                     </Text>
@@ -143,7 +159,7 @@ export const Farm = () => {
                       primary
                       label={
                         'Withdraw ' +
-                        (stableRewards
+                        (seeRewardsAsStable
                           ? selectedFarm?.rewards.stableLabel
                           : selectedFarm?.rewards.label)
                       }
@@ -152,13 +168,13 @@ export const Farm = () => {
                     />
                     <Button
                       label={
-                        stableRewards
+                        seeRewardsAsStable
                           ? 'Prefer ' +
                             selectedFarm?.rewards.label +
                             ' LP tokens?'
                           : 'Prefer ' + selectedFarm?.rewards.stableLabel
                       }
-                      onClick={() => setStableRewards(!stableRewards)}
+                      onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
                       plain
                       style={{
                         textAlign: 'center',
@@ -171,7 +187,59 @@ export const Farm = () => {
                 </Box>
               )}
             </Box>
-          )}
+            <Box
+              round={'medium'}
+              overflow="hidden"
+              width="245px"
+              align="start"
+              height="122pxpx"
+              justify="between"
+              gap="small"
+              direction="column"
+              background="modal"
+              pad={{ vertical: 'medium', horizontal: 'medium' }}
+              border={
+                showBoosterWithdrawalConfirmation
+                  ? {
+                      color: '#F59F31',
+                      size: '0.5px',
+                    }
+                  : {}
+              }
+              style={
+                showBoosterWithdrawalConfirmation
+                  ? {
+                      boxShadow: '0px 0px 10px 0px #FF981133',
+                    }
+                  : {}
+              }
+            >
+              {isLoading || isClamingRewards || isLoadingRewards ? (
+                <Box align="center" justify="center" fill>
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <Box fill gap="12px">
+                  <Text size="16px" weight="bold">
+                    Pending rewards
+                  </Text>
+                  <Box direction="row" justify="between">
+                    <Text weight="bold" size="16px">
+                      {selectedFarm?.rewards.stableLabel}
+                    </Text>
+                    <Text weight="bold" size="16px">
+                      {'$' + selectedFarm?.rewards.pendingValue}
+                    </Text>
+                  </Box>
+                  <Text size="8px" weight={400}>
+                    Available {nextHarvestDate.format('DD MMM')} · Last
+                    harvested {previousHarvestDate.format('DD MMM')}
+                  </Text>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        )}
       </>
     );
   };
