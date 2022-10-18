@@ -1,38 +1,41 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { EPolygonAddresses } from 'app/common/constants/addresses';
+import { EChain } from 'app/common/constants/chains';
 import {
-  transferToAddress,
-  getIbAlluoInfo,
-  EChain,
-} from 'app/common/functions/Web3Client';
-import { useNotification } from 'app/common/state';
+  getIbAlluoInfo, transferToAddress
+} from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
+import { useNotification } from 'app/common/state';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TIbAlluoInfo } from 'app/common/types/transfer';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 export const useTransfer = () => {
-  const { setNotificationt } = useNotification();
+  // atoms
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
+  // notifications
+  const { setNotificationt } = useNotification();
+
+  // biconomy
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
-  type IbAlluoInfo = {
-    type?: string;
-    address?: string;
-    balance?: string;
-    decimals?: number;
-    label?: string;
-    sign?: string;
-  };
+  // ibAlluos
+  const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);
 
+  // inputs
   const [selectedIbAlluo, setSelectedIbAlluo] = useState<string>('IbAlluoUSD');
   const [transferValue, setTransferValue] = useState<string>();
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [transferValueError, setTransferValueError] = useState<string>('');
+  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [recipientAddressError, setRecipientAddressError] =
     useState<string>('');
+
+  // loading control
   const [isTransferring, setIsTransferring] = useState<boolean>(false);
-  const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<IbAlluoInfo>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -41,28 +44,23 @@ export const useTransfer = () => {
     }
   }, [walletAccountAtom]);
 
-  const resetState = () => {
-    setTransferValueError('');
-    setRecipientAddressError('');
-    setIsTransferring(false);
-  };
-
   const setSelectedIbAlluoBySymbol = tokenInfo => {
     setSelectedIbAlluo(tokenInfo.type);
   };
 
   const fetchIbAlluosInfo = async () => {
+    setIsLoading(true);
     const [usd, eur, eth, btc] = await Promise.all([
-      getIbAlluoInfo('usd'),
-      getIbAlluoInfo('eur'),
-      getIbAlluoInfo('eth'),
-      getIbAlluoInfo('btc'),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOUSD),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOEUR),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOETH),
+      getIbAlluoInfo(EPolygonAddresses.IBALLUOBTC),
     ]);
 
     setIbAlluosInfo([
       {
         label: 'USD',
-        address: usd.ibAlluoAddress,
+        address: usd.address,
         balance: usd.balance,
         decimals: usd.decimals,
         type: usd.symbol,
@@ -70,7 +68,7 @@ export const useTransfer = () => {
       },
       {
         label: 'EUR',
-        address: eur.ibAlluoAddress,
+        address: eur.address,
         balance: eur.balance,
         decimals: eur.decimals,
         type: eur.symbol,
@@ -78,7 +76,7 @@ export const useTransfer = () => {
       },
       {
         label: 'ETH',
-        address: eth.ibAlluoAddress,
+        address: eth.address,
         balance: eth.balance,
         decimals: eth.decimals,
         type: eth.symbol,
@@ -86,13 +84,14 @@ export const useTransfer = () => {
       },
       {
         label: 'BTC',
-        address: btc.ibAlluoAddress,
+        address: btc.address,
         balance: btc.balance,
         decimals: btc.decimals,
         type: btc.symbol,
         sign: getTokenSign(btc.symbol),
       },
     ]);
+    setIsLoading(false);
   };
 
   const selectedIbAlluoInfo = ibAlluosInfo?.find(
@@ -122,7 +121,6 @@ export const useTransfer = () => {
   };
 
   const handleTransfer = async () => {
-    resetState();
     setIsTransferring(true);
 
     try {
@@ -134,14 +132,12 @@ export const useTransfer = () => {
         useBiconomy,
       );
       await fetchIbAlluosInfo();
-      resetState();
       setTransferValue('');
       setRecipientAddress('');
       setNotificationt('Transfer completed successfully', 'success');
-    } catch (err) {
-      console.error('Error', err.message);
-      resetState();
-      setNotificationt(err.message, 'error');
+    } catch (error) {
+      console.error(error);
+      setNotificationt(error, 'error');
     }
 
     setIsTransferring(false);
@@ -168,7 +164,6 @@ export const useTransfer = () => {
     handleTransferValueChange,
     isTransferring,
     handleTransfer,
-    resetState,
     ibAlluosInfo,
     recipientAddress,
     handleRecipientAddressChange,
@@ -176,5 +171,6 @@ export const useTransfer = () => {
     isSafeAppAtom,
     useBiconomy,
     setUseBiconomy,
+    isLoading,
   };
 };

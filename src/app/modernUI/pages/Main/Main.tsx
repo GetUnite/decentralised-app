@@ -1,30 +1,19 @@
-import { useRecoilState } from 'recoil';
-import {
-  Box,
-  Heading,
-  Paragraph,
-  Button,
-  Card,
-  Grid,
-  ResponsiveContext,
-  Select,
-  Menu,
-  Text,
-} from 'grommet';
-import Skeleton from 'react-loading-skeleton';
-import { isSmall } from 'app/modernUI/theme';
+import { EChain } from 'app/common/constants/chains';
 import { useMain } from 'app/common/state';
-import { Spinner, Layout } from 'app/modernUI/components';
-import { Assets } from './blocks';
-import { walletAccount } from 'app/common/state/atoms';
-import { Filter } from './components';
+import {
+  HeadingText,
+  Layout,
+  SortIcon,
+  Spinner
+} from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
+import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
+import { FarmCard, Filter } from './components';
 
 export const Main = () => {
-  const [walletAccountAtom] = useRecoilState(walletAccount);
-
   const {
-    headingData,
-    availableFarms,
+    assetsInfo,
+    filteredFarms,
     isLoading,
     showAllFarms,
     showYourFarms,
@@ -34,27 +23,10 @@ export const Main = () => {
     setTokenFilter,
     networkFilter,
     setNetworkFilter,
+    walletAccountAtom,
+    sortBy,
+    sortDirectionIsAsc,
   } = useMain();
-
-  const headingText = isLoading ? (
-    <Box fill>
-      <Skeleton count={2} />
-    </Box>
-  ) : (
-    <>
-      {headingData.numberOfAssets == 0 ? (
-        'You don’t have available assets to farm in your wallet.'
-      ) : (
-        <span>
-          You have {headingData.numberOfAssets}{' '}
-          {headingData.numberOfAssets > 1 ? 'assets' : 'asset'} across{' '}
-          {headingData.numberOfChainsWithAssets}{' '}
-          {headingData.numberOfChainsWithAssets > 1 ? 'networks' : 'network'}{' '}
-          available to farm.
-        </span>
-      )}
-    </>
-  );
 
   return (
     <Layout>
@@ -71,16 +43,13 @@ export const Main = () => {
               fill="horizontal"
             >
               <Box justify="center" fill direction="column">
-                <Text size="36px" weight="bold">
-                  {!walletAccountAtom
-                    ? 'Connect your wallet to see your available assets to farm.'
-                    : headingText}
-                </Text>
-                <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
-                  Fund your wallet using crypto or fiat currency here to start
-                  investing. Get your yield in the same coin and withdraw at any
-                  time with no cost and no lock-in period.{' '}
-                </Paragraph>
+                <HeadingText
+                  isLoading={isLoading}
+                  numberOfAssets={assetsInfo?.numberOfAssets}
+                  numberOfChainsWithAssets={
+                    assetsInfo?.numberOfChainsWithAssets
+                  }
+                />
                 <Box
                   align="center"
                   justify="center"
@@ -97,7 +66,7 @@ export const Main = () => {
                       <Box
                         direction="row"
                         justify="start"
-                        gap="small"
+                        gap="20px"
                         style={{ fontSize: '16px' }}
                       >
                         <Button
@@ -126,7 +95,7 @@ export const Main = () => {
                       <Box
                         direction="row"
                         justify="start"
-                        gap="medium"
+                        gap="20px"
                         style={{ fontSize: '16px' }}
                       >
                         <Filter
@@ -177,16 +146,48 @@ export const Main = () => {
                               <span>supported tokens</span>
                               <span>network</span>
                               <span>TVL</span>
-                              <span>APY</span>
+                              <Box gap="4px" direction="row">
+                                <span>APY</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('apy', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
                             </>
                           ) : (
                             <>
                               <span>asset</span>
                               <span>network</span>
-                              <span>pool share</span>
+                              <Box gap="4px" direction="row">
+                                <span>pool share</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('pool share', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
                               <span>TVL</span>
-                              <span>balance</span>
-                              <span>APY</span>
+                              <Box gap="4px" direction="row">
+                                <span>balance</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('balance', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
+                              <Box gap="4px" direction="row">
+                                <span>APY</span>
+                                <SortIcon
+                                  onClick={() =>
+                                    sortBy('apy', !sortDirectionIsAsc)
+                                  }
+                                  isAsc={sortDirectionIsAsc}
+                                />
+                              </Box>
                             </>
                           )}
                         </Grid>
@@ -205,13 +206,30 @@ export const Main = () => {
                         <Spinner pad="medium" />
                       </Card>
                     ) : (
-                      <>
-                        <Assets
-                          availableFarms={availableFarms}
-                          isLoading={isLoading}
-                          viewType={viewType}
-                        />
-                      </>
+                      <Box gap="6px">
+                        {Array.isArray(filteredFarms) &&
+                          filteredFarms.map(farm => {
+                            return (
+                              <FarmCard
+                                id={farm.id}
+                                key={farm.id}
+                                type={farm.type}
+                                name={farm.name}
+                                totalAssetSupply={farm.totalAssetSupply}
+                                poolShare={farm.poolShare}
+                                balance={farm.depositedAmount}
+                                interest={farm.interest}
+                                disabled={false}
+                                sign={farm.sign}
+                                icons={farm.icons}
+                                isLoading={isLoading}
+                                chain={farm.chain as EChain}
+                                isBooster={farm.isBooster}
+                                viewType={viewType}
+                              />
+                            );
+                          })}
+                      </Box>
                     )}
                   </Box>
                 </Box>

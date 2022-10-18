@@ -2,7 +2,7 @@ import { isCorrectNetwork } from 'app/common/state/atoms';
 import { Button } from 'grommet';
 import { useRecoilState } from 'recoil';
 
-export const SubmitButton = ({ label, disabled, onClick, ...rest }) => {
+export const SubmitButton = ({ label, disabled = false, onClick, ...rest }) => {
   const [isCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
 
   return (

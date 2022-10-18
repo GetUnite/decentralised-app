@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ResponsiveContext, Box, Nav, Image, Footer } from 'grommet';
 import { MenuItem } from '../Menu/blocks';
-import { useMode } from 'app/common/state/shortcuts';
+import { useMode } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
 
 import { Menu, Notification } from 'app/modernUI/components';

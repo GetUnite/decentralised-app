@@ -4,7 +4,7 @@ import { Grommet } from 'grommet';
 
 import { mode } from 'app/common/state/atoms';
 import { theme as modernUITheme } from 'app/modernUI/theme';
-import { Main, Farm, Stake, Buy, Transfer } from 'app/modernUI/pages';
+import { Main, Farm, Stake, Buy, Transfer, AutoInvest } from 'app/modernUI/pages';
 import { SkeletonTheme } from 'react-loading-skeleton';
 
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -28,6 +28,7 @@ export const Router = () => {
               <Route path="/transfer" element={<Transfer />} />
               <Route path="/stake" element={<Stake />} />
               <Route path="/farm/:id" element={<Farm />} />
+              <Route path="/auto-invest" element={<AutoInvest />} />
               <Route path="*" element={<Main />} />
             </Routes>
           </SkeletonTheme>
