@@ -1,4 +1,4 @@
-import { EChain } from 'app/common/functions/Web3Client';
+import { EChain } from 'app/common/constants/chains';
 import { Box, Text, BoxExtendedProps } from 'grommet';
 
 interface IChainBadge extends BoxExtendedProps {

@@ -4,4 +4,5 @@ export enum modernUiPaths {
   STAKE = '/stake',
   BUY = '/buy',
   TRANSFER = '/transfer',
+  AUTOINVEST = '/auto-invest',
 }

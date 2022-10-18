@@ -1,4 +1,4 @@
-import { Box, DropButton, Menu, Select, Text, ThemeContext } from 'grommet';
+import { Select, ThemeContext } from 'grommet';
 
 export const Filter = ({ options, value, onChange, style, ...rest }) => {
   return (
