@@ -1505,47 +1505,6 @@ export const withdrawStableCoin = async (
   }
 };
 
-export const withdrawFromBoosterFarm = async (
-  farmAddress,
-  tokenAddress,
-  amount,
-  decimals,
-  chain = EChain.POLYGON,
-  useBiconomy = false,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [
-          { internalType: 'uint256', name: 'assets', type: 'uint256' },
-          { internalType: 'address', name: 'receiver', type: 'address' },
-          { internalType: 'address', name: 'owner', type: 'address' },
-          { internalType: 'address', name: 'exitToken', type: 'address' },
-        ],
-        name: 'withdrawToNonLp',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-
-    const amountInDecimals = toDecimals(amount, decimals);
-
-    const tx = await sendTransaction(
-      abi,
-      farmAddress,
-      'withdrawToNonLp(uint256,address,address,address)',
-      [amountInDecimals, walletAddress, walletAddress, tokenAddress],
-      chain,
-      useBiconomy,
-    );
-
-    return tx.blockNumber;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const claimBoosterFarmLPRewards = async (
   farmAddress,
   chain = EChain.POLYGON,
