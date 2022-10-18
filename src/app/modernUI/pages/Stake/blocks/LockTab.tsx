@@ -40,7 +40,6 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              {' '}
               <Text textAlign="center" weight="bold">
                 You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO staked
               </Text>
@@ -56,7 +55,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
-              <Info label="Unstaked $ALLUO balance" value={alluoInfo.balance} />
+              <Info label="Unstaked $ALLUO balance" value={roundNumberDown(alluoInfo.balance, 2)} />
               <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
               <Info label="$ALLUO earned" value={alluoInfo.earned} />
               <Info label="Total $ALLUO staked" value={alluoInfo.totalLocked} />

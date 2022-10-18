@@ -217,21 +217,34 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
+      // the complete selected stream data
       const selectedStreamOption = streamOptions.find(
         streamOption =>
           streamOption.from
             .map(so => so.address)
             .includes(selectedSupportedFromToken.address) &&
-          streamOption.to.map(so => so.ibAlluoAddress).includes(selectedSupportedToToken.address),
+          streamOption.to
+            .map(so => so.ibAlluoAddress)
+            .includes(selectedSupportedToToken.address),
       );
+      // data from the selected output
+      const selectedTo = selectedStreamOption.to.find(
+        sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
+      );
+      /*await depositIntoAlluo(
+        selectedSupportedFromToken.address,
+        selectedStreamOption.ibAlluoAddress,
+        streamValue,
+        useBiconomy,
+      );*/
       await startStream(
         selectedStreamOption.ibAlluoAddress,
         selectedStreamOption.stIbAlluoAddress,
-        selectedStreamOption.to.find(
-          sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
-        ).stIbAlluoAddress,
+        selectedTo.stIbAlluoAddress,
+        selectedTo.ricochetMarketAddress,
         +streamValue / 2592000,
-        endDate ? new Date(endDate).getTime() : null
+        endDate ? new Date(endDate).getTime() : null,
+        useBiconomy,
       );
       setStreamValue(undefined);
       setNotificationt('Stream started successfully', 'success');
