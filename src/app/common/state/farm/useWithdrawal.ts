@@ -1,10 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
+import { withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   getIfUserHasWithdrawalRequest,
   isExpectedPolygonEvent,
   listenToHandler,
-  withdrawFromBoosterFarm,
   withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
@@ -47,14 +47,14 @@ export const useWithdrawal = ({
 
   const fetchIfUserHasWithdrawalRequest = async () => {
     // This method of getting if the user already has an withdraw request only works for iballuo farms which are now not the only ones....
-    if(selectedFarm.type == 'booster')return;
+    if (selectedFarm.type == 'booster') return;
     resetState();
     setIsWithdrawalRequestsLoading(true);
     try {
       const userRequests = await getIfUserHasWithdrawalRequest(
         walletAccountAtom,
         selectedFarm.farmAddress,
-        selectedFarm.chain
+        selectedFarm.chain,
       );
       const userRequestslength = userRequests.length;
       if (userRequestslength > 0) {
@@ -175,6 +175,6 @@ export const useWithdrawal = ({
     resetState,
     setUseBiconomy,
     useBiconomy,
-    hasErrors: withdrawValueError != ''
+    hasErrors: withdrawValueError != '',
   };
 };

@@ -1,3 +1,4 @@
+import { roundNumberDown } from 'app/common/functions/utils';
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
 import {
@@ -228,7 +229,7 @@ export const Farm = () => {
                       {selectedFarm?.rewards.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + selectedFarm?.rewards.pendingValue}
+                      {'$' + roundNumberDown(selectedFarm?.rewards.pendingValue, 6)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>
