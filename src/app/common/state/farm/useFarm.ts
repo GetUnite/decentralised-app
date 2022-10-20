@@ -421,9 +421,10 @@ export const useFarm = ({ id }) => {
 
   const depositDivided = depositedAmount => {
     if (depositedAmount == 0) return { first: '0.0', second: '0' };
-    const dotIndex = depositedAmount.indexOf('.');
-    const balanceFirstPart = depositedAmount.substring(0, dotIndex + 3);
-    const balanceSecondPart = depositedAmount.substring(
+    const depositedAmountString = depositedAmount.toString();
+    const dotIndex = depositedAmountString.indexOf('.');
+    const balanceFirstPart = depositedAmountString.substring(0, dotIndex + 3);
+    const balanceSecondPart = depositedAmountString.substring(
       dotIndex + 3,
       dotIndex + 9,
     );
