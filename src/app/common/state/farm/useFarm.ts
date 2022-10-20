@@ -288,10 +288,13 @@ export const useFarm = ({ id }) => {
         valueOf1LPinUSDC,
       supportedTokensList: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
-          return await getSupportedTokensBasicInfo(
-            supportedtoken.address,
-            farm.chain,
-          );
+          return {
+            ...(await getSupportedTokensBasicInfo(
+              supportedtoken.address,
+              farm.chain,
+            )),
+            sign: supportedtoken.sign,
+          };
         }),
       ),
       depositedAmount: 0,
@@ -364,6 +367,7 @@ export const useFarm = ({ id }) => {
               balance: advancedSupportedTokenInfo.balance,
               allowance: advancedSupportedTokenInfo.allowance,
               decimals: supportedToken.decimals,
+              sign: supportedToken.sign,
               // For booster farm withdrawals
               // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
               // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
@@ -480,10 +484,10 @@ export const useFarm = ({ id }) => {
     const projectedLosableRewards =
       selectedFarm.rewards.pendingValue *
       (+withdrawValue / +selectedSupportedToken.boosterDepositedAmount);
-    setPendingRewards(selectedFarm.rewards.pendingValue - projectedLosableRewards);
-    setLosablePendingRewards(
-      projectedLosableRewards
+    setPendingRewards(
+      selectedFarm.rewards.pendingValue - projectedLosableRewards,
     );
+    setLosablePendingRewards(projectedLosableRewards);
   };
 
   const cancelBoosterWithdrawalConfirmation = async () => {
