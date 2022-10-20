@@ -2,10 +2,10 @@ import { EChain } from 'app/common/constants/chains';
 import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  getIfUserHasWithdrawalRequest,
-  isExpectedPolygonEvent,
-  listenToHandler,
-  withdrawStableCoin
+    getIfUserHasWithdrawalRequest,
+    isExpectedPolygonEvent,
+    listenToHandler,
+    withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -121,7 +121,7 @@ export const useWithdrawal = ({
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
     } else if (+value > (selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : +selectedFarm?.depositedAmount)) {
-      setWithdrawValueError('Not enough balance');
+      setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
   };

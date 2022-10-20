@@ -31,6 +31,7 @@ interface INumericInput {
   tokenOptions?: TSupportedToken[];
   error: string;
   maxValue?: string | number;
+  slippageWarning?: boolean;
 }
 
 export const NumericInput = ({
@@ -43,6 +44,7 @@ export const NumericInput = ({
   tokenOptions,
   selectedToken,
   setSelectedToken,
+  slippageWarning =false,
   error,
   ...rest
 }: INumericInput) => {
@@ -112,6 +114,7 @@ export const NumericInput = ({
             )}
           </AbsoluteBox>
         </RelativeBox>
+        {slippageWarning && <Text></Text>}
         {error && (
           <Text color="error" size="small" margin={{ top: 'small' }}>
             {error}
