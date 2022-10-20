@@ -305,7 +305,7 @@ export const useFarm = ({ id }) => {
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
       farmInfo.depositedAmount =
-        farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
+        +farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
       console.log({
         depositedAmountInLP: farmInfo.depositedAmountInLP,
         valueOf1LPinUSDC: valueOf1LPinUSDC,
