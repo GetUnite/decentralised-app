@@ -24,18 +24,20 @@ interface INumericInput {
   label?: string;
   tokenSign?: string;
   value: string;
+  available?: string;
   onValueChange: Function;
   selectedToken?: TSupportedToken;
   setSelectedToken?: Function;
   tokenOptions?: TSupportedToken[];
   error: string;
-  maxValue?: string;
+  maxValue?: string | number;
 }
 
 export const NumericInput = ({
   label,
   tokenSign,
   value,
+  available,
   maxValue,
   onValueChange,
   tokenOptions,
@@ -56,10 +58,16 @@ export const NumericInput = ({
             {label}
           </Text>
           <Text size="medium" color="soul">
-            {!!selectedToken &&
-              'Wallet: ' +
-                tokenSign +
-                roundNumberDown(+(+selectedToken?.balance))}
+            {available != undefined ? (
+              'Available: ' + tokenSign + roundNumberDown(+available)
+            ) : (
+              <>
+                {!!selectedToken &&
+                  'Wallet: ' +
+                    tokenSign +
+                    roundNumberDown(+(+selectedToken?.balance))}
+              </>
+            )}
           </Text>
         </Box>
         <RelativeBox margin={{ top: 'xxsmall' }}>
@@ -76,7 +84,7 @@ export const NumericInput = ({
             }}
           />
           <AbsoluteBox direction="row" gap="xsmall">
-            {maxValue && (
+            {maxValue != undefined && (
               <MaxButton
                 primary
                 onClick={() => {

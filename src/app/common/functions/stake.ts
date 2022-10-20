@@ -2,13 +2,16 @@ import { EChain } from 'app/common/constants/chains';
 import {
   approve,
   callContract,
-  getAlluoPrice,
   getCurrentWalletAddress,
-  sendTransaction
+  getPrice, sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
-import { EEthereumAddresses } from '../constants/addresses';
+import { EEthereumAddresses, EEthereumAddressesMainnet } from '../constants/addresses';
 import { toExactFixed } from './utils';
+
+export const getAlluoPrice = async () => {
+  return getPrice(EEthereumAddressesMainnet.ALLUO, EEthereumAddressesMainnet.USDC, 18, 6);
+};
 
 export const alluoToUsd = async alluoValueInWei => {
   const alluoPrice = await getAlluoPrice();

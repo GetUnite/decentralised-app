@@ -37,6 +37,8 @@ export const Farm = () => {
     showBoosterWithdrawalConfirmation,
     startBoosterWithdrawalConfirmation,
     cancelBoosterWithdrawalConfirmation,
+    pendingRewards,
+    losablePendingRewards
   } = useFarm({
     id,
   });
@@ -94,13 +96,14 @@ export const Farm = () => {
                     cancelBoosterWithdrawalConfirmation={
                       cancelBoosterWithdrawalConfirmation
                     }
+                    losablePendingRewards={losablePendingRewards}
                   />
                 </Tab>
               </Tabs>
             )}
           </>
         </Modal>
-        {showTabs && walletAccountAtom && !isLoading && (
+        {selectedFarm?.isBooster && showTabs && walletAccountAtom && !isLoading && (
           <Box gap="22px">
             <Box
               round={'medium'}
@@ -205,7 +208,7 @@ export const Farm = () => {
                       color: '#F59F31',
                       size: '0.5px',
                     }
-                  : {}
+                  : { size: '0px' }
               }
               style={
                 showBoosterWithdrawalConfirmation
@@ -229,7 +232,7 @@ export const Farm = () => {
                       {selectedFarm?.rewards.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + roundNumberDown(selectedFarm?.rewards.pendingValue, 6)}
+                      {'$' + roundNumberDown(pendingRewards, 6)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>
