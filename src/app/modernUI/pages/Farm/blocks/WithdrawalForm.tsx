@@ -83,7 +83,7 @@ export const WithdrawalForm = ({
                     <NumericInput
                       label={'Withdraw ' + selectedSupportedToken.label}
                       available={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
-                      tokenSign={selectedFarm.sign}
+                      tokenSign={selectedFarm.isBooster ? selectedSupportedToken.sign : selectedFarm.sign}
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
                       maxValue={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
@@ -91,6 +91,7 @@ export const WithdrawalForm = ({
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
+                      //slippageWarning={selectedFarm.isBooster}
                     />
                   </Box>
                 </Box>
