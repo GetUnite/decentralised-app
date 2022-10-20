@@ -8,7 +8,6 @@ import walletConnectModule from '@web3-onboard/walletconnect';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import {
   EEthereumAddresses,
-  EEthereumAddressesMainnet,
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
@@ -17,9 +16,7 @@ import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
 import {
   fromDecimals,
-  maximumUint256Value,
-  roundNumberDown,
-  toDecimals,
+  maximumUint256Value, toDecimals,
   toExactFixed
 } from './utils';
 
@@ -361,39 +358,36 @@ const marketApiURl =
     ? 'https://protocol-mainnet.gnosis.io/api'
     : 'https://protocol-mainnet.dev.gnosisdev.com/api';
 
-export const getTokenUSDCPrice = async (tokenAddress): Promise<number> => {
-  const pathforUSDC =
-    marketApiURl +
-    `/v1/markets/${tokenAddress}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
+export const getPrice = async (
+  sellToken,
+  buyToken,
+  sellDecimals,
+  buyDecimals,
+) => {
+  const url = marketApiURl + `/v1/quote`;
 
-  const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
+  // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
+  const value = toDecimals(1000, sellDecimals);
 
-  const price = +fromDecimals(usdcPrice.amount, 6);
-  return price;
-};
+  const priceResponse = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json;charset=UTF-8',
+    },
+    body: JSON.stringify({
+      sellToken: sellToken,
+      buyToken: buyToken,
+      sellAmountBeforeFee: value,
+      from: walletAddress,
+      kind: 'sell',
+    }),
+  }).then(res => res.json());
 
-export const getAlluoPrice = async (): Promise<number> => {
-  const pathforUSDC =
-    marketApiURl +
-    `/v1/markets/${EEthereumAddressesMainnet.ALLUO}-${EEthereumAddressesMainnet.USDC}/sell/1000000000000000000`;
+  const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
 
-  const usdcPrice = await fetch(pathforUSDC).then(res => res.json());
-
-  const alluoPrice = +fromDecimals(usdcPrice.amount, 6);
-  return alluoPrice;
-};
-
-export const getAlluoPriceInWETH = async (value = 1): Promise<string> => {
-  const valueInDecimals = toDecimals(value, 18);
-
-  const pathforWETH =
-    marketApiURl +
-    `/v1/markets/${EEthereumAddressesMainnet.WETH}-${EEthereumAddressesMainnet.ALLUO}/sell/${valueInDecimals}`;
-
-  const wethPriceObj = await fetch(pathforWETH).then(res => res.json());
-  const wethPrice = wethPriceObj?.amount || 0;
-
-  return fromDecimals(wethPrice, 18);
+  // We multiplied the value by 1000 so now divide it
+  return price / 1000;
 };
 
 export const isExpectedPolygonEvent = (type, depositAddress) => {
@@ -1091,59 +1085,6 @@ export const depositIntoBoosterFarm = async (
   );
 
   return tx;
-};
-
-export const getBoosterFarmRewards = async (farmAddress, chain) => {
-  const farmAbi = [
-    {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'earned',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const curvePoolAbi = [
-    {
-      stateMutability: 'view',
-      type: 'function',
-      name: 'calc_withdraw_one_coin',
-      inputs: [
-        { name: '_token_amount', type: 'uint256' },
-        { name: 'i', type: 'int128' },
-      ],
-      outputs: [{ name: '', type: 'uint256' }],
-    },
-  ];
-
-  const curvePoolAddress = EEthereumAddresses.CURVEPOOL;
-
-  const value = await callContract(
-    farmAbi,
-    farmAddress,
-    'earned(address)',
-    [walletAddress],
-    chain,
-  );
-
-  const stableValue =
-    value > 0
-      ? await callContract(
-          curvePoolAbi,
-          curvePoolAddress,
-          'calc_withdraw_one_coin(uint256,int128)',
-          [value, 1],
-          chain,
-        )
-      : 0;
-
-  const valueAmountInDecimals = fromDecimals(value, 18);
-
-  return {
-    value: roundNumberDown(valueAmountInDecimals, 8),
-    stableValue: stableValue ? fromDecimals(stableValue, 6) : '0',
-  };
 };
 
 export const approve = async (

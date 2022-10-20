@@ -22,6 +22,7 @@ export const WithdrawalForm = ({
   showBoosterWithdrawalConfirmation,
   startBoosterWithdrawalConfirmation,
   cancelBoosterWithdrawalConfirmation,
+  losablePendingRewards,
   ...rest
 }) => {
   const {
@@ -58,6 +59,7 @@ export const WithdrawalForm = ({
               cancelBoosterWithdrawalConfirmation
             }
             nextHarvestDate={nextHarvestDate}
+            losablePendingRewards={losablePendingRewards}
           />
         ) : (
           <>
@@ -80,10 +82,11 @@ export const WithdrawalForm = ({
                   <Box margin={{ top: 'medium' }}>
                     <NumericInput
                       label={'Withdraw ' + selectedSupportedToken.label}
+                      available={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
                       tokenSign={selectedFarm.sign}
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
-                      maxValue={selectedFarm.depositedAmount}
+                      maxValue={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
                       tokenOptions={selectedFarm.supportedTokens || []}
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
@@ -125,10 +128,17 @@ export const WithdrawalForm = ({
         <SubmitButton
           primary
           label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
-          onClick={
+          disabled={
+            isLoading ||
+            isWithdrawing ||
+            isWithdrawalRequestsLoading ||
+            !+withdrawValue ||
+            hasErrors
+          }
+          onClick={() => 
             selectedFarm?.isBooster
-              ? startBoosterWithdrawalConfirmation
-              : handleWithdraw
+              ? startBoosterWithdrawalConfirmation(withdrawValue)
+              : handleWithdraw()
           }
         />
       </Box>)}
