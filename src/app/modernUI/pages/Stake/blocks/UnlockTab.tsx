@@ -104,7 +104,7 @@ export const UnlockTab = ({
             primary
             disabled={(!canWithdraw && +unlockValue === 0) || isUnlocking}
             label="Unlock"
-            onClick={startReunlockConfirmation}
+            onClick={!allTimersAreFinished ? startReunlockConfirmation : handleUnlock}
           />
         </Box>
       )}

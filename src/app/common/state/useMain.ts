@@ -154,13 +154,19 @@ export const useMain = () => {
 
   const fetchBoosterFarmInfo = async farm => {
     let farmInfo;
+
+    const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
+      farm.lPTokenAddress,
+      farm.chain,
+    );
+    
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
         farm.convexFarmIds,
         farm.chain,
       ),
-      totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
+      totalAssetSupply: +(await getTotalAssets(farm.farmAddress, farm.chain)) * valueOf1LPinUSDC,
       supportedTokens: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
           return await getSupportedTokensBasicInfo(
@@ -178,12 +184,8 @@ export const useMain = () => {
       );
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.valueOf1LPinUSDC = await getValueOf1LPinUSDC(
-        farm.lPTokenAddress,
-        farm.chain,
-      );
       farmInfo.depositedAmount =
-        roundNumberDown(farmInfo.depositedAmountInLP * farmInfo.valueOf1LPinUSDC);
+        roundNumberDown(farmInfo.depositedAmountInLP * valueOf1LPinUSDC);
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0

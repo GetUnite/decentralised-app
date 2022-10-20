@@ -366,8 +366,8 @@ export const getPrice = async (
 ) => {
   const url = marketApiURl + `/v1/quote`;
 
-  // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
-  const value = toDecimals(1000, sellDecimals);
+  // quote returns the value accounting with fee so using 10000 to prevent the fee being higher than the actual value
+  const value = toDecimals(10000, sellDecimals);
 
   const priceResponse = await fetch(url, {
     method: 'POST',
@@ -387,7 +387,7 @@ export const getPrice = async (
   const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
 
   // We multiplied the value by 1000 so now divide it
-  return price / 1000;
+  return price / 10000;
 };
 
 export const isExpectedPolygonEvent = (type, depositAddress) => {
