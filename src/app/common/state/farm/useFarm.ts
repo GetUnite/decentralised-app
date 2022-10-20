@@ -50,16 +50,16 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     },
     lPTokenAddress: EEthereumAddresses.FRAXUSDC,
     supportedTokensAddresses: [
-      { address: EEthereumAddresses.USDC, label: 'USDC' },
-      { address: EEthereumAddresses.DAI, label: 'DAI' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX' },
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR' },
-      { address: EEthereumAddresses.EURS, label: 'EURS' },
-      { address: EEthereumAddresses.EURT, label: 'EURT' },
-      { address: EEthereumAddresses.WETH, label: 'WETH' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC' },
-      { address: EEthereumAddresses.CRV, label: 'CRV' },
-      { address: EEthereumAddresses.CVX, label: 'CVX' },
+      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
+      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
+      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
+      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
+      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
+      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
+      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
+      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
+      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
+      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
     ],
 
     convexFarmIds: { A: 100, B: 64 },
@@ -81,16 +81,16 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     },
     lPTokenAddress: EEthereumAddresses.CVXETH,
     supportedTokensAddresses: [
-      { address: EEthereumAddresses.USDC, label: 'USDC' },
-      { address: EEthereumAddresses.DAI, label: 'DAI' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX' },
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR' },
-      { address: EEthereumAddresses.EURS, label: 'EURS' },
-      { address: EEthereumAddresses.EURT, label: 'EURT' },
-      { address: EEthereumAddresses.WETH, label: 'WETH' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC' },
-      { address: EEthereumAddresses.CRV, label: 'CRV' },
-      { address: EEthereumAddresses.CVX, label: 'CVX' },
+      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
+      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
+      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
+      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
+      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
+      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
+      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
+      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
+      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
+      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
     ],
     convexFarmIds: { A: 64, B: 64 },
   },
@@ -111,16 +111,16 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     },
     lPTokenAddress: EEthereumAddresses.STETHETH,
     supportedTokensAddresses: [
-      { address: EEthereumAddresses.USDC, label: 'USDC' },
-      { address: EEthereumAddresses.DAI, label: 'DAI' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX' },
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR' },
-      { address: EEthereumAddresses.EURS, label: 'EURS' },
-      { address: EEthereumAddresses.EURT, label: 'EURT' },
-      { address: EEthereumAddresses.WETH, label: 'WETH' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC' },
-      { address: EEthereumAddresses.CRV, label: 'CRV' },
-      { address: EEthereumAddresses.CVX, label: 'CVX' },
+      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
+      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
+      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
+      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
+      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
+      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
+      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
+      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
+      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
+      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
     ],
     convexFarmIds: { A: 25, B: 64 },
   },
@@ -288,10 +288,13 @@ export const useFarm = ({ id }) => {
         valueOf1LPinUSDC,
       supportedTokensList: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
-          return await getSupportedTokensBasicInfo(
-            supportedtoken.address,
-            farm.chain,
-          );
+          return {
+            ...(await getSupportedTokensBasicInfo(
+              supportedtoken.address,
+              farm.chain,
+            )),
+            sign: supportedtoken.sign,
+          };
         }),
       ),
       depositedAmount: 0,
@@ -306,11 +309,6 @@ export const useFarm = ({ id }) => {
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
       farmInfo.depositedAmount =
         +farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
-      console.log({
-        depositedAmountInLP: farmInfo.depositedAmountInLP,
-        valueOf1LPinUSDC: valueOf1LPinUSDC,
-        depositedAmount: farmInfo.depositedAmount,
-      });
       farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
       farmInfo.rewards = {
         ...farm.rewards,
@@ -369,6 +367,7 @@ export const useFarm = ({ id }) => {
               balance: advancedSupportedTokenInfo.balance,
               allowance: advancedSupportedTokenInfo.allowance,
               decimals: supportedToken.decimals,
+              sign: supportedToken.sign,
               // For booster farm withdrawals
               // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
               // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
@@ -481,14 +480,14 @@ export const useFarm = ({ id }) => {
 
   const startBoosterWithdrawalConfirmation = async withdrawValue => {
     setShowBoosterWithdrawalConfirmation(true);
-    // projected value of the unrealized rewards after withdraw
-    const projectedPendingRewards =
+    // Losable rewards will be the pending value * % of shares to withdraw
+    const projectedLosableRewards =
       selectedFarm.rewards.pendingValue *
-      (+selectedFarm.depositedAmountInLP / +withdrawValue);
-    setPendingRewards(projectedPendingRewards);
-    setLosablePendingRewards(
-      selectedFarm.rewards.pendingValue - projectedPendingRewards,
+      (+withdrawValue / +selectedSupportedToken.boosterDepositedAmount);
+    setPendingRewards(
+      selectedFarm.rewards.pendingValue - projectedLosableRewards,
     );
+    setLosablePendingRewards(projectedLosableRewards);
   };
 
   const cancelBoosterWithdrawalConfirmation = async () => {
