@@ -19,7 +19,7 @@ export const BoosterFarmWithdrawalConfirmation = ({
         <Box gap="20px" margin={{ top: '26px' }}>
           <Text textAlign="center" weight="bold" size="24px">
             If you withdraw {withdrawValue} {withdrawTokenLabel} now, about
-            ${roundNumberDown(losablePendingRewards, 2)} in pending rewards won't be realised.
+            ${roundNumberDown(losablePendingRewards, 6)} in pending rewards won't be realised.
           </Text>
           <Text textAlign="center" weight={400} size="16px">
             Any unrealised rewards will be redistributed amongst the pool. Wait
