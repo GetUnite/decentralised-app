@@ -27,7 +27,7 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setLockValueError('Write a valid number');
     } else if (+value > +alluoInfo?.balance) {
-      setLockValueError('Not enough balance');
+      setLockValueError('Insufficient balance');
     }
     setLockValue(value);
   };

@@ -1,9 +1,9 @@
 import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositIntoBoosterFarm,
-  depositStableCoin
+    approveStableCoin,
+    depositIntoBoosterFarm,
+    depositStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
@@ -55,7 +55,7 @@ export const useDeposit = ({
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setDepositValueError('Write a valid number');
     } else if (+value > +selectedSupportedToken?.balance) {
-      setDepositValueError('Not enough balance');
+      setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
   };

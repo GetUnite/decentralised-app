@@ -1,17 +1,17 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  approveAlluoPurchaseInWETH,
-  buyAlluoWithWETH,
-  getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
-  getVlAlluoTotalSupply,
-  getWETHAllowance,
-  getWEthBalance
+    approveAlluoPurchaseInWETH,
+    buyAlluoWithWETH,
+    getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
+    getVlAlluoTotalSupply,
+    getWETHAllowance,
+    getWEthBalance
 } from 'app/common/functions/buy';
 import {
-  approveAlluoStaking,
-  getAlluoStakingAllowance,
-  getAlluoStakingAPR,
-  lockAlluo
+    approveAlluoStaking,
+    getAlluoStakingAllowance,
+    getAlluoStakingAPR,
+    lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -99,7 +99,7 @@ export const useBuy = () => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.'))
       setInputValueError('Write a valid number');
-    else if (+value > +wethBalance) setInputValueError('Not enough balance');
+    else if (+value > +wethBalance) setInputValueError('Insufficient balance');
     else setInputValue(value);
   };
 
