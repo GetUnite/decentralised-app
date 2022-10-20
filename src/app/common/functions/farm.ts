@@ -131,7 +131,6 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
     }
   }
 
-  console.log(pendingRewardsByToken);
   const pendingRewardsInUSDC = await Promise.all(
     pendingRewardsByToken.map(async prbt => {
       const tokenPrice = await getPrice(

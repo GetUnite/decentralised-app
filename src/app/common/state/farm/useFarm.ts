@@ -271,13 +271,21 @@ export const useFarm = ({ id }) => {
 
   const fetchBoosterFarmInfo = async farm => {
     let farmInfo;
+
+    const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
+      farm.lPTokenAddress,
+      farm.chain,
+    );
+
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
         farm.convexFarmIds,
         farm.chain,
       ),
-      totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
+      totalAssetSupply:
+        +(await getTotalAssets(farm.farmAddress, farm.chain)) *
+        valueOf1LPinUSDC,
       supportedTokensList: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
           return await getSupportedTokensBasicInfo(
@@ -287,6 +295,7 @@ export const useFarm = ({ id }) => {
         }),
       ),
       depositedAmount: 0,
+      valueOf1LPinUSDC: valueOf1LPinUSDC,
     };
     if (walletAccountAtom) {
       farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
@@ -295,12 +304,13 @@ export const useFarm = ({ id }) => {
       );
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.valueOf1LPinUSDC = await getValueOf1LPinUSDC(
-        farm.lPTokenAddress,
-        farm.chain,
-      );
       farmInfo.depositedAmount =
-        farmInfo.depositedAmountInLP * farmInfo.valueOf1LPinUSDC;
+        farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
+      console.log({
+        depositedAmountInLP: farmInfo.depositedAmountInLP,
+        valueOf1LPinUSDC: valueOf1LPinUSDC,
+        depositedAmount: farmInfo.depositedAmount,
+      });
       farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
       farmInfo.rewards = {
         ...farm.rewards,
@@ -328,7 +338,9 @@ export const useFarm = ({ id }) => {
           stableCoin => stableCoin?.address == selectedSupportedToken?.address,
         ),
       );
-      setPendingRewards(farm.rewards.pendingValue);
+      if (farm.isBooster) {
+        setPendingRewards(farm.rewards.pendingValue);
+      }
       setSelectedFarm(farm);
     } catch (error) {
       console.log(error);
@@ -393,7 +405,9 @@ export const useFarm = ({ id }) => {
       setSelectedsupportedToken(
         farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
       );
-      setPendingRewards(farm.rewards.pendingValue);
+      if (farm.isBooster) {
+        setPendingRewards(farm.rewards.pendingValue);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -501,6 +515,6 @@ export const useFarm = ({ id }) => {
     startBoosterWithdrawalConfirmation,
     cancelBoosterWithdrawalConfirmation,
     pendingRewards,
-    losablePendingRewards
+    losablePendingRewards,
   };
 };

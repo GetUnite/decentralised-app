@@ -1,7 +1,7 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  getIbAlluoInfo, transferToAddress
+    getIbAlluoInfo, transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -103,7 +103,7 @@ export const useTransfer = () => {
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setTransferValueError('Write a valid number');
     } else if (+value > +(selectedIbAlluoInfo?.balance || 0)) {
-      setTransferValueError('Not enough balance');
+      setTransferValueError('Insufficient balance');
     } else {
       setTransferValue(value);
     }
