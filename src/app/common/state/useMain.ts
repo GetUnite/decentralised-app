@@ -13,19 +13,16 @@ import {
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
-import { toExactFixed } from '../functions/utils';
+import { getValueOf1LPinUSDC } from '../functions/farm';
+import { roundNumberDown, toExactFixed } from '../functions/utils';
 import { TFarm } from '../types/farm';
 import { TAssetsInfo } from '../types/heading';
 import { initialAvailableFarmsState } from './farm/useFarm';
 import { useNotification } from './useNotification';
 
 export const useMain = () => {
-  // react
-  const [cookies] = useCookies(['has_seen_boost_farms']);
-
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -58,7 +55,15 @@ export const useMain = () => {
 
   useEffect(() => {
     filterFarms();
-  }, [availableFarms, viewType, sortField, sortDirectionIsAsc, isSafeAppAtom]);
+  }, [
+    availableFarms,
+    viewType,
+    sortField,
+    sortDirectionIsAsc,
+    isSafeAppAtom,
+    tokenFilter,
+    networkFilter,
+  ]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
@@ -111,11 +116,6 @@ export const useMain = () => {
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
-        if (!cookies.has_seen_boost_farms) {
-          availableFarms.sort(function (a, b) {
-            return a.isBooster ? -1 : 1;
-          });
-        }
         setAvailableFarms(availableFarms);
         setAllSupportedTokens(Array.from(allSupportedTokens));
       });
@@ -172,10 +172,19 @@ export const useMain = () => {
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = toExactFixed(
-        await getUserDepositedLPAmount(farm.farmAddress, farm.chain),
-        4,
+      farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
+        farm.farmAddress,
+        farm.chain,
       );
+      // Let's use the depositedAmount to store the deposited amount in USD(C)
+      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
+      farmInfo.valueOf1LPinUSDC = await getValueOf1LPinUSDC(
+        farm.lPTokenAddress,
+        farm.chain,
+      );
+      farmInfo.depositedAmount =
+        roundNumberDown(farmInfo.depositedAmountInLP * farmInfo.valueOf1LPinUSDC);
+
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
@@ -271,11 +280,10 @@ export const useMain = () => {
       }
     }
 
-    console.log({isSafeAppAtom, wallet: walletAccountAtom})
     if (isSafeAppAtom && walletAccountAtom) {
       const chainId = await getCurrentChainId();
       const chain = await getChainById(chainId);
-      console.log({chain: chain, chainId: chainId})
+      console.log({ chain: chain, chainId: chainId });
 
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }

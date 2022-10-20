@@ -2,8 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import {
   approveAlluoPurchaseInWETH,
   buyAlluoWithWETH,
-  getAlluoBalance,
-  getVlAlluoBalance,
+  getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
   getVlAlluoTotalSupply,
   getWETHAllowance,
   getWEthBalance
@@ -15,7 +14,6 @@ import {
   lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
-import { getAlluoPriceInWETH } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';

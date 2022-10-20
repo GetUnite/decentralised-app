@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { withdrawFromBoosterFarm } from 'app/common/functions/farm';
+import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   getIfUserHasWithdrawalRequest,
@@ -120,7 +120,7 @@ export const useWithdrawal = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
-    } else if (+value > +selectedFarm?.depositedAmount) {
+    } else if (+value > (selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : +selectedFarm?.depositedAmount)) {
       setWithdrawValueError('Not enough balance');
     }
     setWithdrawValue(value);
@@ -140,7 +140,10 @@ export const useWithdrawal = ({
         blockNumber = await withdrawFromBoosterFarm(
           selectedFarm.farmAddress,
           selectedSupportedToken.address,
-          withdrawValue,
+          // The withdraw value is always referent to the selected supported token
+          // But the contract for booster farm withdrawal expects the value as LP/Shares
+          // Thus, convert the value into LP
+          await convertToLP(withdrawValue, selectedSupportedToken.address, selectedSupportedToken.decimals, selectedFarm.valueOf1LPinUSDC),
           selectedSupportedToken.decimals,
           selectedFarm.chain,
           useBiconomy,

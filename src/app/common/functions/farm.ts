@@ -1,10 +1,11 @@
+import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
-import { fromDecimals, toDecimals } from './utils';
+import { fromDecimals, roundNumberDown, toDecimals } from './utils';
 import {
-    callContract,
-    getCurrentWalletAddress,
-    getTokenUSDCPrice,
-    sendTransaction
+  callContract,
+  getCurrentWalletAddress,
+  getPrice,
+  sendTransaction
 } from './web3Client';
 
 export const withdrawFromBoosterFarm = async (
@@ -113,25 +114,6 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
     chain,
   );
 
-shareholderAccruedRewards = [
-    [
-      {
-        token: '0xd533a949740bb3306d119cc777fa900ba034cd52',
-        amount: '478075760298449',
-      },
-    ],
-    [
-      {
-        token: '0xd533a949740bb3306d119cc777fa900ba034cd52',
-        amount: '0',
-      },
-      {
-        token: '0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b',
-        amount: '0',
-      },
-    ],
-  ];
-
   let pendingRewardsByToken = [];
   for (const pendingRewardsArray of shareholderAccruedRewards) {
     for (const pendingRewards of pendingRewardsArray) {
@@ -149,16 +131,113 @@ shareholderAccruedRewards = [
     }
   }
 
+  console.log(pendingRewardsByToken);
   const pendingRewardsInUSDC = await Promise.all(
     pendingRewardsByToken.map(async prbt => {
-      const tokenPrice = await getTokenUSDCPrice(prbt.token);
-      return +fromDecimals(prbt.amount, 18) * tokenPrice;
+      const tokenPrice = await getPrice(
+        prbt.token,
+        EEthereumAddresses.USDC,
+        18,
+        6,
+      );
+      return +fromDecimals(prbt.amount.toString(), 18) * tokenPrice;
     }),
   );
-  console.log(pendingRewardsInUSDC);
 
   return pendingRewardsInUSDC.reduce(
     (previous, current) => previous + current,
     0,
   );
+};
+
+export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'address', name: 'token', type: 'address' },
+        { internalType: 'uint256', name: 'fiatId', type: 'uint256' },
+      ],
+      name: 'getPrice',
+      outputs: [
+        { internalType: 'uint256', name: 'value', type: 'uint256' },
+        { internalType: 'uint8', name: 'decimals', type: 'uint8' },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
+
+  // The fiatId for USDC is 1
+  const priceInUSDC = await callContract(
+    abi,
+    priceFeedRouter,
+    'getPrice(address,uint256)',
+    [lPTokenAddress, 1],
+    chain,
+  );
+
+  return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
+};
+
+export const getBoosterFarmRewards = async (
+  farmAddress,
+  valueOf1LPinUSDC,
+  chain,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'earned',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const value = await callContract(
+    abi,
+    farmAddress,
+    'earned(address)',
+    [getCurrentWalletAddress()],
+    chain,
+  );
+
+  const valueAmountInDecimals = fromDecimals(value, 18);
+
+  const stableValue = +valueAmountInDecimals * valueOf1LPinUSDC;
+
+  return {
+    value: roundNumberDown(valueAmountInDecimals, 8),
+    stableValue: stableValue,
+  };
+};
+
+export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
+  if (tokenAddress == EEthereumAddresses.USDC) {
+    return valueInUSDC;
+  }
+  const tokenPrice = await getPrice(
+    EEthereumAddresses.USDC,
+    tokenAddress,
+    6,
+    decimals,
+  );
+  return valueInUSDC * tokenPrice;
+};
+
+export const convertToLP = async (
+  value,
+  tokenAddress,
+  decimals,
+  valueOf1LPinUSDC,
+) => {
+  const usdcPrice = await getPrice(
+    tokenAddress,
+    EEthereumAddresses.USDC,
+    decimals,
+    6,
+  );
+  return (usdcPrice * value) / valueOf1LPinUSDC;
 };
