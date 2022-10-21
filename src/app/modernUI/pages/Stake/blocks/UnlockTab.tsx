@@ -1,4 +1,4 @@
-import { roundNumberDown, timerIsFinished } from 'app/common/functions/utils';
+import { roundNumberDown } from 'app/common/functions/utils';
 import { useUnlock } from 'app/common/state/stake';
 import {
   Info,
@@ -16,6 +16,7 @@ export const UnlockTab = ({
   startReunlockConfirmation,
   showReunlockConfirmation,
   cancelReunlockConfirmation,
+  allTimersAreFinished,
   ...rest
 }) => {
   const {
@@ -26,13 +27,6 @@ export const UnlockTab = ({
     handleUnlock,
     unlockValueError,
   } = useUnlock({ alluoInfo, updateAlluoInfo });
-
-  const allTimersAreFinished =
-    timerIsFinished(alluoInfo?.depositUnlockTime) &&
-    timerIsFinished(alluoInfo?.withdrawUnlockTime);
-
-  const canWithdraw =
-    timerIsFinished(alluoInfo?.withdrawUnlockTime) && +alluoInfo?.unlocked > 0;
 
   return (
     <Box fill>
@@ -102,7 +96,7 @@ export const UnlockTab = ({
         <Box margin={{ top: 'large' }} style={{ height: 52 }}>
           <SubmitButton
             primary
-            disabled={(!canWithdraw && +unlockValue === 0) || isUnlocking}
+            disabled={(+unlockValue === 0) || isUnlocking}
             label="Unlock"
             onClick={!allTimersAreFinished ? startReunlockConfirmation : handleUnlock}
           />
