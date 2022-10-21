@@ -21,6 +21,10 @@ export const Stake = ({ ...rest }) => {
     cancelReunlockConfirmation,
   } = useStake();
 
+  const allTimersAreFinished =
+    timerIsFinished(alluoInfo?.depositUnlockTime) &&
+    timerIsFinished(alluoInfo?.withdrawUnlockTime);
+
   const renderModal = () => {
     return (
       <>
@@ -28,7 +32,7 @@ export const Stake = ({ ...rest }) => {
           <Box gap="28px">
             {walletAccountAtom && !isLoading && (
               <Box gap="16px">
-                {+alluoInfo?.unlocked > 0 && (
+                {+alluoInfo?.unlocked > 0 && allTimersAreFinished && (
                   <Box
                     round={'medium'}
                     width="245px"
@@ -109,6 +113,7 @@ export const Stake = ({ ...rest }) => {
                 startReunlockConfirmation={startReunlockConfirmation}
                 showReunlockConfirmation={showReunlockConfirmation}
                 cancelReunlockConfirmation={cancelReunlockConfirmation}
+                allTimersAreFinished={allTimersAreFinished}
               />
             </Tab>
           </Tabs>

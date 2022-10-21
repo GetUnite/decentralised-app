@@ -1,7 +1,7 @@
 import { Box, Text } from 'grommet';
 import Countdown, {
-    CountdownTimeDelta,
-    formatTimeDelta
+  CountdownTimeDelta,
+  formatTimeDelta
 } from 'react-countdown';
 
 export const UnlockCountdown = (
