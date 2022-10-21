@@ -1,36 +1,35 @@
-import { EChain } from 'app/common/functions/Web3Client';
-import { ENotificationId, walletAccount } from 'app/common/state/atoms';
+import { EChain } from 'app/common/constants/chains';
 import { useNotification } from 'app/common/state';
+import { ENotificationId, walletAccount } from 'app/common/state/atoms';
 import { ChainBadge, ConnectionButton, Spinner } from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, Text } from 'grommet';
 import { FormClose } from 'grommet-icons';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
 interface IModal {
-  size: any;
   chain: EChain;
   heading: any;
   isLoading?: boolean;
+  showChainBadge?: boolean;
   notificationId?: ENotificationId;
   children: React.ReactNode;
   noHeading?: boolean;
-  contentHeight?: string;
+  closeAction?: Function;
 }
 
 export const Modal = ({
-  size,
   chain,
   heading,
   isLoading = false,
+  showChainBadge = true,
   children,
   noHeading = false,
-  contentHeight,
+  closeAction,
 }: IModal) => {
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
-  const toggleForm = () => {
+  const closeModal = () => {
     resetNotification();
     navigate('/');
   };
@@ -40,7 +39,6 @@ export const Modal = ({
   return (
     <Box fill justify="center" align="center">
       <Box
-        margin={isSmall(size) ? 'none' : { vertical: 'small' }}
         round={'medium'}
         overflow="auto"
         width="medium"
@@ -63,15 +61,19 @@ export const Modal = ({
               <Box direction="row" fill="horizontal" justify="between">
                 <Heading size="small" level={3} margin="none">
                   <Box alignContent="between" direction="row" fill="horizontal">
-                    {!isLoading && heading}
+                    {heading}
                   </Box>
                 </Heading>
                 <Box direction="row" gap="small" align="end">
-                  {!isLoading && <ChainBadge chain={chain} />}
+                  {showChainBadge && <ChainBadge chain={chain} />}
                 </Box>
               </Box>
             )}
-            <Button plain fill="vertical" onClick={toggleForm}>
+            <Button
+              plain
+              fill="vertical"
+              onClick={() => (closeAction ? closeAction() : closeModal())}
+            >
               <Box
                 style={{
                   width: 32,
@@ -86,11 +88,7 @@ export const Modal = ({
               </Box>
             </Button>
           </Box>
-          <Box
-            direction="column"
-            fill="vertical"
-            gap="small"
-          >
+          <Box direction="column" fill="vertical" gap="small">
             {!walletAccountAtom ? (
               <Box margin={{ vertical: 'large' }}>
                 <Text textAlign="center" weight="bold">
@@ -103,7 +101,6 @@ export const Modal = ({
                 fill="vertical"
                 margin={{ vertical: 'medium' }}
                 gap="small"
-                style={contentHeight ? { minHeight: contentHeight } : {}}
               >
                 {isLoading ? (
                   <Box

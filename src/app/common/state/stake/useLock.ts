@@ -1,108 +1,76 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import {
-  approveAlluoTransaction,
-  lockAlluoToken,
-  getTokenInfo,
-  EChain,
-} from 'app/common/functions/Web3Client';
-import { tokenInfo, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { useNotification, ENotificationId } from 'app/common/state';
-import { isNumeric, maximumUint256Value } from 'app/common/functions/utils';
+import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
+import { isNumeric } from 'app/common/functions/utils';
+import { useNotification } from 'app/common/state';
+import { useState } from 'react';
 
-export const useLock = () => {
+export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
+  // other state control files
   const { setNotificationt, resetNotification } = useNotification();
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-  const [walletAccountAtom] = useRecoilState(walletAccount);
-  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
+  // inputs
   const [lockValue, setLockValue] = useState<string>();
+  const [lockValueError, setLockValueError] = useState<string>();
+
+  // loading control
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isLocking, setIsLocking] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (walletAccountAtom) {
-      setWantedChainAtom(EChain.ETHEREUM);
-      setAccountInformation();
-    }
-  }, [walletAccountAtom]);
 
   const resetState = () => {
-    setError('');
     resetNotification();
-    setIsLocking(false);
+    setLockValueError('');
     setIsApproving(false);
+    setIsLocking(false);
   };
 
-  const handleLockValueChange = e => {
-    const { value } = e.target;
-
+  const handleLockValueChange = value => {
     resetState();
-    if (isNumeric(value) || value === '' || value === '.') setLockValue(value);
-    else setError('Write a valid number');
-  };
-
-  const handleSetLockToMax = () => {
-    resetState();
-    setLockValue(tokenInfoAtom.alluoBalance + '');
-  };
-
-  const setAccountInformation = async () => {
-    setTokenInfoAtom({
-      isLoading: true,
-    });
-
-    const tokenInfoData = await getTokenInfo(walletAccountAtom);
-    setTokenInfoAtom(tokenInfoData);
+    if (!(isNumeric(value) || value === '' || value === '.')) {
+      setLockValueError('Write a valid number');
+    } else if (+value > +alluoInfo?.balance) {
+      setLockValueError('Insufficient balance');
+    }
+    setLockValue(value);
   };
 
   const handleApprove = async () => {
-    resetNotification();
+    resetState();
     setIsApproving(true);
 
     try {
-      await approveAlluoTransaction(maximumUint256Value);
-      setAccountInformation();
+      await approveAlluoStaking();
+      await updateAlluoInfo();
     } catch (err) {
       console.error('Error', err.message);
       setNotificationt(err.message, 'error');
     }
-    
+
     setIsApproving(false);
   };
-  const handleLockAction = async () => {
-    resetNotification();
+
+  const handleLock = async () => {
+    resetState();
     setIsLocking(true);
 
     try {
-      await lockAlluoToken(lockValue);
-      setAccountInformation();
+      await lockAlluo(lockValue);
+      await updateAlluoInfo();
       setLockValue(null);
       setNotificationt('Successfully locked', 'success');
-    } catch (err) {
-      console.error('Error', err.message);
-      setNotificationt(err.message, error);
+    } catch (error) {
+      setNotificationt(error, 'error');
     }
 
     setIsLocking(false);
   };
 
-  const setToMax = () => {
-    setError('');
-    setLockValue(tokenInfoAtom.alluoBalance);
-  };
-
   return {
-    notificationId: ENotificationId.LOCK,
-    error,
     lockValue,
     isApproving,
     isLocking,
     handleLockValueChange,
-    handleSetLockToMax,
     handleApprove,
-    handleLockAction,
-    setToMax,
+    handleLock,
+    lockValueError,
+    hasErrors: lockValueError != '',
   };
 };

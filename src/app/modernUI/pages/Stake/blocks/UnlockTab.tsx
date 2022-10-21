@@ -1,243 +1,107 @@
-import { tokenInfo } from 'app/common/state/atoms';
+import { roundNumberDown } from 'app/common/functions/utils';
 import { useUnlock } from 'app/common/state/stake';
-import { Info, Input, Notification, Spinner, SubmitButton } from 'app/modernUI/components';
-import { Box, Button, Heading, Text } from 'grommet';
-import { useState } from 'react';
-import Countdown, {
-  CountdownTimeDelta,
-  formatTimeDelta,
-} from 'react-countdown';
-import { useRecoilState } from 'recoil';
+import {
+  Info,
+  RangeInput,
+  Spinner,
+  SubmitButton
+} from 'app/modernUI/components';
+import { Box, Text } from 'grommet';
+import { ReunlockConfirmation } from './ReunlockConfirmation';
 
-export const UnlockTab = ({ ...rest }) => {
+export const UnlockTab = ({
+  isLoading,
+  alluoInfo,
+  updateAlluoInfo,
+  startReunlockConfirmation,
+  showReunlockConfirmation,
+  cancelReunlockConfirmation,
+  allTimersAreFinished,
+  ...rest
+}) => {
   const {
-    notificationId,
     unlockValue,
     isUnlocking,
-    isWithdrawing,
+    projectedUnlockValue,
     handleUnlockValueChange,
-    handleUnlockAction,
-    withdraw,
-    setToMax,
-    setAccountInformation,
-  } = useUnlock();
-
-  const [tokenInfoAtom, setTokenInfoAtom] = useRecoilState(tokenInfo);
-
-  const [isDepositCountdownCompleted, setIsDepositCountdownCompleted] =
-    useState(true);
-  const [isWithdrawCountdownCompleted, setIsWithdrawCountdownCompleted] =
-    useState(true);
-  // const [reset, setReset] = useState(0);
-  const timerIsFinished = expectedTime => {
-    return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
-  };
-  const allTimersAreFinished =
-    timerIsFinished(tokenInfoAtom.infoByAddress?.depositUnlockTime_) &&
-    timerIsFinished(tokenInfoAtom.infoByAddress?.withdrawUnlockTime_);
-
-  /*console.log(
-    'Log',
-    timerIsFinished(tokenInfoAtom.infoByAddress?.depositUnlockTime_),
-    timerIsFinished(tokenInfoAtom.infoByAddress?.withdrawUnlockTime_),
-  );*/
-  const canUnlock = timerIsFinished(
-    tokenInfoAtom.infoByAddress?.depositUnlockTime_,
-  );
-  const canWithdraw =
-    timerIsFinished(tokenInfoAtom.infoByAddress?.withdrawUnlockTime_) &&
-    +tokenInfoAtom.unlockedAlluoValueOfUser > 0;
-
-  const rendererForUnlock = ({ completed, days, ...timeDelta }) => {
-    const { hours, minutes, seconds } = formatTimeDelta(
-      timeDelta as CountdownTimeDelta,
-      { zeroPadTime: 2 },
-    );
-
-    if (completed) {
-      return null;
-    } else {
-      // Render a countdown
-      return (
-        <Box fill>
-          <Text weight="bold" size="xlarge" textAlign="center">
-            You will be able to unlock your{' '}
-            {(+(+tokenInfoAtom.lockedAlluoValueOfUser).toFixed(
-              2,
-            )).toLocaleString()}{' '}
-            $ALLUO in
-          </Text>
-          <Box flex direction="row" width="80%" margin={{ horizontal: 'auto' }}>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{days}</Heading>
-              <Text>Days</Text>
-            </Box>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{hours}</Heading>
-              <Text>Hours</Text>
-            </Box>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{minutes}</Heading>
-              <Text>Minutes</Text>
-            </Box>
-
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{seconds}</Heading>
-              <Text>Seconds</Text>
-            </Box>
-          </Box>
-        </Box>
-      );
-    }
-  };
-
-  const rendererForWithdraw = ({ completed, days, ...timeDelta }) => {
-    const { hours, minutes, seconds } = formatTimeDelta(
-      timeDelta as CountdownTimeDelta,
-      { zeroPadTime: 2 },
-    );
-
-    if (completed) {
-      return null;
-    } else {
-      // Render a countdown
-      return (
-        <Box fill>
-          <Text weight="bold" size="xlarge" textAlign="center">
-            You can withdraw{' '}
-            {(+(+tokenInfoAtom.unlockedAlluoValueOfUser).toFixed(
-              2,
-            )).toLocaleString()}{' '}
-            $ALLUO in
-          </Text>
-          <Box flex direction="row" width="80%" margin={{ horizontal: 'auto' }}>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{days}</Heading>
-              <Text>Days</Text>
-            </Box>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{hours}</Heading>
-              <Text>Hours</Text>
-            </Box>
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{minutes}</Heading>
-              <Text>Minutes</Text>
-            </Box>
-
-            <Box flex direction="column" align="center">
-              <Heading margin="none">{seconds}</Heading>
-              <Text>Seconds</Text>
-            </Box>
-          </Box>
-        </Box>
-      );
-    }
-  };
+    handleUnlock,
+    unlockValueError,
+  } = useUnlock({ alluoInfo, updateAlluoInfo });
 
   return (
     <Box fill>
-      {tokenInfoAtom.isLoading || isUnlocking || isWithdrawing ? (
-        <Box
-          align="center"
-          justify="center"
-          fill="vertical"
-          margin={{ top: 'large', bottom: 'medium' }}
-        >
-          <Spinner pad="large" />
-        </Box>
-      ) : (
-        <Box margin={{ top: 'large' }}>
-          <Text textAlign="center" margin="auto" weight="bold">
-            {allTimersAreFinished &&
-              `You have ${(+tokenInfoAtom.lockedAlluoValueOfUser).toLocaleString()}
-            $ALLUO staked`}
-          </Text>
-
-          {!timerIsFinished(
-            tokenInfoAtom.infoByAddress?.depositUnlockTime_,
-          ) && (
-            <>
-              <Countdown
-                date={+tokenInfoAtom.infoByAddress.depositUnlockTime_ * 1000}
-                renderer={rendererForUnlock}
-                onComplete={setAccountInformation}
-              />
-            </>
-          )}
-
-          {!timerIsFinished(
-            tokenInfoAtom.infoByAddress?.withdrawUnlockTime_,
-          ) && (
-            <>
-              <Countdown
-                date={+tokenInfoAtom.infoByAddress.withdrawUnlockTime_ * 1000}
-                renderer={rendererForWithdraw}
-                onComplete={setAccountInformation}
-              />
-            </>
-          )}
-
-          <Box margin={{ top: 'medium' }}>
-            {allTimersAreFinished && (
-              <Input
-                isRangeInput
-                headerText="Unlock percentage"
-                rangeInputProps={{
-                  value: unlockValue || 0,
-                  onChange: handleUnlockValueChange,
-                }}
-                maxButtonProps={{ onClick: setToMax }}
-              />
-            )}
-            {/* depositUnlockTime{' '}
-            {+tokenInfoAtom.infoByAddress.depositUnlockTime_ * 1000 -
-              Date.now()}
-            <hr />
-            withdrawUnlockTime{' '}
-            {+tokenInfoAtom.infoByAddress.withdrawUnlockTime_ * 1000 -
-              Date.now()} */}
+      <Box
+        style={{
+          minHeight: '454px',
+        }}
+        justify="center"
+      >
+        {isLoading || isUnlocking ? (
+          <Box
+            align="center"
+            justify="center"
+            fill="vertical"
+            margin={{ top: 'large', bottom: 'medium' }}
+          >
+            <Spinner pad="large" />
           </Box>
-        </Box>
-      )}
-      {!tokenInfoAtom.isLoading && !isUnlocking && !isWithdrawing && (
-        <Box margin={{ top: 'medium' }}>
-          <Info
-            label="$ALLUO being unlocked"
-            value={(
-              (+unlockValue / 100) *
-              +tokenInfoAtom.lockedAlluoValueOfUser
-            ).toFixed(2)}
-          />
-          <Info label="$ALLUO APR" value={tokenInfoAtom.apr + '%'} />
-          <Info
-            label="$ALLUO earned"
-            value={(+tokenInfoAtom.claimedAlluo).toLocaleString()}
-          />
-          <Info
-            label="$ALLUO unlocked"
-            value={(+tokenInfoAtom.unlockedAlluoValueOfUser)
-              .toFixed(2)
-              .toLocaleString()}
-          />
-          <Info
-            label="Total $ALLUO staked"
-            value={(+tokenInfoAtom.totalLocked).toLocaleString()}
-          />
-        </Box>
-      )}
+        ) : (
+          <>
+            {showReunlockConfirmation ? (
+              <ReunlockConfirmation
+                handleUnlock={handleUnlock}
+                cancelReunlockConfirmation={cancelReunlockConfirmation}
+              />
+            ) : (
+              <>
+                <Box margin={{ top: 'large' }}>
+                  <Text textAlign="center" margin="auto" weight="bold">
+                    You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO
+                    staked
+                  </Text>
 
-      <Box margin={{ top: 'large' }} style={{ height: 52 }}>
-        <SubmitButton
-          primary
-          disabled={
-            (!canWithdraw && +unlockValue === 0) || isUnlocking || isWithdrawing
-          }
-          label={canWithdraw && +unlockValue === 0 ? 'Withdraw' : 'Unlock'}
-          onClick={
-            canWithdraw && +unlockValue === 0 ? withdraw : handleUnlockAction
-          }
-        />
+                  <Box margin={{ top: 'medium' }}>
+                    <RangeInput
+                      label="Unlock percentage"
+                      value={unlockValue}
+                      onValueChange={handleUnlockValueChange}
+                      error={unlockValueError}
+                    />
+                  </Box>
+
+                  <Box margin={{ top: 'medium' }}>
+                    <Info
+                      label="$ALLUO being unlocked"
+                      value={projectedUnlockValue}
+                    />
+                    <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
+                    <Info label="$ALLUO earned" value={alluoInfo.earned} />
+                    <Info
+                      label="$ALLUO unlocked"
+                      value={roundNumberDown(alluoInfo.unlocked, 2)}
+                    />
+                    <Info
+                      label="Total $ALLUO staked"
+                      value={alluoInfo.totalLocked}
+                    />
+                  </Box>
+                </Box>
+              </>
+            )}
+          </>
+        )}
       </Box>
+
+      {(isUnlocking || !showReunlockConfirmation) && (
+        <Box margin={{ top: 'large' }} style={{ height: 52 }}>
+          <SubmitButton
+            primary
+            disabled={(+unlockValue === 0) || isUnlocking}
+            label="Unlock"
+            onClick={!allTimersAreFinished ? startReunlockConfirmation : handleUnlock}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
