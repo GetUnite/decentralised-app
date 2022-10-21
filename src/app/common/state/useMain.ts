@@ -163,7 +163,7 @@ export const useMain = () => {
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
-        farm.apyFarmAddress,
+        farm.apyFarmAddresses,
         farm.chain,
       ),
       totalAssetSupply: +(await getTotalAssets(farm.farmAddress, farm.chain)) * valueOf1LPinUSDC,
