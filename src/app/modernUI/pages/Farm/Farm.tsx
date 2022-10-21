@@ -103,7 +103,7 @@ export const Farm = () => {
             )}
           </>
         </Modal>
-        {selectedFarm?.isBooster && showTabs && walletAccountAtom && !isLoading && (
+        {selectedFarm?.isBooster && showTabs && walletAccountAtom && (
           <Box gap="22px">
             <Box
               round={'medium'}
@@ -117,7 +117,7 @@ export const Farm = () => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isLoading || isClamingRewards || isLoadingRewards ? (
+              {isLoading || isClamingRewards || isLoadingRewards || !selectedSupportedToken? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
@@ -218,7 +218,7 @@ export const Farm = () => {
                   : {}
               }
             >
-              {isLoading || isClamingRewards || isLoadingRewards ? (
+              {isLoading || isClamingRewards || isLoadingRewards || !selectedSupportedToken ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
