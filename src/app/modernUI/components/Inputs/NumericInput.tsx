@@ -32,6 +32,7 @@ interface INumericInput {
   error: string;
   maxValue?: string | number;
   slippageWarning?: boolean;
+  lowSlippageTokenLabels?: string[];
 }
 
 export const NumericInput = ({
@@ -44,7 +45,8 @@ export const NumericInput = ({
   tokenOptions,
   selectedToken,
   setSelectedToken,
-  slippageWarning =false,
+  slippageWarning = false,
+  lowSlippageTokenLabels,
   error,
   ...rest
 }: INumericInput) => {
@@ -114,12 +116,25 @@ export const NumericInput = ({
             )}
           </AbsoluteBox>
         </RelativeBox>
-        {slippageWarning && <Text></Text>}
-        {error && (
-          <Text color="error" size="small" margin={{ top: 'small' }}>
-            {error}
-          </Text>
-        )}
+        <Box margin={{top: "small"}} height={slippageWarning ? '60px' : 'auto'}>
+          {error ? (
+            <Text color="error" size="small">
+              {error}
+            </Text>
+          ) : (
+            <>
+              {slippageWarning && (
+                <>
+                  <Text size="small" color="soul">
+                    Withdrawing in any token other than {lowSlippageTokenLabels.join('/')} increases
+                    slippage. Values shown are an approximation and may change subject to
+                    exhange rates
+                  </Text>
+                </>
+              )}
+            </>
+          )}
+        </Box>
       </Box>
     </>
   );

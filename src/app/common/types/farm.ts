@@ -29,13 +29,15 @@ export type TFarm = {
   totalAssetSupply?: string | number;
   depositedAmount?: string;
   depositDividedAmount?: { first: any; second: any };
-  isBooster?: boolean;
-  rewards?: TBoostFarmRewards;
   farmAddress?: string;
-  supportedTokensAddresses?: TSupportedToken[];
   poolShare?: number;
   convexFarmIds?: TConvexFarmIds;
+  // For booster farms
+  isBooster?: boolean;
+  rewards?: TBoostFarmRewards;
+  supportedTokensAddresses?: TSupportedToken[];
   lPTokenAddress?: string;
+  lowSlippageTokenLabels?: string[];
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;

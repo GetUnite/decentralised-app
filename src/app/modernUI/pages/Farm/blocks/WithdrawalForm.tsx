@@ -45,7 +45,11 @@ export const WithdrawalForm = ({
     <Box fill>
       <Box
         style={{
-          minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
+          minHeight: selectedFarm.isBooster
+            ? '504px'
+            : selectedFarm?.chain == EChain.POLYGON
+            ? '462px'
+            : '433px',
         }}
         justify="center"
       >
@@ -82,16 +86,31 @@ export const WithdrawalForm = ({
                   <Box margin={{ top: 'medium' }}>
                     <NumericInput
                       label={'Withdraw ' + selectedSupportedToken.label}
-                      available={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
-                      tokenSign={selectedFarm.isBooster ? selectedSupportedToken.sign : selectedFarm.sign}
+                      available={
+                        selectedFarm.isBooster
+                          ? selectedSupportedToken.boosterDepositedAmount
+                          : selectedFarm.depositedAmount
+                      }
+                      tokenSign={
+                        selectedFarm.isBooster
+                          ? selectedSupportedToken.sign
+                          : selectedFarm.sign
+                      }
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
-                      maxValue={selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : selectedFarm.depositedAmount}
+                      maxValue={
+                        selectedFarm.isBooster
+                          ? selectedSupportedToken.boosterDepositedAmount
+                          : selectedFarm.depositedAmount
+                      }
                       tokenOptions={selectedFarm.supportedTokens || []}
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
-                      //slippageWarning={selectedFarm.isBooster}
+                      slippageWarning={selectedFarm.isBooster}
+                      lowSlippageTokenLabels={selectedFarm.isBooster
+                        ? selectedFarm.lowSlippageTokenLabels
+                        : null}
                     />
                   </Box>
                 </Box>
@@ -125,24 +144,26 @@ export const WithdrawalForm = ({
           </>
         )}
       </Box>
-      {!showBoosterWithdrawalConfirmation && (<Box margin={{ top: 'medium' }}>
-        <SubmitButton
-          primary
-          label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
-          disabled={
-            isLoading ||
-            isWithdrawing ||
-            isWithdrawalRequestsLoading ||
-            !+withdrawValue ||
-            hasErrors
-          }
-          onClick={() => 
-            selectedFarm?.isBooster
-              ? startBoosterWithdrawalConfirmation(withdrawValue)
-              : handleWithdraw()
-          }
-        />
-      </Box>)}
+      {!showBoosterWithdrawalConfirmation && (
+        <Box margin={{ top: 'medium' }}>
+          <SubmitButton
+            primary
+            label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
+            disabled={
+              isLoading ||
+              isWithdrawing ||
+              isWithdrawalRequestsLoading ||
+              !+withdrawValue ||
+              hasErrors
+            }
+            onClick={() =>
+              selectedFarm?.isBooster
+                ? startBoosterWithdrawalConfirmation(withdrawValue)
+                : handleWithdraw()
+            }
+          />
+        </Box>
+      )}
     </Box>
   );
 };
