@@ -24,57 +24,60 @@ export const TransferTab = ({ ...rest }) => {
     handleRecipientAddressChange,
     useBiconomy,
     setUseBiconomy,
+    isLoading,
   } = useTransfer();
 
   return (
     <Box fill>
-      {isTransferring ? (
-        <Box
-          align="center"
-          justify="center"
-          fill="vertical"
-          margin={{ top: 'large', bottom: 'medium' }}
-        >
-          <Spinner pad="large" />
-        </Box>
-      ) : (
-        <Box margin={{ top: 'large' }}>
-          <TopHeader ibAlluosInfo={ibAlluosInfo} />
-          <Box margin={{ top: 'medium' }}>
-            <NumericInput
-              label="Transfer"
-              tokenSign={selectedIbAlluoInfo?.sign}
-              onValueChange={handleTransferValueChange}
-              value={transferValue}
-              maxValue={selectedIbAlluoInfo?.balance}
-              tokenOptions={ibAlluosInfo}
-              selectedToken={selectedIbAlluoInfo}
-              setSelectedToken={setSelectedIbAlluoBySymbol}
-              error={transferValueError}
-            />
+      <Box style={{ minHeight: '380px' }} justify="center">
+        {isLoading || isTransferring ? (
+          <Box
+            align="center"
+            justify="center"
+            fill="vertical"
+            margin={{ top: 'large', bottom: 'medium' }}
+          >
+            <Spinner pad="large" />
           </Box>
-          <Box margin={{ top: 'medium' }}>
-            <Box direction="row" justify="between">
-              <Text size="medium" color="soul">
-                Recipient
+        ) : (
+          <Box margin={{ top: 'large' }}>
+            <TopHeader ibAlluosInfo={ibAlluosInfo} />
+            <Box margin={{ top: 'medium' }}>
+              <NumericInput
+                label="Transfer"
+                tokenSign={selectedIbAlluoInfo?.sign}
+                onValueChange={handleTransferValueChange}
+                value={transferValue}
+                maxValue={selectedIbAlluoInfo?.balance}
+                tokenOptions={ibAlluosInfo}
+                selectedToken={selectedIbAlluoInfo}
+                setSelectedToken={setSelectedIbAlluoBySymbol}
+                error={transferValueError}
+              />
+            </Box>
+            <Box margin={{ top: 'medium' }}>
+              <Box direction="row" justify="between">
+                <Text size="medium" color="soul">
+                  Recipient
+                </Text>
+              </Box>
+              <TextInput
+                value={recipientAddress}
+                onChange={handleRecipientAddressChange}
+                placeholder="Address"
+              />
+              <Text color="error" size="small" margin={{ top: 'small' }}>
+                {recipientAddressError}
               </Text>
             </Box>
-            <TextInput
-              value={recipientAddress}
-              onChange={handleRecipientAddressChange}
-              placeholder="Address"
+            <FeeInfo
+              useBiconomy={useBiconomy}
+              setUseBiconomy={setUseBiconomy}
+              showWalletFee={!useBiconomy}
             />
-            <Text color="error" size="small" margin={{ top: 'small' }}>
-              {recipientAddressError}
-            </Text>
           </Box>
-          <FeeInfo
-            useBiconomy={useBiconomy}
-            setUseBiconomy={setUseBiconomy}
-            showWalletFee={!useBiconomy}
-          />
-        </Box>
-      )}
+        )}
+      </Box>
       <Box margin={{ top: 'large' }}>
         <SubmitButton
           primary

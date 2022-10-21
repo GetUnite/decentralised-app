@@ -1,31 +1,33 @@
-import { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
-import { walletAccount } from 'app/common/state/atoms';
-import { initialAvailableFarmsState, TFarm } from './farm/useFarm';
 import {
-  getTotalAssetSupply,
+  getBoosterFarmInterest,
+  getChainById,
+  getCurrentChainId,
   getInterest,
   getSupportedTokensAdvancedInfo,
-  getUserDepositedAmount,
-  getSupportedTokensList,
-  EChain,
   getSupportedTokensBasicInfo,
+  getSupportedTokensList,
   getTotalAssets,
-  getUserDepositedLPAmount,
-} from 'app/common/functions/Web3Client';
+  getTotalAssetSupply,
+  getUserDepositedAmount,
+  getUserDepositedLPAmount
+} from 'app/common/functions/web3Client';
+import { isSafeApp, walletAccount } from 'app/common/state/atoms';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { EChain } from '../constants/chains';
+import { getValueOf1LPinUSDC } from '../functions/farm';
+import { roundNumberDown, toExactFixed } from '../functions/utils';
+import { TFarm } from '../types/farm';
+import { TAssetsInfo } from '../types/heading';
+import { initialAvailableFarmsState } from './farm/useFarm';
 import { useNotification } from './useNotification';
-import { useCookies } from 'react-cookie';
-import { toExactFixed } from '../functions/utils';
-
-export type THeadingData = {
-  numberOfAssets: number;
-  numberOfChainsWithAssets: number;
-};
 
 export const useMain = () => {
-  const [cookies] = useCookies(['has_seen_boost_farms']);
-  const { resetNotification } = useNotification();
+  // atoms
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
+
+  const { resetNotification } = useNotification();
 
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>(
     initialAvailableFarmsState,
@@ -33,9 +35,12 @@ export const useMain = () => {
   const [networkFilter, setNetworkFilter] = useState<string>();
   const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
+  const [sortField, setSortField] = useState<string>(null);
+  const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm>();
 
-  const [headingData, setHeadingData] = useState<THeadingData>();
+  const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -47,6 +52,18 @@ export const useMain = () => {
   useEffect(() => {
     fetchFarmsInfo();
   }, [walletAccountAtom]);
+
+  useEffect(() => {
+    filterFarms();
+  }, [
+    availableFarms,
+    viewType,
+    sortField,
+    sortDirectionIsAsc,
+    isSafeAppAtom,
+    tokenFilter,
+    networkFilter,
+  ]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
@@ -64,7 +81,7 @@ export const useMain = () => {
               totalAssetSupply,
               supportedTokens,
               depositedAmount,
-              poolShare
+              poolShare,
             } = availableFarm.isBooster
               ? await fetchBoosterFarmInfo(availableFarm)
               : await fetchFarmInfo(availableFarm);
@@ -95,15 +112,10 @@ export const useMain = () => {
             availableFarm.poolShare = poolShare;
           }),
       ).then(() => {
-        setHeadingData({
+        setAssetsInfo({
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
-        if (!cookies.has_seen_boost_farms) {
-          availableFarms.sort(function (a, b) {
-            return a.isBooster ? -1 : 1;
-          });
-        }
         setAvailableFarms(availableFarms);
         setAllSupportedTokens(Array.from(allSupportedTokens));
       });
@@ -142,21 +154,39 @@ export const useMain = () => {
 
   const fetchBoosterFarmInfo = async farm => {
     let farmInfo;
+
+    const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
+      farm.lPTokenAddress,
+      farm.chain,
+    );
+    
     farmInfo = {
-      interest: '10', //await getInterest(farm.type, farm.chain),
-      totalAssetSupply: await getTotalAssets(farm.farmAddress, farm.chain),
+      interest: await getBoosterFarmInterest(
+        farm.farmAddress,
+        farm.convexFarmIds,
+        farm.chain,
+      ),
+      totalAssetSupply: +(await getTotalAssets(farm.farmAddress, farm.chain)) * valueOf1LPinUSDC,
       supportedTokens: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
-          return await getSupportedTokensBasicInfo(supportedtoken, farm.chain);
+          return await getSupportedTokensBasicInfo(
+            supportedtoken.address,
+            farm.chain,
+          );
         }),
       ),
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = toExactFixed(
-        await getUserDepositedLPAmount(farm.farmAddress, farm.chain),
-        4,
+      farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
+        farm.farmAddress,
+        farm.chain,
       );
+      // Let's use the depositedAmount to store the deposited amount in USD(C)
+      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
+      farmInfo.depositedAmount =
+        roundNumberDown(farmInfo.depositedAmountInLP * valueOf1LPinUSDC);
+
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
@@ -180,7 +210,12 @@ export const useMain = () => {
     setViewType('your');
   };
 
-  const filteredFarms = () => {
+  const sortBy = (field, isAsc) => {
+    setSortField(field);
+    setSortDirectionIsAsc(isAsc);
+  };
+
+  const filterFarms = async () => {
     let filteredFarms;
 
     filteredFarms =
@@ -204,14 +239,65 @@ export const useMain = () => {
         )
       : filteredFarms;
 
-    return filteredFarms;
+    if (sortField) {
+      switch (sortField) {
+        case 'apy':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.interest > +a.interest
+                ? 1
+                : -1
+              : +a.interest > +b.interest
+              ? 1
+              : -1;
+          });
+          break;
+
+        case 'pool share':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.poolShare > +a.poolShare
+                ? 1
+                : -1
+              : +a.poolShare > +b.poolShare
+              ? 1
+              : -1;
+          });
+          break;
+
+        case 'balance':
+          filteredFarms = filteredFarms.sort(function (a, b) {
+            return sortDirectionIsAsc
+              ? +b.balance > +a.balance
+                ? 1
+                : -1
+              : +a.balance > +b.balance
+              ? 1
+              : -1;
+          });
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    if (isSafeAppAtom && walletAccountAtom) {
+      const chainId = await getCurrentChainId();
+      const chain = await getChainById(chainId);
+      console.log({ chain: chain, chainId: chainId });
+
+      filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
+    }
+
+    setFilteredFarms(filteredFarms);
   };
 
   return {
     isLoading,
     error,
-    availableFarms: filteredFarms(),
-    headingData,
+    filteredFarms,
+    assetsInfo,
     showAllFarms,
     showYourFarms,
     viewType,
@@ -220,5 +306,8 @@ export const useMain = () => {
     setTokenFilter,
     networkFilter,
     setNetworkFilter,
+    walletAccountAtom,
+    sortBy,
+    sortDirectionIsAsc,
   };
 };

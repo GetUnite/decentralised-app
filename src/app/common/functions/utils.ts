@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { ethers } from 'ethers';
 import fromExponential from 'from-exponential';
 
 export const maximumUint256Value =
@@ -136,5 +136,21 @@ export const hasCorrectDecimals = (
 };
 
 export const addressIsValid = address => {
-  return Web3.utils.isAddress(address);
+  return ethers.utils.isAddress(address);
 };
+
+export const timerIsFinished = expectedTime => {
+  return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
+};
+
+export const getNextMonday = (date = new Date())  => {
+  const dateCopy = new Date(date.getTime());
+
+  const nextMonday = new Date(
+    dateCopy.setDate(
+      dateCopy.getDate() + ((7 - dateCopy.getDay() + 1) % 7 || 7),
+    ),
+  );
+
+  return nextMonday;
+}

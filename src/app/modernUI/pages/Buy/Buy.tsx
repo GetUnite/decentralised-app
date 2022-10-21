@@ -1,16 +1,15 @@
-import { EChain } from 'app/common/functions/Web3Client';
+import { EChain } from 'app/common/constants/chains';
 import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
+import { BuyTab } from './blocks';
 import { RampEmbed } from './components';
-import { BuyTab } from './partials';
 
 export const Buy = ({ ...rest }) => {
   return (
     <ResponsiveContext.Consumer>
       {size => (
         <Layout>
-          <Modal size={size} chain={EChain.ETHEREUM} heading={'Buy $ALLUO'} contentHeight="557px"
-          >
+          <Modal chain={EChain.ETHEREUM} heading={'Buy $ALLUO'}>
             <Tabs>
               <Tab title="$ALLUO">
                 <BuyTab />

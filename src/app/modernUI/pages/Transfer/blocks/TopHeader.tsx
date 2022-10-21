@@ -1,10 +1,11 @@
+import { toExactFixed } from 'app/common/functions/utils';
 import { Text } from 'grommet';
 
 export const TopHeader = ({ ibAlluosInfo, ...rest }) => {
   const alluoTextBalances = ibAlluosInfo
-    .filter(token => token.balance > 0)
+    .filter(token => Number(toExactFixed(token.balance, 2)) > 0)
     .map(token => {
-      return Number(token.balance).toFixed(2) + ' ' + token.label;
+      return toExactFixed(token.balance, 5) + ' ' + token.label;
     });
   return (
     <>

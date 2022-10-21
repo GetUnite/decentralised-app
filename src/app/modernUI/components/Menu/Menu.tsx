@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { ResponsiveContext, Layer, Box, Text, Button, Avatar } from 'grommet';
+import { ResponsiveContext, Layer, Box, Button, Avatar } from 'grommet';
 import { Menu as MenuIcon, Close } from 'grommet-icons';
 
 import { isSmall } from 'app/modernUI/theme';
-import { useMode } from 'app/common/state/shortcuts';
+import { useMode } from 'app/common/state';
 import { ConnectionButton } from 'app/modernUI/components';
 import { MenuItem } from './blocks';
 
@@ -11,7 +11,6 @@ import sunIcon from '../../images/sunIcon.svg';
 import moonIcon from '../../images/moonIcon.svg';
 
 const Drop = () => {
-  const { isLightMode, mode, setMode, toggleMode } = useMode();
   return (
     <Layer
       background="transparent"

@@ -8,14 +8,13 @@ import {
 } from 'app/common/state/atoms';
 import {
   changeNetwork,
-  EChain,
   onWalletUpdated,
   getCurrentChainId,
-  EChainId,
   getChainNameById,
   trySafeAppConnection,
-} from 'app/common/functions/Web3Client';
+} from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
+import { EChain, EChainId } from '../constants/chains';
 
 export const useWallet = () => {
   const { resetNotification, setNotificationt } = useNotification();
