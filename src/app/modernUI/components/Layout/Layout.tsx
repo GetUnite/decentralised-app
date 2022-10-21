@@ -1,25 +1,25 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ResponsiveContext, Box, Nav, Image, Footer } from 'grommet';
-import { MenuItem } from '../Menu/blocks';
 import { useMode } from 'app/common/state';
 import { isSmall } from 'app/modernUI/theme';
+import { Box, Footer, Image, Nav, ResponsiveContext } from 'grommet';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { MenuItem } from '../Menu/blocks';
 
 import { Menu, Notification } from 'app/modernUI/components';
 
-import logo from '../../images/logo.png';
-import logoDark from '../../images/logo-dark.svg';
-import logoIcon from '../../images/logoIcon.svg';
-import logoIconDark from '../../images/logoIcon-dark.svg';
-import discord from '../../images/discord.svg';
-import discordDark from '../../images/discord-dark.svg';
-import twitter from '../../images/twitter.svg';
-import twitterDark from '../../images/twitter-dark.svg';
-import medium from '../../images/medium.svg';
-import mediumDark from '../../images/medium-dark.svg';
-import telegram from '../../images/telegram.svg';
-import telegramDark from '../../images/telegram-dark.svg';
 import { modernUiPaths } from 'app/common/hooks';
+import discordDark from '../../images/discord-dark.svg';
+import discord from '../../images/discord.svg';
+import logoDark from '../../images/logo-dark.svg';
+import logo from '../../images/logo.png';
+import logoIconDark from '../../images/logoIcon-dark.svg';
+import logoIcon from '../../images/logoIcon.svg';
+import mediumDark from '../../images/medium-dark.svg';
+import medium from '../../images/medium.svg';
+import telegramDark from '../../images/telegram-dark.svg';
+import telegram from '../../images/telegram.svg';
+import twitterDark from '../../images/twitter-dark.svg';
+import twitter from '../../images/twitter.svg';
 
 export const Layout = ({ children, notificationId = null, ...rest }) => {
   const { isLightMode } = useMode();
