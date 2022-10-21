@@ -22,7 +22,7 @@ import {
   getUserDepositedAmount,
   getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/form';
 import moment from 'moment';
@@ -211,6 +211,7 @@ export const useFarm = ({ id }) => {
 
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
@@ -231,8 +232,7 @@ export const useFarm = ({ id }) => {
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
 
   // information/confirmation control
-  const showBoosterFarmPresentation =
-    selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
+  const showBoosterFarmPresentation = !isSafeAppAtom && selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
 
   const previousHarvestDate = moment().day('Monday');
   const nextHarvestDate = moment().add(1, 'week').day('Monday');
