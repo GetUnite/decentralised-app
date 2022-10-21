@@ -105,7 +105,7 @@ export const Stake = ({ ...rest }) => {
                 updateAlluoInfo={updateAlluoInfo}
               />
             </Tab>
-            <Tab title="Unlock and Withdraw">
+            <Tab title="Unlock">
               <UnlockTab
                 isLoading={isLoading}
                 alluoInfo={alluoInfo}
