@@ -16,8 +16,7 @@ import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
 import {
   fromDecimals,
-  maximumUint256Value, toDecimals,
-  toExactFixed
+  maximumUint256Value, roundNumberDown, toDecimals
 } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
@@ -1275,13 +1274,13 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
 };
 
 const boosterFarmInterestApiUrl =
-  'https://api-py.llama.airforce/convex/v1/pools/apr/';
+  'https://yields.llama.fi/chart/';
 const getTotalApr = apr => {
   return apr.baseApr + apr.crvApr + apr.cvxApr + apr.extraRewardsApr;
 };
 export const getBoosterFarmInterest = async (
-  farmAddress,
-  convexFarmIds,
+  farmVaultAddress,
+  apyFarmAddress,
   chain,
 ) => {
   const abi = [
@@ -1294,19 +1293,14 @@ export const getBoosterFarmInterest = async (
     },
   ];
 
-  const f =
+  const fee =
     1 -
-    (await callContract(abi, farmAddress, 'adminFee()', null, chain)) / 10000;
+    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) / 10000;
 
-  const [aJsonResult, bJsonResult] = await Promise.all([
-    fetch(boosterFarmInterestApiUrl + convexFarmIds.A).then(res => res.json()),
-    fetch(boosterFarmInterestApiUrl + convexFarmIds.B).then(res => res.json()),
-  ]);
+  const apyJsonResult = await fetch(boosterFarmInterestApiUrl + apyFarmAddress).then(res => res.json());
+  const apyData = apyJsonResult.data[apyJsonResult.data.length - 1];
 
-  const a = getTotalApr(aJsonResult.apr[0]);
-  const b = 1 + getTotalApr(bJsonResult.apr[0]);
-
-  return toExactFixed(a * f * b * 100, 2);
+  return roundNumberDown(apyData.apyBase + (apyData.apyReward * (1 + (apyData.apy / 100)) * fee) , 2);
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
