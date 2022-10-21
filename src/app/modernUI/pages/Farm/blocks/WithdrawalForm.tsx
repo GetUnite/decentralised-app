@@ -45,7 +45,7 @@ export const WithdrawalForm = ({
     <Box fill>
       <Box
         style={{
-          minHeight: selectedFarm.isBooster
+          minHeight: selectedFarm?.isBooster
             ? '504px'
             : selectedFarm?.chain == EChain.POLYGON
             ? '462px'
