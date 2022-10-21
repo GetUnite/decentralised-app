@@ -55,7 +55,11 @@ export const DepositForm = ({
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
                   label={'Deposit ' + selectedSupportedToken.label}
-                  tokenSign={selectedFarm.sign}
+                  tokenSign={
+                    selectedFarm.isBooster
+                      ? selectedSupportedToken.sign
+                      : selectedFarm.sign
+                  }
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
                   maxValue={selectedSupportedToken?.balance}

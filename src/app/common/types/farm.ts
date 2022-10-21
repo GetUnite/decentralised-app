@@ -12,11 +12,6 @@ export type TBoostFarmRewards = {
   pendingValue?: number;
 };
 
-export type TConvexFarmIds = {
-  A?: number;
-  B?: number;
-};
-
 export type TFarm = {
   id: number;
   type: string;
@@ -31,13 +26,14 @@ export type TFarm = {
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;
   poolShare?: number;
-  convexFarmIds?: TConvexFarmIds;
+  
   // For booster farms
   isBooster?: boolean;
   rewards?: TBoostFarmRewards;
   supportedTokensAddresses?: TSupportedToken[];
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
+  apyFarmAddress?: string;
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
