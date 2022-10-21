@@ -223,10 +223,7 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
     6,
     decimals,
   );
-  console.log("tokenPrice", tokenAddress, tokenPrice);
-  console.log(valueInUSDC);
-  console.log("value after conversion", valueInUSDC * tokenPrice);
-  console.log("")
+  
   return valueInUSDC * tokenPrice;
 };
 
