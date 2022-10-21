@@ -1,19 +1,17 @@
-import { roundNumberDown } from 'app/common/functions/utils';
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
 import {
   Layout,
-  Modal,
-  Spinner,
-  Tab,
-  Tabs,
-  TokenIcon
+  Modal, Tab,
+  Tabs
 } from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
+import { ResponsiveContext } from 'grommet';
 import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { BoosterFarmPresentation, DepositForm, WithdrawalForm } from './blocks';
+import {
+  DepositForm,
+  FarmWithdrawalTab
+} from './blocks';
 
 export const Farm = () => {
   const { id } = useParams();
@@ -38,229 +36,42 @@ export const Farm = () => {
     startBoosterWithdrawalConfirmation,
     cancelBoosterWithdrawalConfirmation,
     pendingRewards,
-    losablePendingRewards
+    losablePendingRewards,
   } = useFarm({
     id,
   });
 
-  const renderModal = () => {
-    const farmName = (
-      <span>
-        {selectedFarm?.name}
-        {selectedFarm?.isBooster && (
-          <span style={{ color: '#1C1CFF' }}> BOOST</span>
-        )}
-      </span>
-    );
-    return (
-      <>
-        <Box></Box>
-        <Modal
-          chain={selectedFarm?.chain}
-          heading={farmName}
-          showChainBadge={!isLoading}
-          noHeading={!showTabs}
-        >
-          <>
-            {showBoosterFarmPresentation && (
-              <BoosterFarmPresentation
-                selectedFarm={selectedFarm}
-                farmName={farmName}
-              />
-            )}
-            {showTabs && (
-              <Tabs>
-                <Tab title="Deposit">
-                  <DepositForm
-                    selectedFarm={selectedFarm}
-                    isLoading={isLoading}
-                    updateFarmInfo={updateFarmInfo}
-                    selectedSupportedToken={selectedSupportedToken}
-                    selectSupportedToken={selectSupportedToken}
-                  />
-                </Tab>
-                <Tab title="Withdraw">
-                  <WithdrawalForm
-                    selectedFarm={selectedFarm}
-                    isLoading={isLoading}
-                    updateFarmInfo={updateFarmInfo}
-                    selectedSupportedToken={selectedSupportedToken}
-                    selectSupportedToken={selectSupportedToken}
-                    nextHarvestDate={nextHarvestDate}
-                    showBoosterWithdrawalConfirmation={
-                      showBoosterWithdrawalConfirmation
-                    }
-                    startBoosterWithdrawalConfirmation={
-                      startBoosterWithdrawalConfirmation
-                    }
-                    cancelBoosterWithdrawalConfirmation={
-                      cancelBoosterWithdrawalConfirmation
-                    }
-                    losablePendingRewards={losablePendingRewards}
-                  />
-                </Tab>
-              </Tabs>
-            )}
-          </>
-        </Modal>
-        {selectedFarm?.isBooster && showTabs && walletAccountAtom && !isLoading && (
-          <Box gap="22px">
-            <Box
-              round={'medium'}
-              overflow="hidden"
-              width="245px"
-              align="start"
-              height="224px"
-              justify="between"
-              gap="small"
-              direction="column"
-              background="modal"
-              pad={{ vertical: 'medium', horizontal: 'medium' }}
-            >
-              {isLoading || isClamingRewards || isLoadingRewards ? (
-                <Box align="center" justify="center" fill>
-                  <Spinner pad="large" />
-                </Box>
-              ) : (
-                <Box fill>
-                  <Heading
-                    size="small"
-                    level={3}
-                    margin={{ bottom: '16px', top: '0px' }}
-                    fill
-                  >
-                    <Box direction="row" justify="between" fill>
-                      <Text size="18px">Rewards</Text>
-                      <Box direction="row">
-                        {selectedFarm?.rewards?.icons?.map((icon, i) => (
-                          <TokenIcon
-                            key={i}
-                            label={icon}
-                            style={i > 0 ? { marginLeft: '-0.6rem' } : {}}
-                          />
-                        ))}
-                      </Box>
-                    </Box>
-                  </Heading>
-                  <Box
-                    direction="row"
-                    justify="between"
-                    margin={{ bottom: '28px' }}
-                  >
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? selectedFarm?.rewards.stableLabel
-                        : selectedFarm?.rewards.label}
-                    </Text>
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? '$' + selectedFarm?.rewards.stableValue
-                        : selectedFarm?.rewards.value}
-                    </Text>
-                  </Box>
-                  <Box gap="12px">
-                    <Button
-                      primary
-                      label={
-                        'Withdraw ' +
-                        (seeRewardsAsStable
-                          ? selectedFarm?.rewards.stableLabel
-                          : selectedFarm?.rewards.label)
-                      }
-                      style={{ borderRadius: '58px', width: '197px' }}
-                      onClick={claimRewards}
-                    />
-                    <Button
-                      label={
-                        seeRewardsAsStable
-                          ? 'Prefer ' +
-                            selectedFarm?.rewards.label +
-                            ' LP tokens?'
-                          : 'Prefer ' + selectedFarm?.rewards.stableLabel
-                      }
-                      onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
-                      plain
-                      style={{
-                        textAlign: 'center',
-                        color: '#2A73FF',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                      }}
-                    />
-                  </Box>
-                </Box>
-              )}
-            </Box>
-            <Box
-              round={'medium'}
-              overflow="hidden"
-              width="245px"
-              align="start"
-              height="122pxpx"
-              justify="between"
-              gap="small"
-              direction="column"
-              background="modal"
-              pad={{ vertical: 'medium', horizontal: 'medium' }}
-              border={
-                showBoosterWithdrawalConfirmation
-                  ? {
-                      color: '#F59F31',
-                      size: '0.5px',
-                    }
-                  : { size: '0px' }
-              }
-              style={
-                showBoosterWithdrawalConfirmation
-                  ? {
-                      boxShadow: '0px 0px 10px 0px #FF981133',
-                    }
-                  : {}
-              }
-            >
-              {isLoading || isClamingRewards || isLoadingRewards ? (
-                <Box align="center" justify="center" fill>
-                  <Spinner pad="large" />
-                </Box>
-              ) : (
-                <Box fill gap="12px">
-                  <Text size="16px" weight="bold">
-                    Pending rewards
-                  </Text>
-                  <Box direction="row" justify="between">
-                    <Text weight="bold" size="16px">
-                      {selectedFarm?.rewards.stableLabel}
-                    </Text>
-                    <Text weight="bold" size="16px">
-                      {'$' + roundNumberDown(pendingRewards, 6)}
-                    </Text>
-                  </Box>
-                  <Text size="8px" weight={400}>
-                    Available {nextHarvestDate.format('DD MMM')} · Last
-                    harvested {previousHarvestDate.format('DD MMM')}
-                  </Text>
-                </Box>
-              )}
-            </Box>
-          </Box>
-        )}
-      </>
-    );
-  };
-
   return (
     <ResponsiveContext.Consumer>
-      {size => (
+      {_ => (
         <Layout>
-          {!isSmall(size) ? (
-            <Grid columns={['flex', 'auto', 'flex']} gap="small">
-              {renderModal()}
-            </Grid>
-          ) : (
-            <Grid rows={'auto'} gap="small">
-              {renderModal()}
-            </Grid>
-          )}
+          <Modal
+            chain={selectedFarm?.chain}
+            heading={selectedFarm?.name}
+            showChainBadge={!isLoading}
+            noHeading={!showTabs}
+          >
+            <Tabs>
+              <Tab title="Deposit">
+                <DepositForm
+                  selectedFarm={selectedFarm}
+                  isLoading={isLoading}
+                  updateFarmInfo={updateFarmInfo}
+                  selectedSupportedToken={selectedSupportedToken}
+                  selectSupportedToken={selectSupportedToken}
+                />
+              </Tab>
+              <Tab title="Withdraw">
+                <FarmWithdrawalTab
+                  selectedFarm={selectedFarm}
+                  isLoading={isLoading}
+                  updateFarmInfo={updateFarmInfo}
+                  selectedSupportedToken={selectedSupportedToken}
+                  selectSupportedToken={selectSupportedToken}
+                />
+              </Tab>
+            </Tabs>
+          </Modal>
         </Layout>
       )}
     </ResponsiveContext.Consumer>
