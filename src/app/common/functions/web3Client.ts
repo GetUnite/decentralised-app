@@ -16,7 +16,9 @@ import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
 import {
   fromDecimals,
-  maximumUint256Value, roundNumberDown, toDecimals
+  maximumUint256Value,
+  roundNumberDown,
+  toDecimals
 } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
@@ -1273,14 +1275,13 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
   return Web3.utils.fromWei(userDepositedLPAmount);
 };
 
-const boosterFarmInterestApiUrl =
-  'https://yields.llama.fi/chart/';
+const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 const getTotalApr = apr => {
   return apr.baseApr + apr.crvApr + apr.cvxApr + apr.extraRewardsApr;
 };
 export const getBoosterFarmInterest = async (
   farmVaultAddress,
-  apyFarmAddress,
+  apyFarmAddresses,
   chain,
 ) => {
   const abi = [
@@ -1295,12 +1296,31 @@ export const getBoosterFarmInterest = async (
 
   const fee =
     1 -
-    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) / 10000;
+    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
+      10000;
 
-  const apyJsonResult = await fetch(boosterFarmInterestApiUrl + apyFarmAddress).then(res => res.json());
-  const apyData = apyJsonResult.data[apyJsonResult.data.length - 1];
+  const baseApyJsonResult = await fetch(
+    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+  ).then(res => res.json());
+  const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
 
-  return roundNumberDown(apyData.apyBase + (apyData.apyReward * (1 + (apyData.apy / 100)) * fee) , 2);
+  const boostApyJsonResult = await fetch(
+    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+  ).then(res => res.json());
+  const boostApyData =
+    boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
+
+  const baseRewardsAPR = baseApyData.apyReward / 100;
+  const boostRewardsAPR = boostApyData.apyReward / 100;
+
+  return roundNumberDown(
+    baseApyData.apyBase +
+      baseRewardsAPR *
+        fee *
+        (1 + boostApyData.apyBase) *
+        ((1 + boostRewardsAPR / 52) ^ 52),
+    2,
+  );
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {

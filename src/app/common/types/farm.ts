@@ -12,6 +12,11 @@ export type TBoostFarmRewards = {
   pendingValue?: number;
 };
 
+export type TApyFarmAddresses = {
+  baseApyAddress?: string;
+  boostApyAddress?: string;
+};
+
 export type TFarm = {
   id: number;
   type: string;
@@ -33,7 +38,7 @@ export type TFarm = {
   supportedTokensAddresses?: TSupportedToken[];
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
-  apyFarmAddress?: string;
+  apyFarmAddresses?: TApyFarmAddresses;
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;

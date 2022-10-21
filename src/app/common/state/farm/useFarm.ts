@@ -63,7 +63,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
     ],
     lowSlippageTokenLabels: ['FRAX', 'USDC'],
-    apyFarmAddress: "bd072651-d99c-4154-aeae-51f12109c054",
+    apyFarmAddresses: { baseApyAddress: "bd072651-d99c-4154-aeae-51f12109c054", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 9,
@@ -95,7 +95,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
     ],
     lowSlippageTokenLabels: ['CVX', 'WETH'],
-    apyFarmAddress: "25d9dc49-3182-493a-bda4-0db53b25f457",
+    apyFarmAddresses: { baseApyAddress: "25d9dc49-3182-493a-bda4-0db53b25f457", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 10,
@@ -128,7 +128,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     ],
     lowSlippageTokenLabels: [//'stETH', 
     'wETH'],
-    apyFarmAddress: "5ce23e7e-3800-4c9c-ad30-6db3db0515a1",
+    apyFarmAddresses: { baseApyAddress: "5ce23e7e-3800-4c9c-ad30-6db3db0515a1", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 0,
