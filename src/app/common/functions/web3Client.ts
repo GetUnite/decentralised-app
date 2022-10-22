@@ -1310,15 +1310,19 @@ export const getBoosterFarmInterest = async (
   const boostApyData =
     boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
 
+  const baseApy = baseApyData.apyBase / 100;
+  const boostApy = boostApyData.apyBase / 100;
   const baseRewardsAPR = baseApyData.apyReward / 100;
   const boostRewardsAPR = boostApyData.apyReward / 100;
 
+  console.log(baseApy, baseRewardsAPR, fee, (1+boostApy), ((1 + (boostRewardsAPR / 52)) ^ 52))
+  console.log((boostRewardsAPR / 52), 1 + (boostRewardsAPR / 52), ((1 + (boostRewardsAPR / 52)) ^ 52))
   return roundNumberDown(
-    baseApyData.apyBase +
+    (baseApy +
       baseRewardsAPR *
         fee *
-        (1 + boostApyData.apyBase) *
-        ((1 + boostRewardsAPR / 52) ^ 52),
+        (1 + boostApy) *
+        (Math.pow(1 + (boostRewardsAPR / 52), 52))) * 100,
     2,
   );
 };
