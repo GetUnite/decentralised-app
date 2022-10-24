@@ -286,7 +286,7 @@ export const useFarm = ({ id }) => {
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
-        farm.apyFarmAddress,
+        farm.apyFarmAddresses,
         farm.chain,
       ),
       totalAssetSupply:
