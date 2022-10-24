@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
 import { getValueOf1LPinUSDC } from '../functions/farm';
-import { roundNumberDown, toExactFixed } from '../functions/utils';
+import { toExactFixed } from '../functions/utils';
 import { TFarm } from '../types/farm';
 import { TAssetsInfo } from '../types/heading';
 import { initialAvailableFarmsState } from './farm/useFarm';
@@ -209,8 +209,9 @@ export const useMain = () => {
       );
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount = roundNumberDown(
+      farmInfo.depositedAmount = toExactFixed(
         farmInfo.depositedAmountInLP * valueOf1LPinUSDC,
+        2,
       );
 
       farmInfo.poolShare =
