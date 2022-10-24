@@ -213,6 +213,7 @@ export const useMain = () => {
         farmInfo.depositedAmountInLP * valueOf1LPinUSDC,
         2,
       );
+      console.log(farmInfo, valueOf1LPinUSDC);
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -246,7 +247,7 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'your'
-        ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
+        ? availableFarms.filter(farm => +farm.depositedAmount > 0)
         : availableFarms;
 
     filteredFarms = tokenFilter
