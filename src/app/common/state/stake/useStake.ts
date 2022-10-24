@@ -1,5 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import {
+  approveAlluoStaking,
   getAlluoBalance,
   getAlluoStakingAllowance,
   getAlluoStakingAPR,
@@ -7,26 +8,18 @@ import {
   getEarnedAlluo,
   getTotalAlluoLocked,
   getUnlockedAlluo,
+  lockAlluo,
+  unlockAllAlluo,
+  unlockAlluo,
   withdrawAlluo
 } from 'app/common/functions/stake';
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TTokenInfo } from 'app/common/types/global';
+import { TAlluoStakingInfo } from 'app/common/types/stake';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
-
-export type TAlluoStakingInfo = {
-  balance?: string;
-  allowance?: string;
-  locked?: string;
-  lockedInLp?: string;
-  apr?: string;
-  totalLocked?: string;
-  earned?: string;
-  unlocked?: string;
-  depositUnlockTime?: string;
-  withdrawUnlockTime?: string;
-};
 
 export const useStake = () => {
   // atoms
@@ -36,8 +29,9 @@ export const useStake = () => {
   // other state control files
   const { setNotificationt, resetNotification } = useNotification();
 
-  // alluo info
-  const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
+  // staking and alluo token info
+  const [alluoTokenInfo, setAlluoTokenInfo] = useState<TTokenInfo>();
+  const [alluoStakingInfo, setAlluoStakingInfo] = useState<TAlluoStakingInfo>();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,54 +40,103 @@ export const useStake = () => {
   // confirmation/information control
   const [showReunlockConfirmation, setShowReunlockConfirmation] =
     useState<boolean>(false);
+  const showTabs = !showReunlockConfirmation;
 
   useEffect(() => {
+    const fetchRequiredData = async () => {
+      const tokenInfo: TTokenInfo = {
+        balance: toExactFixed(await getAlluoBalance(), 2),
+        allowance: await getAlluoStakingAllowance(),
+      };
+      setAlluoTokenInfo(tokenInfo);
+
+      const totalAlluoLocked = await getTotalAlluoLocked();
+      const alluoStakingWalletAddressInfo =
+        await getAlluoStakingWalletAddressInfo();
+      const stakingInfo: TAlluoStakingInfo = {
+        apr: toExactFixed(await getAlluoStakingAPR(totalAlluoLocked), 2),
+        totalLocked: toExactFixed(totalAlluoLocked, 2),
+        earned: toExactFixed(await getEarnedAlluo(), 2),
+        unlocked: toExactFixed(await getUnlockedAlluo(), 2),
+        locked: toExactFixed(alluoStakingWalletAddressInfo.locked, 2),
+        lockedInLp: toExactFixed(alluoStakingWalletAddressInfo.lockedInLp, 2),
+        depositUnlockTime: toExactFixed(
+          alluoStakingWalletAddressInfo.depositUnlockTime,
+          2,
+        ),
+        withdrawUnlockTime: toExactFixed(
+          alluoStakingWalletAddressInfo.withdrawUnlockTime,
+          2,
+        ),
+      };
+
+      setAlluoStakingInfo(stakingInfo);
+
+      setIsLoading(false);
+    };
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
-      updateAlluoInfo();
+      fetchRequiredData();
     }
   }, [walletAccountAtom]);
 
-  const resetState = () => {
-    resetNotification();
-    setShowReunlockConfirmation(false);
-    setIsWithdrawing(false);
+  // lock functions
+  const updateAlluoTokenInfoAfterApprove = async () => {
+    setAlluoTokenInfo({
+      ...alluoTokenInfo,
+      allowance: await getAlluoStakingAllowance(),
+    });
   };
-
-  const updateAlluoInfo = async () => {
-    setShowReunlockConfirmation(false);
-    setIsLoading(true);
+  const handleApprove = async () => {
     try {
-      let info: TAlluoStakingInfo = {
-        balance: await getAlluoBalance(),
-        allowance: await getAlluoStakingAllowance(),
-        apr: (await getAlluoStakingAPR()).toLocaleString(),
-        totalLocked: roundNumberDown(await getTotalAlluoLocked(), 2),
-        earned: roundNumberDown(await getEarnedAlluo(), 2),
-        unlocked: await getUnlockedAlluo(),
-      };
-      const alluoStakingWalletAddressInfo =
-        await getAlluoStakingWalletAddressInfo();
-      info.locked = alluoStakingWalletAddressInfo.locked;
-      info.lockedInLp = alluoStakingWalletAddressInfo.lockedInLp;
-      info.depositUnlockTime =
-        await alluoStakingWalletAddressInfo.depositUnlockTime;
-      info.withdrawUnlockTime =
-        await alluoStakingWalletAddressInfo.withdrawUnlockTime;
-
-      setAlluoInfo(info);
-    } catch (error) {
-      console.log(error);
+      const tx = await approveAlluoStaking();
+      await updateAlluoTokenInfoAfterApprove();
+    } catch (err) {
+      console.error('Error', err.message);
+      setNotificationt(err.message, 'error');
     }
-    setIsLoading(false);
   };
 
+  const updateInfoAfterLock = async () => {
+    setAlluoTokenInfo({ ...alluoTokenInfo, balance: await getAlluoBalance() });
+  };
+  const handleLock = async lockValue => {
+    try {
+      const tx = await lockAlluo(lockValue);
+      await updateInfoAfterLock();
+      setNotificationt('Successfully locked', 'success');
+    } catch (error) {
+      setNotificationt(error, 'error');
+    }
+  };
+
+  // unlock functions
+  const updateAlluoStakingInfoAfterUnlock = async () => {
+    
+  };
+  const handleUnlock = async (unlockValue) => {
+    try {
+      if (+unlockValue === 100) {
+        await unlockAllAlluo();
+      } else {
+        await unlockAlluo(+alluoStakingInfo.lockedInLp * (+unlockValue / 100));
+      }
+      await updateAlluoStakingInfoAfterUnlock();
+      setNotificationt('Successfully unlocked', 'success');
+    } catch (error) {
+      setNotificationt(error, 'error');
+    }
+  }
+  
+  // rewards withdraw functions
+  const updateAlluoStakingInfoAfterWithdraw = async () => {
+    setAlluoStakingInfo({ ...alluoStakingInfo, earned: '0' });
+  };
   const handleWithdraw = async () => {
-    resetState();
     setIsWithdrawing(true);
     try {
-      await withdrawAlluo();
-      await updateAlluoInfo();
+      const tx = await withdrawAlluo();
+      await updateAlluoStakingInfoAfterWithdraw();
       setNotificationt('Successfully withdrew', 'success');
     } catch (error) {
       console.error('Error', error);
@@ -102,6 +145,7 @@ export const useStake = () => {
     setIsWithdrawing(false);
   };
 
+  // confirmation/information control functions
   const startReunlockConfirmation = () => {
     setShowReunlockConfirmation(true);
   };
@@ -111,14 +155,24 @@ export const useStake = () => {
   };
 
   return {
+    // info
+    alluoTokenInfo,
+    alluoStakingInfo,
     walletAccountAtom,
+    // loading control
     isLoading,
-    alluoInfo,
-    updateAlluoInfo,
-    handleWithdraw,
     isWithdrawing,
+    // lock functions
+    handleApprove,
+    handleLock,
+    //unlock functions
+    handleUnlock,
+    // withdraw functions
+    handleWithdraw,
+    // information/confirmation control
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
+    showTabs,
   };
 };

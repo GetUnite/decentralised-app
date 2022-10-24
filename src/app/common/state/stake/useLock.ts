@@ -1,11 +1,10 @@
-import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 
-export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
+export const useLock = ({ alluoStakingInfo, handleApprove, handleLock }) => {
   // other state control files
-  const { setNotificationt, resetNotification } = useNotification();
+  const { resetNotification } = useNotification();
 
   // inputs
   const [lockValue, setLockValue] = useState<string>();
@@ -26,50 +25,37 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setLockValueError('Write a valid number');
-    } else if (+value > +alluoInfo?.balance) {
+    } else if (+value > +alluoStakingInfo?.balance) {
       setLockValueError('Insufficient balance');
     }
     setLockValue(value);
   };
 
-  const handleApprove = async () => {
-    resetState();
+  const startApprove = async () => {
     setIsApproving(true);
-
-    try {
-      await approveAlluoStaking();
-      await updateAlluoInfo();
-    } catch (err) {
-      console.error('Error', err.message);
-      setNotificationt(err.message, 'error');
-    }
-
+    await handleApprove()
     setIsApproving(false);
   };
 
-  const handleLock = async () => {
-    resetState();
+  const startLock = async () => {
     setIsLocking(true);
-
-    try {
-      await lockAlluo(lockValue);
-      await updateAlluoInfo();
-      setLockValue(null);
-      setNotificationt('Successfully locked', 'success');
-    } catch (error) {
-      setNotificationt(error, 'error');
-    }
-
+    await handleLock(lockValue)
+    setLockValue(null);
     setIsLocking(false);
   };
 
+
   return {
+    // info
     lockValue,
+    // loading control
     isApproving,
     isLocking,
+    // lock functions
+    startApprove,
+    startLock,
+    // input validations
     handleLockValueChange,
-    handleApprove,
-    handleLock,
     lockValueError,
     hasErrors: lockValueError != '',
   };

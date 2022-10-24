@@ -1,4 +1,3 @@
-import { roundNumberDown } from 'app/common/functions/utils';
 import { useLock } from 'app/common/state/stake';
 import {
   Info,
@@ -8,17 +7,24 @@ import {
 } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
 
-export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
+export const LockTab = ({
+  isLoading,
+  alluoStakingInfo,
+  alluoTokenInfo,
+  handleApprove,
+  handleLock,
+  ...rest
+}) => {
   const {
     lockValue,
     isApproving,
     isLocking,
     handleLockValueChange,
-    handleApprove,
-    handleLock,
     hasErrors,
     lockValueError,
-  } = useLock({ alluoInfo, updateAlluoInfo });
+    startApprove,
+    startLock,
+  } = useLock({ alluoStakingInfo, handleApprove, handleLock });
 
   return (
     <Box fill>
@@ -41,7 +47,8 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
           <>
             <Box margin={{ top: 'large' }}>
               <Text textAlign="center" weight="bold">
-                You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO staked
+                You have {alluoStakingInfo.locked} $ALLUO
+                staked
               </Text>
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
@@ -49,16 +56,25 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
                   tokenSign="$"
                   onValueChange={handleLockValueChange}
                   value={lockValue}
-                  maxValue={alluoInfo?.balance}
+                  maxValue={alluoTokenInfo?.balance}
                   error={lockValueError}
                 />
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
-              <Info label="Unstaked $ALLUO balance" value={roundNumberDown(alluoInfo.balance, 2)} />
-              <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
-              <Info label="$ALLUO earned" value={alluoInfo.earned} />
-              <Info label="Total $ALLUO staked" value={alluoInfo.totalLocked} />
+              <Info
+                label="Unstaked $ALLUO balance"
+                value={alluoTokenInfo.balance}
+              />
+              <Info label="$ALLUO APR" value={alluoStakingInfo.apr + '%'} />
+              <Info
+                label="$ALLUO earned"
+                value={alluoStakingInfo.earned}
+              />
+              <Info
+                label="Total $ALLUO staked"
+                value={alluoStakingInfo.totalLocked}
+              />
               <Text
                 size="xsmall"
                 margin={{ left: 'small', top: 'small' }}
@@ -84,13 +100,15 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
           }
           label={
             +lockValue > 0
-              ? +alluoInfo?.allowance >= +lockValue
+              ? +alluoTokenInfo?.allowance >= +lockValue
                 ? 'Lock'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +alluoInfo?.allowance >= +lockValue ? handleLock : handleApprove
+            +alluoTokenInfo?.allowance >= +lockValue
+              ? startLock
+              : startApprove
           }
         />
       </Box>

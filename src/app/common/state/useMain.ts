@@ -98,7 +98,8 @@ export const useMain = () => {
                     supportedToken,
                     availableFarm.chain,
                   );
-                if (Number(advancedSupportedTokenInfo.balance) > 0) {
+                  console.log(advancedSupportedTokenInfo);
+                if (+advancedSupportedTokenInfo.balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(availableFarm.chain);
                 }
@@ -140,7 +141,7 @@ export const useMain = () => {
         4,
       );
       farmInfo.poolShare =
-        farmInfo.depositedAmount > 0
+        +farmInfo.depositedAmount > 0
           ? toExactFixed(
               Number(farmInfo.depositedAmount) /
                 Number(farmInfo.totalAssetSupply),
@@ -220,7 +221,7 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'your'
-        ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
+        ? availableFarms.filter(farm => +farm.depositedAmount > 0)
         : availableFarms;
 
     filteredFarms = tokenFilter
@@ -285,7 +286,6 @@ export const useMain = () => {
     if (isSafeAppAtom && walletAccountAtom) {
       const chainId = await getCurrentChainId();
       const chain = await getChainById(chainId);
-      console.log({ chain: chain, chainId: chainId });
 
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }

@@ -10,20 +10,24 @@ import { UnlockCountdown } from './components/UnlockCountdown';
 
 export const Stake = ({ ...rest }) => {
   const {
-    isLoading,
-    updateAlluoInfo,
-    alluoInfo,
-    handleWithdraw,
+    alluoTokenInfo,
+    alluoStakingInfo,
     walletAccountAtom,
+    isLoading,
     isWithdrawing,
+    handleApprove,
+    handleLock,
+    handleUnlock,
+    handleWithdraw,
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
+    showTabs,
   } = useStake();
 
   const allTimersAreFinished =
-    timerIsFinished(alluoInfo?.depositUnlockTime) &&
-    timerIsFinished(alluoInfo?.withdrawUnlockTime);
+    timerIsFinished(alluoStakingInfo?.depositUnlockTime) &&
+    timerIsFinished(alluoStakingInfo?.withdrawUnlockTime);
 
   const renderModal = () => {
     return (
@@ -32,7 +36,7 @@ export const Stake = ({ ...rest }) => {
           <Box gap="28px">
             {walletAccountAtom && !isLoading && (
               <Box gap="16px">
-                {+alluoInfo?.unlocked > 0 && allTimersAreFinished && (
+                {+alluoStakingInfo?.unlocked > 0 && allTimersAreFinished && (
                   <Box
                     round={'medium'}
                     width="245px"
@@ -52,7 +56,7 @@ export const Stake = ({ ...rest }) => {
                       <>
                         <Text size="18px" weight="bold">
                           Your unlocked balance is{' '}
-                          {roundNumberDown(alluoInfo.unlocked, 2)}
+                          {roundNumberDown(alluoStakingInfo.unlocked, 2)}
                         </Text>
                         <Button
                           primary
@@ -65,29 +69,23 @@ export const Stake = ({ ...rest }) => {
                   </Box>
                 )}
 
-                {!timerIsFinished(+alluoInfo?.depositUnlockTime) && (
+                {!timerIsFinished(+alluoStakingInfo?.depositUnlockTime) && (
                   <>
                     <UnlockCountdown
-                      date={+alluoInfo?.depositUnlockTime * 1000}
-                      onComplete={updateAlluoInfo}
-                      label={`UNLOCKING ${roundNumberDown(
-                        alluoInfo.locked,
-                        2,
-                      )} TOKENS IN`}
+                      date={+alluoStakingInfo?.depositUnlockTime * 1000}
+                      onComplete={() => {}}
+                      label={`UNLOCKING ${alluoStakingInfo.locked} TOKENS IN`}
                       showReunlockConfirmation={showReunlockConfirmation}
                     />
                   </>
                 )}
 
-                {!timerIsFinished(+alluoInfo?.withdrawUnlockTime) && (
+                {!timerIsFinished(+alluoStakingInfo?.withdrawUnlockTime) && (
                   <>
                     <UnlockCountdown
-                      date={+alluoInfo.withdrawUnlockTime * 1000}
-                      onComplete={updateAlluoInfo}
-                      label={`UNLOCKING ${roundNumberDown(
-                        alluoInfo.unlocked,
-                        2,
-                      )} TOKENS IN`}
+                      date={+alluoStakingInfo.withdrawUnlockTime * 1000}
+                      onComplete={() => {}}
+                      label={`UNLOCKING ${alluoStakingInfo.unlocked} TOKENS IN`}
                       showReunlockConfirmation={showReunlockConfirmation}
                     />
                   </>
@@ -97,26 +95,33 @@ export const Stake = ({ ...rest }) => {
           </Box>
         </Box>
         <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-          <Tabs>
+          {/*showReunlockConfirmation && (
+              <ReunlockConfirmation
+              handleUnlock={handleUnlock}
+              cancelReunlockConfirmation={cancelReunlockConfirmation}
+            />
+          )*/}
+          {showTabs && (<Tabs>
             <Tab title="Lock">
               <LockTab
                 isLoading={isLoading}
-                alluoInfo={alluoInfo}
-                updateAlluoInfo={updateAlluoInfo}
+                alluoStakingInfo={alluoStakingInfo}
+                alluoTokenInfo={alluoTokenInfo}
+                handleApprove={handleApprove}
+                handleLock={handleLock}
               />
             </Tab>
             <Tab title="Unlock">
               <UnlockTab
                 isLoading={isLoading}
-                alluoInfo={alluoInfo}
-                updateAlluoInfo={updateAlluoInfo}
+                alluoStakingInfo={alluoStakingInfo}
+                handleUnlock={handleUnlock}
                 startReunlockConfirmation={startReunlockConfirmation}
-                showReunlockConfirmation={showReunlockConfirmation}
                 cancelReunlockConfirmation={cancelReunlockConfirmation}
                 allTimersAreFinished={allTimersAreFinished}
               />
             </Tab>
-          </Tabs>
+          </Tabs>)}
         </Modal>
         <Box></Box>
       </>

@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import { Box, Button, TextInput, Select, Text, ThemeContext } from 'grommet';
-import { Down } from 'grommet-icons';
-import { normalizeColor } from 'grommet/utils';
-import NumberFormat from 'react-number-format';
-import { TSupportedToken } from 'app/common/types/form';
-import { TokenIcon } from '../Icons';
 import { roundNumberDown } from 'app/common/functions/utils';
+import { TSupportedToken } from 'app/common/types/global';
+import { Box, Select, Text, TextInput, ThemeContext } from 'grommet';
+import { Down } from 'grommet-icons';
+import { useState } from 'react';
+import NumberFormat from 'react-number-format';
+import styled from 'styled-components';
+import { TokenIcon } from '../Icons';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;

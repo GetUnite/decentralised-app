@@ -9,7 +9,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { initialAvailableFarmsState } from 'app/common/state/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';

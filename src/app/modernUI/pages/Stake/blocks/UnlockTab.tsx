@@ -1,4 +1,3 @@
-import { roundNumberDown } from 'app/common/functions/utils';
 import { useUnlock } from 'app/common/state/stake';
 import {
   Info,
@@ -7,16 +6,14 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
-import { ReunlockConfirmation } from './ReunlockConfirmation';
 
 export const UnlockTab = ({
   isLoading,
-  alluoInfo,
-  updateAlluoInfo,
+  alluoStakingInfo,
   startReunlockConfirmation,
-  showReunlockConfirmation,
   cancelReunlockConfirmation,
   allTimersAreFinished,
+  handleUnlock,
   ...rest
 }) => {
   const {
@@ -24,9 +21,9 @@ export const UnlockTab = ({
     isUnlocking,
     projectedUnlockValue,
     handleUnlockValueChange,
-    handleUnlock,
+    startUnlock,
     unlockValueError,
-  } = useUnlock({ alluoInfo, updateAlluoInfo });
+  } = useUnlock({ alluoStakingInfo, handleUnlock });
 
   return (
     <Box fill>
@@ -47,61 +44,51 @@ export const UnlockTab = ({
           </Box>
         ) : (
           <>
-            {showReunlockConfirmation ? (
-              <ReunlockConfirmation
-                handleUnlock={handleUnlock}
-                cancelReunlockConfirmation={cancelReunlockConfirmation}
-              />
-            ) : (
-              <>
-                <Box margin={{ top: 'large' }}>
-                  <Text textAlign="center" margin="auto" weight="bold">
-                    You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO
-                    staked
-                  </Text>
+            <Box margin={{ top: 'large' }}>
+              <Text textAlign="center" margin="auto" weight="bold">
+                You have {alluoStakingInfo.locked} $ALLUO staked
+              </Text>
 
-                  <Box margin={{ top: 'medium' }}>
-                    <RangeInput
-                      label="Unlock percentage"
-                      value={unlockValue}
-                      onValueChange={handleUnlockValueChange}
-                      error={unlockValueError}
-                    />
-                  </Box>
+              <Box margin={{ top: 'medium' }}>
+                <RangeInput
+                  label="Unlock percentage"
+                  value={unlockValue}
+                  onValueChange={handleUnlockValueChange}
+                  error={unlockValueError}
+                />
+              </Box>
 
-                  <Box margin={{ top: 'medium' }}>
-                    <Info
-                      label="$ALLUO being unlocked"
-                      value={projectedUnlockValue}
-                    />
-                    <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
-                    <Info label="$ALLUO earned" value={alluoInfo.earned} />
-                    <Info
-                      label="$ALLUO unlocked"
-                      value={roundNumberDown(alluoInfo.unlocked, 2)}
-                    />
-                    <Info
-                      label="Total $ALLUO staked"
-                      value={alluoInfo.totalLocked}
-                    />
-                  </Box>
-                </Box>
-              </>
-            )}
+              <Box margin={{ top: 'medium' }}>
+                <Info
+                  label="$ALLUO being unlocked"
+                  value={projectedUnlockValue}
+                />
+                <Info label="$ALLUO APR" value={alluoStakingInfo.apr + '%'} />
+                <Info label="$ALLUO earned" value={alluoStakingInfo.earned} />
+                <Info
+                  label="$ALLUO unlocked"
+                  value={alluoStakingInfo.unlocked}
+                />
+                <Info
+                  label="Total $ALLUO staked"
+                  value={alluoStakingInfo.totalLocked}
+                />
+              </Box>
+            </Box>
           </>
         )}
       </Box>
 
-      {(isUnlocking || !showReunlockConfirmation) && (
-        <Box margin={{ top: 'large' }} style={{ height: 52 }}>
-          <SubmitButton
-            primary
-            disabled={(+unlockValue === 0) || isUnlocking}
-            label="Unlock"
-            onClick={!allTimersAreFinished ? startReunlockConfirmation : handleUnlock}
-          />
-        </Box>
-      )}
+      <Box margin={{ top: 'large' }} style={{ height: 52 }}>
+        <SubmitButton
+          primary
+          disabled={+unlockValue === 0 || isUnlocking}
+          label="Unlock"
+          onClick={
+            !allTimersAreFinished ? startReunlockConfirmation : startUnlock
+          }
+        />
+      </Box>
     </Box>
   );
 };

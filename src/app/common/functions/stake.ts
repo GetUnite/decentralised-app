@@ -66,19 +66,19 @@ export const getAlluoStakingRewardPerDistribution = async () => {
   return ethers.utils.formatEther(rewardPerDistribution);
 };
 
-export const getAlluoStakingAPR = async () => {
+export const getAlluoStakingAPR = async (totalAlluoLocked = null) => {
   const alluoPrice = await getAlluoPrice();
-  if (!alluoPrice) return 0;
+  if (!alluoPrice) return "0";
 
   const alluoStakingRewardPerDistribution =
     await getAlluoStakingRewardPerDistribution();
 
-  const totalAlluoStaked = await getTotalAlluoLocked();
+  const totalAlluoStaked = totalAlluoLocked ? totalAlluoLocked : await getTotalAlluoLocked();
 
   const exactApr =
     (+alluoStakingRewardPerDistribution / +totalAlluoStaked) * 100 * 365;
 
-  return +exactApr.toFixed(2);
+  return toExactFixed(exactApr, 2);
 };
 
 export const getAlluoBalance = async () => {
@@ -102,7 +102,8 @@ export const getAlluoBalance = async () => {
     EChain.ETHEREUM,
   );
 
-  return ethers.utils.formatEther(balance);
+  // 18 is the number of decimals of alluo
+  return ethers.utils.formatUnits(balance, 18);
 };
 
 export const getEarnedAlluo = async () => {
@@ -126,7 +127,8 @@ export const getEarnedAlluo = async () => {
     EChain.ETHEREUM,
   );
 
-  return ethers.utils.formatEther(earnedAlluo);
+  // 18 is the number of decimals of alluo
+  return ethers.utils.formatUnits(earnedAlluo, 18);
 };
 
 export const getUnlockedAlluo = async () => {

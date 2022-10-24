@@ -1,20 +1,20 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    getDepositedAmount,
-    getInterest,
-    getTotalAssetSupply,
-    startStream
+  getDepositedAmount,
+  getInterest,
+  getTotalAssetSupply,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approve,
-    getAllowance,
-    getBalanceOf,
-    getSupportedTokensBasicInfo
+  approve,
+  getAllowance,
+  getBalanceOf,
+  getSupportedTokensBasicInfo
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';

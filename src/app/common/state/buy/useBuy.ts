@@ -1,17 +1,17 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    approveAlluoPurchaseInWETH,
-    buyAlluoWithWETH,
-    getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
-    getVlAlluoTotalSupply,
-    getWETHAllowance,
-    getWEthBalance
+  approveAlluoPurchaseInWETH,
+  buyAlluoWithWETH,
+  getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
+  getVlAlluoTotalSupply,
+  getWETHAllowance,
+  getWEthBalance
 } from 'app/common/functions/buy';
 import {
-    approveAlluoStaking,
-    getAlluoStakingAllowance,
-    getAlluoStakingAPR,
-    lockAlluo
+  approveAlluoStaking,
+  getAlluoStakingAllowance,
+  getAlluoStakingAPR,
+  lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -34,7 +34,7 @@ export const useBuy = () => {
   const [totalSupply, setTotalSupply] = useState<string>('');
   const [allowance, setAllowance] = useState<string>('');
   const [vlAlluoBalance, setVlAlluoBalance] = useState<string>('');
-  const [alluoStakingAPR, setAlluoStakingAPR] = useState<number>();
+  const [alluoStakingAPR, setAlluoStakingAPR] = useState<string>();
 
   const resetState = () => {
     resetNotification();
