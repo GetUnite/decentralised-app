@@ -1,10 +1,9 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { getStreamFlow } from 'app/common/functions/autoInvest';
+import { toExactFixed } from 'app/common/functions/utils';
 import {
-  getBalanceOf,
-  getSupportedTokensAdvancedInfo,
-  getSupportedTokensBasicInfo,
+  getBalanceOf, getSupportedTokensBasicInfo,
   getSupportedTokensList
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -29,13 +28,13 @@ export const streamOptions: any = [
         ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
-        label: "ETH"
+        label: 'ETH',
       },
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-        label: "BTC"
+        label: 'BTC',
       },
     ],
   },
@@ -49,7 +48,7 @@ export const streamOptions: any = [
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-        label:"USD"
+        label: 'USD',
       },
     ],
   },
@@ -63,7 +62,7 @@ export const streamOptions: any = [
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
-        label: "USD"
+        label: 'USD',
       },
     ],
   },
@@ -79,9 +78,6 @@ export const useAutoInvest = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
-
-  // modal control
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   // assets info
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
@@ -108,8 +104,7 @@ export const useAutoInvest = () => {
 
   const fetchAssetsInfo = async () => {
     try {
-      let numberOfAssets = 0;
-      let chainsWithAssets = new Set();
+      let supportedTokensWithBalance = new Array<any>();
 
       await Promise.all(
         initialAvailableFarmsState
@@ -127,21 +122,45 @@ export const useAutoInvest = () => {
               : await getSupportedTokensList(farm.type, farm.chain);
 
             if (walletAccountAtom) {
-              supportedTokens.map(async supportedToken => {
-                const advancedSupportedTokenInfo =
-                  await getSupportedTokensAdvancedInfo(
-                    farm.farmAddress,
-                    supportedToken,
-                    farm.chain,
-                  );
-                if (Number(advancedSupportedTokenInfo.balance) > 0) {
-                  numberOfAssets++;
-                  chainsWithAssets.add(farm.chain);
-                }
-              });
+              for (const supportedToken of supportedTokens) {
+                supportedTokensWithBalance.push({
+                  ...supportedToken,
+                  chain: farm.chain,
+                });
+              }
             }
           }),
-      ).then(() => {
+      ).then(async () => {
+        let numberOfAssets = 0;
+        let chainsWithAssets = new Set();
+        if (walletAccountAtom) {
+          const uniqueSupportedTokensWithBalance =
+            supportedTokensWithBalance.filter(
+              (value, index, self) =>
+                index ===
+                self.findIndex(
+                  t =>
+                    t.tokenAddress === value.tokenAddress &&
+                    t.chain === value.chain,
+                ),
+            );
+
+          await Promise.all(
+            uniqueSupportedTokensWithBalance.map(
+              async supportedTokenWithBalance => {
+                const balance = await getBalanceOf(
+                  supportedTokenWithBalance.tokenAddress,
+                  supportedTokenWithBalance.decimals,
+                  supportedTokenWithBalance.chain,
+                );
+                if (+toExactFixed(balance, 2) > 0) {
+                  numberOfAssets++;
+                  chainsWithAssets.add(supportedTokenWithBalance.chain);
+                }
+              },
+            ),
+          );
+        }
         setAssetsInfo({
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
@@ -157,8 +176,11 @@ export const useAutoInvest = () => {
       let streamsArray = [];
 
       streamOptions.forEach(async streamOption => {
-        await streamOption.to.map(so => { return {address: so.ricochetMarketAddress, label: so.label}}).forEach(
-          async ricochetMarket => {
+        await streamOption.to
+          .map(so => {
+            return { address: so.ricochetMarketAddress, label: so.label };
+          })
+          .forEach(async ricochetMarket => {
             const streamFlow = await getStreamFlow(
               streamOption.stIbAlluoAddress,
               ricochetMarket.address,
@@ -183,8 +205,7 @@ export const useAutoInvest = () => {
                 ).toLocaleDateString(),
               });
             }
-          },
-        );
+          });
       });
 
       resolve(streamsArray);
@@ -196,8 +217,6 @@ export const useAutoInvest = () => {
     walletAccountAtom,
     isLoading,
     streams,
-    isModalVisible,
-    setIsModalVisible,
     assetsInfo,
   };
 };
