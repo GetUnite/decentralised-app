@@ -59,15 +59,6 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
               <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
               <Info label="$ALLUO earned" value={alluoInfo.earned} />
               <Info label="Total $ALLUO staked" value={alluoInfo.totalLocked} />
-              <Text
-                size="xsmall"
-                margin={{ left: 'small', top: 'small' }}
-                color="#999999"
-              >
-                Staking your tokens means locking them in an 80-20 ALLUO-ETH
-                Balancer pool, Your balance might vary depending on the
-                performance of ETH vs. ALLUO
-              </Text>
             </Box>
           </>
         )}
