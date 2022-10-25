@@ -24,7 +24,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
     <Box fill>
       <Box
         style={{
-          minHeight: '469px',
+          minHeight: '415px',
         }}
         justify="center"
       >
