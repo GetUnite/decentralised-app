@@ -2,10 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    getIfUserHasWithdrawalRequest,
-    isExpectedPolygonEvent,
-    listenToHandler,
-    withdrawStableCoin
+  withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -25,9 +22,7 @@ export const useWithdrawal = ({
   const { setNotificationt } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(
-    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-  );
+  const [useBiconomy, setUseBiconomy] = useState(true);
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -37,84 +32,12 @@ export const useWithdrawal = ({
   const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
     useState<boolean>(false);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [blockNumber, setBlockNumber] = useState<number>();
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      fetchIfUserHasWithdrawalRequest();
+    if (selectedFarm) {
+      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
-  }, [walletAccountAtom]);
-
-  const fetchIfUserHasWithdrawalRequest = async () => {
-    // This method of getting if the user already has an withdraw request only works for iballuo farms which are now not the only ones....
-    if (selectedFarm.type == 'booster') return;
-    resetState();
-    setIsWithdrawalRequestsLoading(true);
-    try {
-      const userRequests = await getIfUserHasWithdrawalRequest(
-        walletAccountAtom,
-        selectedFarm.farmAddress,
-        selectedFarm.chain,
-      );
-      const userRequestslength = userRequests.length;
-      if (userRequestslength > 0) {
-        const FULL_DAY_IN_HOURS = 86400;
-        const lastRequest = userRequests[userRequestslength - 1];
-        const remainingSeconds =
-          Math.trunc(new Date().getTime() / 1000) - +lastRequest.time;
-        const remainingTime = new Date(
-          (FULL_DAY_IN_HOURS - remainingSeconds) * 1000,
-        )
-          .toISOString()
-          .substr(11, 8);
-        const message = `You have ${userRequestslength} ${
-          userRequestslength === 1 ? 'request' : 'requests'
-        } accepted, will be processed within ${remainingTime}`;
-        setNotificationt(message, 'success');
-      }
-    } catch (err) {
-      setWithdrawValueError(err.message);
-    }
-    setIsWithdrawalRequestsLoading(false);
-  };
-
-  useEffect(() => {
-    let bufferListener;
-    if (blockNumber) {
-      bufferListener = listenToHandler(blockNumber);
-      bufferListener.WithdrawalSatisfied(
-        { fromBlock: blockNumber },
-        async function (error, event) {
-          if (error) console.error(error);
-          if (
-            event.blockNumber === blockNumber &&
-            isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
-          ) {
-            setWithdrawValue(null);
-            setIsWithdrawing(false);
-            setNotificationt('Withdrew successfully', 'success');
-          }
-        },
-      );
-      bufferListener.AddedToQueue(
-        { fromBlock: blockNumber },
-        function (error, event) {
-          if (error) console.error(error);
-          if (
-            event.blockNumber === blockNumber &&
-            isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
-          ) {
-            setIsWithdrawing(false);
-            setNotificationt(
-              'Request accepted and will be processed within 24 hours',
-              'success',
-            );
-          }
-        },
-      );
-    }
-    return () => {};
-  }, [blockNumber]);
+  }, [selectedFarm]);
 
   const handleWithdrawalFieldChange = value => {
     resetState();
@@ -158,7 +81,7 @@ export const useWithdrawal = ({
         );
       }
       resetState();
-      setBlockNumber(blockNumber);
+      setNotificationt("Successfully withdrew", 'success');
       await updateFarmInfo();
     } catch (error) {
       resetState();
