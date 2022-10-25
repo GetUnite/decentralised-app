@@ -86,7 +86,7 @@ export const useMain = () => {
               : await fetchFarmInfo(availableFarm);
 
             supportedTokens.map(async supportedToken => {
-              allSupportedTokens.add(supportedToken);
+              allSupportedTokens.add(supportedToken.symbol);
             });
 
             if (walletAccountAtom) {
