@@ -308,12 +308,32 @@ export const startStream = async (
 
     const superfluidAddress = EPolygonAddresses.SUPERFLUID;
 
-    console.log( operations.map(async x => (await x.populateTransactionPromise)));
+    const operationsTransactions = await Promise.all(operations.map(async x => {
+      const transaction = await x.populateTransactionPromise;
+      const iface = new ethers.utils.Interface([
+        "function callAgreement(address agreementClass, bytes callData, bytes userData)"
+      ]);
+
+      let parsed = iface.decodeFunctionData("callAgreement", transaction.data);
+
+      const operationData = ethers.utils.defaultAbiCoder.encode(
+        ['bytes', 'bytes'],
+        [parsed.callData, parsed.userData],
+      );
+
+      return {
+        operationType: 201,
+        target: parsed.agreementClass,
+        data: operationData
+      }
+    }));
+    
+    console.log(useBiconomy);
     await sendTransaction(
       superfluidAbi,
       superfluidAddress,
       'forwardBatchCall((uint32,address,bytes)[])',
-      [operations],
+      [operationsTransactions],
       EChain.POLYGON,
       useBiconomy,
     );
