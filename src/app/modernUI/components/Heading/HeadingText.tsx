@@ -13,12 +13,12 @@ export const HeadingText = ({
 
   const headingText = isLoading ? (
     <Box fill>
-      <Skeleton count={1} height="36px"/>
+      <Skeleton count={1} height="36px" />
     </Box>
   ) : (
     <>
       {numberOfAssets == 0 ? (
-        'You don’t have available assets to farm in your wallet.'
+        'You don’t have any available assets to farm in your wallet.'
       ) : (
         <span>
           You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '}
@@ -39,8 +39,7 @@ export const HeadingText = ({
       </Text>
       <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
         Fund your wallet using crypto or fiat currency here to start investing.
-        Get your yield in the same coin and withdraw at any time with no cost
-        and no lock-in period.{' '}
+        Withdraw at any time with no cost and no lock-in period.
       </Paragraph>
     </>
   );
