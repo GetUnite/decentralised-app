@@ -114,7 +114,7 @@ export const useAutoInvest = () => {
               ? await Promise.all(
                   farm.supportedTokensAddresses.map(async supportedtoken => {
                     return await getSupportedTokensBasicInfo(
-                      supportedtoken,
+                      supportedtoken.address,
                       farm.chain,
                     );
                   }),
@@ -133,6 +133,7 @@ export const useAutoInvest = () => {
       ).then(async () => {
         let numberOfAssets = 0;
         let chainsWithAssets = new Set();
+
         if (walletAccountAtom) {
           const uniqueSupportedTokensWithBalance =
             supportedTokensWithBalance.filter(
@@ -161,6 +162,7 @@ export const useAutoInvest = () => {
             ),
           );
         }
+
         setAssetsInfo({
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,

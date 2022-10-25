@@ -1,16 +1,7 @@
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import {
-  HeadingText,
-  Layout, Spinner
-} from 'app/modernUI/components';
+import { HeadingText, Layout, Spinner } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
-import {
-  Box,
-  Button,
-  Card,
-  Grid, ResponsiveContext,
-  Text
-} from 'grommet';
+import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
@@ -34,9 +25,20 @@ export const AutoInvest = () => {
                   {isLoading ? (
                     <Skeleton count={1} height="36px" />
                   ) : (
-                    <Text size="36px" weight="bold">
-                      {0} active streams
-                    </Text>
+                    <Box direction="row" justify="between" align="center">
+                      {' '}
+                      <Text size="36px" weight="bold">
+                        {0} active streams
+                      </Text>{' '}
+
+                        <Link to={'/auto-invest/add'}>
+                          <Button
+                            label="Start new stream"
+                            style={{ width: '170px' }}
+                          />
+                        </Link>
+
+                    </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
                     {!isSmall(size) && (
@@ -111,13 +113,6 @@ export const AutoInvest = () => {
                               })}
                           </>
                         )}
-                        <Link to={'/auto-invest/add'}>
-                          <Button
-                            label="Start new stream"
-                            style={{ width: '170px' }}
-                            margin={{ top: '18px' }}
-                          />
-                        </Link>
                       </Box>
                     )}
                   </Box>
