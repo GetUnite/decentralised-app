@@ -1,35 +1,22 @@
-import { EChain } from 'app/common/constants/chains';
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
 import {
   HeadingText,
-  Layout,
-  Modal,
-  Spinner,
-  Tab
+  Layout, Spinner
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import {
   Box,
   Button,
   Card,
-  Grid,
-  Layer,
-  ResponsiveContext,
+  Grid, ResponsiveContext,
   Text
 } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
-import { AutoInvestTab } from './blocks/AutoInvestTab';
+import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
-  const {
-    streams,
-    setIsModalVisible,
-    isModalVisible,
-    isLoading,
-    assetsInfo,
-    walletAccountAtom,
-  } = useAutoInvest();
+  const { streams, isLoading, assetsInfo, walletAccountAtom } = useAutoInvest();
 
   return (
     <Layout>
@@ -124,12 +111,13 @@ export const AutoInvest = () => {
                               })}
                           </>
                         )}
-                        <Button
-                          label="Start new stream"
-                          onClick={() => setIsModalVisible(true)}
-                          style={{ width: '170px' }}
-                          margin={{ top: '18px' }}
-                        />
+                        <Link to={'/auto-invest/add'}>
+                          <Button
+                            label="Start new stream"
+                            style={{ width: '170px' }}
+                            margin={{ top: '18px' }}
+                          />
+                        </Link>
                       </Box>
                     )}
                   </Box>
@@ -143,23 +131,6 @@ export const AutoInvest = () => {
           </Box>
         )}
       </ResponsiveContext.Consumer>
-      {isModalVisible && (
-        <Layer
-          onEsc={() => setIsModalVisible(false)}
-          onClickOutside={() => setIsModalVisible(false)}
-        >
-          <Modal
-            chain={EChain.POLYGON}
-            heading="Auto-Invest"
-            isLoading={false}
-            closeAction={() => setIsModalVisible(false)}
-          >
-            <Tab title="Auto-Invest">
-              <AutoInvestTab />
-            </Tab>
-          </Modal>
-        </Layer>
-      )}
     </Layout>
   );
 };

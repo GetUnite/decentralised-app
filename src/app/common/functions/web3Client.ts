@@ -269,24 +269,31 @@ export const sendTransaction = async (
   try {
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, walletProvider);
+      console.log(biconomy);
       provider = new ethers.providers.Web3Provider(biconomy);
     } else {
       provider = walletProvider;
     }
 
+    
     const signer = provider.getSigner();
+    console.log(provider);
     const contract = new ethers.Contract(address, abi as any, signer);
 
     const gasEstimationPromise = contract.estimateGas[functionSignature].apply(
       null,
       params,
     );
-    const gasEstimation = +(await gasEstimationPromise).toString();
-    const gasLimit = Math.floor(gasEstimation + gasEstimation * 0.25);
+    console.log(gasEstimationPromise);
+    const gasLimitEstimation = +(await gasEstimationPromise).toString();
+    const gasLimit = Math.floor(gasLimitEstimation + gasLimitEstimation * 0.25);
+    const gasPriceEstimation = +(await provider.getGasPrice()).toString();
+    const gasPrice = Math.floor(gasPriceEstimation + gasPriceEstimation * 0.25);
+    console.log(gasPriceEstimation, gasPrice);
 
     const method = contract[functionSignature].apply(null, [
       ...params,
-      { gasLimit: gasLimit },
+      { gasLimit: gasLimit, gasPrice: gasPrice },
     ]);
 
     const tx = await method;
@@ -1456,6 +1463,7 @@ export const withdrawStableCoin = async (
       useBiconomy,
     );
 
+    console.log(tx);
     return tx.blockNumber;
   } catch (error) {
     throw error;

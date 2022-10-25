@@ -1,16 +1,16 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    getDepositedAmount,
-    getInterest,
-    getTotalAssetSupply,
-    startStream
+  getDepositedAmount,
+  getInterest,
+  getTotalAssetSupply,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approve,
-    getAllowance,
-    getBalanceOf,
-    getSupportedTokensBasicInfo
+  approve,
+  getAllowance,
+  getBalanceOf,
+  getSupportedTokensBasicInfo
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
@@ -195,6 +195,7 @@ export const useAutoInvestTab = () => {
     setIsFetchingFarmInfo(false);
   };
 
+  // approve functions
   const handleApprove = async () => {
     setIsApproving(true);
 
@@ -213,6 +214,7 @@ export const useAutoInvestTab = () => {
     setIsApproving(false);
   };
 
+  // start stream functions
   const handleStartStream = async () => {
     setIsStartingStream(true);
 

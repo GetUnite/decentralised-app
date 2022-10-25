@@ -128,7 +128,7 @@ export const useMain = () => {
                   supportedTokenWithBalance.decimals,
                   supportedTokenWithBalance.chain,
                 );
-                if (+balance > 0) {
+                if (+toExactFixed(balance,2) > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
                 }
@@ -213,7 +213,6 @@ export const useMain = () => {
         farmInfo.depositedAmountInLP * valueOf1LPinUSDC,
         2,
       );
-      console.log(farmInfo, valueOf1LPinUSDC);
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -312,7 +311,6 @@ export const useMain = () => {
     if (isSafeAppAtom && walletAccountAtom) {
       const chainId = await getCurrentChainId();
       const chain = await getChainById(chainId);
-      console.log({ chain: chain, chainId: chainId });
 
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }
