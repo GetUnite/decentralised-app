@@ -3,14 +3,23 @@ import {
   approve,
   callContract,
   getCurrentWalletAddress,
-  getPrice, sendTransaction
+  getPrice,
+  sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
-import { EEthereumAddresses, EEthereumAddressesMainnet } from '../constants/addresses';
+import {
+  EEthereumAddresses,
+  EEthereumAddressesMainnet
+} from '../constants/addresses';
 import { toExactFixed } from './utils';
 
 export const getAlluoPrice = async () => {
-  return getPrice(EEthereumAddressesMainnet.ALLUO, EEthereumAddressesMainnet.USDC, 18, 6);
+  return getPrice(
+    EEthereumAddressesMainnet.ALLUO,
+    EEthereumAddressesMainnet.USDC,
+    18,
+    6,
+  );
 };
 
 export const alluoToUsd = async alluoValueInWei => {
@@ -162,6 +171,7 @@ export const getAlluoStakingWalletAddressInfo = async () => {
         { internalType: 'uint256', name: 'locked_', type: 'uint256' },
         { internalType: 'uint256', name: 'unlockAmount_', type: 'uint256' },
         { internalType: 'uint256', name: 'claim_', type: 'uint256' },
+        { internalType: 'uint256', name: 'claimCvx_', type: 'uint256' },
         {
           internalType: 'uint256',
           name: 'depositUnlockTime_',
@@ -176,13 +186,6 @@ export const getAlluoStakingWalletAddressInfo = async () => {
       stateMutability: 'view',
       type: 'function',
     },
-    {
-      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
-      name: 'convertLpToAlluo',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
   ];
   const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
 
@@ -194,18 +197,10 @@ export const getAlluoStakingWalletAddressInfo = async () => {
     EChain.ETHEREUM,
   );
 
-  const walletLockedAlluo = await callContract(
-    abi,
-    ethereumVlAlluoAddress,
-    'convertLpToAlluo(uint256)',
-    [alluoStakingWalletAddressInfo.locked_],
-    EChain.ETHEREUM,
-  );
-
   return {
-    locked: ethers.utils.formatEther(walletLockedAlluo),
+    locked: ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
     lockedInLp: ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
-    lockedInUsd: alluoToUsd(ethers.utils.formatEther(walletLockedAlluo)),
+    lockedInUsd: alluoToUsd(ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_)),
     withdrawUnlockTime:
       alluoStakingWalletAddressInfo.withdrawUnlockTime_.toString(),
     depositUnlockTime:
@@ -214,29 +209,9 @@ export const getAlluoStakingWalletAddressInfo = async () => {
 };
 
 export const getTotalAlluoLocked = async () => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'uint256', name: '_amount', type: 'uint256' }],
-      name: 'convertLpToAlluo',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
   const totalAlluoLockedInLp = await getTotalAlluoLockedInLp();
 
-  const totalAlluoLocked = await callContract(
-    abi,
-    ethereumVlAlluoAddress,
-    'convertLpToAlluo(uint256)',
-    [totalAlluoLockedInLp],
-    EChain.ETHEREUM,
-  );
-
-  return ethers.utils.formatEther(totalAlluoLocked);
+  return ethers.utils.formatEther(totalAlluoLockedInLp);
 };
 
 export const getTotalAlluoLockedInUsd = async () => {
