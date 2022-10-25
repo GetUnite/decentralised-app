@@ -53,9 +53,9 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
 
     try {
       await lockAlluo(lockValue);
+      setNotificationt('Successfully locked', 'success');
       await updateAlluoInfo();
       setLockValue(null);
-      setNotificationt('Successfully locked', 'success');
     } catch (error) {
       setNotificationt(error, 'error');
     }

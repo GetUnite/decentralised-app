@@ -209,8 +209,6 @@ export const getAlluoStakingWalletAddressInfo = async () => {
 };
 
 export const getTotalAlluoLocked = async () => {
-  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
-
   const totalAlluoLockedInLp = await getTotalAlluoLockedInLp();
 
   return ethers.utils.formatEther(totalAlluoLockedInLp);
