@@ -1,22 +1,24 @@
 import { TokenIcon } from 'app/modernUI/components';
-import { Card, Grid, ResponsiveContext } from 'grommet';
+import { Box, Card, Grid, ResponsiveContext } from 'grommet';
 
 interface IStreamCard {
   from: string;
   to: string;
+  tvs:string;
   flowPerMinute: string;
   startDate: string;
   endDate?: string;
-  fundedUntil?: string;
+  fundedUntilDate?: string;
 }
 
 export const StreamCard = ({
   from,
   to,
+  tvs,
   flowPerMinute,
   startDate,
   endDate,
-  fundedUntil,
+  fundedUntilDate,
   ...rest
 }: IStreamCard) => {
   return (
@@ -41,17 +43,19 @@ export const StreamCard = ({
               style={{ fontSize: '16px' }}
             >
               <>
-                <span style={{ fontWeight: '500' }}>
-                  <TokenIcon label={from} /> {from} Farm
-                </span>
-                <span style={{ fontWeight: '500' }}>
-                  <TokenIcon label={to} /> {to} Farm
-                </span>
-                <span>{endDate || '∞'}</span>
+              <Box direction='row' gap="5px">
+                  <TokenIcon label={from} />{' '}
+                  <span style={{ fontWeight: '500' }}>{from} Farm</span>
+                </Box>
+                <Box direction='row' gap="5px">
+                  <TokenIcon label={to} />{' '}
+                  <span style={{ fontWeight: '500' }}>{to} Farm</span>
+                </Box>
+                <span>{tvs || '∞'}</span>
                 <span>{flowPerMinute}/m</span>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
-                <span>{fundedUntil}</span>
+                <span>{fundedUntilDate}</span>
               </>
             </Grid>
           </Card>

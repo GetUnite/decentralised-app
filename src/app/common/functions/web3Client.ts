@@ -269,28 +269,61 @@ export const sendTransaction = async (
   try {
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, walletProvider);
-      console.log(biconomy);
-      provider = new ethers.providers.Web3Provider(biconomy);
+      provider = biconomy.getEthersProvider();
+      console.log(provider);
     } else {
       provider = walletProvider;
     }
 
-    
-    const signer = provider.getSigner();
-    console.log(provider);
+    let contractInterface = new ethers.utils.Interface(abi);
+
+    const data = contractInterface.encodeFunctionData(
+      functionSignature,
+      params,
+    );
+
+    let rawTx = {
+      to: address,
+      data: data,
+      from: walletAddress,
+    };
+
+    let finalTx;
+    if (useBiconomy) {
+      const gasLimitEstimation = +(
+        await provider.estimateGas(rawTx)
+      ).toString();
+      const gasLimit = Math.floor(
+        gasLimitEstimation + gasLimitEstimation * 0.25,
+      );
+      const gasPriceEstimation = +(await provider.getGasPrice()).toString();
+      const gasPrice = Math.floor(
+        gasPriceEstimation + gasPriceEstimation * 0.25,
+      );
+      finalTx = { ...rawTx, gasLimit: gasLimit, gasPrice: gasPrice};
+    } else {
+      finalTx = rawTx;
+    }
+
+    let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
+    let receipt = await provider.waitForTransaction(transactionHash);
+    return receipt;
+    /*const signer = provider.getSigner();
+    console.log(signer)
+    const signedTx = signer.signTransaction(rawTx);
+    return;
     const contract = new ethers.Contract(address, abi as any, signer);
 
-    const gasEstimationPromise = contract.estimateGas[functionSignature].apply(
+    const gasEstimationPromise = contract.connect("0x86c80a8aa58e0a4fa09a69624c31ab2a6cad56b8").estimateGas[functionSignature].apply(
       null,
       params,
     );
-    console.log(gasEstimationPromise);
     const gasLimitEstimation = +(await gasEstimationPromise).toString();
     const gasLimit = Math.floor(gasLimitEstimation + gasLimitEstimation * 0.25);
     const gasPriceEstimation = +(await provider.getGasPrice()).toString();
     const gasPrice = Math.floor(gasPriceEstimation + gasPriceEstimation * 0.25);
-    console.log(gasPriceEstimation, gasPrice);
 
+    console.log("sadas");
     const method = contract[functionSignature].apply(null, [
       ...params,
       { gasLimit: gasLimit, gasPrice: gasPrice },
@@ -300,7 +333,7 @@ export const sendTransaction = async (
 
     const receipt = await tx.wait();
 
-    return receipt;
+    return receipt;*/
   } catch (error) {
     console.log(error);
     console.log({
@@ -310,6 +343,10 @@ export const sendTransaction = async (
       params: params,
       walletAddress: walletAddress,
     });
+
+    if (error.code == 4001) {
+      throw 'User denied message signature';
+    }
 
     if (error.code == 417) {
       throw 'Error while estimating gas. Please try again';
@@ -328,6 +365,81 @@ export const sendTransaction = async (
     throw 'Something went wrong with your transaction. Please try again';
   }
 };
+
+/*export const sendMetaTransaction = async (
+  abi,
+  address,
+  functionSignature,
+  params = [],
+  chain,
+  useBiconomy = false,
+) => {
+  let provider;
+
+  try {
+    if (useBiconomy) {
+      const biconomy = await startBiconomy(chain, walletProvider);
+      provider = biconomy.getEthersProvider();
+      console.log(provider);
+    } else {
+      provider = walletProvider;
+    }
+
+    let contractInterface = new ethers.utils.Interface(abi);
+
+    let nonce = await contract.getNonce(userAddress);
+
+    const data = contractInterface.encodeFunctionData(
+      functionSignature,
+      params,
+    );
+                
+let message = {nonce: parseInt(nonce),from: userAddress, functionSignature: data};
+
+const dataToSign = JSON.stringify({
+  types: {
+    EIP712Domain: domainType,
+    MetaTransaction: metaTransactionType
+  },
+  domain: domainData,
+  primaryType: "MetaTransaction",
+  message: message
+});
+
+    let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
+    let receipt = await provider.waitForTransaction(transactionHash);
+    return receipt;
+  } catch (error) {
+    console.log(error);
+    console.log({
+      abi: abi,
+      address: address,
+      functionSignature: functionSignature,
+      params: params,
+      walletAddress: walletAddress,
+    });
+
+    if (error.code == 4001) {
+      throw 'User denied message signature';
+    }
+
+    if (error.code == 417) {
+      throw 'Error while estimating gas. Please try again';
+    }
+
+    const errorString = error.toString();
+
+    if (errorString.includes('user rejected transaction')) {
+      throw 'User denied message signature';
+    }
+
+    if (errorString.includes('reverted by the EVM')) {
+      throw 'Transaction has been reverted by the EVM. Please try again';
+    }
+
+    throw 'Something went wrong with your transaction. Please try again';
+  }
+};*/
 
 export const getReadOnlyProvider = chain => {
   const providerUrl =
@@ -1152,6 +1264,32 @@ export const getBalanceOf = async (
   return fromDecimals(balance, tokenDecimals);
 };
 
+export const getBalance = async (
+  tokenAddress,
+  tokenDecimals,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+      name: 'getBalance',
+      outputs: [{ internalType: 'int256', name: '', type: 'int256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const balance = await callContract(
+    abi,
+    tokenAddress,
+    'getBalance(address)',
+    [walletAddress],
+    chain,
+  );
+
+  return fromDecimals(balance, tokenDecimals);
+};
+
 export const getAllowance = async (
   tokenAddress,
   spenderAddress,
@@ -1327,7 +1465,8 @@ export const getBoosterFarmInterest = async (
       baseRewardsAPR *
         fee *
         (1 + boostApy) *
-        (Math.pow(1 + (boostRewardsAPR / 52), 52))) * 100,
+        Math.pow(1 + boostRewardsAPR / 52, 52)) *
+      100,
     2,
   );
 };

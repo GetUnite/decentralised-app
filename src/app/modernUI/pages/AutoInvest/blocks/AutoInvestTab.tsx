@@ -13,36 +13,38 @@ import { Box } from 'grommet';
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
+    //loading 
+    isLoading,
+    isFetchingFarmInfo,
+    isUpdatingSelectedStreamOption,
+    // errors
+    hasErrors,
+    // inputs
+    disableInputs,
     streamValue,
     handleStreamValueChange,
     selectedSupportedFromToken,
-    hasErrors,
     streamValueError,
     selectSupportedFromToken,
     supportedFromTokens,
-    handleStartStream,
-    isStartingStream,
     supportedToTokens,
     selectedSupportedToToken,
     selectSupportedToToken,
     targetFarmInfo,
     useBiconomy,
     setUseBiconomy,
-    isLoading,
     useEndDate,
     setUseEndDate,
     endDate,
     setEndDate,
-    allowance,
-    handleApprove,
-    isApproving,
-    isFetchingFarmInfo,
+    currentStep,
+    selectedStreamOptionSteps,
   } = useAutoInvestTab();
 
   return (
     <Box fill>
-      <Box style={{ minHeight: '382px' }} justify="center">
-        {isLoading || isStartingStream || isApproving ? (
+      <Box style={{ minHeight: '410px' }} justify="center">
+        {isLoading ? (
           <Box
             align="center"
             justify="center"
@@ -67,21 +69,28 @@ export const AutoInvestTab = ({ ...rest }) => {
                 selectedToToken={selectedSupportedToToken}
                 setSelectedToToken={selectSupportedToToken}
                 error={streamValueError}
+                disabled={disableInputs}
               />
               <RightAlignToggle
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
+                disabled={disableInputs}
               />
               {useEndDate && (
                 <DateInput
                   label="End date"
                   date={endDate}
                   setDate={setEndDate}
+                  disabled={disableInputs}
                 />
               )}
             </Box>
-            <Box margin={{ top: 'medium' }} style={{minHeight:"224px"}} justify="center">
+            <Box
+              margin={{ top: 'medium' }}
+              style={{ minHeight: '224px' }}
+              justify="center"
+            >
               {isFetchingFarmInfo ? (
                 <Box align="center" justify="center" fill="vertical">
                   <Spinner pad="large" />
@@ -105,6 +114,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                   <FeeInfo
                     useBiconomy={useBiconomy}
                     setUseBiconomy={setUseBiconomy}
+                    disableBiconomy={true}
                     showWalletFee={!useBiconomy}
                   />
                 </>
@@ -116,11 +126,11 @@ export const AutoInvestTab = ({ ...rest }) => {
       <Box margin={{ top: 'large' }}>
         <SubmitButton
           primary
-          disabled={false}
-          label="Start stream"
-          onClick={
-            handleStartStream 
+          disabled={
+            isLoading || hasErrors || isUpdatingSelectedStreamOption
           }
+          label={isLoading || isUpdatingSelectedStreamOption ? "Loading..." : `Step ${currentStep} of ${selectedStreamOptionSteps.length}: ${selectedStreamOptionSteps[currentStep-1].label}`}
+          onClick={!isLoading && !isUpdatingSelectedStreamOption? selectedStreamOptionSteps[currentStep-1]?.method : null}
         />
       </Box>
     </Box>

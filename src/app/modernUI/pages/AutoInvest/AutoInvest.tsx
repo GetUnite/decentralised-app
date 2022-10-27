@@ -28,10 +28,10 @@ export const AutoInvest = () => {
                     <Box direction="row" justify="between" align="center">
                       {' '}
                       <Text size="36px" weight="bold">
-                        {0} active streams
+                        {streams?.length || 0} active streams
                       </Text>{' '}
 
-                        <Link to={'/auto-invest/add'}>
+                        <Link to={'/autoinvest/add'}>
                           <Button
                             label="Start new stream"
                             style={{ width: '170px' }}
@@ -105,9 +105,10 @@ export const AutoInvest = () => {
                                     key={index}
                                     from={stream.from}
                                     to={stream.to}
+                                    tvs={stream.tvs}
                                     flowPerMinute={stream.flowPerMinute}
                                     startDate={stream.startDate}
-                                    fundedUntil={stream.fundedUntil}
+                                    fundedUntilDate={stream.fundedUntilDate}
                                   />
                                 );
                               })}

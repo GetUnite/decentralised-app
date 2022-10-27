@@ -1,9 +1,13 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { getStreamFlow } from 'app/common/functions/autoInvest';
-import { toExactFixed } from 'app/common/functions/utils';
 import {
-  getBalanceOf, getSupportedTokensBasicInfo,
+  fromDecimals, toExactFixed
+} from 'app/common/functions/utils';
+import {
+  getBalance,
+  getBalanceOf,
+  getSupportedTokensBasicInfo,
   getSupportedTokensList
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -176,6 +180,7 @@ export const useAutoInvest = () => {
   const fetchStreamsInfo = async () => {
     const streamPromise = new Promise(resolve => {
       let streamsArray = [];
+      const currentTime = new Date().getTime();
 
       streamOptions.forEach(async streamOption => {
         await streamOption.to
@@ -188,22 +193,28 @@ export const useAutoInvest = () => {
               ricochetMarket.address,
             );
             if (streamFlow.flowPerSecond > 0) {
-              const ibAlluoBalance = await getBalanceOf(
+              const ibAlluoBalance = await getBalance(
                 streamOption.ibAlluoAddress,
                 18,
                 EChain.POLYGON,
               );
+              const flowPerSecond = +fromDecimals(streamFlow.flowPerSecond, 18);
+
               const remainingFundedMiliseconds =
-                (+ibAlluoBalance / streamFlow.flowPerSecond) * 1000;
+                (+ibAlluoBalance /
+                flowPerSecond) *
+                1000;
+              
               streamsArray.push({
                 from: streamOption.label,
                 to: ricochetMarket.label,
-                flow: streamFlow.flowPerMinute,
-                start: new Date(
+                flowPerMinute: fromDecimals(streamFlow.flowPerMinute, 18),
+                startDate: new Date(
                   streamFlow.timestamp * 1000,
                 ).toLocaleDateString(),
-                fundedUntil: new Date(
-                  new Date().getTime() + remainingFundedMiliseconds,
+                tvs: toExactFixed((currentTime / 1000 - streamFlow.timestamp) * flowPerSecond, 6),
+                fundedUntilDate: new Date(
+                  currentTime + remainingFundedMiliseconds,
                 ).toLocaleDateString(),
               });
             }
