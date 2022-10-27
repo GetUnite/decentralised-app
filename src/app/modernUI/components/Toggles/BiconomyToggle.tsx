@@ -1,8 +1,8 @@
-import ReactTooltip from 'react-tooltip';
-import { Box, Button, Text } from 'grommet';
-import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
 import { mode } from 'app/common/state/atoms';
+import { Box, Button, Text } from 'grommet';
+import ReactTooltip from 'react-tooltip';
+import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
 
 const ReactTooltipStyledDark = styled(ReactTooltip)`
   &.place-bottom {
@@ -30,7 +30,7 @@ const ReactTooltipStyledLight = styled(ReactTooltip)`
   }
 `;
 
-export function BiconomyToggle({ useBiconomy, setUseBiconomy }) {
+export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
   const [modeAtom] = useRecoilState(mode);
   const useBiconomyButton = useBiconomy ? 'row' : 'row-reverse';
   const useBiconomyButtonColor = !useBiconomy ? '#CCCCCC' : '#2A73FF';
@@ -59,7 +59,7 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy }) {
           </span>{' '}
           ON/OFF?
         </Text>
-        <Button onClick={() => setUseBiconomy(!useBiconomy)}>
+        <Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>
         <Box
           width="46px"
           height="20px"

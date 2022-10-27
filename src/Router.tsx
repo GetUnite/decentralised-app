@@ -28,7 +28,7 @@ export const Router = () => {
             <Route path="/transfer" element={<Transfer />} />
             <Route path="/stake" element={<Stake />} />
             <Route path="/farm/:id" element={<Farm />} />
-            <Route path="/auto-invest/*" element={<AutoInvestRoutes />} />
+            <Route path="/autoinvest/*" element={<AutoInvestRoutes />} />
             <Route path="*" element={<Main />} />
           </Routes>
         </SkeletonTheme>
