@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
-  const { streams, isLoading, assetsInfo, walletAccountAtom } = useAutoInvest();
+  const { streams, isLoading, assetsInfo, walletAccountAtom, fundedUntilByStreamOptions } = useAutoInvest();
 
   return (
     <Layout>
@@ -108,7 +108,7 @@ export const AutoInvest = () => {
                                     tvs={stream.tvs}
                                     flowPerMinute={stream.flowPerMinute}
                                     startDate={stream.startDate}
-                                    fundedUntilDate={stream.fundedUntilDate}
+                                    fundedUntilDate={fundedUntilByStreamOptions.find(fundedUntilByStreamOption=> fundedUntilByStreamOption.from == stream.from).fundedUntilDate}
                                   />
                                 );
                               })}

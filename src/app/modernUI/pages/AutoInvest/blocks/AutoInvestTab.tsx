@@ -13,7 +13,7 @@ import { Box } from 'grommet';
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
-    //loading 
+    //loading
     isLoading,
     isFetchingFarmInfo,
     isUpdatingSelectedStreamOption,
@@ -22,7 +22,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     // inputs
     disableInputs,
     streamValue,
-    handleStreamValueChange,
+    validateInputs,
     selectedSupportedFromToken,
     streamValueError,
     selectSupportedFromToken,
@@ -39,6 +39,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     setEndDate,
     currentStep,
     selectedStreamOptionSteps,
+    handleCurrentStep
   } = useAutoInvestTab();
 
   return (
@@ -59,7 +60,7 @@ export const AutoInvestTab = ({ ...rest }) => {
               <StreamInput
                 label="Flow rate"
                 tokenSign={selectedSupportedFromToken?.sign}
-                onValueChange={handleStreamValueChange}
+                onValueChange={validateInputs}
                 value={streamValue}
                 maxValue={selectedSupportedFromToken?.balance}
                 fromTokenOptions={supportedFromTokens}
@@ -127,10 +128,20 @@ export const AutoInvestTab = ({ ...rest }) => {
         <SubmitButton
           primary
           disabled={
-            isLoading || hasErrors || isUpdatingSelectedStreamOption
+            isLoading ||
+            hasErrors ||
+            isUpdatingSelectedStreamOption ||
+            !(+streamValue > 0)
           }
-          label={isLoading || isUpdatingSelectedStreamOption ? "Loading..." : `Step ${currentStep} of ${selectedStreamOptionSteps.length}: ${selectedStreamOptionSteps[currentStep-1].label}`}
-          onClick={!isLoading && !isUpdatingSelectedStreamOption? selectedStreamOptionSteps[currentStep-1]?.method : null}
+          label={
+            isLoading || isUpdatingSelectedStreamOption
+              ? 'Loading...'
+              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps.length}: ${
+                  selectedStreamOptionSteps[currentStep].label
+                }`
+          }
+          onClick={handleCurrentStep}
+          glowing={currentStep > 0}
         />
       </Box>
     </Box>
