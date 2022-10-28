@@ -1,9 +1,7 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { getStreamFlow } from 'app/common/functions/autoInvest';
-import {
-  fromDecimals, toExactFixed
-} from 'app/common/functions/utils';
+import { fromDecimals, toExactFixed } from 'app/common/functions/utils';
 import {
   getBalance,
   getBalanceOf,
@@ -88,6 +86,8 @@ export const useAutoInvest = () => {
 
   // streams
   const [streams, setStreams] = useState<any>();
+  const [fundedUntilByStreamOptions, setFundedUntilByStreamOptions] =
+    useState<any>();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -178,9 +178,10 @@ export const useAutoInvest = () => {
   };
 
   const fetchStreamsInfo = async () => {
+    const currentTime = new Date().getTime();
+    let fundedUntilArray = [];
     const streamPromise = new Promise(resolve => {
       let streamsArray = [];
-      const currentTime = new Date().getTime();
 
       streamOptions.forEach(async streamOption => {
         await streamOption.to
@@ -200,11 +201,6 @@ export const useAutoInvest = () => {
               );
               const flowPerSecond = +fromDecimals(streamFlow.flowPerSecond, 18);
 
-              const remainingFundedMiliseconds =
-                (+ibAlluoBalance /
-                flowPerSecond) *
-                1000;
-              
               streamsArray.push({
                 from: streamOption.label,
                 to: ricochetMarket.label,
@@ -212,17 +208,44 @@ export const useAutoInvest = () => {
                 startDate: new Date(
                   streamFlow.timestamp * 1000,
                 ).toLocaleDateString(),
-                tvs: toExactFixed((currentTime / 1000 - streamFlow.timestamp) * flowPerSecond, 6),
-                fundedUntilDate: new Date(
-                  currentTime + remainingFundedMiliseconds,
-                ).toLocaleDateString(),
+                tvs: toExactFixed(
+                  (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
+                  6,
+                ),
               });
+
+              let fundedUntil = fundedUntilArray.find(
+                fundedUntil => fundedUntil.from == streamOption.label,
+              );
+
+              if (fundedUntil) {
+                fundedUntil.flowPerSecond =
+                  fundedUntil.flowPerSecond + flowPerSecond;
+                  const remainingFundedMiliseconds =
+                  (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
+                  fundedUntil.fundedUntilDate = new Date(
+                    currentTime + remainingFundedMiliseconds,
+                  ).toLocaleDateString()
+              } else {
+                const remainingFundedMiliseconds =
+                  (+ibAlluoBalance / flowPerSecond) * 1000;
+
+                fundedUntilArray.push({
+                  from: streamOption.label,
+                  flowPerSecond: flowPerSecond,
+                  fundedUntilDate: new Date(
+                    currentTime + remainingFundedMiliseconds,
+                  ).toLocaleDateString()
+                });
+              }
             }
           });
       });
 
       resolve(streamsArray);
     });
+
+    setFundedUntilByStreamOptions(fundedUntilArray);
     setStreams(await streamPromise);
   };
 
@@ -231,5 +254,6 @@ export const useAutoInvest = () => {
     isLoading,
     streams,
     assetsInfo,
+    fundedUntilByStreamOptions,
   };
 };
