@@ -4,6 +4,7 @@ import {
   depositIntoAlluo,
   getDepositedAmount,
   getInterest,
+  getStreamFlow,
   getTotalAssetSupply,
   getUnapprovedSuperfluidSubscriptions,
   startStream
@@ -24,6 +25,13 @@ import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
 import { streamOptions, streamToOptions } from './useAutoInvest';
 
+const possibleStreamCreationSteps: TStreamCreationStep[] = [
+  { id: 0, label: 'Approve' },
+  { id: 1, label: 'Deposit' },
+  { id: 2, label: 'Ricochet exchange set-up' },
+  { id: 3, label: 'Start stream' },
+];
+
 export const useAutoInvestTab = () => {
   // Atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -34,7 +42,7 @@ export const useAutoInvestTab = () => {
   const { setNotificationt } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(true); //useState(isSafeAppAtom ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(false); //useState(isSafeAppAtom ? false : true);
 
   // keep allowance separated since it changes everytime etiher the "from" or "to" changes
   const [allowance, setAllowance] = useState<string>();
@@ -63,7 +71,7 @@ export const useAutoInvestTab = () => {
   const [endDateError, setEndDateError] = useState<string>('');
 
   // stream creation steps
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const [selectedStreamOptionSteps, setSelectedStreamOptionSteps] =
     useState<TStreamCreationStep[]>();
   const [
@@ -101,7 +109,7 @@ export const useAutoInvestTab = () => {
   // resets the current step when one stream creation is finished
   useEffect(() => {
     if (walletAccountAtom && selectedStreamOption) {
-      if (currentStep > selectedStreamOptionSteps.length) {
+      if (currentStep > selectedStreamOptionSteps.length - 1) {
         setCurrentStep(1);
       }
     }
@@ -115,7 +123,7 @@ export const useAutoInvestTab = () => {
       selectedSupportedToToken
     ) {
       setIsUpdatingSelectedStreamOption(true);
-      setCurrentStep(1);
+
       const updateSelectedStreamOption = async () => {
         const newSelectedStreamOption = streamOptions.find(
           streamOption =>
@@ -130,26 +138,16 @@ export const useAutoInvestTab = () => {
           setSelectedStreamOption(newSelectedStreamOption);
 
           let neededSteps: TStreamCreationStep[] = [];
-          let stepsCount: 0;
           // First step is always approve when needed
           const allowance = await getAllowance(
             selectedSupportedFromToken.address,
             newSelectedStreamOption.ibAlluoAddress,
           );
           if (!(+allowance > 0)) {
-            neededSteps.push({
-              id: stepsCount + 1,
-              label: 'Approve IBAlluo',
-              method: handleApprove,
-            });
-            stepsCount++;
+            neededSteps.push(possibleStreamCreationSteps[0]);
           }
           // Deposit is always there
-          neededSteps.push({
-            id: stepsCount + 1,
-            label: 'Deposit',
-            method: handleDeposit,
-          });
+          neededSteps.push(possibleStreamCreationSteps[1]);
           // subscriptions to superfluid contracts
           const selectedTo = newSelectedStreamOption.to.find(
             sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
@@ -163,27 +161,25 @@ export const useAutoInvestTab = () => {
             );
           if (subscriptionOperations.length > 0) {
             setUnapprovedSuperfluidSubscriptions(subscriptionOperations);
-            neededSteps.push({
-              id: stepsCount + 1,
-              label: 'Ricochet exchange set-up',
-              method: handleSuperfluidStreamApprove,
-            });
-            stepsCount++;
+            neededSteps.push(possibleStreamCreationSteps[2]);
           }
           // start stream finishs the steps
-          neededSteps.push({
-            id: stepsCount + 1,
-            label: 'Start stream :)',
-            method: handleStartStream,
-          });
+          neededSteps.push(possibleStreamCreationSteps[3]);
 
           setSelectedStreamOptionSteps(neededSteps);
         }
-        setIsUpdatingSelectedStreamOption(false);
         setIsUpdating(false);
       };
+      // Check the stream value against the new "from" token
+      if (+streamValue > 0) {
+        validateInputs(streamValue);
+      }
+      // Only update if we didn't take the first step yet, after that info is updated on a need basis
+      if (!(currentStep > 0)) {
+        updateSelectedStreamOption();
+      }
 
-      updateSelectedStreamOption();
+      setIsUpdatingSelectedStreamOption(false);
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 
@@ -248,7 +244,7 @@ export const useAutoInvestTab = () => {
     setAllowance(allowance);
   };
 
-  const handleStreamValueChange = value => {
+  const validateInputs = value => {
     setStreamValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setStreamValueError('Write a valid number');
@@ -283,6 +279,19 @@ export const useAutoInvestTab = () => {
       let supportedFromTokensArray = [];
 
       for (const streamOption of streamOptions) {
+        var alreadyStreaming = false;
+        for (const supportedToken of streamOption.to) {
+          const streamFlow = await getStreamFlow(
+            streamOption.stIbAlluoAddress,
+            supportedToken.ricochetMarketAddress,
+          );
+          if (streamFlow.flowPerSecond > 0) {
+            alreadyStreaming = true;
+          }
+        }
+        if (alreadyStreaming) {
+          continue;
+        }
         for (const supportedToken of streamOption.from) {
           const basicSupportedTokenInfo = await getSupportedTokensBasicInfo(
             supportedToken.address,
@@ -370,6 +379,7 @@ export const useAutoInvestTab = () => {
   const handleDeposit = async () => {
     setIsDepositing(true);
 
+    console.log(selectedStreamOption, streamValue);
     try {
       const tx = await depositIntoAlluo(
         selectedSupportedFromToken.address,
@@ -379,6 +389,15 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
+      // update "from" token balance
+      const balance = await getBalanceOf(
+        selectedSupportedFromToken.address,
+        selectedSupportedFromToken.decimals,
+      );
+      setSelectedSupportedFromToken({
+        ...selectedSupportedFromToken,
+        balance: balance,
+      });
       setNotificationt('Deposit successfully', 'success');
     } catch (err) {
       setNotificationt(err, 'error');
@@ -415,6 +434,35 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(false);
   };
 
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    const currentStreamCreationStep = possibleStreamCreationSteps.find(
+      possibleStreamCreationStep =>
+        possibleStreamCreationStep.id ==
+        selectedStreamOptionSteps[currentStep].id,
+    );
+
+    switch (currentStreamCreationStep.id) {
+      case 0:
+        await handleApprove();
+        break;
+
+      case 1:
+        await handleDeposit();
+        break;
+
+      case 2:
+        await handleSuperfluidStreamApprove();
+        break;
+
+      case 3:
+        await handleStartStream();
+        break;
+      default:
+        break;
+    }
+  };
+
   return {
     // loading control
     isLoading: isUpdating || isStartingStream || isApproving || isDepositing,
@@ -423,9 +471,9 @@ export const useAutoInvestTab = () => {
     // error control
     hasErrors: streamValueError != '' || endDateError != '',
     // inputs
-    disableInputs: currentStep > 1,
+    disableInputs: currentStep > 0,
     streamValue,
-    handleStreamValueChange,
+    validateInputs,
     selectedSupportedFromToken,
     streamValueError,
     selectSupportedFromToken,
@@ -442,5 +490,6 @@ export const useAutoInvestTab = () => {
     setEndDate,
     currentStep,
     selectedStreamOptionSteps,
+    handleCurrentStep,
   };
 };

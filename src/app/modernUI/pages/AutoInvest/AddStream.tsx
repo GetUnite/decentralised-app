@@ -7,7 +7,7 @@ import { AutoInvestTab } from './blocks/AutoInvestTab';
 export const AddStream = () => {
   const navigate = useNavigate();
   const closeModal = () => {
-    navigate('/auto-invest');
+    navigate('/autoinvest');
   };
 
   return (

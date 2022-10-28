@@ -270,7 +270,6 @@ export const sendTransaction = async (
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, walletProvider);
       provider = biconomy.getEthersProvider();
-      console.log(provider);
     } else {
       provider = walletProvider;
     }

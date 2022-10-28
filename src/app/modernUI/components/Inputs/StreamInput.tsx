@@ -78,7 +78,7 @@ export const StreamInput = ({
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
             value={formattedValue}
-            placeholder="0.00"
+            placeholder={disabled ? value.toLocaleString() : "0.00".toLocaleString()}
             customInput={TextInput}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
