@@ -1,26 +1,39 @@
 import { TokenIcon } from 'app/modernUI/components';
-import { Box, Card, Grid, ResponsiveContext } from 'grommet';
+import {
+  Box, Card,
+  Grid, ResponsiveContext
+} from 'grommet';
+import { useState } from 'react';
+import { StopStreamConfirmation } from './StopStreamConfirmation';
 
 interface IStreamCard {
   from: string;
+  fromAddress:string;
   to: string;
-  tvs:string;
+  toAddress: string;
+  tvs: string;
   flowPerMinute: string;
   startDate: string;
   endDate?: string;
   fundedUntilDate?: string;
+  handleStopStream?: Function;
 }
 
 export const StreamCard = ({
   from,
+  fromAddress,
   to,
+  toAddress,
   tvs,
   flowPerMinute,
   startDate,
   endDate,
   fundedUntilDate,
+  handleStopStream,
   ...rest
 }: IStreamCard) => {
+  const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
+
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -43,11 +56,11 @@ export const StreamCard = ({
               style={{ fontSize: '16px' }}
             >
               <>
-              <Box direction='row' gap="5px">
+                <Box direction="row" gap="5px">
                   <TokenIcon label={from} />{' '}
                   <span style={{ fontWeight: '500' }}>{from} Farm</span>
                 </Box>
-                <Box direction='row' gap="5px">
+                <Box direction="row" gap="5px">
                   <TokenIcon label={to} />{' '}
                   <span style={{ fontWeight: '500' }}>{to} Farm</span>
                 </Box>
@@ -55,7 +68,16 @@ export const StreamCard = ({
                 <span>{flowPerMinute}/m</span>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
-                <span>{fundedUntilDate}</span>
+                <Box direction="row" justify="between" align="center">
+                  <span>{fundedUntilDate}</span>
+                  <StopStreamConfirmation
+                    stopStreamConfirmation={stopStreamConfirmation}
+                    setStopStreamConfirmation={setStopStreamConfirmation}
+                    fromAddress={fromAddress}
+                    toAddress={toAddress}
+                    handleStopStream={handleStopStream}
+                  />
+                </Box>
               </>
             </Grid>
           </Card>
