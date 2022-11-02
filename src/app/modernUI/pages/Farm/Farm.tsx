@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
 import {
@@ -232,7 +232,7 @@ export const Farm = () => {
                       {selectedFarm?.rewards.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + roundNumberDown(pendingRewards, 6)}
+                      {'$' + toExactFixed(pendingRewards, 6)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>
