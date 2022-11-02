@@ -1,6 +1,6 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
-import { getStreamFlow } from 'app/common/functions/autoInvest';
+import { getStreamFlow, stopStream } from 'app/common/functions/autoInvest';
 import { fromDecimals, toExactFixed } from 'app/common/functions/utils';
 import {
   getBalance,
@@ -14,13 +14,21 @@ import { TSupportedToken } from 'app/common/types/form';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { useNotification } from '../useNotification';
 
 export const streamOptions: any = [
   {
+    id: 0,
     label: 'USD',
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
     ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
     from: [
+      {
+        address: EPolygonAddresses.IBALLUOUSD,
+        label: 'Your USD farm',
+        sign: '$',
+        isStreamable: true,
+      },
       { address: EPolygonAddresses.USDC, label: 'USDC', sign: '$' },
       { address: EPolygonAddresses.DAI, label: 'DAI', sign: '$' },
       { address: EPolygonAddresses.USDT, label: 'USDT', sign: '$' },
@@ -41,10 +49,19 @@ export const streamOptions: any = [
     ],
   },
   {
+    id: 1,
     label: 'BTC',
     ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    from: [{ address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' }],
+    from: [
+      {
+        address: EPolygonAddresses.IBALLUOBTC,
+        label: 'Your BTC farm',
+        sign: '₿',
+        isStreamable: true,
+      },
+      { address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' },
+    ],
     to: [
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
@@ -55,10 +72,19 @@ export const streamOptions: any = [
     ],
   },
   {
+    id: 2,
     label: 'ETH',
     ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
     stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
-    from: [{ address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' }],
+    from: [
+      {
+        address: EPolygonAddresses.IBALLUOETH,
+        label: 'Your ETH farm',
+        sign: 'Ξ',
+        isStreamable: true,
+      },
+      { address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' },
+    ],
     to: [
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
@@ -80,6 +106,9 @@ export const useAutoInvest = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
+
+  // other state control files
+  const { setNotificationt } = useNotification();
 
   // assets info
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
@@ -202,8 +231,11 @@ export const useAutoInvest = () => {
               const flowPerSecond = +fromDecimals(streamFlow.flowPerSecond, 18);
 
               streamsArray.push({
+                id: streamOption.id,
                 from: streamOption.label,
+                fromAddress: streamOption.ibAlluoAddress,
                 to: ricochetMarket.label,
+                toAddress: ricochetMarket.address,
                 flowPerMinute: fromDecimals(streamFlow.flowPerMinute, 18),
                 startDate: new Date(
                   streamFlow.timestamp * 1000,
@@ -221,11 +253,11 @@ export const useAutoInvest = () => {
               if (fundedUntil) {
                 fundedUntil.flowPerSecond =
                   fundedUntil.flowPerSecond + flowPerSecond;
-                  const remainingFundedMiliseconds =
+                const remainingFundedMiliseconds =
                   (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
-                  fundedUntil.fundedUntilDate = new Date(
-                    currentTime + remainingFundedMiliseconds,
-                  ).toLocaleDateString()
+                fundedUntil.fundedUntilDate = new Date(
+                  currentTime + remainingFundedMiliseconds,
+                ).toLocaleDateString();
               } else {
                 const remainingFundedMiliseconds =
                   (+ibAlluoBalance / flowPerSecond) * 1000;
@@ -235,7 +267,7 @@ export const useAutoInvest = () => {
                   flowPerSecond: flowPerSecond,
                   fundedUntilDate: new Date(
                     currentTime + remainingFundedMiliseconds,
-                  ).toLocaleDateString()
+                  ).toLocaleDateString(),
                 });
               }
             }
@@ -249,11 +281,36 @@ export const useAutoInvest = () => {
     setStreams(await streamPromise);
   };
 
+  const handleStopStream = async (fromAddress, toAddress) => {
+    const streamOption = streamOptions.find(
+      so =>
+        so.ibAlluoAddress == fromAddress &&
+        so.to.find(to => to.ricochetMarketAddress == toAddress) != undefined,
+    );
+    if (streamOption) {
+      try {
+        const tx = await stopStream(
+          fromAddress,
+          toAddress,
+          false, // use biconomy here
+        );
+        setNotificationt('Steam was stopped successfully', 'success');
+      } catch (err) {
+        setNotificationt(err, 'error');
+      }
+    } else {
+      setNotificationt(
+        'There was a problem while finding the stream to stop. Please try again',
+        'error',
+      );
+    }
+  };
   return {
     walletAccountAtom,
     isLoading,
     streams,
     assetsInfo,
     fundedUntilByStreamOptions,
+    handleStopStream,
   };
 };

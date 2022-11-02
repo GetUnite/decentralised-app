@@ -7,7 +7,14 @@ import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
-  const { streams, isLoading, assetsInfo, walletAccountAtom, fundedUntilByStreamOptions } = useAutoInvest();
+  const {
+    streams,
+    isLoading,
+    assetsInfo,
+    walletAccountAtom,
+    fundedUntilByStreamOptions,
+    handleStopStream,
+  } = useAutoInvest();
 
   return (
     <Layout>
@@ -30,14 +37,12 @@ export const AutoInvest = () => {
                       <Text size="36px" weight="bold">
                         {streams?.length || 0} active streams
                       </Text>{' '}
-
-                        <Link to={'/autoinvest/add'}>
-                          <Button
-                            label="Start new stream"
-                            style={{ width: '170px' }}
-                          />
-                        </Link>
-
+                      <Link to={'/autoinvest/add'}>
+                        <Button
+                          label="Start new stream"
+                          style={{ width: '170px' }}
+                        />
+                      </Link>
                     </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
@@ -104,11 +109,20 @@ export const AutoInvest = () => {
                                   <StreamCard
                                     key={index}
                                     from={stream.from}
+                                    fromAddress={stream.fromAddress}
                                     to={stream.to}
+                                    toAddress={stream.toAddress}
                                     tvs={stream.tvs}
                                     flowPerMinute={stream.flowPerMinute}
                                     startDate={stream.startDate}
-                                    fundedUntilDate={fundedUntilByStreamOptions.find(fundedUntilByStreamOption=> fundedUntilByStreamOption.from == stream.from).fundedUntilDate}
+                                    fundedUntilDate={
+                                      fundedUntilByStreamOptions.find(
+                                        fundedUntilByStreamOption =>
+                                          fundedUntilByStreamOption.from ==
+                                          stream.from,
+                                      ).fundedUntilDate
+                                    }
+                                    handleStopStream={handleStopStream}
                                   />
                                 );
                               })}

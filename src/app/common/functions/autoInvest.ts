@@ -376,6 +376,7 @@ export const approveSuperfluidSubscriptions = async (
     throw error;
   }
 };
+
 export const startStream = async (
   ibAlluoInputAddress,
   superfluidInputAddress,
@@ -494,4 +495,29 @@ export const startStream = async (
   } catch (error) {
     throw error;
   }
+};
+
+export const stopStream = async (
+  ibAlluoAddress,
+  ricochetMarketAddress,
+  useBiconomy,
+) => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: 'receiver', type: 'address' }],
+      name: 'deleteFlow',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const tx = await sendTransaction(
+    abi,
+    ibAlluoAddress,
+    'deleteFlow(address)',
+    [ricochetMarketAddress],
+    EChain.POLYGON,
+    useBiconomy,
+  );
 };
