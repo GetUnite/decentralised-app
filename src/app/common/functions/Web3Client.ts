@@ -22,6 +22,8 @@ import gnosisModule from '@web3-onboard/gnosis';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import injectedModule from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import UAuth from '@uauth/js';
+import uauthBNCModule from '@uauth/web3-onboard';
 import {
   EEthereumAddresses,
   EEthereumAddressesMainnet,
@@ -56,6 +58,24 @@ export enum EChainId {
   POL_MAINNET = '0x89',
   POL_MUMBAI = '0x13881',
 }
+
+//Unstoppable Domains Start
+const uauth = new UAuth({
+  clientID: process.env.REACT_APP_CLIENT_ID!,
+  redirectUri: process.env.REACT_APP_REDIRECT_URI!,
+  fallbackIssuer: process.env.REACT_APP_FALLBACK_ISSUER!,
+  scope: 'openid wallet',
+});
+
+const uauthBNCOptions = {
+  uauth: uauth,
+  walletconnect: {
+    infuraId: process.env.REACT_APP_INFURA_ID!,
+  },
+};
+
+const uauthModule = uauthBNCModule(uauthBNCOptions);
+//Unstoppable Domains End
 
 const injected = injectedModule();
 const walletConnect = walletConnectModule({
@@ -126,6 +146,7 @@ onboard.state.actions.setWalletModules([
   walletConnect,
   gnosis,
   coinbase,
+  uauthModule,
 ]);
 
 declare let window: any;
@@ -170,16 +191,35 @@ export const trySafeAppConnection = async callback => {
 };
 
 export const connectToWallet = async (connectOptions?) => {
-  let wallets;
+  let wallets = [];
+  let udDomain;
+
+  const uauthOptions = {
+    clientID: process.env.REACT_APP_CLIENT_ID!,
+    redirectUri: process.env.REACT_APP_REDIRECT_URI!,
+    fallbackIssuer: process.env.REACT_APP_FALLBACK_ISSUER!,
+    scope: 'openid wallet',
+  };
 
   try {
+    wallets = [];
     wallets = await onboard.connectWallet(connectOptions);
-
-    if (wallets[0]) {
-      web3 = new Web3(wallets[0].provider as any);
-      walletAddress = wallets[0].accounts[0].address;
-      return walletAddress;
-    }
+    udDomain = new UAuth(uauthOptions).user().then().catch();
+    wallets[0].domain = (await udDomain).sub;
+    const [primaryWallet] = onboard.state.get().wallets;
+    let newWallet: any = {};
+    wallets.forEach(wallet => {
+      walletAddress = wallet.accounts[0].address;
+      if (
+        primaryWallet.label === 'Unstoppable' &&
+        wallet.label === 'Unstoppable'
+      ) {
+        newWallet = wallet;
+      }
+    });
+    return primaryWallet.label === 'Unstoppable'
+      ? { walletAddress, domain: newWallet.domain, label: 'Unstoppable' }
+      : walletAddress;
   } catch (error) {
     console.log(error);
   }
