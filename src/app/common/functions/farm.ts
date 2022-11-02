@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, roundNumberDown, toDecimals } from './utils';
@@ -106,7 +107,7 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
     },
   ];
 
-  let shareholderAccruedRewards = await callContract(
+  const shareholderAccruedRewards = await callContract(
     abi,
     farmAddress,
     'shareholderAccruedRewards(address)',
@@ -119,9 +120,9 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
     for (const pendingRewards of pendingRewardsArray) {
       const rewardByToken = pendingRewardsByToken.find(
         prbt => prbt.token == pendingRewards.token,
-      );
+      );  
       if (rewardByToken) {
-        rewardByToken.amount += pendingRewards.amount;
+        rewardByToken.amount = rewardByToken.amount.add(pendingRewards.amount);
       } else {
         pendingRewardsByToken.push({
           token: pendingRewards.token,
@@ -139,7 +140,7 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
         18,
         6,
       );
-      return +fromDecimals(prbt.amount.toString(), 18) * tokenPrice;
+      return +ethers.utils.formatUnits(prbt.amount.toString(), 18) * tokenPrice;
     }),
   );
 
@@ -223,7 +224,7 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
     6,
     decimals,
   );
-  
+
   return valueInUSDC * tokenPrice;
 };
 

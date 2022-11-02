@@ -1420,9 +1420,6 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
 };
 
 const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
-const getTotalApr = apr => {
-  return apr.baseApr + apr.crvApr + apr.cvxApr + apr.extraRewardsApr;
-};
 export const getBoosterFarmInterest = async (
   farmVaultAddress,
   apyFarmAddresses,

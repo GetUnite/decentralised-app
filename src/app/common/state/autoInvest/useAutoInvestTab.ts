@@ -13,6 +13,7 @@ import { isNumeric } from 'app/common/functions/utils';
 import {
   approve,
   getAllowance,
+  getBalance,
   getBalanceOf,
   getSupportedTokensBasicInfo
 } from 'app/common/functions/web3Client';
@@ -138,16 +139,20 @@ export const useAutoInvestTab = () => {
           setSelectedStreamOption(newSelectedStreamOption);
 
           let neededSteps: TStreamCreationStep[] = [];
-          // First step is always approve when needed
-          const allowance = await getAllowance(
-            selectedSupportedFromToken.address,
-            newSelectedStreamOption.ibAlluoAddress,
-          );
-          if (!(+allowance > 0)) {
-            neededSteps.push(possibleStreamCreationSteps[0]);
+          // First step is always approve when there is a need for deposit
+          if (!selectedSupportedFromToken.isStreamable) {
+            const allowance = await getAllowance(
+              selectedSupportedFromToken.address,
+              newSelectedStreamOption.ibAlluoAddress,
+            );
+            if (!(+allowance > 0)) {
+              neededSteps.push(possibleStreamCreationSteps[0]);
+            }
           }
-          // Deposit is always there
-          neededSteps.push(possibleStreamCreationSteps[1]);
+          // Deposit step if its not one of the iballuo
+          if (!selectedSupportedFromToken.isStreamable) {
+            neededSteps.push(possibleStreamCreationSteps[1]);
+          }
           // subscriptions to superfluid contracts
           const selectedTo = newSelectedStreamOption.to.find(
             sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
@@ -300,12 +305,18 @@ export const useAutoInvestTab = () => {
           supportedFromTokensArray.push({
             label: supportedToken.label,
             address: basicSupportedTokenInfo.tokenAddress,
-            balance: await getBalanceOf(
-              basicSupportedTokenInfo.tokenAddress,
-              basicSupportedTokenInfo.decimals,
-            ),
+            balance: supportedToken.isStreamable
+              ? await getBalance(
+                  basicSupportedTokenInfo.tokenAddress,
+                  basicSupportedTokenInfo.decimals,
+                )
+              : await getBalanceOf(
+                  basicSupportedTokenInfo.tokenAddress,
+                  basicSupportedTokenInfo.decimals,
+                ),
             decimals: basicSupportedTokenInfo.decimals,
             sign: supportedToken.sign,
+            isStreamable: supportedToken.isStreamable,
           });
         }
       }
@@ -379,7 +390,6 @@ export const useAutoInvestTab = () => {
   const handleDeposit = async () => {
     setIsDepositing(true);
 
-    console.log(selectedStreamOption, streamValue);
     try {
       const tx = await depositIntoAlluo(
         selectedSupportedFromToken.address,
