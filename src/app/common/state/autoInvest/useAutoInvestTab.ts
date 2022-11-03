@@ -111,7 +111,7 @@ export const useAutoInvestTab = () => {
   useEffect(() => {
     if (walletAccountAtom && selectedStreamOption) {
       if (currentStep > selectedStreamOptionSteps.length - 1) {
-        setCurrentStep(1);
+        setCurrentStep(0);
       }
     }
   }, [currentStep]);
