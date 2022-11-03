@@ -74,8 +74,8 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
     case 'stETH':
       src = steth;
       break;
-     
-      case 'CRV':
+
+    case 'CRV':
       src = crv;
       break;
     case 'CVX':
@@ -83,17 +83,21 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       break;
 
     case 'USD':
+    case 'Your USD farm':
       src = iballuousd;
       break;
 
+    case 'Your EUR farm':
     case 'EUR':
       src = iballuoeur;
       break;
 
+    case 'Your ETH farm':
     case 'ETH':
       src = iballuoeth;
       break;
 
+    case 'Your BTC farm':
     case 'BTC':
       src = iballuobtc;
       break;
@@ -102,5 +106,5 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       src = tokenPlaceholder;
       break;
   }
-  return <img width={size} height={size} src={src} alt="tokenIcon" {...rest}/>;
+  return <img width={size} height={size} src={src} alt="tokenIcon" {...rest} />;
 };
