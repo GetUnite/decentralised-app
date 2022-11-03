@@ -322,7 +322,7 @@ export const useAutoInvest = () => {
         );
         setNotificationt('Steam was stopped successfully', 'success');
         // remove stream from the list
-        updateAutoInvestInfo();
+        await updateAutoInvestInfo();
       } catch (err) {
         setNotificationt(err, 'error');
       }
