@@ -22,6 +22,7 @@ import { TStreamCreationStep } from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
 import { TAllowance, TSupportedToken } from 'app/common/types/form';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
 import { streamOptions, streamToOptions } from './useAutoInvest';
@@ -34,7 +35,10 @@ const possibleStreamCreationSteps: TStreamCreationStep[] = [
 ];
 
 export const useAutoInvestTab = () => {
-  // Atoms
+  // react
+  const navigate = useNavigate();
+
+  // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
@@ -106,15 +110,6 @@ export const useAutoInvestTab = () => {
       updateSupportedToTokens(selectedSupportedFromToken);
     }
   }, [selectedSupportedFromToken]);
-
-  // resets the current step when one stream creation is finished
-  useEffect(() => {
-    if (walletAccountAtom && selectedStreamOption) {
-      if (currentStep > selectedStreamOptionSteps.length - 1) {
-        setCurrentStep(0);
-      }
-    }
-  }, [currentStep]);
 
   // updates the selectes stream option when either the "from" or "to" tokens change
   useEffect(() => {
@@ -188,7 +183,7 @@ export const useAutoInvestTab = () => {
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 
-  const updateSupportedToTokens = async selectedFromToken => {
+  const updateSupportedToTokens = async (selectedFromToken) => {
     // streaming data of the selected from token
     const streamOption = streamOptions.find(streamOption =>
       streamOption.from
@@ -197,7 +192,22 @@ export const useAutoInvestTab = () => {
     );
 
     // the addresses to which the from token can stream to
-    const toAddresses = streamOption.to.map(so => so.ibAlluoAddress);
+    let tokensToRemoveFromTheToOptions =[];
+    for (const supportedToken of streamOption.to) {
+      const streamFlow = await getStreamFlow(
+        streamOption.stIbAlluoAddress,
+        supportedToken.ricochetMarketAddress,
+      );
+      if (+streamFlow.flowPerSecond > 0) {
+        // stores tokens that can't be used as "to"
+        tokensToRemoveFromTheToOptions.push(supportedToken.ibAlluoAddress);
+      }
+    }
+    let toOptions = streamOption.to;
+    if(tokensToRemoveFromTheToOptions.length > 0){
+      toOptions = toOptions.filter(streamToOption => tokensToRemoveFromTheToOptions.find(token => token == streamToOption.ibAlluoAddress) == undefined);
+    }
+    const toAddresses = toOptions.map(so => so.ibAlluoAddress);
 
     // if there is a option stream from the new "from" to the already selected "to" only update the allowance
     if (toAddresses.includes(selectedSupportedToToken?.address)) {
@@ -282,19 +292,27 @@ export const useAutoInvestTab = () => {
 
     if (walletAccountAtom) {
       let supportedFromTokensArray = [];
+      let tokensToRemoveFromTheToOptions = [];
 
       for (const streamOption of streamOptions) {
-        var alreadyStreaming = false;
+        var hasToOptions = true;
+        var streamsCount = 0;
         for (const supportedToken of streamOption.to) {
           const streamFlow = await getStreamFlow(
             streamOption.stIbAlluoAddress,
             supportedToken.ricochetMarketAddress,
           );
           if (+streamFlow.flowPerSecond > 0) {
-            alreadyStreaming = true;
+            // stores tokens that can't be used as "to"
+            tokensToRemoveFromTheToOptions.push(supportedToken.ibAlluoAddress);
+            // handles logic to remove the "from" option if there aren't any "to" options remaining
+            streamsCount++;
+            if(streamsCount == streamOption.to.length){
+              hasToOptions = false;
+            }
           }
         }
-        if (alreadyStreaming) {
+        if(!hasToOptions){
           continue;
         }
         for (const supportedToken of streamOption.from) {
@@ -324,10 +342,12 @@ export const useAutoInvestTab = () => {
       // set the from supported tokens and the first as the default selected
       setSupportedFromTokens(supportedFromTokensArray);
       const selectedSupportedToken = supportedFromTokensArray[0];
-      setSelectedSupportedFromToken(selectedSupportedToken);
-
+      
       // updates supported to tokens
       await updateSupportedToTokens(selectedSupportedToken);
+
+      // updates the from token 
+      setSelectedSupportedFromToken(selectedSupportedToken);
     }
   };
 
@@ -434,9 +454,8 @@ export const useAutoInvestTab = () => {
         endDate ? new Date(endDate).getTime() : null,
         useBiconomy,
       );
-      // Next step
-      setCurrentStep(currentStep + 1);
       setNotificationt('Stream started successfully', 'success');
+      navigate('/autoinvest');
     } catch (error) {
       setNotificationt(error, 'error');
     }

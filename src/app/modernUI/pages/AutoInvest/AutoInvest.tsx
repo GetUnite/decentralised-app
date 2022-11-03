@@ -115,9 +115,9 @@ export const AutoInvest = () => {
                                     toAddress={stream.toAddress}
                                     tvs={stream.tvs}
                                     tvsInUSD={stream.tvsInUSD}
-                                    flowPerMinute={stream.flowPerMinute}
-                                    flowPerMinuteInUSD={
-                                      stream.flowPerMinuteInUSD
+                                    flowPerMonth={stream.flowPerMonth}
+                                    flowPerMonthInUSD={
+                                      stream.flowPerMonthInUSD
                                     }
                                     startDate={stream.startDate}
                                     fundedUntilDate={
