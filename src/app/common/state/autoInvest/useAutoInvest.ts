@@ -253,6 +253,7 @@ export const useAutoInvest = () => {
             EChain.POLYGON,
           );
           const flowPerSecond = +streamFlow.flowPerSecond;
+          const flowPerMonth = flowPerSecond * 60 * 60 * 24 * 365 / 12;
           const tvs = toExactFixed(
             (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
             6,
@@ -264,8 +265,8 @@ export const useAutoInvest = () => {
             to: ricochetMarket.label,
             toAddress: ricochetMarket.address,
             flowPerSecond: flowPerSecond,
-            flowPerMinute: toExactFixed(streamFlow.flowPerMinute, 6),
-            flowPerMinuteInUSD: toExactFixed(await convertToUSDC(streamFlow.flowPerMinute, streamOption.ibAlluoAddress, 18, streamOption.underlyingTokenAddress, 18),6),
+            flowPerMonth: toExactFixed(flowPerMonth, 6),
+            flowPerMonthInUSD: toExactFixed(await convertToUSDC(flowPerMonth, streamOption.ibAlluoAddress, 18, streamOption.underlyingTokenAddress, 18),6),
             startDate: new Date(
               streamFlow.timestamp * 1000,
             ).toLocaleDateString(),

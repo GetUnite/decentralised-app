@@ -10,8 +10,8 @@ interface IStreamCard {
   toAddress: string;
   tvs: string;
   tvsInUSD: string;
-  flowPerMinute: string;
-  flowPerMinuteInUSD: string;
+  flowPerMonth: string;
+  flowPerMonthInUSD: string;
   startDate: string;
   endDate?: string;
   fundedUntilDate?: string;
@@ -27,8 +27,8 @@ export const StreamCard = ({
   toAddress,
   tvs,
   tvsInUSD,
-  flowPerMinute,
-  flowPerMinuteInUSD,
+  flowPerMonth,
+  flowPerMonthInUSD,
   startDate,
   endDate,
   fundedUntilDate,
@@ -81,7 +81,7 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {isFlowRateInUSD ? `$${flowPerMinuteInUSD}` : `${sign}${flowPerMinute}`}/m
+                    {isFlowRateInUSD ? `$${flowPerMonthInUSD}` : `${sign}${flowPerMonth}`}/m
                   </span>
                   {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
                   <Box justify="center" fill>
