@@ -54,10 +54,11 @@ export const toDecimals = (amount, decimals) => {
 };
 
 export const fromDecimals = (
-  amount: string,
+  amount: string | number,
   decimals,
   isFixed = false,
 ): string => {
+  amount = amount.toString();
   let newAmount = '';
 
   if (amount.length <= decimals) {

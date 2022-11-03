@@ -1,24 +1,46 @@
 import { TokenIcon } from 'app/modernUI/components';
-import { Card, Grid, ResponsiveContext } from 'grommet';
+import { Box, Card, Grid, ResponsiveContext } from 'grommet';
+import { useState } from 'react';
+import { StopStreamConfirmation } from './StopStreamConfirmation';
 
 interface IStreamCard {
   from: string;
+  fromAddress: string;
   to: string;
-  flowPerMinute: string;
+  toAddress: string;
+  tvs: string;
+  tvsInUSD: string;
+  flowPerMonth: string;
+  flowPerMonthInUSD: string;
   startDate: string;
   endDate?: string;
-  fundedUntil?: string;
+  fundedUntilDate?: string;
+  handleStopStream?: Function;
+  sign:string;
+  isStoppingStream: boolean;
 }
 
 export const StreamCard = ({
   from,
+  fromAddress,
   to,
-  flowPerMinute,
+  toAddress,
+  tvs,
+  tvsInUSD,
+  flowPerMonth,
+  flowPerMonthInUSD,
   startDate,
   endDate,
-  fundedUntil,
+  fundedUntilDate,
+  handleStopStream,
+  isStoppingStream,
+  sign,
   ...rest
 }: IStreamCard) => {
+  const [isTvsInUSD, setIsTvsInUSD] = useState(true);
+  const [isFlowRateInUSD, setIsFlowRateInUSD] = useState(true);
+  const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
+
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -41,17 +63,45 @@ export const StreamCard = ({
               style={{ fontSize: '16px' }}
             >
               <>
-                <span style={{ fontWeight: '500' }}>
-                  <TokenIcon label={from} /> {from} Farm
-                </span>
-                <span style={{ fontWeight: '500' }}>
-                  <TokenIcon label={to} /> {to} Farm
-                </span>
-                <span>{endDate || '∞'}</span>
-                <span>{flowPerMinute}/m</span>
+                <Box direction="row" gap="5px">
+                  <TokenIcon label={from} />{' '}
+                  <span style={{ fontWeight: '500' }}>{from} Farm</span>
+                </Box>
+                <Box direction="row" gap="5px">
+                  <TokenIcon label={to} />{' '}
+                  <span style={{ fontWeight: '500' }}>{to} Farm</span>
+                </Box>
+                <Box direction="row" gap="5px">
+                  <span>{isTvsInUSD ? `$${tvsInUSD}` : `${sign}${tvs}`}</span>
+                  {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
+                    <Box justify="center" fill>
+                      <img src={swap} />
+                    </Box>
+      </Button>*/}
+                </Box>
+                <Box direction="row" gap="5px">
+                  <span>
+                    {isFlowRateInUSD ? `$${flowPerMonthInUSD}` : `${sign}${flowPerMonth}`}/m
+                  </span>
+                  {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
+                  <Box justify="center" fill>
+                      <img src={swap} />
+                    </Box>
+                  </Button>*/}
+                </Box>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
-                <span>{fundedUntil}</span>
+                <Box direction="row" justify="between" align="center">
+                  <span>{fundedUntilDate}</span>
+                  <StopStreamConfirmation
+                    stopStreamConfirmation={stopStreamConfirmation}
+                    setStopStreamConfirmation={setStopStreamConfirmation}
+                    fromAddress={fromAddress}
+                    toAddress={toAddress}
+                    handleStopStream={handleStopStream}
+                    isStoppingStream={isStoppingStream}
+                  />
+                </Box>
               </>
             </Grid>
           </Card>

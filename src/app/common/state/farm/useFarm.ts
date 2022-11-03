@@ -256,6 +256,12 @@ export const useFarm = ({ id }) => {
     selectFarm(id);
   }, [walletAccountAtom]);
 
+  useEffect(() => {
+    if (walletAccountAtom && selectedFarm) {
+      //here update the actual selected token. 
+    }
+  }, [selectedSupportedToken]);
+
   const fetchFarmInfo = async farm => {
     let farmInfo;
     farmInfo = {

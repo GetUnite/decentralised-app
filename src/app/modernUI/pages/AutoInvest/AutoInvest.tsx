@@ -7,7 +7,15 @@ import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
-  const { streams, isLoading, assetsInfo, walletAccountAtom } = useAutoInvest();
+  const {
+    streams,
+    isLoading,
+    assetsInfo,
+    walletAccountAtom,
+    fundedUntilByStreamOptions,
+    isStoppingStream,
+    handleStopStream,
+  } = useAutoInvest();
 
   return (
     <Layout>
@@ -28,16 +36,14 @@ export const AutoInvest = () => {
                     <Box direction="row" justify="between" align="center">
                       {' '}
                       <Text size="36px" weight="bold">
-                        {0} active streams
+                        {streams?.length || 0} active streams
                       </Text>{' '}
-
-                        <Link to={'/auto-invest/add'}>
-                          <Button
-                            label="Start new stream"
-                            style={{ width: '170px' }}
-                          />
-                        </Link>
-
+                      <Link to={'/autoinvest/add'}>
+                        <Button
+                          label="Start new stream"
+                          style={{ width: '170px' }}
+                        />
+                      </Link>
                     </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
@@ -104,10 +110,26 @@ export const AutoInvest = () => {
                                   <StreamCard
                                     key={index}
                                     from={stream.from}
+                                    fromAddress={stream.fromAddress}
                                     to={stream.to}
-                                    flowPerMinute={stream.flowPerMinute}
+                                    toAddress={stream.toAddress}
+                                    tvs={stream.tvs}
+                                    tvsInUSD={stream.tvsInUSD}
+                                    flowPerMonth={stream.flowPerMonth}
+                                    flowPerMonthInUSD={
+                                      stream.flowPerMonthInUSD
+                                    }
                                     startDate={stream.startDate}
-                                    fundedUntil={stream.fundedUntil}
+                                    fundedUntilDate={
+                                      fundedUntilByStreamOptions.find(
+                                        fundedUntilByStreamOption =>
+                                          fundedUntilByStreamOption.from ==
+                                          stream.from,
+                                      ).fundedUntilDate
+                                    }
+                                    sign={stream.sign}
+                                    handleStopStream={handleStopStream}
+                                    isStoppingStream={isStoppingStream}
                                   />
                                 );
                               })}

@@ -1,8 +1,8 @@
-import { Box, Text, Select, Image } from 'grommet';
+import { Box, Image, Select, Text } from 'grommet';
 
 import { useMode } from 'app/common/state';
 
-import logo from '../../images/logo.png';
+import logo from '../../images/logo.svg';
 
 export const Selector = ({ ...rest }) => {
   const { isLightMode, mode, setMode, toggleMode } = useMode();
