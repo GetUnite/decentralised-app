@@ -76,7 +76,8 @@ export const AutoInvestTab = ({ ...rest }) => {
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
-                disabled={disableInputs}
+                //disabled={disableInputs}
+                disabled={true}
               />
               {useEndDate && (
                 <DateInput
