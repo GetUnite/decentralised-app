@@ -123,6 +123,7 @@ export const useAutoInvest = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isStoppingStream, setIsStoppingStream] = useState<boolean>(false);
 
   useEffect(() => {
     if (walletAccountAtom) {
@@ -305,6 +306,7 @@ export const useAutoInvest = () => {
   };
 
   const handleStopStream = async (fromAddress, toAddress) => {
+    setIsStoppingStream(true);
     const streamOption = streamOptions.find(
       so =>
         so.ibAlluoAddress == fromAddress &&
@@ -318,6 +320,8 @@ export const useAutoInvest = () => {
           false, // use biconomy here
         );
         setNotificationt('Steam was stopped successfully', 'success');
+        // remove stream from the list
+        updateAutoInvestInfo();
       } catch (err) {
         setNotificationt(err, 'error');
       }
@@ -327,10 +331,12 @@ export const useAutoInvest = () => {
         'error',
       );
     }
+    setIsStoppingStream(false);
   };
   return {
     walletAccountAtom,
     isLoading,
+    isStoppingStream,
     streams,
     assetsInfo,
     fundedUntilByStreamOptions,

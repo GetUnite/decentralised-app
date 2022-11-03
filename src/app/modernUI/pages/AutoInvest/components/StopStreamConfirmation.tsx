@@ -1,4 +1,5 @@
 import { useMode } from 'app/common/state';
+import { Spinner } from 'app/modernUI/components';
 import stopStreamDark from 'app/modernUI/images/stopStream-dark.svg';
 import stopStream from 'app/modernUI/images/stopStream.svg';
 import { Box, Button, Heading, Layer, ResponsiveContext, Text } from 'grommet';
@@ -10,6 +11,7 @@ export const StopStreamConfirmation = ({
   fromAddress,
   toAddress,
   handleStopStream,
+  isStoppingStream,
   ...rest
 }) => {
   const { isLightMode } = useMode();
@@ -66,29 +68,44 @@ export const StopStreamConfirmation = ({
                     </Box>
                   </Button>
                 </Box>
-                <Box justify="center" align="center" fill="horizontal">
-                  <Text size="18">Do you really want to stop your stream?</Text>
-                </Box>
-                <Box direction="row" justify="around">
-                  <Button
-                    label="Keep stream"
-                    onClick={() =>
-                      setStopStreamConfirmation(!stopStreamConfirmation)
-                    }
-                    style={{ width: '170px' }}
-                  />
+                {isStoppingStream ? (
+                  <Box
+                    align="center"
+                    justify="center"
+                    fill="vertical"
+                    margin={{ top: 'large', bottom: 'medium' }}
+                  >
+                    <Spinner pad="large" />
+                  </Box>
+                ) : (
+                  <>
+                    <Box justify="center" align="center" fill="horizontal">
+                      <Text size="18">
+                        Do you really want to stop your stream?
+                      </Text>
+                    </Box>
+                    <Box direction="row" justify="around">
+                      <Button
+                        label="Keep stream"
+                        onClick={() =>
+                          setStopStreamConfirmation(!stopStreamConfirmation)
+                        }
+                        style={{ width: '170px' }}
+                      />
 
-                  <Button
-                    primary
-                    label="Yes, stop now"
-                    onClick={async () => {
-                      await handleStopStream(fromAddress, toAddress);
-                      setStopStreamConfirmation(!stopStreamConfirmation);
-                    }}
-                    color={'red'}
-                    style={{ color: 'white', width: '170px' }}
-                  />
-                </Box>
+                      <Button
+                        primary
+                        label="Yes, stop now"
+                        onClick={async () => {
+                          await handleStopStream(fromAddress, toAddress);
+                          setStopStreamConfirmation(!stopStreamConfirmation);
+                        }}
+                        color={'red'}
+                        style={{ color: 'white', width: '170px' }}
+                      />
+                    </Box>
+                  </>
+                )}
               </Box>
             </Layer>
           )}

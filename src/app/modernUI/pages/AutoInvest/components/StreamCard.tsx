@@ -1,6 +1,5 @@
 import { TokenIcon } from 'app/modernUI/components';
-import swap from 'app/modernUI/images/swap.svg';
-import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
+import { Box, Card, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
 import { StopStreamConfirmation } from './StopStreamConfirmation';
 
@@ -18,6 +17,7 @@ interface IStreamCard {
   fundedUntilDate?: string;
   handleStopStream?: Function;
   sign:string;
+  isStoppingStream: boolean;
 }
 
 export const StreamCard = ({
@@ -33,11 +33,12 @@ export const StreamCard = ({
   endDate,
   fundedUntilDate,
   handleStopStream,
+  isStoppingStream,
   sign,
   ...rest
 }: IStreamCard) => {
-  const [isTvsInUSD, setIsTvsInUSD] = useState(false);
-  const [isFlowRateInUSD, setIsFlowRateInUSD] = useState(false);
+  const [isTvsInUSD, setIsTvsInUSD] = useState(true);
+  const [isFlowRateInUSD, setIsFlowRateInUSD] = useState(true);
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
 
   return (
@@ -72,21 +73,21 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>{isTvsInUSD ? `$${tvsInUSD}` : `${sign}${tvs}`}</span>
-                  <Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
+                  {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
                     <Box justify="center" fill>
                       <img src={swap} />
                     </Box>
-                  </Button>
+      </Button>*/}
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
                     {isFlowRateInUSD ? `$${flowPerMinuteInUSD}` : `${sign}${flowPerMinute}`}/m
                   </span>
-                  <Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
+                  {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
                   <Box justify="center" fill>
                       <img src={swap} />
                     </Box>
-                  </Button>
+                  </Button>*/}
                 </Box>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
@@ -98,6 +99,7 @@ export const StreamCard = ({
                     fromAddress={fromAddress}
                     toAddress={toAddress}
                     handleStopStream={handleStopStream}
+                    isStoppingStream={isStoppingStream}
                   />
                 </Box>
               </>

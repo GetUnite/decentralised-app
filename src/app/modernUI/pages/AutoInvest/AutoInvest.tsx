@@ -13,6 +13,7 @@ export const AutoInvest = () => {
     assetsInfo,
     walletAccountAtom,
     fundedUntilByStreamOptions,
+    isStoppingStream,
     handleStopStream,
   } = useAutoInvest();
 
@@ -128,6 +129,7 @@ export const AutoInvest = () => {
                                     }
                                     sign={stream.sign}
                                     handleStopStream={handleStopStream}
+                                    isStoppingStream={isStoppingStream}
                                   />
                                 );
                               })}
