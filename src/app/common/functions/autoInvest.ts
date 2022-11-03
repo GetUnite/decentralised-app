@@ -127,7 +127,7 @@ export const getStreamFlow = async (
 
   return {
     flowPerSecond: flowPerSecond,
-    flowPerMinute: +flowPerSecond * 60,
+    flowPerMonth: +flowPerSecond * 60,
     timestamp: flow.timestamp.toString(),
   };
 };
