@@ -78,7 +78,7 @@ export const Main = () => {
                             !viewType ? { textDecoration: 'underline' } : {}
                           }
                         />
-                        {walletAccountAtom && (
+                        {walletAccountAtom && !isLoading && (
                           <Button
                             size="small"
                             onClick={showYourFarms}
