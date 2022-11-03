@@ -290,7 +290,7 @@ export const useAutoInvestTab = () => {
             streamOption.stIbAlluoAddress,
             supportedToken.ricochetMarketAddress,
           );
-          if (streamFlow.flowPerSecond > 0) {
+          if (+streamFlow.flowPerSecond > 0) {
             alreadyStreaming = true;
           }
         }

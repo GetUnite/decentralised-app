@@ -4,6 +4,7 @@ import {
   getBalanceOf,
   getCurrentWalletAddress,
   getDecimals,
+  getPrice,
   getReadOnlyProvider,
   getSuperfluidFramework,
   sendTransaction
@@ -122,11 +123,11 @@ export const getStreamFlow = async (
     chain,
   );
 
-  const flowPerSecond = flow.flowRate.toNumber();
+  const flowPerSecond = ethers.utils.formatUnits(flow.flowRate, 18);
 
   return {
     flowPerSecond: flowPerSecond,
-    flowPerMinute: flowPerSecond * 60,
+    flowPerMinute: +flowPerSecond * 60,
     timestamp: flow.timestamp.toString(),
   };
 };
@@ -520,4 +521,45 @@ export const stopStream = async (
     EChain.POLYGON,
     useBiconomy,
   );
+};
+
+export const convertToUSDC = async (
+  value,
+  tokenAddress,
+  decimals,
+  underlyingTokenAddress,
+  underlyingTokenDecimals
+) => {
+  const abi = [{
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amountInTokenValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "convertToAssetValue",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }];
+
+  const valueInDecimals = toDecimals(value, decimals);
+
+  const underlyingTokenValue = await callContract(
+    abi,
+    tokenAddress,
+    'convertToAssetValue(uint256)',
+    [valueInDecimals],
+    EChain.POLYGON,
+  );
+
+  const tokenPrice = underlyingTokenAddress == EPolygonAddresses.USDC ? 1 : await getPrice(
+    underlyingTokenAddress,
+    EPolygonAddresses.USDC,
+    decimals,
+    6,
+  );
+
+  return +ethers.utils.formatUnits(underlyingTokenValue, 18) * tokenPrice;
 };

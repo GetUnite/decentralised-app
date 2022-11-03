@@ -113,7 +113,11 @@ export const AutoInvest = () => {
                                     to={stream.to}
                                     toAddress={stream.toAddress}
                                     tvs={stream.tvs}
+                                    tvsInUSD={stream.tvsInUSD}
                                     flowPerMinute={stream.flowPerMinute}
+                                    flowPerMinuteInUSD={
+                                      stream.flowPerMinuteInUSD
+                                    }
                                     startDate={stream.startDate}
                                     fundedUntilDate={
                                       fundedUntilByStreamOptions.find(
@@ -122,6 +126,7 @@ export const AutoInvest = () => {
                                           stream.from,
                                       ).fundedUntilDate
                                     }
+                                    sign={stream.sign}
                                     handleStopStream={handleStopStream}
                                   />
                                 );
