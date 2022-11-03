@@ -1,22 +1,23 @@
 import { TokenIcon } from 'app/modernUI/components';
-import {
-  Box, Card,
-  Grid, ResponsiveContext
-} from 'grommet';
+import swap from 'app/modernUI/images/swap.svg';
+import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
 import { StopStreamConfirmation } from './StopStreamConfirmation';
 
 interface IStreamCard {
   from: string;
-  fromAddress:string;
+  fromAddress: string;
   to: string;
   toAddress: string;
   tvs: string;
+  tvsInUSD: string;
   flowPerMinute: string;
+  flowPerMinuteInUSD: string;
   startDate: string;
   endDate?: string;
   fundedUntilDate?: string;
   handleStopStream?: Function;
+  sign:string;
 }
 
 export const StreamCard = ({
@@ -25,13 +26,18 @@ export const StreamCard = ({
   to,
   toAddress,
   tvs,
+  tvsInUSD,
   flowPerMinute,
+  flowPerMinuteInUSD,
   startDate,
   endDate,
   fundedUntilDate,
   handleStopStream,
+  sign,
   ...rest
 }: IStreamCard) => {
+  const [isTvsInUSD, setIsTvsInUSD] = useState(false);
+  const [isFlowRateInUSD, setIsFlowRateInUSD] = useState(false);
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
 
   return (
@@ -64,8 +70,24 @@ export const StreamCard = ({
                   <TokenIcon label={to} />{' '}
                   <span style={{ fontWeight: '500' }}>{to} Farm</span>
                 </Box>
-                <span>{tvs || '∞'}</span>
-                <span>{flowPerMinute}/m</span>
+                <Box direction="row" gap="5px">
+                  <span>{isTvsInUSD ? `$${tvsInUSD}` : `${sign}${tvs}`}</span>
+                  <Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
+                    <Box justify="center" fill>
+                      <img src={swap} />
+                    </Box>
+                  </Button>
+                </Box>
+                <Box direction="row" gap="5px">
+                  <span>
+                    {isFlowRateInUSD ? `$${flowPerMinuteInUSD}` : `${sign}${flowPerMinute}`}/m
+                  </span>
+                  <Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
+                  <Box justify="center" fill>
+                      <img src={swap} />
+                    </Box>
+                  </Button>
+                </Box>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
                 <Box direction="row" justify="between" align="center">
