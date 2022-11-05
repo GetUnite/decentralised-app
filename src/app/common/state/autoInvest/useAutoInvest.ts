@@ -10,7 +10,6 @@ import {
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { initialAvailableFarmsState } from 'app/common/state/farm';
-import { TSupportedToken } from 'app/common/types/form';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -40,12 +39,14 @@ export const streamOptions: any = [
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
         label: 'ETH',
+        sign: 'Ξ'
       },
       {
         ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
         label: 'BTC',
+        sign: '₿'
       },
     ],
   },
@@ -70,6 +71,7 @@ export const streamOptions: any = [
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
         label: 'USD',
+        sign: '$'
       },
     ],
   },
@@ -94,15 +96,10 @@ export const streamOptions: any = [
         stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
         ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
         label: 'USD',
+        sign: '$'
       },
     ],
   },
-];
-
-export const streamToOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.IBALLUOUSD, label: 'USD', sign: '$' },
-  { address: EPolygonAddresses.IBALLUOBTC, label: 'BTC', sign: '₿' },
-  { address: EPolygonAddresses.IBALLUOETH, label: 'ETH', sign: 'Ξ' },
 ];
 
 export const useAutoInvest = () => {
