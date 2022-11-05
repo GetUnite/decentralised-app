@@ -1,5 +1,5 @@
 import { roundNumberDown } from 'app/common/functions/utils';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import { Box, Select, Text, TextInput, ThemeContext } from 'grommet';
 import { Down } from 'grommet-icons';
 import { useState } from 'react';
