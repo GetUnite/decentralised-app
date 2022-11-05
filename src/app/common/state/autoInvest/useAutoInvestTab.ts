@@ -130,6 +130,7 @@ export const useAutoInvestTab = () => {
                 // push the combination into the possible stream combinations array
                 possibleStreamTokensCombinationArray.push({
                   fromAddress: supportedFromToken.address,
+                  fromIbAlluoAddress: streamOption.ibAlluoAddress,
                   fromStIbAlluoAddress: streamOption.stIbAlluoAddress,
                   toIbAlluoAddress: supportedToToken.ibAlluoAddress,
                   toStIbAlluoAddress: supportedToToken.stIbAlluoAddress,
@@ -233,14 +234,10 @@ export const useAutoInvestTab = () => {
           if (!selectedSupportedFromToken.isStreamable) {
             neededSteps.push(possibleStreamCreationSteps[1]);
           }
-          console.log({toIbAlluoAddress:newSelectedStreamCombination.toIbAlluoAddress,fromStIbAlluoAddress:
-            newSelectedStreamCombination.fromStIbAlluoAddress,toStIbAlluoAddress:
-            newSelectedStreamCombination.toStIbAlluoAddress,ricochetMarketAddress:
-            newSelectedStreamCombination.ricochetMarketAddress});
           // subscriptions to superfluid contracts
           const subscriptionOperations =
             await getUnapprovedSuperfluidSubscriptions(
-              newSelectedStreamCombination.toIbAlluoAddress,
+              newSelectedStreamCombination.fromIbAlluoAddress,
               newSelectedStreamCombination.fromStIbAlluoAddress,
               newSelectedStreamCombination.toStIbAlluoAddress,
               newSelectedStreamCombination.ricochetMarketAddress,
