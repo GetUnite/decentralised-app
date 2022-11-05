@@ -13,6 +13,7 @@ export type TStreamOptionCreationSteps = {
 
 export type TStreamTokensCombination = {
   fromAddress: string;
+  fromIbAlluoAddress: string;
   fromStIbAlluoAddress: string;
   toIbAlluoAddress: string;
   toStIbAlluoAddress: string;
