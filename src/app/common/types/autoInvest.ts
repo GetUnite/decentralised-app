@@ -11,13 +11,17 @@ export type TStreamOptionCreationSteps = {
   steps: TStreamCreationStep[];
 };
 
-export type TStreamTokensCombination = {
-  fromAddress: string;
+export type TStreamOption = {
+  fromLabel: string;
+  toLabel: string;
+  fromSign: string;
+  fromAddress?: string;
   fromIbAlluoAddress: string;
   fromStIbAlluoAddress: string;
   toIbAlluoAddress: string;
   toStIbAlluoAddress: string;
   ricochetMarketAddress: string;
+  underlyingTokenAddress: string;
 };
 
 export type TSupportedStreamToken = TSupportedToken & {
