@@ -1,6 +1,10 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
-import { convertToUSDC, getStreamFlow, stopStream } from 'app/common/functions/autoInvest';
+import {
+  convertToUSDC,
+  getStreamFlow,
+  stopStream
+} from 'app/common/functions/autoInvest';
 import { toExactFixed } from 'app/common/functions/utils';
 import {
   getBalance,
@@ -10,99 +14,66 @@ import {
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { initialAvailableFarmsState } from 'app/common/state/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TStreamOption } from 'app/common/types/autoInvest';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
 
-export const streamOptions: any = [
+const streamOptions: TStreamOption[] = [
+  // from USD options
   {
-    id: 0,
-    label: 'USD',
-    stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    // USD Farm to ETH
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'ETH',
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
-    from: [
-      {
-        address: EPolygonAddresses.IBALLUOUSD,
-        label: 'Your USD farm',
-        sign: '$',
-        isStreamable: true,
-      },
-      { address: EPolygonAddresses.USDC, label: 'USDC', sign: '$' },
-      { address: EPolygonAddresses.DAI, label: 'DAI', sign: '$' },
-      { address: EPolygonAddresses.USDT, label: 'USDT', sign: '$' },
-    ],
-    to: [
-      {
-        ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
-        stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
-        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
-        label: 'ETH',
-      },
-      {
-        ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-        stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-        label: 'BTC',
-      },
-    ],
   },
   {
-    id: 1,
-    label: 'BTC',
-    ibAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    stIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    // USD Farm to BTC
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'BTC',
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  // from BTC options
+  {
+    // WBTC to USD
+    fromLabel: 'BTC',
+    fromSign: '₿',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.WBTC,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
     underlyingTokenAddress: EPolygonAddresses.WBTC,
-    from: [
-      {
-        address: EPolygonAddresses.IBALLUOBTC,
-        label: 'Your BTC farm',
-        sign: '₿',
-        isStreamable: true,
-      },
-      { address: EPolygonAddresses.WBTC, label: 'WBTC', sign: '₿' },
-    ],
-    to: [
-      {
-        ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-        stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-        label: 'USD',
-      },
-    ],
   },
+  // from ETH options
   {
-    id: 2,
-    label: 'ETH',
-    ibAlluoAddress: EPolygonAddresses.IBALLUOETH,
-    stIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    // WETH to USD
+    fromLabel: 'BTC',
+    fromSign: 'Ξ',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.WETH,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.WETH,
-    from: [
-      {
-        address: EPolygonAddresses.IBALLUOETH,
-        label: 'Your ETH farm',
-        sign: 'Ξ',
-        isStreamable: true,
-      },
-      { address: EPolygonAddresses.WETH, label: 'WETH', sign: 'Ξ' },
-    ],
-    to: [
-      {
-        ibAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-        stIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-        ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
-        label: 'USD',
-      },
-    ],
   },
-];
-
-export const streamToOptions: TSupportedToken[] = [
-  { address: EPolygonAddresses.IBALLUOUSD, label: 'USD', sign: '$' },
-  { address: EPolygonAddresses.IBALLUOBTC, label: 'BTC', sign: '₿' },
-  { address: EPolygonAddresses.IBALLUOETH, label: 'ETH', sign: 'Ξ' },
 ];
 
 export const useAutoInvest = () => {
@@ -236,47 +207,60 @@ export const useAutoInvest = () => {
     let fundedUntilArray = [];
     let streamsArray = [];
 
-    for (const streamOption of streamOptions)
-      for (const streamOptionTo of streamOption.to) {
-        const ricochetMarket = {
-          address: streamOptionTo.ricochetMarketAddress,
-          label: streamOptionTo.label,
-        };
+    for (let index = 0; index < streamOptions.length; index++) {
+      const element = streamOptions[index];
         const streamFlow = await getStreamFlow(
-          streamOption.stIbAlluoAddress,
-          ricochetMarket.address,
+          element.fromStIbAlluoAddress,
+          element.ricochetMarketAddress
         );
         if (+streamFlow.flowPerSecond > 0) {
           const ibAlluoBalance = await getBalance(
-            streamOption.ibAlluoAddress,
+            element.fromIbAlluoAddress,
             18,
             EChain.POLYGON,
           );
           const flowPerSecond = +streamFlow.flowPerSecond;
-          const flowPerMonth = flowPerSecond * 60 * 60 * 24 * 365 / 12;
+          const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
           const tvs = toExactFixed(
             (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
             6,
           );
           streamsArray.push({
-            id: streamOption.id,
-            from: streamOption.label,
-            fromAddress: streamOption.ibAlluoAddress,
-            to: ricochetMarket.label,
-            toAddress: ricochetMarket.address,
+            from: element.fromLabel,
+            fromAddress: element.fromIbAlluoAddress,
+            to: element.toLabel,
+            toAddress: element.ricochetMarketAddress,
             flowPerSecond: flowPerSecond,
             flowPerMonth: toExactFixed(flowPerMonth, 6),
-            flowPerMonthInUSD: toExactFixed(await convertToUSDC(flowPerMonth, streamOption.ibAlluoAddress, 18, streamOption.underlyingTokenAddress, 18),6),
+            flowPerMonthInUSD: toExactFixed(
+              await convertToUSDC(
+                flowPerMonth,
+                element.fromIbAlluoAddress,
+                18,
+                element.underlyingTokenAddress,
+                18,
+              ),
+              6,
+            ),
             startDate: new Date(
               streamFlow.timestamp * 1000,
             ).toLocaleDateString(),
             tvs: tvs,
-            tvsInUSD: toExactFixed(await convertToUSDC(tvs, streamOption.ibAlluoAddress, 18, streamOption.underlyingTokenAddress, 18),6),
-            sign: streamOption.from[0].sign,
+            tvsInUSD: toExactFixed(
+              await convertToUSDC(
+                tvs,
+                element.fromIbAlluoAddress,
+                18,
+                element.underlyingTokenAddress,
+                18,
+              ),
+              6,
+            ),
+            sign: element.fromSign,
           });
 
           let fundedUntil = fundedUntilArray.find(
-            fundedUntil => fundedUntil.from == streamOption.label,
+            fundedUntil => fundedUntil.from == element.fromLabel,
           );
 
           if (fundedUntil) {
@@ -292,7 +276,7 @@ export const useAutoInvest = () => {
               (+ibAlluoBalance / flowPerSecond) * 1000;
 
             fundedUntilArray.push({
-              from: streamOption.label,
+              from: element.fromLabel,
               flowPerSecond: flowPerSecond,
               fundedUntilDate: new Date(
                 currentTime + remainingFundedMiliseconds,
@@ -310,8 +294,8 @@ export const useAutoInvest = () => {
     setIsStoppingStream(true);
     const streamOption = streamOptions.find(
       so =>
-        so.ibAlluoAddress == fromAddress &&
-        so.to.find(to => to.ricochetMarketAddress == toAddress) != undefined,
+        so.fromIbAlluoAddress == fromAddress &&
+        so.ricochetMarketAddress == toAddress
     );
     if (streamOption) {
       try {

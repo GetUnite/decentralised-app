@@ -24,7 +24,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';

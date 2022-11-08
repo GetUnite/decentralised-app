@@ -16,7 +16,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     //loading
     isLoading,
     isFetchingFarmInfo,
-    isUpdatingSelectedStreamOption,
+    isUpdatingSelectedStreamCombination,
     // errors
     hasErrors,
     // inputs
@@ -38,7 +38,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     endDate,
     setEndDate,
     currentStep,
-    selectedStreamOptionSteps,
+    selectedStreamCombinationSteps,
     handleCurrentStep
   } = useAutoInvestTab();
 
@@ -93,7 +93,7 @@ export const AutoInvestTab = ({ ...rest }) => {
               style={{ minHeight: '224px' }}
               justify="center"
             >
-              {isFetchingFarmInfo ? (
+              {isFetchingFarmInfo || isUpdatingSelectedStreamCombination ? (
                 <Box align="center" justify="center" fill="vertical">
                   <Spinner pad="large" />
                 </Box>
@@ -131,14 +131,14 @@ export const AutoInvestTab = ({ ...rest }) => {
           disabled={
             isLoading ||
             hasErrors ||
-            isUpdatingSelectedStreamOption ||
+            isUpdatingSelectedStreamCombination ||
             !(+streamValue > 0)
           }
           label={
-            isLoading || isUpdatingSelectedStreamOption
+            isLoading || isUpdatingSelectedStreamCombination
               ? 'Loading...'
-              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps.length}: ${
-                  selectedStreamOptionSteps[currentStep].label
+              : `Step ${currentStep + 1} of ${selectedStreamCombinationSteps?.length}: ${
+                selectedStreamCombinationSteps[currentStep]?.label
                 }`
           }
           onClick={handleCurrentStep}

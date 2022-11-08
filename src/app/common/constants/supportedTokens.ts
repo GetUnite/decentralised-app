@@ -1,4 +1,4 @@
-import { TSupportedToken } from '../types/form';
+import { TSupportedToken } from '../types/global';
 import { EPolygonAddresses } from './addresses';
 
 export enum ESupportedTokens {

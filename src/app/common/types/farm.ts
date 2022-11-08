@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { TSupportedToken } from './form';
+import { TSupportedToken } from './global';
 
 export type TBoostFarmRewards = {
   icons?: any[];
