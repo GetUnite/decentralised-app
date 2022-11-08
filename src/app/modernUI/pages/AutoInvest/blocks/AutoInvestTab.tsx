@@ -16,7 +16,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     //loading
     isLoading,
     isFetchingFarmInfo,
-    isUpdatingSelectedStreamCombination,
+    isUpdatingSelectedStreamOption,
     // errors
     hasErrors,
     // inputs
@@ -38,7 +38,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     endDate,
     setEndDate,
     currentStep,
-    selectedStreamCombinationSteps,
+    selectedStreamOptionSteps,
     handleCurrentStep
   } = useAutoInvestTab();
 
@@ -76,8 +76,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
-                //disabled={disableInputs}
-                disabled={true}
+                disabled={disableInputs}
               />
               {useEndDate && (
                 <DateInput
@@ -93,7 +92,7 @@ export const AutoInvestTab = ({ ...rest }) => {
               style={{ minHeight: '224px' }}
               justify="center"
             >
-              {isFetchingFarmInfo || isUpdatingSelectedStreamCombination ? (
+              {isFetchingFarmInfo || isUpdatingSelectedStreamOption ? (
                 <Box align="center" justify="center" fill="vertical">
                   <Spinner pad="large" />
                 </Box>
@@ -131,14 +130,14 @@ export const AutoInvestTab = ({ ...rest }) => {
           disabled={
             isLoading ||
             hasErrors ||
-            isUpdatingSelectedStreamCombination ||
+            isUpdatingSelectedStreamOption ||
             !(+streamValue > 0)
           }
           label={
-            isLoading || isUpdatingSelectedStreamCombination
+            isLoading || isUpdatingSelectedStreamOption
               ? 'Loading...'
-              : `Step ${currentStep + 1} of ${selectedStreamCombinationSteps?.length}: ${
-                selectedStreamCombinationSteps[currentStep]?.label
+              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps?.length}: ${
+                selectedStreamOptionSteps[currentStep]?.label
                 }`
           }
           onClick={handleCurrentStep}
