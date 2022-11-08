@@ -348,8 +348,8 @@ export const useAutoInvestTab = () => {
   const [possibleStreamOptions, setPossibleStreamOptions] = useState<
     TStreamOption[]
   >([]);
-  const [selectedStreamCombination, setSelectedStreamCombination] =
-    useState<any>();
+  const [selectedStreamOption, setSelectedStreamOption] =
+    useState<TStreamOption>();
 
   // stream from
   const [supportedFromTokens, setSupportedFromTokens] =
@@ -373,7 +373,7 @@ export const useAutoInvestTab = () => {
 
   // stream creation steps
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [selectedStreamCombinationSteps, setSelectedStreamCombinationSteps] =
+  const [selectedStreamOptionSteps, setSelectedStreamOptionSteps] =
     useState<TStreamCreationStep[]>();
   const [
     unapprovedSuperfluidSubscriptions,
@@ -387,8 +387,8 @@ export const useAutoInvestTab = () => {
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [
-    isUpdatingSelectedStreamCombination,
-    setIsUpdatingSelectedStreamCombination,
+    isUpdatingSelectedStreamOption,
+    setIsUpdatingSelectedStreamOption,
   ] = useState<boolean>(false);
 
   // updates the entire modal
@@ -483,22 +483,22 @@ export const useAutoInvestTab = () => {
       selectedSupportedToToken
     ) {
       const updateSelectedStreamCombination = async () => {
-        setIsUpdatingSelectedStreamCombination(true);
+        setIsUpdatingSelectedStreamOption(true);
 
-        const newSelectedStreamCombination = possibleStreamOptions.find(
+        const newSelectedStreamOption = possibleStreamOptions.find(
           pstc =>
             pstc.fromAddress == selectedSupportedFromToken.address &&
             pstc.toIbAlluoAddress == selectedSupportedToToken.address,
         );
-        if (newSelectedStreamCombination) {
-          setSelectedStreamCombination(newSelectedStreamCombination);
+        if (newSelectedStreamOption) {
+          setSelectedStreamOption(newSelectedStreamOption);
 
           let neededSteps: TStreamCreationStep[] = [];
           // First step is always approve when there is a need for deposit
           if (!selectedSupportedFromToken.isStreamable) {
             const allowance = await getAllowance(
               selectedSupportedFromToken.address,
-              newSelectedStreamCombination.toIbAlluoAddress,
+              newSelectedStreamOption.toIbAlluoAddress,
             );
             if (!(+allowance > 0)) {
               neededSteps.push(possibleStreamCreationSteps[0]);
@@ -511,10 +511,10 @@ export const useAutoInvestTab = () => {
           // subscriptions to superfluid contracts
           const subscriptionOperations =
             await getUnapprovedSuperfluidSubscriptions(
-              newSelectedStreamCombination.fromIbAlluoAddress,
-              newSelectedStreamCombination.fromStIbAlluoAddress,
-              newSelectedStreamCombination.toStIbAlluoAddress,
-              newSelectedStreamCombination.ricochetMarketAddress,
+              newSelectedStreamOption.fromIbAlluoAddress,
+              newSelectedStreamOption.fromStIbAlluoAddress,
+              newSelectedStreamOption.toStIbAlluoAddress,
+              newSelectedStreamOption.ricochetMarketAddress,
             );
           if (subscriptionOperations.length > 0) {
             setUnapprovedSuperfluidSubscriptions(subscriptionOperations);
@@ -523,9 +523,9 @@ export const useAutoInvestTab = () => {
           // start stream finishs the steps
           neededSteps.push(possibleStreamCreationSteps[3]);
 
-          setSelectedStreamCombinationSteps(neededSteps);
+          setSelectedStreamOptionSteps(neededSteps);
         }
-        setIsUpdatingSelectedStreamCombination(false);
+        setIsUpdatingSelectedStreamOption(false);
       };
       // Check the stream value against the new "from" token
       if (+streamValue > 0) {
@@ -633,7 +633,7 @@ export const useAutoInvestTab = () => {
     try {
       const tx = await depositIntoAlluo(
         selectedSupportedFromToken.address,
-        selectedStreamCombination.ibAlluoAddress,
+        selectedStreamOption.fromIbAlluoAddress,
         streamValue,
         useBiconomy,
       );
@@ -662,16 +662,13 @@ export const useAutoInvestTab = () => {
 
     try {
       // data from the selected output
-      const selectedTo = selectedStreamCombination.to.find(
-        sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
-      );
       await startStream(
-        selectedStreamCombination.ibAlluoAddress,
-        selectedStreamCombination.stIbAlluoAddress,
-        selectedTo.stIbAlluoAddress,
-        selectedTo.ricochetMarketAddress,
+        selectedStreamOption.fromIbAlluoAddress,
+        selectedStreamOption.fromStIbAlluoAddress,
+        selectedStreamOption.toStIbAlluoAddress,
+        selectedStreamOption.ricochetMarketAddress,
         +streamValue,
-        endDate ? new Date(endDate).getTime() : null,
+        useEndDate ? new Date(endDate).getTime() : null,
         useBiconomy,
       );
       setNotificationt('Stream started successfully', 'success');
@@ -688,7 +685,7 @@ export const useAutoInvestTab = () => {
     const currentStreamCreationStep = possibleStreamCreationSteps.find(
       possibleStreamCreationStep =>
         possibleStreamCreationStep.id ==
-        selectedStreamCombinationSteps[currentStep].id,
+        selectedStreamOptionSteps[currentStep].id,
     );
 
     switch (currentStreamCreationStep.id) {
@@ -716,7 +713,7 @@ export const useAutoInvestTab = () => {
     // loading control
     isLoading: isUpdating || isStartingStream || isApproving || isDepositing,
     isFetchingFarmInfo,
-    isUpdatingSelectedStreamCombination,
+    isUpdatingSelectedStreamOption,
     // error control
     hasErrors: streamValueError != '' || endDateError != '',
     // inputs
@@ -738,7 +735,7 @@ export const useAutoInvestTab = () => {
     endDate,
     setEndDate,
     currentStep,
-    selectedStreamCombinationSteps,
+    selectedStreamOptionSteps,
     handleCurrentStep,
   };
 };
