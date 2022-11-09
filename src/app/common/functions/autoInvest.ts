@@ -528,21 +528,23 @@ export const convertToUSDC = async (
   tokenAddress,
   decimals,
   underlyingTokenAddress,
-  underlyingTokenDecimals
+  underlyingTokenDecimals,
 ) => {
-  const abi = [{
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_amountInTokenValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "convertToAssetValue",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  }];
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: '_amountInTokenValue',
+          type: 'uint256',
+        },
+      ],
+      name: 'convertToAssetValue',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
 
   const valueInDecimals = toDecimals(value, decimals);
 
@@ -554,12 +556,15 @@ export const convertToUSDC = async (
     EChain.POLYGON,
   );
 
-  const tokenPrice = underlyingTokenAddress == EPolygonAddresses.USDC ? 1 : await getPrice(
-    underlyingTokenAddress,
-    EPolygonAddresses.USDC,
-    decimals,
-    6,
-  );
+  const tokenPrice =
+    underlyingTokenAddress == EPolygonAddresses.USDC
+      ? 1
+      : await getPrice(
+          underlyingTokenAddress,
+          EPolygonAddresses.USDC,
+          decimals,
+          6,
+        );
 
-  return +ethers.utils.formatUnits(underlyingTokenValue, 18) * tokenPrice;
+  return +ethers.utils.formatUnits(underlyingTokenValue, underlyingTokenDecimals) * tokenPrice;
 };
