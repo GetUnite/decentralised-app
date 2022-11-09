@@ -70,10 +70,10 @@ export const Stake = ({ ...rest }) => {
                     <UnlockCountdown
                       date={+alluoInfo?.depositUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
-                      label={`UNLOCKING ${roundNumberDown(
+                      label={`${roundNumberDown(
                         alluoInfo.locked,
                         2,
-                      )} TOKENS IN`}
+                      )} TOKENS LOCKED UNTIL`}
                       showReunlockConfirmation={showReunlockConfirmation}
                     />
                   </>
