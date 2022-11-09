@@ -11,7 +11,7 @@ import { modernUiPaths } from 'app/common/hooks';
 import discordDark from '../../images/discord-dark.svg';
 import discord from '../../images/discord.svg';
 import logoDark from '../../images/logo-dark.svg';
-import logo from '../../images/logo.png';
+import logo from '../../images/logo.svg';
 import logoIconDark from '../../images/logoIcon-dark.svg';
 import logoIcon from '../../images/logoIcon.svg';
 import mediumDark from '../../images/medium-dark.svg';
@@ -138,6 +138,16 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   }}
                 >
                   Privacy Policy
+                </a>
+                <a
+                  target="_blank"
+                  href="https://docs.alluo.com"
+                  style={{
+                    color: isLightMode ? 'black' : 'white',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Documentation
                 </a>
               </Box>
             </Footer>
