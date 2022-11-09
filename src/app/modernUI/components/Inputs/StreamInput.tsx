@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import { Box, Button, TextInput, Select, Text, ThemeContext } from 'grommet';
-import { Down } from 'grommet-icons';
-import { normalizeColor } from 'grommet/utils';
-import NumberFormat from 'react-number-format';
-import { TSupportedToken } from 'app/common/types/form';
-import { TokenIcon } from '../Icons';
 import { roundNumberDown } from 'app/common/functions/utils';
+import { TSupportedToken } from 'app/common/types/global';
+import { Box, Select, Text, TextInput, ThemeContext } from 'grommet';
+import { Down } from 'grommet-icons';
+import { useState } from 'react';
+import NumberFormat from 'react-number-format';
+import styled from 'styled-components';
+import { TokenIcon } from '../Icons';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
@@ -40,6 +39,7 @@ interface IStreamInput {
   setSelectedToToken?: Function;
   error: string;
   maxValue?: string;
+  disabled: boolean;
 }
 
 export const StreamInput = ({
@@ -54,6 +54,7 @@ export const StreamInput = ({
   selectedToToken,
   setSelectedToToken,
   error,
+  disabled = false,
   ...rest
 }: IStreamInput) => {
   const [formattedValue, setFormattedValue] = useState('');
@@ -77,7 +78,7 @@ export const StreamInput = ({
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
             value={formattedValue}
-            placeholder="0.00"
+            placeholder={disabled ? value.toLocaleString() : "0.00".toLocaleString()}
             customInput={TextInput}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
@@ -86,14 +87,17 @@ export const StreamInput = ({
               onValueChange(value);
               setFormattedValue(formattedValue);
             }}
+            disabled={disabled}
           />
           <AbsoluteBox direction="row" gap="xsmall">
             <ThemeContext.Extend
               value={{
                 select: {
-                  icons: { margin: {
-                    right: "10px"
-                }},
+                  icons: {
+                    margin: {
+                      right: '10px',
+                    },
+                  },
                 },
               }}
             >
@@ -111,9 +115,10 @@ export const StreamInput = ({
                   onChange={({ option }) => setSelectedFromToken(option)}
                   labelKey="label"
                   valueKey="address"
+                  disabled={disabled}
                 />
               )}
-              <Text margin={{right: "10px"}}> to </Text>
+              <Text margin={{ right: '10px' }}> to </Text>
               {toTokenOptions && (
                 <Select
                   width="10px"
@@ -128,6 +133,7 @@ export const StreamInput = ({
                   onChange={({ option }) => setSelectedToToken(option)}
                   labelKey="label"
                   valueKey="address"
+                  disabled={disabled}
                 />
               )}
               / month

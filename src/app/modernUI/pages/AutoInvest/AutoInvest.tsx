@@ -1,34 +1,20 @@
-import { EChain } from 'app/common/constants/chains';
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import {
-  HeadingText,
-  Layout,
-  Modal,
-  Spinner,
-  Tab
-} from 'app/modernUI/components';
+import { HeadingText, Layout, Spinner } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
-import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  Layer,
-  ResponsiveContext,
-  Text
-} from 'grommet';
+import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
-import { AutoInvestTab } from './blocks/AutoInvestTab';
+import { Link } from 'react-router-dom';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
   const {
     streams,
-    setIsModalVisible,
-    isModalVisible,
     isLoading,
     assetsInfo,
     walletAccountAtom,
+    fundedUntilByStreamOptions,
+    isStoppingStream,
+    handleStopStream,
   } = useAutoInvest();
 
   return (
@@ -47,9 +33,18 @@ export const AutoInvest = () => {
                   {isLoading ? (
                     <Skeleton count={1} height="36px" />
                   ) : (
-                    <Text size="36px" weight="bold">
-                      {0} active streams
-                    </Text>
+                    <Box direction="row" justify="between" align="center">
+                      {' '}
+                      <Text size="36px" weight="bold">
+                        {streams?.length || 0} active streams
+                      </Text>{' '}
+                      <Link to={'/autoinvest/add'}>
+                        <Button
+                          label="Start new stream"
+                          style={{ width: '170px' }}
+                        />
+                      </Link>
+                    </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
                     {!isSmall(size) && (
@@ -115,21 +110,31 @@ export const AutoInvest = () => {
                                   <StreamCard
                                     key={index}
                                     from={stream.from}
+                                    fromAddress={stream.fromAddress}
                                     to={stream.to}
-                                    flowPerMinute={stream.flowPerMinute}
+                                    toAddress={stream.toAddress}
+                                    tvs={stream.tvs}
+                                    tvsInUSD={stream.tvsInUSD}
+                                    flowPerMonth={stream.flowPerMonth}
+                                    flowPerMonthInUSD={
+                                      stream.flowPerMonthInUSD
+                                    }
                                     startDate={stream.startDate}
-                                    fundedUntil={stream.fundedUntil}
+                                    fundedUntilDate={
+                                      fundedUntilByStreamOptions.find(
+                                        fundedUntilByStreamOption =>
+                                          fundedUntilByStreamOption.from ==
+                                          stream.from,
+                                      ).fundedUntilDate
+                                    }
+                                    sign={stream.sign}
+                                    handleStopStream={handleStopStream}
+                                    isStoppingStream={isStoppingStream}
                                   />
                                 );
                               })}
                           </>
                         )}
-                        <Button
-                          label="Start new stream"
-                          onClick={() => setIsModalVisible(true)}
-                          style={{ width: '170px' }}
-                          margin={{ top: '18px' }}
-                        />
                       </Box>
                     )}
                   </Box>
@@ -143,23 +148,6 @@ export const AutoInvest = () => {
           </Box>
         )}
       </ResponsiveContext.Consumer>
-      {isModalVisible && (
-        <Layer
-          onEsc={() => setIsModalVisible(false)}
-          onClickOutside={() => setIsModalVisible(false)}
-        >
-          <Modal
-            chain={EChain.POLYGON}
-            heading="Auto-Invest"
-            isLoading={false}
-            closeAction={() => setIsModalVisible(false)}
-          >
-            <Tab title="Auto-Invest">
-              <AutoInvestTab />
-            </Tab>
-          </Modal>
-        </Layer>
-      )}
     </Layout>
   );
 };

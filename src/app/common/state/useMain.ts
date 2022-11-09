@@ -1,9 +1,9 @@
 import {
+  getBalanceOf,
   getBoosterFarmInterest,
   getChainById,
   getCurrentChainId,
   getInterest,
-  getSupportedTokensAdvancedInfo,
   getSupportedTokensBasicInfo,
   getSupportedTokensList,
   getTotalAssets,
@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
 import { getValueOf1LPinUSDC } from '../functions/farm';
-import { roundNumberDown, toExactFixed } from '../functions/utils';
+import { toExactFixed } from '../functions/utils';
 import { TFarm } from '../types/farm';
 import { TAssetsInfo } from '../types/heading';
 import { initialAvailableFarmsState } from './farm/useFarm';
@@ -68,8 +68,7 @@ export const useMain = () => {
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
     try {
-      let numberOfAssets = 0;
-      let chainsWithAssets = new Set();
+      let supportedTokensWithBalance = new Array<any>();
       let allSupportedTokens = new Set<string>();
 
       await Promise.all(
@@ -91,18 +90,12 @@ export const useMain = () => {
             });
 
             if (walletAccountAtom) {
-              supportedTokens.map(async supportedToken => {
-                const advancedSupportedTokenInfo =
-                  await getSupportedTokensAdvancedInfo(
-                    availableFarm.farmAddress,
-                    supportedToken,
-                    availableFarm.chain,
-                  );
-                if (Number(advancedSupportedTokenInfo.balance) > 0) {
-                  numberOfAssets++;
-                  chainsWithAssets.add(availableFarm.chain);
-                }
-              });
+              for (const supportedToken of supportedTokens) {
+                supportedTokensWithBalance.push({
+                  ...supportedToken,
+                  chain: availableFarm.chain,
+                });
+              }
             }
 
             availableFarm.interest = interest;
@@ -111,7 +104,38 @@ export const useMain = () => {
             availableFarm.depositedAmount = depositedAmount;
             availableFarm.poolShare = poolShare;
           }),
-      ).then(() => {
+      ).then(async () => {
+        let numberOfAssets = 0;
+        let chainsWithAssets = new Set();
+
+        if (walletAccountAtom) {
+          const uniqueSupportedTokensWithBalance =
+            supportedTokensWithBalance.filter(
+              (value, index, self) =>
+                index ===
+                self.findIndex(
+                  t =>
+                    t.tokenAddress === value.tokenAddress &&
+                    t.chain === value.chain,
+                ),
+            );
+
+          await Promise.all(
+            uniqueSupportedTokensWithBalance.map(
+              async supportedTokenWithBalance => {
+                const balance = await getBalanceOf(
+                  supportedTokenWithBalance.tokenAddress,
+                  supportedTokenWithBalance.decimals,
+                  supportedTokenWithBalance.chain,
+                );
+                if (+toExactFixed(balance,2) > 0) {
+                  numberOfAssets++;
+                  chainsWithAssets.add(supportedTokenWithBalance.chain);
+                }
+              },
+            ),
+          );
+        }
         setAssetsInfo({
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
@@ -142,8 +166,7 @@ export const useMain = () => {
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
-              Number(farmInfo.depositedAmount) /
-                Number(farmInfo.totalAssetSupply),
+              (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
               2,
             )
           : 0;
@@ -159,14 +182,16 @@ export const useMain = () => {
       farm.lPTokenAddress,
       farm.chain,
     );
-    
+
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
-        farm.convexFarmIds,
+        farm.apyFarmAddresses,
         farm.chain,
       ),
-      totalAssetSupply: +(await getTotalAssets(farm.farmAddress, farm.chain)) * valueOf1LPinUSDC,
+      totalAssetSupply:
+        +(await getTotalAssets(farm.farmAddress, farm.chain)) *
+        valueOf1LPinUSDC,
       supportedTokens: await Promise.all(
         farm.supportedTokensAddresses.map(async supportedtoken => {
           return await getSupportedTokensBasicInfo(
@@ -184,14 +209,15 @@ export const useMain = () => {
       );
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount =
-        roundNumberDown(farmInfo.depositedAmountInLP * valueOf1LPinUSDC);
+      farmInfo.depositedAmount = toExactFixed(
+        farmInfo.depositedAmountInLP * valueOf1LPinUSDC,
+        2,
+      );
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
-              Number(farmInfo.depositedAmount) /
-                Number(farmInfo.totalAssetSupply),
+              (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
               2,
             )
           : 0;
@@ -220,7 +246,7 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'your'
-        ? availableFarms.filter(farm => Number(farm.depositedAmount) > 0)
+        ? availableFarms.filter(farm => +farm.depositedAmount > 0)
         : availableFarms;
 
     filteredFarms = tokenFilter
@@ -285,7 +311,6 @@ export const useMain = () => {
     if (isSafeAppAtom && walletAccountAtom) {
       const chainId = await getCurrentChainId();
       const chain = await getChainById(chainId);
-      console.log({ chain: chain, chainId: chainId });
 
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }

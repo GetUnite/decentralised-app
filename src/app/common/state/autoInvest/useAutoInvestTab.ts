@@ -1,27 +1,339 @@
+import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-    getDepositedAmount,
-    getInterest,
-    getTotalAssetSupply,
-    startStream
+  approveSuperfluidSubscriptions,
+  depositIntoAlluo,
+  getDepositedAmount,
+  getInterest,
+  getStreamFlow,
+  getTotalAssetSupply,
+  getUnapprovedSuperfluidSubscriptions,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approve,
-    getAllowance,
-    getBalanceOf,
-    getSupportedTokensBasicInfo
+  approve,
+  getAllowance,
+  getBalance,
+  getBalanceOf
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import {
+  TStreamCreationStep,
+  TStreamOption,
+  TSupportedStreamToken
+} from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
-import { streamOptions, streamToOptions } from './useAutoInvest';
+
+const streamOptions: TStreamOption[] = [
+  // from USD options
+  {
+    // USD Farm to ETH
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'ETH',
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    fromAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // USD Farm to BTC
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'BTC',
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    fromAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // USDC to ETH
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'ETH',
+    fromAddress: EPolygonAddresses.USDC,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // USDC to BTC
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'BTC',
+    fromAddress: EPolygonAddresses.USDC,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // DAI to ETH
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'ETH',
+    fromAddress: EPolygonAddresses.DAI,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // DAI to BTC
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'BTC',
+    fromAddress: EPolygonAddresses.DAI,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // USDT to ETH
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'ETH',
+    fromAddress: EPolygonAddresses.USDT,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  {
+    // USDT to BTC
+    fromLabel: 'USD',
+    fromSign: '$',
+    toLabel: 'BTC',
+    fromAddress: EPolygonAddresses.USDT,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.USDC,
+  },
+  // from BTC options
+  {
+    // BTC Farm to USD
+    fromLabel: 'BTC',
+    fromSign: '₿',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.IBALLUOBTC,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.WBTC,
+  },
+  {
+    // WBTC to USD
+    fromLabel: 'BTC',
+    fromSign: '₿',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.WBTC,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+    underlyingTokenAddress: EPolygonAddresses.WBTC,
+  },
+  // from ETH options
+  {
+    // ETH Farm to USD
+    fromLabel: 'ETH',
+    fromSign: 'Ξ',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.IBALLUOETH,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.WETH,
+  },
+  {
+    // WETH to USD
+    fromLabel: 'ETH',
+    fromSign: 'Ξ',
+    toLabel: 'USD',
+    fromAddress: EPolygonAddresses.WETH,
+    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOETH,
+    fromIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
+    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+    underlyingTokenAddress: EPolygonAddresses.WETH,
+  },
+];
+
+const streamFromOptions: TSupportedStreamToken[] = [
+  {
+    label: 'Your USD farm',
+    address: EPolygonAddresses.IBALLUOUSD,
+    decimals: 18,
+    sign: '$',
+    isStreamable: true,
+    canStreamTo: [
+      {
+        label: 'BTC',
+        address: EPolygonAddresses.IBALLUOBTC,
+        sign: '₿',
+      },
+      {
+        label: 'ETH',
+        address: EPolygonAddresses.IBALLUOETH,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    label: 'USDC',
+    address: EPolygonAddresses.USDC,
+    decimals: 6,
+    sign: '$',
+    canStreamTo: [
+      {
+        label: 'BTC',
+        address: EPolygonAddresses.IBALLUOBTC,
+        sign: '₿',
+      },
+      {
+        label: 'ETH',
+        address: EPolygonAddresses.IBALLUOETH,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    label: 'DAI',
+    address: EPolygonAddresses.DAI,
+    decimals: 18,
+    sign: '$',
+    canStreamTo: [
+      {
+        label: 'BTC',
+        address: EPolygonAddresses.IBALLUOBTC,
+        sign: '₿',
+      },
+      {
+        label: 'ETH',
+        address: EPolygonAddresses.IBALLUOETH,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    label: 'USDT',
+    address: EPolygonAddresses.USDT,
+    decimals: 6,
+    sign: '$',
+    canStreamTo: [
+      {
+        label: 'BTC',
+        address: EPolygonAddresses.IBALLUOBTC,
+        sign: '₿',
+      },
+      {
+        label: 'ETH',
+        address: EPolygonAddresses.IBALLUOETH,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    label: 'Your ETH farm',
+    address: EPolygonAddresses.IBALLUOETH,
+    decimals: 18,
+    sign: 'Ξ',
+    isStreamable: true,
+    canStreamTo: [
+      {
+        label: 'USD',
+        address: EPolygonAddresses.IBALLUOUSD,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    label: 'WETH',
+    address: EPolygonAddresses.WETH,
+    decimals: 18,
+    sign: 'Ξ',
+    canStreamTo: [
+      {
+        label: 'USD',
+        address: EPolygonAddresses.IBALLUOUSD,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    label: 'Your BTC farm',
+    address: EPolygonAddresses.IBALLUOBTC,
+    decimals: 18,
+    sign: '₿',
+    isStreamable: true,
+    canStreamTo: [
+      {
+        label: 'USD',
+        address: EPolygonAddresses.IBALLUOUSD,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    label: 'WBTC',
+    address: EPolygonAddresses.WBTC,
+    decimals: 18,
+    sign: '₿',
+    canStreamTo: [
+      {
+        label: 'USD',
+        address: EPolygonAddresses.IBALLUOUSD,
+        sign: '$',
+      },
+    ],
+  },
+];
+
+const possibleStreamCreationSteps: TStreamCreationStep[] = [
+  { id: 0, label: 'Approve' },
+  { id: 1, label: 'Deposit' },
+  { id: 2, label: 'Ricochet exchange set-up' },
+  { id: 3, label: 'Start stream' },
+];
 
 export const useAutoInvestTab = () => {
-  // Atoms
+  // react
+  const navigate = useNavigate();
+
+  // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
@@ -30,16 +342,20 @@ export const useAutoInvestTab = () => {
   const { setNotificationt } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(false); //useState(isSafeAppAtom ? false : true);
 
-  // keep allowance separated since it changes everytime etiher the "from" or "to" changes
-  const [allowance, setAllowance] = useState<string>();
+  // stream
+  const [possibleStreamOptions, setPossibleStreamOptions] = useState<
+    TStreamOption[]
+  >([]);
+  const [selectedStreamOption, setSelectedStreamOption] =
+    useState<TStreamOption>();
 
   // stream from
   const [supportedFromTokens, setSupportedFromTokens] =
-    useState<TSupportedToken[]>();
+    useState<TSupportedStreamToken[]>();
   const [selectedSupportedFromToken, setSelectedSupportedFromToken] =
-    useState<TSupportedToken>();
+    useState<TSupportedStreamToken>();
 
   // stream to
   const [supportedToTokens, setSupportedToTokens] =
@@ -53,75 +369,177 @@ export const useAutoInvestTab = () => {
   const [streamValueError, setStreamValueError] = useState<string>('');
   const [useEndDate, setUseEndDate] = useState<boolean>(false);
   const [endDate, setEndDate] = useState<string>();
-  const [endDateError, setEndDateError] = useState<string>();
+  const [endDateError, setEndDateError] = useState<string>('');
+
+  // stream creation steps
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [selectedStreamOptionSteps, setSelectedStreamOptionSteps] =
+    useState<TStreamCreationStep[]>();
+  const [
+    unapprovedSuperfluidSubscriptions,
+    setUnapprovedSuperfluidSubscriptions,
+  ] = useState<any[]>([]);
 
   // loading control
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUpdating, setIsUpdating] = useState<boolean>(true);
   const [isStartingStream, setIsStartingStream] = useState<boolean>(false);
   const [isFetchingFarmInfo, setIsFetchingFarmInfo] = useState<boolean>(false);
   const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isDepositing, setIsDepositing] = useState<boolean>(false);
+  const [isUpdatingSelectedStreamOption, setIsUpdatingSelectedStreamOption] =
+    useState<boolean>(false);
 
+  // updates the entire modal
   useEffect(() => {
     if (walletAccountAtom) {
-      setWantedChainAtom(EChain.POLYGON);
-      updateAutoInvestInfo();
+      (async () => {
+        // sets the wanted chain as Polygon
+        setWantedChainAtom(EChain.POLYGON);
+
+        const possibleStreamOptionsArray: TStreamOption[] = [];
+
+        // logic that saves the possible stream combinations
+        for (let i = 0; i < streamOptions.length; i++) {
+          const streamOption = streamOptions[i];
+
+          // checks if there is any stream flow to that "to" address
+          const streamFlow = await getStreamFlow(
+            streamOption.fromStIbAlluoAddress,
+            streamOption.ricochetMarketAddress,
+          );
+          // if there is no value streaming add a combination of every "from" to this "to"
+          if (!(+streamFlow.flowPerSecond > 0)) {
+            // push the "to" into the possible "to" tokens
+
+            // push the combination into the possible stream combinations array
+            possibleStreamOptionsArray.push(streamOption);
+          }
+        }
+
+        // these are now the possible combinations till the user refreshes or the account changes
+        setPossibleStreamOptions(possibleStreamOptionsArray);
+
+        // these are now the possible "from" choises till the user refreshes or the account changes
+        const possibleStreamOptionsArrayAddresses =
+          possibleStreamOptionsArray.map(psoafa => {
+            return {
+              fromAddress: psoafa.fromAddress,
+              toAddress: psoafa.toIbAlluoAddress,
+            };
+          });
+        const supportedFromTokensArray: TSupportedStreamToken[] =
+          await Promise.all(
+            streamFromOptions
+              .filter(streamFromOption =>
+                possibleStreamOptionsArrayAddresses.find(
+                  psoafa => psoafa.fromAddress == streamFromOption.address,
+                ),
+              )
+              .map(async streamFromOption => {
+                return {
+                  ...streamFromOption,
+                  balance: streamFromOption.isStreamable
+                    ? await getBalance(
+                        streamFromOption.address,
+                        streamFromOption.decimals,
+                      )
+                    : await getBalanceOf(
+                        streamFromOption.address,
+                        streamFromOption.decimals,
+                      ),
+                  canStreamTo: streamFromOption.canStreamTo.filter(cst =>
+                    possibleStreamOptionsArrayAddresses.find(
+                      psoata => psoata.toAddress == cst.address,
+                    ),
+                  ),
+                };
+              }),
+          );
+
+        setSupportedFromTokens(supportedFromTokensArray);
+        // set the first from the possible "from" tokens as the selected
+        const selectedFrom = supportedFromTokensArray[0];
+        setSelectedSupportedFromToken(selectedFrom);
+
+        // sets the "to" tokens as the ones that can be streamed to from the first possible "from"
+        setSupportedToTokens(selectedFrom.canStreamTo);
+        // sets the selected "to" token as the first from the possible "to"
+        const selectedTo = selectedFrom.canStreamTo[0];
+        setSelectedSupportedToToken(selectedTo);
+
+        //update the farm info aswell
+        const targetFarmInfo = await fetchFarmInfo(selectedTo);
+        setTargetFarmInfo(targetFarmInfo);
+
+        setIsUpdating(false);
+      })();
     }
   }, [walletAccountAtom]);
 
-  useEffect(() => {
-    if (walletAccountAtom && selectedSupportedFromToken) {
-      updateSupportedToTokens(selectedSupportedFromToken);
-    }
-  }, [selectedSupportedFromToken]);
-
+  // updates the selectes stream option when either the "from" or "to" tokens change
   useEffect(() => {
     if (
       walletAccountAtom &&
       selectedSupportedFromToken &&
       selectedSupportedToToken
     ) {
-      updateAllowance();
+      const updateSelectedStreamCombination = async () => {
+        setIsUpdatingSelectedStreamOption(true);
+
+        const newSelectedStreamOption = possibleStreamOptions.find(
+          pstc =>
+            pstc.fromAddress == selectedSupportedFromToken.address &&
+            pstc.toIbAlluoAddress == selectedSupportedToToken.address,
+        );
+        if (newSelectedStreamOption) {
+          setSelectedStreamOption(newSelectedStreamOption);
+
+          let neededSteps: TStreamCreationStep[] = [];
+          // First step is always approve when there is a need for deposit
+          if (!selectedSupportedFromToken.isStreamable) {
+            const allowance = await getAllowance(
+              selectedSupportedFromToken.address,
+              newSelectedStreamOption.toIbAlluoAddress,
+            );
+            if (!(+allowance > 0)) {
+              neededSteps.push(possibleStreamCreationSteps[0]);
+            }
+          }
+          // Deposit step if its not one of the iballuo
+          if (!selectedSupportedFromToken.isStreamable) {
+            neededSteps.push(possibleStreamCreationSteps[1]);
+          }
+          // subscriptions to superfluid contracts
+          const subscriptionOperations =
+            await getUnapprovedSuperfluidSubscriptions(
+              newSelectedStreamOption.fromIbAlluoAddress,
+              newSelectedStreamOption.fromStIbAlluoAddress,
+              newSelectedStreamOption.toStIbAlluoAddress,
+              newSelectedStreamOption.ricochetMarketAddress,
+            );
+          if (subscriptionOperations.length > 0) {
+            setUnapprovedSuperfluidSubscriptions(subscriptionOperations);
+            neededSteps.push(possibleStreamCreationSteps[2]);
+          }
+          // start stream finishs the steps
+          neededSteps.push(possibleStreamCreationSteps[3]);
+
+          setSelectedStreamOptionSteps(neededSteps);
+        }
+        setIsUpdatingSelectedStreamOption(false);
+      };
+      // Check the stream value against the new "from" token
+      if (+streamValue > 0) {
+        validateInputs(streamValue);
+      }
+      // Only update if we didn't take the first step yet, after that info is updated on a need basis
+      if (!(currentStep > 0)) {
+        updateSelectedStreamCombination();
+      }
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 
-  const updateSupportedToTokens = async selectedFromToken => {
-    // streaming data of the selected from token
-    const streamOption = streamOptions.find(streamOption =>
-      streamOption.from
-        .map(option => option.address)
-        .includes(selectedFromToken.address),
-    );
-
-    // the addresses to which the from token can stream to
-    const toAddresses = streamOption.to.map(so => so.ibAlluoAddress);
-
-    // if there is a stream from the new "from" to the already selected "to" only update the allowance
-    if (toAddresses.includes(selectedSupportedToToken?.address)) {
-      return;
-    }
-
-    const toSupportedtokens = streamToOptions.filter(supportedToken =>
-      toAddresses.includes(supportedToken.address),
-    );
-
-    setSupportedToTokens(toSupportedtokens);
-
-    // select the first of to tokens
-    setSelectedSupportedToToken(toSupportedtokens[0]);
-
-    setTargetFarmInfo(await fetchFarmInfo(toSupportedtokens[0]));
-  };
-
-  const updateAllowance = async () => {
-    setAllowance(
-      await getAllowance(
-        selectedSupportedFromToken.address,
-        selectedSupportedToToken.address,
-      ),
-    );
-  };
-
-  const handleStreamValueChange = value => {
+  const validateInputs = value => {
     setStreamValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setStreamValueError('Write a valid number');
@@ -131,6 +549,7 @@ export const useAutoInvestTab = () => {
     setStreamValue(value);
   };
 
+  // updates target farm info
   const fetchFarmInfo = async selectedToToken => {
     let farmInfo;
     farmInfo = {
@@ -147,47 +566,18 @@ export const useAutoInvestTab = () => {
     return farmInfo;
   };
 
-  const updateAutoInvestInfo = async () => {
-    setIsLoading(true);
-
-    if (walletAccountAtom) {
-      let supportedFromTokensArray = [];
-
-      for (const streamOption of streamOptions) {
-        for (const supportedToken of streamOption.from) {
-          const basicSupportedTokenInfo = await getSupportedTokensBasicInfo(
-            supportedToken.address,
-            EChain.POLYGON,
-          );
-          supportedFromTokensArray.push({
-            label: supportedToken.label,
-            address: basicSupportedTokenInfo.tokenAddress,
-            balance: await getBalanceOf(
-              basicSupportedTokenInfo.tokenAddress,
-              basicSupportedTokenInfo.decimals,
-            ),
-            decimals: basicSupportedTokenInfo.decimals,
-            sign: supportedToken.sign,
-          });
-        }
-      }
-
-      // set the from supported tokens and the first as the default selected
-      setSupportedFromTokens(supportedFromTokensArray);
-      const selectedSupportedToken = supportedFromTokensArray[0];
-      setSelectedSupportedFromToken(selectedSupportedToken);
-
-      // updates supported to tokens
-      await updateSupportedToTokens(selectedSupportedToken);
-    }
-
-    setIsLoading(false);
-  };
-
-  const selectSupportedFromToken = supportedFromToken => {
+  // the "from" token was changed
+  const selectSupportedFromToken = (
+    supportedFromToken: TSupportedStreamToken,
+  ) => {
     setSelectedSupportedFromToken(supportedFromToken);
+    // updates the list of possible "to" tokens
+    setSupportedToTokens(supportedFromToken.canStreamTo);
+    // changes the "to" token to the first one on the list
+    selectSupportedToToken(supportedFromToken.canStreamTo[0]);
   };
 
+  // the "to" token was changed
   const selectSupportedToToken = async supportedToToken => {
     setSelectedSupportedToToken(supportedToToken);
     setIsFetchingFarmInfo(true);
@@ -195,16 +585,20 @@ export const useAutoInvestTab = () => {
     setIsFetchingFarmInfo(false);
   };
 
+  // approve deposit from the "from" token into the underlying iballuo token
   const handleApprove = async () => {
     setIsApproving(true);
 
     try {
+      // TODO: currently biconomy doesn't work here
       await approve(
         selectedSupportedFromToken.address,
         selectedSupportedToToken.address,
         EChain.POLYGON,
+        //useBiconomy,
       );
-      await updateAllowance();
+      // Next step
+      setCurrentStep(currentStep + 1);
       setNotificationt('Approved successfully', 'success');
     } catch (err) {
       setNotificationt(err, 'error');
@@ -213,41 +607,73 @@ export const useAutoInvestTab = () => {
     setIsApproving(false);
   };
 
+  // approve superfluid subscriptions that allow the creation of streams
+  const handleSuperfluidStreamApprove = async () => {
+    setIsApproving(true);
+
+    try {
+      // TODO: currently biconomy doesn't work here
+      await approveSuperfluidSubscriptions(
+        unapprovedSuperfluidSubscriptions,
+        useBiconomy,
+      );
+      // Next step
+      setCurrentStep(currentStep + 1);
+      setNotificationt('Approved successfully', 'success');
+    } catch (err) {
+      setNotificationt(err, 'error');
+    }
+
+    setIsApproving(false);
+  };
+
+  // deposit form the "from" token into the underlying iballuo token
+  const handleDeposit = async () => {
+    setIsDepositing(true);
+
+    try {
+      const tx = await depositIntoAlluo(
+        selectedSupportedFromToken.address,
+        selectedStreamOption.fromIbAlluoAddress,
+        streamValue,
+        useBiconomy,
+      );
+      // Next step
+      setCurrentStep(currentStep + 1);
+      // update "from" token balance
+      const balance = await getBalanceOf(
+        selectedSupportedFromToken.address,
+        selectedSupportedFromToken.decimals,
+      );
+      setSelectedSupportedFromToken({
+        ...selectedSupportedFromToken,
+        balance: balance,
+      });
+      setNotificationt('Deposit successfully', 'success');
+    } catch (err) {
+      setNotificationt(err, 'error');
+    }
+
+    setIsDepositing(false);
+  };
+
+  // start stream functions
   const handleStartStream = async () => {
     setIsStartingStream(true);
 
     try {
-      // the complete selected stream data
-      const selectedStreamOption = streamOptions.find(
-        streamOption =>
-          streamOption.from
-            .map(so => so.address)
-            .includes(selectedSupportedFromToken.address) &&
-          streamOption.to
-            .map(so => so.ibAlluoAddress)
-            .includes(selectedSupportedToToken.address),
-      );
       // data from the selected output
-      const selectedTo = selectedStreamOption.to.find(
-        sso => sso.ibAlluoAddress == selectedSupportedToToken.address,
-      );
-      /*await depositIntoAlluo(
-        selectedSupportedFromToken.address,
-        selectedStreamOption.ibAlluoAddress,
-        streamValue,
-        useBiconomy,
-      );*/
       await startStream(
-        selectedStreamOption.ibAlluoAddress,
-        selectedStreamOption.stIbAlluoAddress,
-        selectedTo.stIbAlluoAddress,
-        selectedTo.ricochetMarketAddress,
-        +streamValue / 2592000,
-        endDate ? new Date(endDate).getTime() : null,
+        selectedStreamOption.fromIbAlluoAddress,
+        selectedStreamOption.fromStIbAlluoAddress,
+        selectedStreamOption.toStIbAlluoAddress,
+        selectedStreamOption.ricochetMarketAddress,
+        +streamValue,
+        useEndDate ? new Date(endDate).getTime() : null,
         useBiconomy,
       );
-      setStreamValue(undefined);
       setNotificationt('Stream started successfully', 'success');
+      navigate('/autoinvest');
     } catch (error) {
       setNotificationt(error, 'error');
     }
@@ -255,31 +681,62 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(false);
   };
 
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    const currentStreamCreationStep = possibleStreamCreationSteps.find(
+      possibleStreamCreationStep =>
+        possibleStreamCreationStep.id ==
+        selectedStreamOptionSteps[currentStep].id,
+    );
+
+    switch (currentStreamCreationStep.id) {
+      case 0:
+        await handleApprove();
+        break;
+
+      case 1:
+        await handleDeposit();
+        break;
+
+      case 2:
+        await handleSuperfluidStreamApprove();
+        break;
+
+      case 3:
+        await handleStartStream();
+        break;
+      default:
+        break;
+    }
+  };
+
   return {
-    selectedSupportedFromToken,
+    // loading control
+    isLoading: isUpdating || isStartingStream || isApproving || isDepositing,
+    isFetchingFarmInfo,
+    isUpdatingSelectedStreamOption,
+    // error control
     hasErrors: streamValueError != '' || endDateError != '',
-    streamValueError,
+    // inputs
+    disableInputs: currentStep > 0,
     streamValue,
-    handleStreamValueChange,
-    isLoading,
+    validateInputs,
+    selectedSupportedFromToken,
+    streamValueError,
     selectSupportedFromToken,
     supportedFromTokens,
-    handleStartStream,
-    isStartingStream,
     supportedToTokens,
     selectedSupportedToToken,
     selectSupportedToToken,
     targetFarmInfo,
-    setUseBiconomy,
     useBiconomy,
+    setUseBiconomy,
     useEndDate,
     setUseEndDate,
     endDate,
-    endDateError,
     setEndDate,
-    allowance,
-    isApproving,
-    handleApprove,
-    isFetchingFarmInfo,
+    currentStep,
+    selectedStreamOptionSteps,
+    handleCurrentStep,
   };
 };

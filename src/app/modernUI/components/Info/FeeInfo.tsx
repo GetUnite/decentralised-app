@@ -8,6 +8,7 @@ export const FeeInfo = ({
   biconomyToggle = true,
   useBiconomy,
   setUseBiconomy,
+  disableBiconomy = false,
   ...rest
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
@@ -27,6 +28,7 @@ export const FeeInfo = ({
           <BiconomyToggle
             useBiconomy={useBiconomy}
             setUseBiconomy={setUseBiconomy}
+            disabled={disableBiconomy}
           />
         )}
       </div>

@@ -22,9 +22,9 @@ import {
   getUserDepositedAmount,
   getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -63,7 +63,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
     ],
     lowSlippageTokenLabels: ['FRAX', 'USDC'],
-    convexFarmIds: { A: 100, B: 64 },
+    apyFarmAddresses: { baseApyAddress: "bd072651-d99c-4154-aeae-51f12109c054", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 9,
@@ -95,7 +95,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
       { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
     ],
     lowSlippageTokenLabels: ['CVX', 'WETH'],
-    convexFarmIds: { A: 64, B: 64 },
+    apyFarmAddresses: { baseApyAddress: "25d9dc49-3182-493a-bda4-0db53b25f457", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 10,
@@ -128,7 +128,7 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     ],
     lowSlippageTokenLabels: [//'stETH', 
     'wETH'],
-    convexFarmIds: { A: 25, B: 64 },
+    apyFarmAddresses: { baseApyAddress: "5ce23e7e-3800-4c9c-ad30-6db3db0515a1", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
   },
   {
     id: 0,
@@ -211,6 +211,7 @@ export const useFarm = ({ id }) => {
 
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
@@ -231,8 +232,7 @@ export const useFarm = ({ id }) => {
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
 
   // information/confirmation control
-  const showBoosterFarmPresentation =
-    selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
+  const showBoosterFarmPresentation = !isSafeAppAtom && selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
 
   const previousHarvestDate = moment().day('Monday');
   const nextHarvestDate = moment().add(1, 'week').day('Monday');
@@ -255,6 +255,12 @@ export const useFarm = ({ id }) => {
   useEffect(() => {
     selectFarm(id);
   }, [walletAccountAtom]);
+
+  useEffect(() => {
+    if (walletAccountAtom && selectedFarm) {
+      //here update the actual selected token. 
+    }
+  }, [selectedSupportedToken]);
 
   const fetchFarmInfo = async farm => {
     let farmInfo;
@@ -286,7 +292,7 @@ export const useFarm = ({ id }) => {
     farmInfo = {
       interest: await getBoosterFarmInterest(
         farm.farmAddress,
-        farm.convexFarmIds,
+        farm.apyFarmAddresses,
         farm.chain,
       ),
       totalAssetSupply:

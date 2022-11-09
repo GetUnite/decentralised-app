@@ -13,36 +13,39 @@ import { Box } from 'grommet';
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
-    streamValue,
-    handleStreamValueChange,
-    selectedSupportedFromToken,
+    //loading
+    isLoading,
+    isFetchingFarmInfo,
+    isUpdatingSelectedStreamOption,
+    // errors
     hasErrors,
+    // inputs
+    disableInputs,
+    streamValue,
+    validateInputs,
+    selectedSupportedFromToken,
     streamValueError,
     selectSupportedFromToken,
     supportedFromTokens,
-    handleStartStream,
-    isStartingStream,
     supportedToTokens,
     selectedSupportedToToken,
     selectSupportedToToken,
     targetFarmInfo,
     useBiconomy,
     setUseBiconomy,
-    isLoading,
     useEndDate,
     setUseEndDate,
     endDate,
     setEndDate,
-    allowance,
-    handleApprove,
-    isApproving,
-    isFetchingFarmInfo,
+    currentStep,
+    selectedStreamOptionSteps,
+    handleCurrentStep
   } = useAutoInvestTab();
 
   return (
     <Box fill>
-      <Box style={{ minHeight: '382px' }} justify="center">
-        {isLoading || isStartingStream || isApproving ? (
+      <Box style={{ minHeight: '410px' }} justify="center">
+        {isLoading ? (
           <Box
             align="center"
             justify="center"
@@ -57,7 +60,7 @@ export const AutoInvestTab = ({ ...rest }) => {
               <StreamInput
                 label="Flow rate"
                 tokenSign={selectedSupportedFromToken?.sign}
-                onValueChange={handleStreamValueChange}
+                onValueChange={validateInputs}
                 value={streamValue}
                 maxValue={selectedSupportedFromToken?.balance}
                 fromTokenOptions={supportedFromTokens}
@@ -67,22 +70,29 @@ export const AutoInvestTab = ({ ...rest }) => {
                 selectedToToken={selectedSupportedToToken}
                 setSelectedToToken={selectSupportedToToken}
                 error={streamValueError}
+                disabled={disableInputs}
               />
               <RightAlignToggle
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
+                disabled={disableInputs}
               />
               {useEndDate && (
                 <DateInput
                   label="End date"
                   date={endDate}
                   setDate={setEndDate}
+                  disabled={disableInputs}
                 />
               )}
             </Box>
-            <Box margin={{ top: 'medium' }} style={{minHeight:"224px"}} justify="center">
-              {isFetchingFarmInfo ? (
+            <Box
+              margin={{ top: 'medium' }}
+              style={{ minHeight: '224px' }}
+              justify="center"
+            >
+              {isFetchingFarmInfo || isUpdatingSelectedStreamOption ? (
                 <Box align="center" justify="center" fill="vertical">
                   <Spinner pad="large" />
                 </Box>
@@ -105,6 +115,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                   <FeeInfo
                     useBiconomy={useBiconomy}
                     setUseBiconomy={setUseBiconomy}
+                    disableBiconomy={true}
                     showWalletFee={!useBiconomy}
                   />
                 </>
@@ -116,11 +127,21 @@ export const AutoInvestTab = ({ ...rest }) => {
       <Box margin={{ top: 'large' }}>
         <SubmitButton
           primary
-          disabled={false}
-          label="Start stream"
-          onClick={
-            handleStartStream 
+          disabled={
+            isLoading ||
+            hasErrors ||
+            isUpdatingSelectedStreamOption ||
+            !(+streamValue > 0)
           }
+          label={
+            isLoading || isUpdatingSelectedStreamOption
+              ? 'Loading...'
+              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps?.length}: ${
+                selectedStreamOptionSteps[currentStep]?.label
+                }`
+          }
+          onClick={handleCurrentStep}
+          glowing={currentStep > 0}
         />
       </Box>
     </Box>

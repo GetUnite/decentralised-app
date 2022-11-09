@@ -1,1 +1,2 @@
-export * from './AutoInvest';
+export * from './AutoInvestRoutes';
+
