@@ -386,10 +386,8 @@ export const useAutoInvestTab = () => {
   const [isFetchingFarmInfo, setIsFetchingFarmInfo] = useState<boolean>(false);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [
-    isUpdatingSelectedStreamOption,
-    setIsUpdatingSelectedStreamOption,
-  ] = useState<boolean>(false);
+  const [isUpdatingSelectedStreamOption, setIsUpdatingSelectedStreamOption] =
+    useState<boolean>(false);
 
   // updates the entire modal
   useEffect(() => {
@@ -422,16 +420,19 @@ export const useAutoInvestTab = () => {
         setPossibleStreamOptions(possibleStreamOptionsArray);
 
         // these are now the possible "from" choises till the user refreshes or the account changes
-        const possibleStreamOptionsArrayFromAddresses =
-          possibleStreamOptionsArray.map(psoafa => psoafa.fromAddress);
-        const possibleStreamOptionsArrayToAddresses =
-          possibleStreamOptionsArray.map(psoafa => psoafa.toIbAlluoAddress);
+        const possibleStreamOptionsArrayAddresses =
+          possibleStreamOptionsArray.map(psoafa => {
+            return {
+              fromAddress: psoafa.fromAddress,
+              toAddress: psoafa.toIbAlluoAddress,
+            };
+          });
         const supportedFromTokensArray: TSupportedStreamToken[] =
           await Promise.all(
             streamFromOptions
               .filter(streamFromOption =>
-                possibleStreamOptionsArrayFromAddresses.find(
-                  psoafa => psoafa == streamFromOption.address,
+                possibleStreamOptionsArrayAddresses.find(
+                  psoafa => psoafa.fromAddress == streamFromOption.address,
                 ),
               )
               .map(async streamFromOption => {
@@ -447,8 +448,8 @@ export const useAutoInvestTab = () => {
                         streamFromOption.decimals,
                       ),
                   canStreamTo: streamFromOption.canStreamTo.filter(cst =>
-                    possibleStreamOptionsArrayToAddresses.find(
-                      psoata => psoata == cst.address,
+                    possibleStreamOptionsArrayAddresses.find(
+                      psoata => psoata.toAddress == cst.address,
                     ),
                   ),
                 };
