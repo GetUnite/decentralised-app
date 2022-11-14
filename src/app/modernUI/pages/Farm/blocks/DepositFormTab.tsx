@@ -11,7 +11,7 @@ import {
 import { Box } from 'grommet';
 import { TopHeader } from './TopHeader';
 
-export const DepositForm = ({
+export const DepositFormTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -38,6 +38,7 @@ export const DepositForm = ({
         style={{
           minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
         }}
+        justify="center"
       >
         {isLoading || !selectedSupportedToken || isApproving || isDepositing ? (
           <Box

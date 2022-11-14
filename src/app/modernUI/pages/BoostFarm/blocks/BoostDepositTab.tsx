@@ -11,7 +11,7 @@ import {
 import { Box } from 'grommet';
 import { TopHeader } from './TopHeader';
 
-export const DepositForm = ({
+export const BoostDepositTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -55,11 +55,7 @@ export const DepositForm = ({
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
                   label={'Deposit ' + selectedSupportedToken.label}
-                  tokenSign={
-                    selectedFarm.isBooster
-                      ? selectedSupportedToken.sign
-                      : selectedFarm.sign
-                  }
+                  tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
                   maxValue={selectedSupportedToken?.balance}

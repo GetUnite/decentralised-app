@@ -9,10 +9,10 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { BoosterFarmWithdrawalConfirmation } from './BoosterFarmWithdrawalConfirmation';
+import { BoostFarmWithdrawalConfirmation } from './BoostFarmWithdrawalConfirmation';
 import { TopHeader } from './TopHeader';
 
-export const WithdrawalForm = ({
+export const BoostFarmWithdrawalTab = ({
   selectedFarm,
   isLoading,
   updateFarmInfo,
@@ -54,7 +54,7 @@ export const WithdrawalForm = ({
         justify="center"
       >
         {showBoosterWithdrawalConfirmation ? (
-          <BoosterFarmWithdrawalConfirmation
+          <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
             withdrawTokenLabel={selectedSupportedToken.label}

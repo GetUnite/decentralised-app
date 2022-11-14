@@ -12,15 +12,16 @@ import {
   getUserDepositedLPAmount
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
+import { boostFarmOptions } from 'app/common/state/boostFarm';
+import { farmOptions } from 'app/common/state/farm/useFarm';
+import { useNotification } from 'app/common/state/useNotification';
+import { TFarm } from 'app/common/types/farm';
+import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
 import { getValueOf1LPinUSDC } from '../functions/farm';
 import { toExactFixed } from '../functions/utils';
-import { TFarm } from '../types/farm';
-import { TAssetsInfo } from '../types/heading';
-import { initialAvailableFarmsState } from './farm/useFarm';
-import { useNotification } from './useNotification';
 
 export const useMain = () => {
   // atoms
@@ -29,9 +30,8 @@ export const useMain = () => {
 
   const { resetNotification } = useNotification();
 
-  const [availableFarms, setAvailableFarms] = useState<TFarm[]>(
-    initialAvailableFarmsState,
-  );
+  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([]);
+
   const [networkFilter, setNetworkFilter] = useState<string>();
   const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
@@ -68,43 +68,43 @@ export const useMain = () => {
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
     try {
-      let supportedTokensWithBalance = new Array<any>();
-      let allSupportedTokens = new Set<string>();
-
+      const supportedTokensWithBalance = new Array<any>();
+      const allSupportedTokens = new Set<string>();
+      
       await Promise.all(
-        initialAvailableFarmsState
-          .filter(x => true)
-          .map(async availableFarm => {
-            const {
-              interest,
-              totalAssetSupply,
-              supportedTokens,
-              depositedAmount,
-              poolShare,
-            } = availableFarm.isBooster
-              ? await fetchBoosterFarmInfo(availableFarm)
-              : await fetchFarmInfo(availableFarm);
+        [...boostFarmOptions, ...farmOptions].map(async availableFarm => {
+          const {
+            interest,
+            totalAssetSupply,
+            supportedTokens,
+            depositedAmount,
+            poolShare,
+          } = availableFarm.isBooster
+            ? await fetchBoosterFarmInfo(availableFarm)
+            : await fetchFarmInfo(availableFarm);
 
-            supportedTokens.map(async supportedToken => {
-              allSupportedTokens.add(supportedToken.symbol);
-            });
+          supportedTokens.map(async supportedToken => {
+            allSupportedTokens.add(supportedToken.symbol);
+          });
 
-            if (walletAccountAtom) {
-              for (const supportedToken of supportedTokens) {
-                supportedTokensWithBalance.push({
-                  ...supportedToken,
-                  chain: availableFarm.chain,
-                });
-              }
+          if (walletAccountAtom) {
+            for (const supportedToken of supportedTokens) {
+              supportedTokensWithBalance.push({
+                ...supportedToken,
+                chain: availableFarm.chain,
+              });
             }
+          }
 
-            availableFarm.interest = interest;
-            availableFarm.totalAssetSupply = totalAssetSupply;
-            availableFarm.supportedTokens = supportedTokens;
-            availableFarm.depositedAmount = depositedAmount;
-            availableFarm.poolShare = poolShare;
-          }),
-      ).then(async () => {
+          availableFarm.interest = interest;
+          availableFarm.totalAssetSupply = totalAssetSupply;
+          availableFarm.supportedTokens = supportedTokens;
+          availableFarm.depositedAmount = depositedAmount;
+          availableFarm.poolShare = poolShare;
+
+          return availableFarm;
+        }),
+      ).then(async (mappedFarms) => {
         let numberOfAssets = 0;
         let chainsWithAssets = new Set();
 
@@ -128,7 +128,7 @@ export const useMain = () => {
                   supportedTokenWithBalance.decimals,
                   supportedTokenWithBalance.chain,
                 );
-                if (+toExactFixed(balance,2) > 0) {
+                if (+toExactFixed(balance, 2) > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
                 }
@@ -140,7 +140,7 @@ export const useMain = () => {
           numberOfAssets: numberOfAssets,
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
-        setAvailableFarms(availableFarms);
+        setAvailableFarms(mappedFarms);
         setAllSupportedTokens(Array.from(allSupportedTokens));
       });
     } catch (error) {
