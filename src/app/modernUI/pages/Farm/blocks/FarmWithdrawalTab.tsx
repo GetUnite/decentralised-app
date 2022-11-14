@@ -43,7 +43,6 @@ export const FarmWithdrawalTab = ({
         }}
         justify="center"
       >
-        (
         <>
           {isLoading ||
           !selectedSupportedToken ||

@@ -1,5 +1,3 @@
-import { toExactFixed } from 'app/common/functions/utils';
-import { walletAccount } from 'app/common/state/atoms';
 import { useFarm } from 'app/common/state/farm';
 import {
   Layout,
@@ -8,36 +6,20 @@ import {
 } from 'app/modernUI/components';
 import { ResponsiveContext } from 'grommet';
 import { useParams } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
 import {
-  DepositForm,
+  DepositFormTab,
   FarmWithdrawalTab
 } from './blocks';
 
 export const Farm = () => {
   const { id } = useParams();
 
-  const [walletAccountAtom] = useRecoilState(walletAccount);
   const {
     selectedFarm,
     updateFarmInfo,
     isLoading,
     selectSupportedToken,
     selectedSupportedToken,
-    seeRewardsAsStable,
-    setSeeRewardsAsStable,
-    claimRewards,
-    isClamingRewards,
-    isLoadingRewards,
-    showBoosterFarmPresentation,
-    showTabs,
-    previousHarvestDate,
-    nextHarvestDate,
-    showBoosterWithdrawalConfirmation,
-    startBoosterWithdrawalConfirmation,
-    cancelBoosterWithdrawalConfirmation,
-    pendingRewards,
-    losablePendingRewards,
   } = useFarm({
     id,
   });
@@ -50,11 +32,10 @@ export const Farm = () => {
             chain={selectedFarm?.chain}
             heading={selectedFarm?.name}
             showChainBadge={!isLoading}
-            noHeading={!showTabs}
           >
             <Tabs>
               <Tab title="Deposit">
-                <DepositForm
+                <DepositFormTab
                   selectedFarm={selectedFarm}
                   isLoading={isLoading}
                   updateFarmInfo={updateFarmInfo}

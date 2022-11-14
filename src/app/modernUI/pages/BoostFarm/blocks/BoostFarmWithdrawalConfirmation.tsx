@@ -2,7 +2,7 @@ import { roundNumberDown } from 'app/common/functions/utils';
 import exclamation from 'app/modernUI/images/blackExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
-export const BoosterFarmWithdrawalConfirmation = ({
+export const BoostFarmWithdrawalConfirmation = ({
   selectedFarm,
   withdrawValue,
   withdrawTokenLabel,

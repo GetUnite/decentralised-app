@@ -3,7 +3,7 @@ import { useCookies } from 'react-cookie';
 
 import booster from 'app/modernUI/images/booster.svg';
 
-export const BoosterFarmPresentation = ({
+export const BoostFarmPresentation = ({
   selectedFarm,
   farmName,
   ...rest

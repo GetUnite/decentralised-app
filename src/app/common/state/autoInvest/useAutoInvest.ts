@@ -8,12 +8,10 @@ import {
 import { toExactFixed } from 'app/common/functions/utils';
 import {
   getBalance,
-  getBalanceOf,
-  getSupportedTokensBasicInfo,
-  getSupportedTokensList
+  getBalanceOf, getSupportedTokensList
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { initialAvailableFarmsState } from 'app/common/state/farm';
+import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TStreamOption } from 'app/common/types/autoInvest';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
@@ -136,19 +134,9 @@ export const useAutoInvest = () => {
       let supportedTokensWithBalance = new Array<any>();
 
       await Promise.all(
-        initialAvailableFarmsState
-          .filter(x => true)
+        farmOptions
           .map(async farm => {
-            const supportedTokens = farm.isBooster
-              ? await Promise.all(
-                  farm.supportedTokensAddresses.map(async supportedtoken => {
-                    return await getSupportedTokensBasicInfo(
-                      supportedtoken.address,
-                      farm.chain,
-                    );
-                  }),
-                )
-              : await getSupportedTokensList(farm.type, farm.chain);
+            const supportedTokens = await getSupportedTokensList(farm.type, farm.chain);
 
             if (walletAccountAtom) {
               for (const supportedToken of supportedTokens) {
