@@ -46,6 +46,52 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             }}
           />
           <Box
+            align="center"
+            justify="center"
+            fill="horizontal"
+            style={{ position: 'sticky',top: '0px' }}
+          >
+            <Nav
+              background="bg"
+              justify="between"
+              flex={false}
+              direction="row"
+              pad={{ horizontal: 'medium', vertical: 'small' }}
+              gap="none"
+              fill
+            >
+              <Box direction="row" align="end" style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <Link to={modernUiPaths.MAIN}>
+                    <Image
+                      src={
+                        isLightMode
+                          ? isSmall(size)
+                            ? logoIcon
+                            : logo
+                          : isSmall(size)
+                          ? logoIconDark
+                          : logoDark
+                      }
+                      fit="contain"
+                      height={31}
+                    />
+                  </Link>
+                </div>
+              </Box>
+              {isSmall(size) || (
+                <MenuItem
+                  direction="row"
+                  gap="large"
+                  align="center"
+                  justify="center"
+                  style={{ flex: 1 }}
+                />
+              )}
+              <Menu />
+            </Nav>
+          </Box>
+          <Box
             fill
             background="container"
             style={{ minHeight: '100vh' }}
@@ -53,48 +99,6 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             flex="grow"
           >
-            <Box align="center" justify="center" fill="horizontal">
-              <Nav
-                background="bg"
-                align="center"
-                justify="between"
-                flex={false}
-                direction="row"
-                pad={{ horizontal: 'medium', vertical: 'small' }}
-                gap="none"
-                fill
-              >
-                <Box direction="row" align="end" style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                    <Link to={modernUiPaths.MAIN}>
-                      <Image
-                        src={
-                          isLightMode
-                            ? isSmall(size)
-                              ? logoIcon
-                              : logo
-                            : isSmall(size)
-                            ? logoIconDark
-                            : logoDark
-                        }
-                        fit="contain"
-                        height={31}
-                      />
-                    </Link>
-                  </div>
-                </Box>
-                {isSmall(size) || (
-                  <MenuItem
-                    direction="row"
-                    gap="large"
-                    align="center"
-                    justify="center"
-                    style={{ flex: 1 }}
-                  />
-                )}
-                <Menu />
-              </Nav>
-            </Box>
             <Notification id={notificationId} />
             <Box
               width="xlarge"
