@@ -1,7 +1,7 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-    getIbAlluoInfo, transferToAddress
+  getIbAlluoInfo, transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -17,7 +17,7 @@ export const useTransfer = () => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // notifications
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
@@ -124,7 +124,7 @@ export const useTransfer = () => {
     setIsTransferring(true);
 
     try {
-      await transferToAddress(
+      const tx = await transferToAddress(
         selectedIbAlluoInfo.address,
         transferValue,
         selectedIbAlluoInfo.decimals,
@@ -134,10 +134,10 @@ export const useTransfer = () => {
       await fetchIbAlluosInfo();
       setTransferValue('');
       setRecipientAddress('');
-      setNotificationt('Transfer completed successfully', 'success');
+      setNotification('Transfer completed successfully', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (error) {
       console.error(error);
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsTransferring(false);

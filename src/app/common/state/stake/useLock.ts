@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
   // other state control files
-  const { setNotificationt, resetNotification } = useNotification();
+  const { setNotification, resetNotification } = useNotification();
 
   // inputs
   const [lockValue, setLockValue] = useState<string>();
@@ -41,7 +41,7 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
       await updateAlluoInfo();
     } catch (err) {
       console.error('Error', err.message);
-      setNotificationt(err.message, 'error');
+      setNotification(err.message, 'error');
     }
 
     setIsApproving(false);
@@ -53,11 +53,11 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
 
     try {
       await lockAlluo(lockValue);
-      setNotificationt('Successfully locked', 'success');
+      setNotification('Successfully locked', 'success');
       await updateAlluoInfo();
       setLockValue(null);
     } catch (error) {
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsLocking(false);

@@ -1,23 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import {
-  isCorrectNetwork,
-  isSafeApp,
-  walletAccount,
-  wantedChain,
-} from 'app/common/state/atoms';
-import {
-  changeNetwork,
-  onWalletUpdated,
-  getCurrentChainId,
-  getChainNameById,
-  trySafeAppConnection,
+    changeNetwork, getChainNameById, getCurrentChainId, onWalletUpdated, trySafeAppConnection
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
+import {
+    isCorrectNetwork,
+    isSafeApp,
+    walletAccount,
+    wantedChain
+} from 'app/common/state/atoms';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import { EChain, EChainId } from '../constants/chains';
 
 export const useWallet = () => {
-  const { resetNotification, setNotificationt } = useNotification();
+  const { resetNotification, setNotification } = useNotification();
   const [walletAccountAtom, setWalletAccountAtom] =
     useRecoilState(walletAccount);
   const [wantedChainAtom] = useRecoilState(wantedChain);
@@ -72,7 +68,7 @@ export const useWallet = () => {
     const isCorrectNetwork = (await getCurrentChainId()) == chainIdToUse;
     setIsCorrectNetworkAtom(isCorrectNetwork);
     if (!isCorrectNetwork) {
-      setNotificationt(
+      setNotification(
         `Please change your wallet network to ${getChainNameById(
           chainIdToUse,
         )}`,

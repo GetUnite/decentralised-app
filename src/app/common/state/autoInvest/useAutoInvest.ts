@@ -1,16 +1,16 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  convertToUSDC,
-  getStreamFlow,
-  stopStream
+    convertToUSDC,
+    getStreamFlow,
+    stopStream
 } from 'app/common/functions/autoInvest';
 import { toExactFixed } from 'app/common/functions/utils';
 import {
-  getBalance,
-  getBalanceOf,
-  getSupportedTokensBasicInfo,
-  getSupportedTokensList
+    getBalance,
+    getBalanceOf,
+    getSupportedTokensBasicInfo,
+    getSupportedTokensList
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { initialAvailableFarmsState } from 'app/common/state/farm';
@@ -82,7 +82,7 @@ export const useAutoInvest = () => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // assets info
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
@@ -304,14 +304,14 @@ export const useAutoInvest = () => {
           toAddress,
           false, // use biconomy here
         );
-        setNotificationt('Steam was stopped successfully', 'success');
+        setNotification('Steam was stopped successfully', 'success');
         // remove stream from the list
         await updateAutoInvestInfo();
       } catch (err) {
-        setNotificationt(err, 'error');
+        setNotification(err, 'error');
       }
     } else {
-      setNotificationt(
+      setNotification(
         'There was a problem while finding the stream to stop. Please try again',
         'error',
       );

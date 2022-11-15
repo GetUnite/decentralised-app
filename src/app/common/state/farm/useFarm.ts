@@ -215,7 +215,7 @@ export const useFarm = ({ id }) => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // selected farm control
   const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
@@ -234,8 +234,8 @@ export const useFarm = ({ id }) => {
   // information/confirmation control
   const showBoosterFarmPresentation = !isSafeAppAtom && selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
 
-  const previousHarvestDate = moment().day('Monday');
-  const nextHarvestDate = moment().add(1, 'week').day('Monday');
+  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
+  const nextHarvestDate = moment().subtract(1, 'days').add(1, 'week').day('Monday');
   const [
     showBoosterWithdrawalConfirmation,
     setShowBoosterWithdrawalConfirmation,
@@ -483,9 +483,9 @@ export const useFarm = ({ id }) => {
             );
       }
       await updateRewardsInfo();
-      setNotificationt('Rewards claimed successfully', 'success');
+      setNotification('Rewards claimed successfully', 'success');
     } catch (error) {
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
     setIsClamingRewards(false);
   };
