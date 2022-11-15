@@ -24,7 +24,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/form';
+import { TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -215,7 +215,7 @@ export const useFarm = ({ id }) => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // selected farm control
   const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
@@ -234,8 +234,8 @@ export const useFarm = ({ id }) => {
   // information/confirmation control
   const showBoosterFarmPresentation = !isSafeAppAtom && selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
 
-  const previousHarvestDate = moment().day('Monday');
-  const nextHarvestDate = moment().add(1, 'week').day('Monday');
+  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
+  const nextHarvestDate = moment().subtract(1, 'days').add(1, 'week').day('Monday');
   const [
     showBoosterWithdrawalConfirmation,
     setShowBoosterWithdrawalConfirmation,
@@ -483,9 +483,9 @@ export const useFarm = ({ id }) => {
             );
       }
       await updateRewardsInfo();
-      setNotificationt('Rewards claimed successfully', 'success');
+      setNotification('Rewards claimed successfully', 'success');
     } catch (error) {
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
     setIsClamingRewards(false);
   };

@@ -1,9 +1,9 @@
 import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositIntoBoosterFarm,
-  depositStableCoin
+    approveStableCoin,
+    depositIntoBoosterFarm,
+    depositStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ export const useDeposit = ({
   updateFarmInfo,
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
   const [depositValue, setDepositValue] = useState<string>();
   const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
@@ -46,9 +46,9 @@ export const useDeposit = ({
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotificationt('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success');
     } catch (err) {
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsApproving(false);
@@ -89,11 +89,11 @@ export const useDeposit = ({
       }
       resetState();
       setDepositValue(null);
-      setNotificationt('Deposit successfully', 'success');
+      setNotification('Deposit successfully', 'success');
       await updateFarmInfo();
     } catch (error) {
       resetState();
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsDepositing(false);

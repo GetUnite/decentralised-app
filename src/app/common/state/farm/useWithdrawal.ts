@@ -2,7 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  withdrawStableCoin
+    withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -19,7 +19,7 @@ export const useWithdrawal = ({
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(true);
@@ -81,11 +81,11 @@ export const useWithdrawal = ({
         );
       }
       resetState();
-      setNotificationt("Successfully withdrew", 'success');
+      setNotification("Successfully withdrew", 'success');
       await updateFarmInfo();
     } catch (error) {
       resetState();
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsWithdrawing(false);

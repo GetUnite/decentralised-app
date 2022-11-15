@@ -76,8 +76,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
-                //disabled={disableInputs}
-                disabled={true}
+                disabled={disableInputs}
               />
               {useEndDate && (
                 <DateInput
@@ -93,7 +92,7 @@ export const AutoInvestTab = ({ ...rest }) => {
               style={{ minHeight: '224px' }}
               justify="center"
             >
-              {isFetchingFarmInfo ? (
+              {isFetchingFarmInfo || isUpdatingSelectedStreamOption ? (
                 <Box align="center" justify="center" fill="vertical">
                   <Spinner pad="large" />
                 </Box>
@@ -137,8 +136,8 @@ export const AutoInvestTab = ({ ...rest }) => {
           label={
             isLoading || isUpdatingSelectedStreamOption
               ? 'Loading...'
-              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps.length}: ${
-                  selectedStreamOptionSteps[currentStep].label
+              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps?.length}: ${
+                selectedStreamOptionSteps[currentStep]?.label
                 }`
           }
           onClick={handleCurrentStep}
