@@ -1,27 +1,27 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  approveSuperfluidSubscriptions,
-  depositIntoAlluo,
-  getDepositedAmount,
-  getInterest,
-  getStreamFlow,
-  getTotalAssetSupply,
-  getUnapprovedSuperfluidSubscriptions,
-  startStream
+    approveSuperfluidSubscriptions,
+    depositIntoAlluo,
+    getDepositedAmount,
+    getInterest,
+    getStreamFlow,
+    getTotalAssetSupply,
+    getUnapprovedSuperfluidSubscriptions,
+    startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approve,
-  getAllowance,
-  getBalance,
-  getBalanceOf
+    approve,
+    getAllowance,
+    getBalance,
+    getBalanceOf
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
-  TStreamCreationStep,
-  TStreamOption,
-  TSupportedStreamToken
+    TStreamCreationStep,
+    TStreamOption,
+    TSupportedStreamToken
 } from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
@@ -339,7 +339,7 @@ export const useAutoInvestTab = () => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(false); //useState(isSafeAppAtom ? false : true);
@@ -599,9 +599,9 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotificationt('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success');
     } catch (err) {
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsApproving(false);
@@ -619,9 +619,9 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotificationt('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success');
     } catch (err) {
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsApproving(false);
@@ -649,9 +649,9 @@ export const useAutoInvestTab = () => {
         ...selectedSupportedFromToken,
         balance: balance,
       });
-      setNotificationt('Deposit successfully', 'success');
+      setNotification('Deposit successfully', 'success');
     } catch (err) {
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsDepositing(false);
@@ -672,10 +672,10 @@ export const useAutoInvestTab = () => {
         useEndDate ? new Date(endDate).getTime() : null,
         useBiconomy,
       );
-      setNotificationt('Stream started successfully', 'success');
+      setNotification('Stream started successfully', 'success');
       navigate('/autoinvest');
     } catch (error) {
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsStartingStream(false);

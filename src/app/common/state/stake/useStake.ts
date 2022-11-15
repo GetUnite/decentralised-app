@@ -1,13 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  getAlluoBalance,
-  getAlluoStakingAllowance,
-  getAlluoStakingAPR,
-  getAlluoStakingWalletAddressInfo,
-  getEarnedAlluo,
-  getTotalAlluoLocked,
-  getUnlockedAlluo,
-  withdrawAlluo
+    getAlluoBalance,
+    getAlluoStakingAllowance,
+    getAlluoStakingAPR,
+    getAlluoStakingWalletAddressInfo,
+    getEarnedAlluo,
+    getTotalAlluoLocked,
+    getUnlockedAlluo,
+    withdrawAlluo
 } from 'app/common/functions/stake';
 import { roundNumberDown } from 'app/common/functions/utils';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -34,7 +34,7 @@ export const useStake = () => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotificationt, resetNotification } = useNotification();
+  const { setNotification, resetNotification } = useNotification();
 
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
@@ -94,10 +94,10 @@ export const useStake = () => {
     try {
       await withdrawAlluo();
       await updateAlluoInfo();
-      setNotificationt('Successfully withdrew', 'success');
+      setNotification('Successfully withdrew', 'success');
     } catch (error) {
       console.error('Error', error);
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
     setIsWithdrawing(false);
   };
