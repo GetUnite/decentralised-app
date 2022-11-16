@@ -9,7 +9,11 @@ import { EEthereumAddresses, EEthereumAddressesMainnet } from '../constants/addr
 import { maximumUint256Value } from './utils';
 
 export const getAlluoPriceInWETH = async ()=> {
-  return getPrice(EEthereumAddressesMainnet.WETH, EEthereumAddressesMainnet.ALLUO, 18, 18);
+  try {
+    return getPrice(EEthereumAddressesMainnet.WETH, EEthereumAddressesMainnet.ALLUO, 18, 18);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getWEthBalance = async () => {
