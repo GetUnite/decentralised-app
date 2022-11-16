@@ -1,9 +1,8 @@
-import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approveStableCoin,
-    depositIntoBoosterFarm,
-    depositStableCoin
+  approveStableCoin,
+  depositIntoBoosterFarm,
+  depositStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
@@ -21,11 +20,11 @@ export const useDeposit = ({
   const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(true);
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
   

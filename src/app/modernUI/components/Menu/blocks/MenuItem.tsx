@@ -35,7 +35,8 @@ export const MenuItem = ({ ...rest }) => {
         label="buy"
         size="medium"
         weight={isBuyPage ? 'bold' : 'normal'}
-        onClick={() => navigate(modernUiPaths.BUY)}
+        onClick={() => //navigate(modernUiPaths.BUY)
+        window.open('https://app.uniswap.org/#/swap?theme=dark&inputCurrency=ETH&outputCurrency=0x1E5193ccC53f25638Aa22a940af899B692e10B09', '_blank', 'noopener,noreferrer')}
       />
     </Box>
   );
