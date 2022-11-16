@@ -1,17 +1,17 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    approveAlluoPurchaseInWETH,
-    buyAlluoWithWETH,
-    getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
-    getVlAlluoTotalSupply,
-    getWETHAllowance,
-    getWEthBalance
+  approveAlluoPurchaseInWETH,
+  buyAlluoWithWETH,
+  getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
+  getVlAlluoTotalSupply,
+  getWETHAllowance,
+  getWEthBalance
 } from 'app/common/functions/buy';
 import {
-    approveAlluoStaking,
-    getAlluoStakingAllowance,
-    getAlluoStakingAPR,
-    lockAlluo
+  approveAlluoStaking,
+  getAlluoStakingAllowance,
+  getAlluoStakingAPR,
+  lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -80,9 +80,13 @@ export const useBuy = () => {
   };
 
   const fetchAlluoPriceInWETH = async () => {
+    try{
     const price = await getAlluoPriceInWETH();
     const fixed = toExactFixed(price, 2);
     setAlluoPriceInWETH(fixed);
+    }catch(error){
+      setNotification(error, 'error');
+    }
   };
 
   const fetchAllowanceOfWETH = async () => {
