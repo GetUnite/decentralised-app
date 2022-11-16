@@ -14,12 +14,16 @@ import {
 import { toExactFixed } from './utils';
 
 export const getAlluoPrice = async () => {
-  return getPrice(
-    EEthereumAddressesMainnet.ALLUO,
-    EEthereumAddressesMainnet.USDC,
-    18,
-    6,
-  );
+  try {
+    return getPrice(
+      EEthereumAddressesMainnet.ALLUO,
+      EEthereumAddressesMainnet.USDC,
+      18,
+      6,
+    );
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const alluoToUsd = async alluoValueInWei => {
@@ -200,7 +204,9 @@ export const getAlluoStakingWalletAddressInfo = async () => {
   return {
     locked: ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
     lockedInLp: ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
-    lockedInUsd: alluoToUsd(ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_)),
+    lockedInUsd: alluoToUsd(
+      ethers.utils.formatEther(alluoStakingWalletAddressInfo.locked_),
+    ),
     withdrawUnlockTime:
       alluoStakingWalletAddressInfo.withdrawUnlockTime_.toString(),
     depositUnlockTime:
