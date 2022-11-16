@@ -20,7 +20,7 @@ export const useTransfer = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(false);//useState(!isSafeAppAtom);
 
   // ibAlluos
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);

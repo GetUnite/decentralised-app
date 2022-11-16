@@ -299,7 +299,7 @@ export const sendTransaction = async (
       const gasPrice = Math.floor(
         gasPriceEstimation + gasPriceEstimation * 0.25,
       );
-      finalTx = { ...rawTx, gasLimit: gasLimit, gasPrice: gasPrice};
+      finalTx = { ...rawTx, gasLimit: gasLimit, gasPrice: gasPrice };
     } else {
       finalTx = rawTx;
     }
@@ -353,7 +353,7 @@ export const sendTransaction = async (
 
     const errorString = error.toString();
 
-    if (errorString.includes('user rejected transaction')) {
+    if (errorString.includes('user rejected signing')) {
       throw 'User denied message signature';
     }
 
@@ -472,6 +472,56 @@ export const callContract = async (
   }
 };
 
+export const QueryFilter = async (
+  abi,
+  address,
+  eventSignature,
+  params,
+  blockNumber,
+  chain,
+) => {
+  const readOnlyProvider = getReadOnlyProvider(chain);
+  const contract = new ethers.Contract(address, abi, readOnlyProvider);
+
+  console.log(contract.filters);
+  try {
+    const event = contract.filters[eventSignature].apply(null, params);
+
+    const logs = await contract.queryFilter(event, blockNumber, blockNumber)
+
+    console.log(logs);
+    return logs;
+  } catch (error) {
+    console.log(abi, address, eventSignature, params);
+    // here do all error handling to readable stuff
+    console.log(error);
+  }
+};
+
+export const binarySearchForBlock = async (startTimestamp: number) : Promise<number>  => {
+  const provider = getReadOnlyProvider(EChain.POLYGON);
+  let highestEstimatedBlockNumber = await provider.getBlockNumber();
+  let highestEstimatedBlock = await provider.getBlock(highestEstimatedBlockNumber)
+  let lowestEstimatedBlock = await provider.getBlock(highestEstimatedBlock.number - Math.floor((highestEstimatedBlock.timestamp - startTimestamp)/9))
+  let closestBlock;
+
+  while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
+      closestBlock = await provider.getBlock(Math.floor((highestEstimatedBlock.number + lowestEstimatedBlock.number)/2))
+      console.log("Checking block number:", closestBlock.number, closestBlock.timestamp)
+
+      if (closestBlock.timestamp == startTimestamp) {
+          return closestBlock.number
+      } 
+      else if (closestBlock.timestamp > lowestEstimatedBlock.timestamp) {
+          lowestEstimatedBlock = closestBlock
+      }
+      else {
+          highestEstimatedBlock = closestBlock;
+      }
+  }
+  return 0;
+}
+
 const marketApiURl =
   process.env.REACT_APP_NET === 'mainnet'
     ? 'https://protocol-mainnet.gnosis.io/api'
@@ -488,25 +538,29 @@ export const getPrice = async (
   // quote returns the value accounting with fee so using 10000 to prevent the fee being higher than the actual value
   const value = toDecimals(10000, sellDecimals);
 
-  const priceResponse = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json;charset=UTF-8',
-    },
-    body: JSON.stringify({
-      sellToken: sellToken,
-      buyToken: buyToken,
-      sellAmountBeforeFee: value,
-      from: walletAddress,
-      kind: 'sell',
-    }),
-  }).then(res => res.json());
+  try {
+    const priceResponse = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      body: JSON.stringify({
+        sellToken: sellToken,
+        buyToken: buyToken,
+        sellAmountBeforeFee: value,
+        from: walletAddress,
+        kind: 'sell',
+      }),
+    }).then(res => res.json());
 
-  const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
+    const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
 
-  // We multiplied the value by 1000 so now divide it
-  return price / 10000;
+    // We multiplied the value by 1000 so now divide it
+    return price / 10000;
+  } catch (error) {
+    throw 'Something went wrong while fetching data. Please try again later';
+  }
 };
 
 export const isExpectedPolygonEvent = (type, depositAddress) => {
