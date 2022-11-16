@@ -5,10 +5,12 @@ import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import UAuth from '@uauth/js';
+import uauthBNCModule from '@uauth/web3-onboard';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
@@ -18,7 +20,7 @@ import {
   fromDecimals,
   maximumUint256Value,
   roundNumberDown,
-  toDecimals
+  toDecimals,
 } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
@@ -80,6 +82,24 @@ const chains = [
   },
 ];
 
+//Unstoppable Domains Start
+const uauth = new UAuth({
+  clientID: process.env.REACT_APP_CLIENT_ID!,
+  redirectUri: process.env.REACT_APP_REDIRECT_URI!,
+  fallbackIssuer: process.env.REACT_APP_FALLBACK_ISSUER!,
+  scope: 'openid wallet',
+});
+
+const uauthBNCOptions = {
+  uauth: uauth,
+  walletconnect: {
+    infuraId: process.env.REACT_APP_INFURA_ID!,
+  },
+};
+
+const uauthModule = uauthBNCModule(uauthBNCOptions);
+//Unstoppable Domains End
+
 const onboard = Onboard({
   wallets: [],
   chains: chains,
@@ -106,6 +126,7 @@ onboard.state.actions.setWalletModules([
   walletConnect,
   gnosis,
   coinbase,
+  uauthModule,
 ]);
 
 const permitOnlyTokenAddresses = [
@@ -149,17 +170,35 @@ export const trySafeAppConnection = async callback => {
 };
 
 export const connectToWallet = async (connectOptions?) => {
-  let wallets;
+  let wallets = [];
+  let udDomain;
+
+  const uauthOptions = {
+    clientID: process.env.REACT_APP_CLIENT_ID!,
+    redirectUri: process.env.REACT_APP_REDIRECT_URI!,
+    fallbackIssuer: process.env.REACT_APP_FALLBACK_ISSUER!,
+    scope: 'openid wallet',
+  };
 
   try {
+    wallets = [];
     wallets = await onboard.connectWallet(connectOptions);
-
-    if (wallets[0]) {
-      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
-      web3 = new Web3(walletProvider);
-      walletAddress = wallets[0].accounts[0].address;
-      return walletAddress;
-    }
+    udDomain = new UAuth(uauthOptions).user().then().catch();
+    wallets[0].domain = (await udDomain).sub;
+    const [primaryWallet] = onboard.state.get().wallets;
+    let newWallet: any = {};
+    wallets.forEach(wallet => {
+      walletAddress = wallet.accounts[0].address;
+      if (
+        primaryWallet.label === 'Unstoppable' &&
+        wallet.label === 'Unstoppable'
+      ) {
+        newWallet = wallet;
+      }
+    });
+    return primaryWallet.label === 'Unstoppable'
+      ? { walletAddress, domain: newWallet.domain, label: 'Unstoppable' }
+      : walletAddress;
   } catch (error) {
     console.log(error);
   }
