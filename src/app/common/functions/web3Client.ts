@@ -498,25 +498,24 @@ export const QueryFilter = async (
   }
 };
 
-export const binarySearchForBlock = async (startTimestamp: number) : Promise<number>  => {
-  const provider = getReadOnlyProvider(EChain.POLYGON);
+export const binarySearchForBlock = async (startTimestamp: number, chain: EChain) : Promise<number> => {
+  const provider = getReadOnlyProvider(chain);
   let highestEstimatedBlockNumber = await provider.getBlockNumber();
   let highestEstimatedBlock = await provider.getBlock(highestEstimatedBlockNumber)
-  let lowestEstimatedBlock = await provider.getBlock(highestEstimatedBlock.number - Math.floor((highestEstimatedBlock.timestamp - startTimestamp)/9))
+  let lowestEstimatedBlock = await provider.getBlock(highestEstimatedBlock.number - Math.floor((highestEstimatedBlock.timestamp - startTimestamp)))
   let closestBlock;
 
   while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
       closestBlock = await provider.getBlock(Math.floor((highestEstimatedBlock.number + lowestEstimatedBlock.number)/2))
-      console.log("Checking block number:", closestBlock.number, closestBlock.timestamp)
-
+      console.log("Checking block:", closestBlock.number, closestBlock.timestamp)
       if (closestBlock.timestamp == startTimestamp) {
           return closestBlock.number
       } 
-      else if (closestBlock.timestamp > lowestEstimatedBlock.timestamp) {
-          lowestEstimatedBlock = closestBlock
+      else if (closestBlock.timestamp > startTimestamp) {
+          highestEstimatedBlock = closestBlock
       }
       else {
-          highestEstimatedBlock = closestBlock;
+          lowestEstimatedBlock = closestBlock;
       }
   }
   return 0;
