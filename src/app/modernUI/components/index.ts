@@ -1,6 +1,5 @@
 export * from './Badges';
 export * from './Buttons';
-export * from './Heading';
 export * from './Icons';
 export * from './Info';
 export * from './Inputs';

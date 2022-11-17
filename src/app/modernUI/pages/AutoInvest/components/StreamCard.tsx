@@ -1,7 +1,7 @@
 import { TokenIcon } from 'app/modernUI/components';
 import { Box, Card, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
-import { StopStreamConfirmation } from './StopStreamConfirmation';
+import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
 interface IStreamCard {
   from: string;
@@ -9,14 +9,12 @@ interface IStreamCard {
   to: string;
   toAddress: string;
   tvs: string;
-  tvsInUSD: string;
   flowPerMonth: string;
-  flowPerMonthInUSD: string;
   startDate: string;
   endDate?: string;
   fundedUntilDate?: string;
   handleStopStream?: Function;
-  sign:string;
+  sign: string;
   isStoppingStream: boolean;
 }
 
@@ -26,9 +24,7 @@ export const StreamCard = ({
   to,
   toAddress,
   tvs,
-  tvsInUSD,
   flowPerMonth,
-  flowPerMonthInUSD,
   startDate,
   endDate,
   fundedUntilDate,
@@ -37,8 +33,6 @@ export const StreamCard = ({
   sign,
   ...rest
 }: IStreamCard) => {
-  const [isTvsInUSD, setIsTvsInUSD] = useState(true);
-  const [isFlowRateInUSD, setIsFlowRateInUSD] = useState(true);
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
 
   return (
@@ -72,7 +66,9 @@ export const StreamCard = ({
                   <span style={{ fontWeight: '500' }}>{to} Farm</span>
                 </Box>
                 <Box direction="row" gap="5px">
-                  <span>{isTvsInUSD ? `$${tvsInUSD}` : `${sign}${tvs}`}</span>
+                  <span>
+                    {sign}{tvs}
+                  </span>
                   {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
                     <Box justify="center" fill>
                       <img src={swap} />
@@ -81,7 +77,7 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {isFlowRateInUSD ? `$${flowPerMonthInUSD}` : `${sign}${flowPerMonth}`}/m
+                    {sign}{flowPerMonth}/m
                   </span>
                   {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
                   <Box justify="center" fill>

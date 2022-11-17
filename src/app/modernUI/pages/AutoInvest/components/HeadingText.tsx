@@ -1,0 +1,43 @@
+import { walletAccount } from 'app/common/state/atoms';
+import { Box, Paragraph, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
+import { useRecoilState } from 'recoil';
+
+export const HeadingText = ({
+  isLoading,
+  numberOfAssets,
+  ...rest
+}) => {
+  const [walletAccountAtom] = useRecoilState(walletAccount);
+
+  const headingText = isLoading ? (
+    <Box fill>
+      <Skeleton count={1} height="36px" />
+    </Box>
+  ) : (
+    <>
+      {numberOfAssets == 0 ? (
+        'You don’t have any available assets to stream in your wallet.'
+      ) : (
+        <span>
+          You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '} available to
+          stream.
+        </span>
+      )}
+    </>
+  );
+
+  return (
+    <>
+      <Text size="36px" weight="bold">
+        {!walletAccountAtom
+          ? 'Connect your wallet to see your available assets to farm.'
+          : headingText}
+      </Text>
+      <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
+        Fund your wallet using crypto or fiat currency here to start investing.
+        Withdraw at any time with no cost and no lock-in period.
+      </Paragraph>
+    </>
+  );
+};
