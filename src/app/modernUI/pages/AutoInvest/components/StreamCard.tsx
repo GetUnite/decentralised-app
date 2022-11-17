@@ -67,7 +67,7 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    ${sign}${tvs}
+                    {sign}{tvs}
                   </span>
                   {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
                     <Box justify="center" fill>
@@ -77,7 +77,7 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {sign}${flowPerMonth}/m
+                    {sign}{flowPerMonth}/m
                   </span>
                   {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
                   <Box justify="center" fill>
