@@ -99,6 +99,9 @@ export const useFarm = ({ id }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
+  // other state control files
+  const { setNotification } = useNotification();
+
   // selected farm control
   const [availableFarms] = useState<TFarm[]>(farmOptions);
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();

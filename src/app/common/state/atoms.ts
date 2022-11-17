@@ -1,5 +1,6 @@
 import { atom, RecoilState } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
+import { EChain } from '../constants/chains';
 
 const { persistAtom } = recoilPersist();
 
@@ -111,10 +112,12 @@ type TNotification = {
   id: ENotificationId;
   type: 'error' | 'success' | 'info' | '';
   message: string;
+  txHash?: string;
+  chain?: EChain;
 };
 export const notification: RecoilState<TNotification> = atom({
   key: 'notification',
-  default: { id: null, type: '', message: '' },
+  default: { id: null, type: '', message: '', txHash: '', chain: EChain.POLYGON},
 });
 
 export type TStableCoinCodes = {

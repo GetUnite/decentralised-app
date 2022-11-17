@@ -59,50 +59,53 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
           </span>{' '}
           ON/OFF?
         </Text>
-        <Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>
-        <Box
-          width="46px"
-          height="20px"
-          round="10px"
-          pad="0px 7px 0px 7px"
-          background={useBiconomyButtonColor}
-          direction={useBiconomyButton}
-          justify="between"
-          align='center'
-        >
-          <Text size="9px" color="white">
-            {useBiconomy ? 'ON' : 'OFF'}
-          </Text>
-          <span style={{
-              width: '13px',
-              height: '13px',
-              textAlign: 'center',
-              backgroundColor: 'white',
-              borderRadius: '50px',
-              color: 'white',
-              cursor: 'pointer',
-              border: 'none',
-            }}></span>
-          {modeAtom === 'light' ? (
-            <ReactTooltipStyledLight
-              id="biconomyTip"
-              place="bottom"
-              effect="float"
-            >
-              Turning off Biconomy means Alluo will no longer pay your
-              transaction fee.
-            </ReactTooltipStyledLight>
-          ) : (
-            <ReactTooltipStyledDark
-              id="biconomyTip"
-              place="bottom"
-              effect="float"
-            >
-              Turning off Biconomy means Alluo will no longer pay your
-              transaction fee.
-            </ReactTooltipStyledDark>
-          )}
-        </Box>
+        <Button disabled={true} onClick={() => setUseBiconomy(!useBiconomy)}>
+          {/*<Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>*/}
+          <Box
+            width="46px"
+            height="20px"
+            round="10px"
+            pad="0px 7px 0px 7px"
+            background={useBiconomyButtonColor}
+            direction={useBiconomyButton}
+            justify="between"
+            align="center"
+          >
+            <Text size="9px" color="white">
+              {useBiconomy ? 'ON' : 'OFF'}
+            </Text>
+            <span
+              style={{
+                width: '13px',
+                height: '13px',
+                textAlign: 'center',
+                backgroundColor: 'white',
+                borderRadius: '50px',
+                color: 'white',
+                cursor: 'pointer',
+                border: 'none',
+              }}
+            ></span>
+            {modeAtom === 'light' ? (
+              <ReactTooltipStyledLight
+                id="biconomyTip"
+                place="bottom"
+                effect="float"
+              >
+                Turning off Biconomy means Alluo will no longer pay your
+                transaction fee.
+              </ReactTooltipStyledLight>
+            ) : (
+              <ReactTooltipStyledDark
+                id="biconomyTip"
+                place="bottom"
+                effect="float"
+              >
+                Turning off Biconomy means Alluo will no longer pay your
+                transaction fee.
+              </ReactTooltipStyledDark>
+            )}
+          </Box>
         </Button>
       </Box>
     </Box>

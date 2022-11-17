@@ -1,14 +1,14 @@
+import { Avatar, Box, Button, Layer, ResponsiveContext } from 'grommet';
+import { Close, Menu as MenuIcon } from 'grommet-icons';
 import { useState } from 'react';
-import { ResponsiveContext, Layer, Box, Button, Avatar } from 'grommet';
-import { Menu as MenuIcon, Close } from 'grommet-icons';
 
-import { isSmall } from 'app/modernUI/theme';
 import { useMode } from 'app/common/state';
 import { ConnectionButton } from 'app/modernUI/components';
+import { isSmall } from 'app/modernUI/theme';
 import { MenuItem } from './blocks';
 
-import sunIcon from '../../images/sunIcon.svg';
 import moonIcon from '../../images/moonIcon.svg';
+import sunIcon from '../../images/sunIcon.svg';
 
 const Drop = () => {
   return (
@@ -54,8 +54,16 @@ export const Menu = ({ ...rest }) => {
             style={{ flex: 1 }}
             justify="end"
           >
-            {((isSmall(size) && isModalOpen) || !isSmall(size)) && (
-              <ConnectionButton />
+            {!isSmall(size) && <ConnectionButton />}
+            {isSmall(size) && isModalOpen && (
+              <Button
+                plain
+                onClick={() => {
+                  toggleModal();
+                }}
+              >
+                <ConnectionButton />
+              </Button>
             )}
             {((isSmall(size) && !isModalOpen) || !isSmall(size)) && (
               <Button

@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
   // other state control files
-  const { setNotificationt, resetNotification } = useNotification();
+  const { setNotification, resetNotification } = useNotification();
 
   // inputs
   const [unlockValue, setUnlockValue] = useState<number>(0);
@@ -43,10 +43,10 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
       } else {
         await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
       }
-      setNotificationt('Successfully unlocked', 'success');
+      setNotification('Successfully unlocked', 'success');
       await updateAlluoInfo();
     } catch (error) {
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
     setIsUnlocking(false);
   };

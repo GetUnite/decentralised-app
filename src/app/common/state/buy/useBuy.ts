@@ -1,17 +1,17 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-    approveAlluoPurchaseInWETH,
-    buyAlluoWithWETH,
-    getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
-    getVlAlluoTotalSupply,
-    getWETHAllowance,
-    getWEthBalance
+  approveAlluoPurchaseInWETH,
+  buyAlluoWithWETH,
+  getAlluoBalance, getAlluoPriceInWETH, getVlAlluoBalance,
+  getVlAlluoTotalSupply,
+  getWETHAllowance,
+  getWEthBalance
 } from 'app/common/functions/buy';
 import {
-    approveAlluoStaking,
-    getAlluoStakingAllowance,
-    getAlluoStakingAPR,
-    lockAlluo
+  approveAlluoStaking,
+  getAlluoStakingAllowance,
+  getAlluoStakingAPR,
+  lockAlluo
 } from 'app/common/functions/stake';
 import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 export const useBuy = () => {
-  const { setNotificationt, resetNotification } = useNotification();
+  const { setNotification, resetNotification } = useNotification();
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
@@ -80,9 +80,13 @@ export const useBuy = () => {
   };
 
   const fetchAlluoPriceInWETH = async () => {
+    try{
     const price = await getAlluoPriceInWETH();
     const fixed = toExactFixed(price, 2);
     setAlluoPriceInWETH(fixed);
+    }catch(error){
+      setNotification(error, 'error');
+    }
   };
 
   const fetchAllowanceOfWETH = async () => {
@@ -112,7 +116,7 @@ export const useBuy = () => {
       await updateBuyInfo();
     } catch (err) {
       console.log('Error', err.message);
-      setNotificationt(err.message, 'error');
+      setNotification(err.message, 'error');
     }
 
     setIsApproving(false);
@@ -126,10 +130,10 @@ export const useBuy = () => {
       await buyAlluoWithWETH(inputValue);
       setInputValue(null);
       await updateBuyInfo();
-      setNotificationt('Successfully bought', 'success');
+      setNotification('Successfully bought', 'success');
     } catch (err) {
       console.log('Error', err);
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsBuying(false);
@@ -153,10 +157,10 @@ export const useBuy = () => {
       }
       await lockAlluo(difference);
       await updateBuyInfo();
-      setNotificationt('Successfully bought and locked', 'success');
+      setNotification('Successfully bought and locked', 'success');
     } catch (err) {
       console.log('Error', err.message);
-      setNotificationt(err.message, 'error');
+      setNotification(err.message, 'error');
     }
 
     setIsBuying(false);
