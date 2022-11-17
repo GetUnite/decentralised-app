@@ -1,7 +1,7 @@
 import { TokenIcon } from 'app/modernUI/components';
 import { Box, Card, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
-import { StopStreamConfirmation } from './StopStreamConfirmation';
+import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
 interface IStreamCard {
   from: string;
