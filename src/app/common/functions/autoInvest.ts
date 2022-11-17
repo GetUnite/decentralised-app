@@ -1,5 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import {
+  binarySearchForBlock,
   callContract,
   getBalanceOf,
   getCurrentWalletAddress,
@@ -7,6 +8,7 @@ import {
   getPrice,
   getReadOnlyProvider,
   getSuperfluidFramework,
+  QueryFilter,
   sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
@@ -130,6 +132,63 @@ export const getStreamFlow = async (
     flowPerMonth: +flowPerSecond * 60,
     timestamp: flow.timestamp.toString(),
   };
+};
+
+export const getStreamEndDate = async (
+  ibAlluoAddress,
+  ricochetMarketAddress,
+  startDateTimestamp,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'from',
+          type: 'address',
+        },
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'to',
+          type: 'address',
+        },
+        {
+          indexed: false,
+          internalType: 'int96',
+          name: 'amountPerSecond',
+          type: 'int96',
+        },
+        {
+          indexed: true,
+          internalType: 'uint256',
+          name: 'endTimestamp',
+          type: 'uint256',
+        },
+      ],
+      name: 'CreateFlowWithTimestamp',
+      type: 'event',
+    },
+  ];
+
+  console.log(startDateTimestamp);
+  const blockNumber = await binarySearchForBlock(startDateTimestamp, EChain.POLYGON);
+
+  const eventLogs = await QueryFilter(
+    abi,
+    ibAlluoAddress,
+    'CreateFlowWithTimestamp(address,address,int96,uint256)',
+    [getCurrentWalletAddress(), ricochetMarketAddress],
+    blockNumber,
+    chain,
+  );
+
+  console.log(eventLogs);
+
+  return 10;
 };
 
 const getRicochetStreamIndexes = (inputAddress, outputAddress) => {
@@ -566,5 +625,8 @@ export const convertToUSDC = async (
           6,
         );
 
-  return +ethers.utils.formatUnits(underlyingTokenValue, underlyingTokenDecimals) * tokenPrice;
+  return (
+    +ethers.utils.formatUnits(underlyingTokenValue, underlyingTokenDecimals) *
+    tokenPrice
+  );
 };
