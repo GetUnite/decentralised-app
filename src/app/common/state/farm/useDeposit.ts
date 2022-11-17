@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
@@ -16,16 +15,16 @@ export const useDeposit = ({
   updateFarmInfo,
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
   const [depositValue, setDepositValue] = useState<string>();
   const [depositValueError, setDepositValueError] = useState<string>('');
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(true);
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
   
@@ -46,9 +45,9 @@ export const useDeposit = ({
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotificationt('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success');
     } catch (err) {
-      setNotificationt(err, 'error');
+      setNotification(err, 'error');
     }
 
     setIsApproving(false);
@@ -89,11 +88,11 @@ export const useDeposit = ({
       }
       resetState();
       setDepositValue(null);
-      setNotificationt('Deposit successfully', 'success');
+      setNotification('Deposit successfully', 'success');
       await updateFarmInfo();
     } catch (error) {
       resetState();
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsDepositing(false);

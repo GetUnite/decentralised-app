@@ -1,7 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useCurrentPath } from 'app/common/hooks';
-import { ENotificationId, useNotification } from 'app/common/state';
+import { useNotification } from 'app/common/state';
 import { TFarmDepositCoinType, walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
@@ -76,11 +76,7 @@ export const FarmCard = ({
               onClick={() => {
                 if (!disabled && !!walletAccountAtom) navigate('/farm/' + id);
                 else
-                  setNotification({
-                    id: ENotificationId.ASSET_CARD,
-                    type: 'error',
-                    message: 'Connect your wallet',
-                  });
+                  setNotification('Connect your wallet', 'error');
               }}
               style={{ position: 'relative' }}
               pad={{ horizontal: 'medium', vertical: 'medium' }}

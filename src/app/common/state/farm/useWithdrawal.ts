@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
@@ -19,10 +18,10 @@ export const useWithdrawal = ({
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(true);
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -35,7 +34,7 @@ export const useWithdrawal = ({
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
 
@@ -81,11 +80,11 @@ export const useWithdrawal = ({
         );
       }
       resetState();
-      setNotificationt("Successfully withdrew", 'success');
+      setNotification("Successfully withdrew", 'success');
       await updateFarmInfo();
     } catch (error) {
       resetState();
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsWithdrawing(false);

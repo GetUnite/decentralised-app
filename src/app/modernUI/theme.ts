@@ -36,7 +36,7 @@ export enum colors {
   PURPLE = '#8247E5',
 }
 
-export const isSmall = size => size === 'xsmall' || size === 'small';
+export const isSmall = size => size === 'xsmall' || size === 'small' || size === 'xmedium';
 
 export const theme = deepMerge(grommet, {
   global: {
@@ -46,6 +46,9 @@ export const theme = deepMerge(grommet, {
       xsmall: {
         value: 500,
       },
+      xmedium: {
+        value: 980
+      }
     },
     font: {
       family: 'Poppins',
