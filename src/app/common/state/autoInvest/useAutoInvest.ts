@@ -1,7 +1,6 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  convertToUSDC,
   getStreamEndDate,
   getStreamFlow,
   stopStream
@@ -226,6 +225,12 @@ export const useAutoInvest = () => {
           (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
           6,
         );
+        const endDateTimestamp = await getStreamEndDate(
+          element.fromIbAlluoAddress,
+          element.ricochetMarketAddress,
+          streamFlow.timestamp,
+        );
+        console.log(endDateTimestamp);
         streamsArray.push({
           from: element.fromLabel,
           fromAddress: element.fromIbAlluoAddress,
@@ -233,35 +238,11 @@ export const useAutoInvest = () => {
           toAddress: element.ricochetMarketAddress,
           flowPerSecond: flowPerSecond,
           flowPerMonth: toExactFixed(flowPerMonth, 6),
-          flowPerMonthInUSD: toExactFixed(
-            await convertToUSDC(
-              flowPerMonth,
-              element.fromIbAlluoAddress,
-              18,
-              element.underlyingTokenAddress,
-              18,
-            ),
-            6,
-          ),
           startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
-          endDate: new Date(
-            await getStreamEndDate(
-              element.fromIbAlluoAddress,
-              element.ricochetMarketAddress,
-              streamFlow.timestamp,
-            ),
-          ).toLocaleDateString(),
+          endDate: endDateTimestamp
+            ? new Date(endDateTimestamp).toLocaleDateString()
+            : null,
           tvs: tvs,
-          tvsInUSD: toExactFixed(
-            await convertToUSDC(
-              tvs,
-              element.fromIbAlluoAddress,
-              18,
-              element.underlyingTokenAddress,
-              18,
-            ),
-            6,
-          ),
           sign: element.fromSign,
         });
 

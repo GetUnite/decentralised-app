@@ -1,27 +1,27 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-    approveSuperfluidSubscriptions,
-    depositIntoAlluo,
-    getDepositedAmount,
-    getInterest,
-    getStreamFlow,
-    getTotalAssetSupply,
-    getUnapprovedSuperfluidSubscriptions,
-    startStream
+  approveSuperfluidSubscriptions,
+  depositIntoAlluo,
+  getDepositedAmount,
+  getInterest,
+  getStreamFlow,
+  getTotalAssetSupply,
+  getUnapprovedSuperfluidSubscriptions,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approve,
-    getAllowance,
-    getBalance,
-    getBalanceOf
+  approve,
+  getAllowance,
+  getBalance,
+  getBalanceOf
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
-    TStreamCreationStep,
-    TStreamOption,
-    TSupportedStreamToken
+  TStreamCreationStep,
+  TStreamOption,
+  TSupportedStreamToken
 } from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
@@ -539,6 +539,10 @@ export const useAutoInvestTab = () => {
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 
+  useEffect(() => {
+    validateInputs(streamValue);
+  }, [endDate]);
+
   const validateInputs = value => {
     setStreamValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
@@ -547,6 +551,12 @@ export const useAutoInvestTab = () => {
       setStreamValueError('Insufficient balance');
     }
     setStreamValue(value);
+
+    if(new Date().getTime() > new Date(endDate).getTime()){
+      setEndDateError(`The date can't be in the past`);
+    }else{
+      setEndDateError('');
+    }
   };
 
   // updates target farm info
@@ -593,7 +603,7 @@ export const useAutoInvestTab = () => {
       // TODO: currently biconomy doesn't work here
       await approve(
         selectedSupportedFromToken.address,
-        selectedSupportedToToken.address,
+        selectedStreamOption.toIbAlluoAddress,
         EChain.POLYGON,
         //useBiconomy,
       );
@@ -662,6 +672,7 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
+      const timeToStreamInSeconds = (new Date().getTime() - new Date(endDate).getTime()) / 1000;
       // data from the selected output
       await startStream(
         selectedStreamOption.fromIbAlluoAddress,
@@ -669,7 +680,7 @@ export const useAutoInvestTab = () => {
         selectedStreamOption.toStIbAlluoAddress,
         selectedStreamOption.ricochetMarketAddress,
         +streamValue,
-        useEndDate ? new Date(endDate).getTime() : null,
+        useEndDate ? timeToStreamInSeconds : null,
         useBiconomy,
       );
       setNotification('Stream started successfully', 'success');
@@ -717,6 +728,7 @@ export const useAutoInvestTab = () => {
     isUpdatingSelectedStreamOption,
     // error control
     hasErrors: streamValueError != '' || endDateError != '',
+    endDateError,
     // inputs
     disableInputs: currentStep > 0,
     streamValue,
