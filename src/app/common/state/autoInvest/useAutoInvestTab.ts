@@ -603,7 +603,7 @@ export const useAutoInvestTab = () => {
       // TODO: currently biconomy doesn't work here
       await approve(
         selectedSupportedFromToken.address,
-        selectedStreamOption.toIbAlluoAddress,
+        selectedStreamOption.fromIbAlluoAddress,
         EChain.POLYGON,
         //useBiconomy,
       );
@@ -673,6 +673,7 @@ export const useAutoInvestTab = () => {
 
     try {
       const timeToStreamInSeconds = (new Date().getTime() - new Date(endDate).getTime()) / 1000;
+      console.log(timeToStreamInSeconds);
       // data from the selected output
       await startStream(
         selectedStreamOption.fromIbAlluoAddress,
