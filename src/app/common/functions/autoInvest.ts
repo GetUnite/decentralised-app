@@ -174,7 +174,6 @@ export const getStreamEndDate = async (
     },
   ];
 
-  console.log(startDateTimestamp);
   const blockNumber = await binarySearchForBlock(
     startDateTimestamp,
     EChain.POLYGON,
@@ -191,7 +190,6 @@ export const getStreamEndDate = async (
 
   if (eventLogs[0]) {
     const endTimestamp = eventLogs[0].args.endTimestamp;
-    console.log(endTimestamp);
     return Number(endTimestamp);
   }
 

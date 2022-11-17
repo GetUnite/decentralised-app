@@ -483,13 +483,11 @@ export const QueryFilter = async (
   const readOnlyProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
-  console.log(contract.filters);
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
     const logs = await contract.queryFilter(event, blockNumber, blockNumber)
-
-    console.log(logs);
+    
     return logs;
   } catch (error) {
     console.log(abi, address, eventSignature, params);
@@ -507,7 +505,6 @@ export const binarySearchForBlock = async (startTimestamp: number, chain: EChain
 
   while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
       closestBlock = await provider.getBlock(Math.floor((highestEstimatedBlock.number + lowestEstimatedBlock.number)/2))
-      console.log("Checking block:", closestBlock.number, closestBlock.timestamp)
       if (closestBlock.timestamp == startTimestamp) {
           return closestBlock.number
       } 
