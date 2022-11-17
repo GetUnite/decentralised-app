@@ -240,10 +240,10 @@ export const useAutoInvest = () => {
           to: element.toLabel,
           toAddress: element.ricochetMarketAddress,
           flowPerSecond: flowPerSecond,
-          flowPerMonth: toExactFixed(flowPerMonth, 6),
+          flowPerMonth: toExactFixed(flowPerMonth, 6).toLocaleString(),
           startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
           endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
-          tvs: tvs,
+          tvs: tvs.toLocaleString(),
           sign: element.fromSign,
         });
 
