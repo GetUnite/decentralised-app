@@ -175,7 +175,10 @@ export const getStreamEndDate = async (
   ];
 
   console.log(startDateTimestamp);
-  const blockNumber = await binarySearchForBlock(startDateTimestamp, EChain.POLYGON);
+  const blockNumber = await binarySearchForBlock(
+    startDateTimestamp,
+    EChain.POLYGON,
+  );
 
   const eventLogs = await QueryFilter(
     abi,
@@ -186,9 +189,13 @@ export const getStreamEndDate = async (
     chain,
   );
 
-  console.log(eventLogs);
+  if (eventLogs[0]) {
+    const endTimestamp = eventLogs[0].args.endTimestamp;
+    console.log(endTimestamp);
+    return Number(endTimestamp);
+  }
 
-  return 10;
+  return null;
 };
 
 const getRicochetStreamIndexes = (inputAddress, outputAddress) => {
