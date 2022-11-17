@@ -6,15 +6,12 @@ import {
   stopStream
 } from 'app/common/functions/autoInvest';
 import { toExactFixed } from 'app/common/functions/utils';
-import {
-  getBalance,
-  getBalanceOf,
-  getSupportedTokensBasicInfo,
-  getSupportedTokensList
-} from 'app/common/functions/web3Client';
+import { getBalance, getBalanceOf } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { initialAvailableFarmsState } from 'app/common/state/farm';
-import { TStreamOption } from 'app/common/types/autoInvest';
+import {
+  TStreamOption,
+  TSupportedStreamToken
+} from 'app/common/types/autoInvest';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -76,6 +73,60 @@ const streamOptions: TStreamOption[] = [
   },
 ];
 
+const streamFromOptions: TSupportedStreamToken[] = [
+  {
+    label: 'Your USD farm',
+    address: EPolygonAddresses.IBALLUOUSD,
+    decimals: 18,
+    sign: '$',
+    isStreamable: true,
+  },
+  {
+    label: 'USDC',
+    address: EPolygonAddresses.USDC,
+    decimals: 6,
+    sign: '$',
+  },
+  {
+    label: 'DAI',
+    address: EPolygonAddresses.DAI,
+    decimals: 18,
+    sign: '$',
+  },
+  {
+    label: 'USDT',
+    address: EPolygonAddresses.USDT,
+    decimals: 6,
+    sign: '$',
+  },
+  {
+    label: 'Your ETH farm',
+    address: EPolygonAddresses.IBALLUOETH,
+    decimals: 18,
+    sign: 'Ξ',
+    isStreamable: true,
+  },
+  {
+    label: 'WETH',
+    address: EPolygonAddresses.WETH,
+    decimals: 18,
+    sign: 'Ξ',
+  },
+  {
+    label: 'Your BTC farm',
+    address: EPolygonAddresses.IBALLUOBTC,
+    decimals: 18,
+    sign: '₿',
+    isStreamable: true,
+  },
+  {
+    label: 'WBTC',
+    address: EPolygonAddresses.WBTC,
+    decimals: 18,
+    sign: '₿',
+  },
+];
+
 export const useAutoInvest = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -133,69 +184,20 @@ export const useAutoInvest = () => {
 
   const fetchAssetsInfo = async () => {
     try {
-      let supportedTokensWithBalance = new Array<any>();
+      let numberOfAssets = 0;
 
-      await Promise.all(
-        initialAvailableFarmsState
-          .filter(x => true)
-          .map(async farm => {
-            const supportedTokens = farm.isBooster
-              ? await Promise.all(
-                  farm.supportedTokensAddresses.map(async supportedtoken => {
-                    return await getSupportedTokensBasicInfo(
-                      supportedtoken.address,
-                      farm.chain,
-                    );
-                  }),
-                )
-              : await getSupportedTokensList(farm.type, farm.chain);
-
-            if (walletAccountAtom) {
-              for (const supportedToken of supportedTokens) {
-                supportedTokensWithBalance.push({
-                  ...supportedToken,
-                  chain: farm.chain,
-                });
-              }
-            }
-          }),
-      ).then(async () => {
-        let numberOfAssets = 0;
-        let chainsWithAssets = new Set();
-
-        if (walletAccountAtom) {
-          const uniqueSupportedTokensWithBalance =
-            supportedTokensWithBalance.filter(
-              (value, index, self) =>
-                index ===
-                self.findIndex(
-                  t =>
-                    t.tokenAddress === value.tokenAddress &&
-                    t.chain === value.chain,
-                ),
-            );
-
-          await Promise.all(
-            uniqueSupportedTokensWithBalance.map(
-              async supportedTokenWithBalance => {
-                const balance = await getBalanceOf(
-                  supportedTokenWithBalance.tokenAddress,
-                  supportedTokenWithBalance.decimals,
-                  supportedTokenWithBalance.chain,
-                );
-                if (+toExactFixed(balance, 2) > 0) {
-                  numberOfAssets++;
-                  chainsWithAssets.add(supportedTokenWithBalance.chain);
-                }
-              },
-            ),
-          );
+      for (let index = 0; index < streamFromOptions.length; index++) {
+        const supportedToken = streamFromOptions[index];
+        const balance = supportedToken.isStreamable
+          ? await getBalance(supportedToken.address, supportedToken.decimals)
+          : await getBalanceOf(supportedToken.address, supportedToken.decimals);
+        if (+balance > 0) {
+          numberOfAssets++;
         }
+      }
 
-        setAssetsInfo({
-          numberOfAssets: numberOfAssets,
-          numberOfChainsWithAssets: chainsWithAssets.size,
-        });
+      setAssetsInfo({
+        numberOfAssets: numberOfAssets,
       });
     } catch (error) {
       console.log(error);
@@ -238,12 +240,10 @@ export const useAutoInvest = () => {
           to: element.toLabel,
           toAddress: element.ricochetMarketAddress,
           flowPerSecond: flowPerSecond,
-          flowPerMonth: toExactFixed(flowPerMonth, 6),
+          flowPerMonth: toExactFixed(flowPerMonth, 6).toLocaleString(),
           startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
-          endDate: endDateTimestamp
-            ? endDate.toLocaleDateString()
-            : null,
-          tvs: tvs,
+          endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
+          tvs: tvs.toLocaleString(),
           sign: element.fromSign,
         });
 
