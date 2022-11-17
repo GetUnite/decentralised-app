@@ -127,6 +127,11 @@ const streamFromOptions: TSupportedStreamToken[] = [
   },
 ];
 
+const ricochetMarketAddressOptions: string[] = [
+  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC
+];
+
 export const useAutoInvest = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -142,6 +147,9 @@ export const useAutoInvest = () => {
   const [streams, setStreams] = useState<any>([]);
   const [fundedUntilByStreamOptions, setFundedUntilByStreamOptions] =
     useState<any>();
+
+  // control actions
+  const [canStartStreams, setCanStartStreams] = useState<boolean>(true);
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -206,8 +214,9 @@ export const useAutoInvest = () => {
 
   const fetchStreamsInfo = async () => {
     const currentTime = new Date().getTime();
-    let fundedUntilArray = [];
-    let streamsArray = [];
+    const ricochetMarketAddressesWithStreams = [];
+    const fundedUntilArray = [];
+    const streamsArray = [];
 
     for (let index = 0; index < streamOptions.length; index++) {
       const element = streamOptions[index];
@@ -216,6 +225,8 @@ export const useAutoInvest = () => {
         element.ricochetMarketAddress,
       );
       if (+streamFlow.flowPerSecond > 0) {
+        ricochetMarketAddressesWithStreams.push(element.ricochetMarketAddress);
+
         const ibAlluoBalance = await getBalance(
           element.fromIbAlluoAddress,
           18,
@@ -273,6 +284,9 @@ export const useAutoInvest = () => {
       }
     }
 
+    if(ricochetMarketAddressesWithStreams.length >= ricochetMarketAddressOptions.length){
+      setCanStartStreams(false);
+    }
     setFundedUntilByStreamOptions(fundedUntilArray);
     setStreams(streamsArray);
   };
@@ -305,6 +319,7 @@ export const useAutoInvest = () => {
     }
     setIsStoppingStream(false);
   };
+
   return {
     walletAccountAtom,
     isLoading,
@@ -313,5 +328,6 @@ export const useAutoInvest = () => {
     assetsInfo,
     fundedUntilByStreamOptions,
     handleStopStream,
+    canStartStreams
   };
 };

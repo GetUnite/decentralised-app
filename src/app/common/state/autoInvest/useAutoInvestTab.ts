@@ -396,7 +396,7 @@ export const useAutoInvestTab = () => {
         // sets the wanted chain as Polygon
         setWantedChainAtom(EChain.POLYGON);
 
-        const possibleStreamOptionsArray: TStreamOption[] = [];
+        const ricochetMarketAddressesWithStreams = [];
 
         // logic that saves the possible stream combinations
         for (let i = 0; i < streamOptions.length; i++) {
@@ -409,11 +409,19 @@ export const useAutoInvestTab = () => {
           );
           // if there is no value streaming add a combination of every "from" to this "to"
           if (!(+streamFlow.flowPerSecond > 0)) {
-            // push the "to" into the possible "to" tokens
-
-            // push the combination into the possible stream combinations array
-            possibleStreamOptionsArray.push(streamOption);
+            // save the ricochet market addresses that already have a stream running
+            ricochetMarketAddressesWithStreams.push(streamOption.ricochetMarketAddress);
           }
+        }
+
+        // the possible streams are all the options that don't have already one stream running
+        const possibleStreamOptionsArray = streamOptions.filter(streamOption => !ricochetMarketAddressesWithStreams.find(rmaws => rmaws == streamOption.ricochetMarketAddress));
+
+        // If there aren't any possible stream options, redirect to auto invest
+        if(possibleStreamOptionsArray.length == 0){
+          navigate('/autoinvest');
+          setNotification('No available stream options', 'info');
+          return;
         }
 
         // these are now the possible combinations till the user refreshes or the account changes

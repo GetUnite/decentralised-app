@@ -16,6 +16,7 @@ export const AutoInvest = () => {
     fundedUntilByStreamOptions,
     isStoppingStream,
     handleStopStream,
+    canStartStreams,
   } = useAutoInvest();
 
   return (
@@ -39,12 +40,14 @@ export const AutoInvest = () => {
                       <Text size="36px" weight="bold">
                         {streams?.length || 0} active streams
                       </Text>{' '}
-                      <Link to={'/autoinvest/add'}>
-                        <Button
-                          label="Start new stream"
-                          style={{ width: '170px' }}
-                        />
-                      </Link>
+                      {canStartStreams && (
+                        <Link to={'/autoinvest/add'}>
+                          <Button
+                            label="Start new stream"
+                            style={{ width: '170px' }}
+                          />
+                        </Link>
+                      )}
                     </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
