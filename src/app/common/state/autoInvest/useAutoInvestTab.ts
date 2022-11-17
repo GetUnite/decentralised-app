@@ -499,7 +499,7 @@ export const useAutoInvestTab = () => {
           if (!selectedSupportedFromToken.isStreamable) {
             const allowance = await getAllowance(
               selectedSupportedFromToken.address,
-              newSelectedStreamOption.toIbAlluoAddress,
+              newSelectedStreamOption.fromIbAlluoAddress,
             );
             if (!(+allowance > 0)) {
               neededSteps.push(possibleStreamCreationSteps[0]);
@@ -544,18 +544,22 @@ export const useAutoInvestTab = () => {
   }, [endDate]);
 
   const validateInputs = value => {
-    setStreamValueError('');
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setStreamValueError('Write a valid number');
-    } else if (+value > +selectedSupportedFromToken?.balance) {
-      setStreamValueError('Insufficient balance');
-    }
-    setStreamValue(value);
-
-    if(new Date().getTime() > new Date(endDate).getTime()){
-      setEndDateError(`The date can't be in the past`);
-    }else{
+    if (!(currentStep > 0)) {
+      setStreamValueError('');
       setEndDateError('');
+      if (value) {
+        if (!(isNumeric(value) || value === '' || value === '.')) {
+          setStreamValueError('Write a valid number');
+        } else if (+value > +selectedSupportedFromToken?.balance) {
+          setStreamValueError('Insufficient balance');
+        }
+        setStreamValue(value);
+      }
+      if (useEndDate) {
+        if (new Date().getTime() > new Date(endDate).getTime()) {
+          setEndDateError(`The end date of the stream can't be in the past`);
+        }
+      }
     }
   };
 
@@ -672,7 +676,8 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
-      const timeToStreamInSeconds = (new Date().getTime() - new Date(endDate).getTime()) / 1000;
+      const timeToStreamInSeconds =
+        (new Date().getTime() - new Date(endDate).getTime()) / 1000;
       console.log(timeToStreamInSeconds);
       // data from the selected output
       await startStream(
