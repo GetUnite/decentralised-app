@@ -1,4 +1,4 @@
 export type TAssetsInfo = {
     numberOfAssets: number;
-    numberOfChainsWithAssets: number;
+    numberOfChainsWithAssets?: number;
   };

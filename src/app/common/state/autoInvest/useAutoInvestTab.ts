@@ -1,27 +1,27 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-    approveSuperfluidSubscriptions,
-    depositIntoAlluo,
-    getDepositedAmount,
-    getInterest,
-    getStreamFlow,
-    getTotalAssetSupply,
-    getUnapprovedSuperfluidSubscriptions,
-    startStream
+  approveSuperfluidSubscriptions,
+  depositIntoAlluo,
+  getDepositedAmount,
+  getInterest,
+  getStreamFlow,
+  getTotalAssetSupply,
+  getUnapprovedSuperfluidSubscriptions,
+  startStream
 } from 'app/common/functions/autoInvest';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    approve,
-    getAllowance,
-    getBalance,
-    getBalanceOf
+  approve,
+  getAllowance,
+  getBalance,
+  getBalanceOf
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
-    TStreamCreationStep,
-    TStreamOption,
-    TSupportedStreamToken
+  TStreamCreationStep,
+  TStreamOption,
+  TSupportedStreamToken
 } from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
@@ -396,7 +396,7 @@ export const useAutoInvestTab = () => {
         // sets the wanted chain as Polygon
         setWantedChainAtom(EChain.POLYGON);
 
-        const possibleStreamOptionsArray: TStreamOption[] = [];
+        const ricochetMarketAddressesWithStreams = [];
 
         // logic that saves the possible stream combinations
         for (let i = 0; i < streamOptions.length; i++) {
@@ -409,11 +409,19 @@ export const useAutoInvestTab = () => {
           );
           // if there is no value streaming add a combination of every "from" to this "to"
           if (!(+streamFlow.flowPerSecond > 0)) {
-            // push the "to" into the possible "to" tokens
-
-            // push the combination into the possible stream combinations array
-            possibleStreamOptionsArray.push(streamOption);
+            // save the ricochet market addresses that already have a stream running
+            ricochetMarketAddressesWithStreams.push(streamOption.ricochetMarketAddress);
           }
+        }
+
+        // the possible streams are all the options that don't have already one stream running
+        const possibleStreamOptionsArray = streamOptions.filter(streamOption => !ricochetMarketAddressesWithStreams.find(rmaws => rmaws == streamOption.ricochetMarketAddress));
+
+        // If there aren't any possible stream options, redirect to auto invest
+        if(possibleStreamOptionsArray.length == 0){
+          navigate('/autoinvest');
+          setNotification('No available stream options', 'info');
+          return;
         }
 
         // these are now the possible combinations till the user refreshes or the account changes
@@ -499,7 +507,7 @@ export const useAutoInvestTab = () => {
           if (!selectedSupportedFromToken.isStreamable) {
             const allowance = await getAllowance(
               selectedSupportedFromToken.address,
-              newSelectedStreamOption.toIbAlluoAddress,
+              newSelectedStreamOption.fromIbAlluoAddress,
             );
             if (!(+allowance > 0)) {
               neededSteps.push(possibleStreamCreationSteps[0]);
@@ -539,14 +547,28 @@ export const useAutoInvestTab = () => {
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 
+  useEffect(() => {
+    validateInputs(streamValue);
+  }, [endDate]);
+
   const validateInputs = value => {
-    setStreamValueError('');
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setStreamValueError('Write a valid number');
-    } else if (+value > +selectedSupportedFromToken?.balance) {
-      setStreamValueError('Insufficient balance');
+    if (!(currentStep > 0)) {
+      setStreamValueError('');
+      setEndDateError('');
+      if (value) {
+        if (!(isNumeric(value) || value === '' || value === '.')) {
+          setStreamValueError('Write a valid number');
+        } else if (+value > +selectedSupportedFromToken?.balance) {
+          setStreamValueError('Insufficient balance');
+        }
+        setStreamValue(value);
+      }
+      if (useEndDate) {
+        if (new Date().getTime() > new Date(endDate).getTime()) {
+          setEndDateError(`The end date of the stream can't be in the past`);
+        }
+      }
     }
-    setStreamValue(value);
   };
 
   // updates target farm info
@@ -593,7 +615,7 @@ export const useAutoInvestTab = () => {
       // TODO: currently biconomy doesn't work here
       await approve(
         selectedSupportedFromToken.address,
-        selectedSupportedToToken.address,
+        selectedStreamOption.fromIbAlluoAddress,
         EChain.POLYGON,
         //useBiconomy,
       );
@@ -662,6 +684,8 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
+      const timeToStreamInSeconds = Math.floor(
+        (new Date(endDate).getTime() - new Date().getTime()) / 1000);
       // data from the selected output
       await startStream(
         selectedStreamOption.fromIbAlluoAddress,
@@ -669,7 +693,7 @@ export const useAutoInvestTab = () => {
         selectedStreamOption.toStIbAlluoAddress,
         selectedStreamOption.ricochetMarketAddress,
         +streamValue,
-        useEndDate ? new Date(endDate).getTime() : null,
+        useEndDate ? timeToStreamInSeconds : null,
         useBiconomy,
       );
       setNotification('Stream started successfully', 'success');
@@ -717,6 +741,7 @@ export const useAutoInvestTab = () => {
     isUpdatingSelectedStreamOption,
     // error control
     hasErrors: streamValueError != '' || endDateError != '',
+    endDateError,
     // inputs
     disableInputs: currentStep > 0,
     streamValue,

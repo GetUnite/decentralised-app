@@ -9,7 +9,7 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { RightAlignToggle } from 'app/modernUI/components/Toggles';
-import { Box } from 'grommet';
+import { Box, Text } from 'grommet';
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
@@ -37,6 +37,7 @@ export const AutoInvestTab = ({ ...rest }) => {
     setUseEndDate,
     endDate,
     setEndDate,
+    endDateError,
     currentStep,
     selectedStreamOptionSteps,
     handleCurrentStep
@@ -78,13 +79,18 @@ export const AutoInvestTab = ({ ...rest }) => {
                 label="Set end date for stream"
                 disabled={disableInputs}
               />
-              {useEndDate && (
+              {useEndDate && (<>
                 <DateInput
                   label="End date"
                   date={endDate}
                   setDate={setEndDate}
                   disabled={disableInputs}
                 />
+                {endDateError && (
+                  <Text color="error" size="small" margin={{ top: 'small' }}>
+                    {endDateError}
+                  </Text>
+                )}</>
               )}
             </Box>
             <Box

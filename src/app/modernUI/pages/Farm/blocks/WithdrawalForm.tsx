@@ -9,8 +9,8 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
+import { TopHeader } from '../components/TopHeader';
 import { BoosterFarmWithdrawalConfirmation } from './BoosterFarmWithdrawalConfirmation';
-import { TopHeader } from './TopHeader';
 
 export const WithdrawalForm = ({
   selectedFarm,
