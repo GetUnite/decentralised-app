@@ -676,9 +676,8 @@ export const useAutoInvestTab = () => {
     setIsStartingStream(true);
 
     try {
-      const timeToStreamInSeconds =
-        (new Date().getTime() - new Date(endDate).getTime()) / 1000;
-      console.log(timeToStreamInSeconds);
+      const timeToStreamInSeconds = Math.floor(
+        (new Date(endDate).getTime() - new Date().getTime()) / 1000);
       // data from the selected output
       await startStream(
         selectedStreamOption.fromIbAlluoAddress,
