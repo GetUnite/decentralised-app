@@ -1,9 +1,10 @@
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import { HeadingText, Layout, Spinner } from 'app/modernUI/components';
+import { Layout, Spinner } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
+import { HeadingText } from './components';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {

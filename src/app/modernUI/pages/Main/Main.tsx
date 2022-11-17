@@ -1,13 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
 import { useMain } from 'app/common/state';
 import {
-  HeadingText,
   Layout,
   SortIcon,
   Spinner
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
+import { HeadingText } from '../AutoInvest/components';
 import { FarmCard, Filter } from './components';
 
 export const Main = () => {
