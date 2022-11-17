@@ -230,7 +230,8 @@ export const useAutoInvest = () => {
           element.ricochetMarketAddress,
           streamFlow.timestamp,
         );
-        console.log(endDateTimestamp);
+        const endDate = new Date(0);
+        endDate.setSeconds(endDateTimestamp);
         streamsArray.push({
           from: element.fromLabel,
           fromAddress: element.fromIbAlluoAddress,
@@ -240,7 +241,7 @@ export const useAutoInvest = () => {
           flowPerMonth: toExactFixed(flowPerMonth, 6),
           startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
           endDate: endDateTimestamp
-            ? new Date(endDateTimestamp).toLocaleDateString()
+            ? endDate.toLocaleDateString()
             : null,
           tvs: tvs,
           sign: element.fromSign,
