@@ -2,17 +2,17 @@ import { EChain } from 'app/common/constants/chains';
 import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-    getIfUserHasWithdrawalRequest,
-    isExpectedPolygonEvent,
-    listenToHandler,
-    withdrawStableCoin
+  getIfUserHasWithdrawalRequest,
+  isExpectedPolygonEvent,
+  listenToHandler,
+  withdrawStableCoin
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-export const useWithdrawal = ({
+export const useBoostFarmWithdrawal = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
@@ -22,7 +22,7 @@ export const useWithdrawal = ({
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
-  const { setNotificationt } = useNotification();
+  const { setNotification } = useNotification();
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(
@@ -70,7 +70,7 @@ export const useWithdrawal = ({
         const message = `You have ${userRequestslength} ${
           userRequestslength === 1 ? 'request' : 'requests'
         } accepted, will be processed within ${remainingTime}`;
-        setNotificationt(message, 'success');
+        setNotification(message, 'success');
       }
     } catch (err) {
       setWithdrawValueError(err.message);
@@ -92,7 +92,7 @@ export const useWithdrawal = ({
           ) {
             setWithdrawValue(null);
             setIsWithdrawing(false);
-            setNotificationt('Withdrew successfully', 'success');
+            setNotification('Withdrew successfully', 'success');
           }
         },
       );
@@ -105,7 +105,7 @@ export const useWithdrawal = ({
             isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
           ) {
             setIsWithdrawing(false);
-            setNotificationt(
+            setNotification(
               'Request accepted and will be processed within 24 hours',
               'success',
             );
@@ -162,7 +162,7 @@ export const useWithdrawal = ({
       await updateFarmInfo();
     } catch (error) {
       resetState();
-      setNotificationt(error, 'error');
+      setNotification(error, 'error');
     }
 
     setIsWithdrawing(false);

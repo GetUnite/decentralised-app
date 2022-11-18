@@ -8,7 +8,7 @@ import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-export const useWithdrawal = ({
+export const useFarmWithdrawal = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,

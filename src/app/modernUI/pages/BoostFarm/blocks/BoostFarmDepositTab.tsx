@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useDeposit } from 'app/common/state/farm';
+import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -9,9 +9,9 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from './TopHeader';
+import { TopHeader } from '../components';
 
-export const BoostDepositTab = ({
+export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -30,7 +30,7 @@ export const BoostDepositTab = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-  } = useDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>

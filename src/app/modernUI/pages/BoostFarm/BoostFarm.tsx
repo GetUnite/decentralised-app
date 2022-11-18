@@ -13,7 +13,7 @@ import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
 import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { BoostDepositTab, BoostFarmPresentation, BoostFarmWithdrawalTab } from './blocks';
+import { BoostFarmDepositTab, BoostFarmPresentation, BoostFarmWithdrawalTab } from './blocks';
 
 export const BoostFarm = () => {
   const { id } = useParams();
@@ -30,7 +30,7 @@ export const BoostFarm = () => {
     claimRewards,
     isClamingRewards,
     isLoadingRewards,
-    showBoosterFarmPresentation,
+    showBoostFarmPresentation,
     showTabs,
     previousHarvestDate,
     nextHarvestDate,
@@ -62,7 +62,7 @@ export const BoostFarm = () => {
           noHeading={!showTabs}
         >
           <>
-            {showBoosterFarmPresentation && (
+            {showBoostFarmPresentation && (
               <BoostFarmPresentation
                 selectedFarm={selectedFarm}
                 farmName={farmName}
@@ -71,7 +71,7 @@ export const BoostFarm = () => {
             {showTabs && (
               <Tabs>
                 <Tab title="Deposit">
-                  <BoostDepositTab
+                  <BoostFarmDepositTab
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                     updateFarmInfo={updateFarmInfo}
