@@ -408,7 +408,7 @@ export const useAutoInvestTab = () => {
             streamOption.ricochetMarketAddress,
           );
           // if there is no value streaming add a combination of every "from" to this "to"
-          if (!(+streamFlow.flowPerSecond > 0)) {
+          if (+streamFlow.flowPerSecond > 0) {
             // save the ricochet market addresses that already have a stream running
             ricochetMarketAddressesWithStreams.push(streamOption.ricochetMarketAddress);
           }
