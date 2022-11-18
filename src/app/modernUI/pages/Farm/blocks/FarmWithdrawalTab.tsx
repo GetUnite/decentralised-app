@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useWithdrawal } from 'app/common/state/farm';
+import { useFarmWithdrawal } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -9,7 +9,7 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from './TopHeader';
+import { TopHeader } from '../components';
 
 export const FarmWithdrawalTab = ({
   selectedFarm,
@@ -29,7 +29,7 @@ export const FarmWithdrawalTab = ({
     handleWithdraw,
     useBiconomy,
     setUseBiconomy,
-  } = useWithdrawal({
+  } = useFarmWithdrawal({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,

@@ -164,7 +164,7 @@ export const useBoostFarm = ({ id }) => {
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
 
   // information/confirmation control
-  const showBoosterFarmPresentation =
+  const showBoostFarmPresentation =
     selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
 
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
@@ -179,7 +179,7 @@ export const useBoostFarm = ({ id }) => {
   const [pendingRewards, setPendingRewards] = useState<number>();
   const [losablePendingRewards, setLosablePendingRewards] = useState<number>();
 
-  const showTabs = !showBoosterFarmPresentation;
+  const showTabs = !showBoostFarmPresentation;
   //&& !showBoosterWithdrawalConfirmation;
 
   useEffect(() => {
@@ -404,7 +404,7 @@ export const useBoostFarm = ({ id }) => {
     isClamingRewards,
     isLoadingRewards,
     showTabs,
-    showBoosterFarmPresentation,
+    showBoostFarmPresentation,
     previousHarvestDate,
     nextHarvestDate,
     showBoosterWithdrawalConfirmation,

@@ -1,4 +1,3 @@
-export * from './BoosterFarmPresentation';
-export * from './DepositFormTab';
+export * from './FarmDepositTab';
 export * from './FarmWithdrawalTab';
 

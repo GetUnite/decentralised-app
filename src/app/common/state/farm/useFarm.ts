@@ -5,8 +5,7 @@ import {
 import { EChain } from 'app/common/constants/chains';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  getInterest,
-  getSupportedTokensAdvancedInfo, getSupportedTokensList, getTotalAssetSupply,
+  getInterest, getTotalAssetSupply,
   getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -25,6 +24,26 @@ export const farmOptions: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    supportedTokens: [
+      {
+        label: 'USDT',
+        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'DAI',
+        address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        decimals: 6,
+        sign: '$',
+      },
+    ],
   },
   {
     id: 1,
@@ -34,6 +53,32 @@ export const farmOptions: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'jEUR'],
+    supportedTokens: [
+      {
+        label: 'EURS',
+        address: '0xE111178A87A3BFf0c8d18DECBa5798827539Ae99',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'PAR',
+        address: '0xE2Aa7db6dA1dAE97C5f5C6914d285fBfCC32A128',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'jEUR',
+        address: '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0x7BDF330f423Ea880FF95fC41A280fD5eCFD3D09f',
+        decimals: 6,
+        sign: '€',
+      },
+    ],
   },
   {
     id: 2,
@@ -43,6 +88,14 @@ export const farmOptions: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
   },
   {
     id: 3,
@@ -52,6 +105,14 @@ export const farmOptions: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
   },
   {
     id: 4,
@@ -61,6 +122,26 @@ export const farmOptions: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    supportedTokens: [
+      {
+        label: 'USDC',
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'DAI',
+        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+        decimals: 6,
+        sign: '$',
+      },
+    ],
   },
   {
     id: 5,
@@ -70,6 +151,26 @@ export const farmOptions: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'agEUR'],
+    supportedTokens: [
+      {
+        label: 'EURS',
+        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'agEUR',
+        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        decimals: 18,
+        sign: '€',
+      },
+    ],
   },
   {
     id: 6,
@@ -79,6 +180,14 @@ export const farmOptions: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
   },
   {
     id: 7,
@@ -88,6 +197,14 @@ export const farmOptions: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
   },
 ];
 
@@ -98,9 +215,6 @@ export const useFarm = ({ id }) => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
-
-  // other state control files
-  const { setNotification } = useNotification();
 
   // selected farm control
   const [availableFarms] = useState<TFarm[]>(farmOptions);
@@ -120,12 +234,6 @@ export const useFarm = ({ id }) => {
   useEffect(() => {
     selectFarm(id);
   }, [walletAccountAtom]);
-
-  useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      //here update the actual selected token.
-    }
-  }, [selectedSupportedToken]);
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
@@ -150,7 +258,6 @@ export const useFarm = ({ id }) => {
       farmInfo = {
         interest: await getInterest(farm.type, farm.chain),
         totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
-        supportedTokensList: await getSupportedTokensList(farm.type, farm.chain),
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
@@ -158,27 +265,8 @@ export const useFarm = ({ id }) => {
           farm.type,
           farm.chain,
         );
-        farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
-      }
-
-      if (walletAccountAtom) {
-        farmInfo.supportedTokens = await Promise.all(
-          farmInfo.supportedTokensList.map(async supportedToken => {
-            const advancedSupportedTokenInfo =
-              await getSupportedTokensAdvancedInfo(
-                farm.farmAddress,
-                supportedToken,
-                farm.chain,
-              );
-            return {
-              label: supportedToken.symbol,
-              address: supportedToken.tokenAddress,
-              balance: advancedSupportedTokenInfo.balance,
-              allowance: advancedSupportedTokenInfo.allowance,
-              decimals: supportedToken.decimals,
-              sign: supportedToken.sign,
-            } as TSupportedToken;
-          }),
+        farmInfo.depositDividedAmount = depositDivided(
+          farmInfo.depositedAmount,
         );
       }
 

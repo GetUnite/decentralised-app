@@ -31,6 +31,7 @@ interface INumericInput {
   tokenOptions?: TSupportedToken[];
   error: string;
   maxValue?: string | number;
+  maxButton?: boolean;
   slippageWarning?: boolean;
   lowSlippageTokenLabels?: string[];
 }
@@ -41,6 +42,7 @@ export const NumericInput = ({
   value,
   available,
   maxValue,
+  maxButton = false,
   onValueChange,
   tokenOptions,
   selectedToken,
@@ -69,7 +71,7 @@ export const NumericInput = ({
                 {!!selectedToken &&
                   'Wallet: ' +
                     tokenSign +
-                    roundNumberDown(+(+selectedToken?.balance))}
+                    roundNumberDown(+(+maxValue))}
               </>
             )}
           </Text>
@@ -88,7 +90,7 @@ export const NumericInput = ({
             }}
           />
           <AbsoluteBox direction="row" gap="xsmall">
-            {maxValue != undefined && (
+            {maxButton && maxValue != undefined && (
               <MaxButton
                 primary
                 onClick={() => {

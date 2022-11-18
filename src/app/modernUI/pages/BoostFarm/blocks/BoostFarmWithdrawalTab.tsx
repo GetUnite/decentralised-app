@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useWithdrawal } from 'app/common/state/farm';
+import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
   FeeInfo,
   Info,
@@ -9,8 +9,8 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from '../components/TopHeader';
-import { BoosterFarmWithdrawalConfirmation } from './BoosterFarmWithdrawalConfirmation';
+import { TopHeader } from '../components';
+import { BoostFarmWithdrawalConfirmation } from './BoostFarmWithdrawalConfirmation';
 
 export const BoostFarmWithdrawalTab = ({
   selectedFarm,
@@ -35,7 +35,7 @@ export const BoostFarmWithdrawalTab = ({
     handleWithdraw,
     useBiconomy,
     setUseBiconomy,
-  } = useWithdrawal({
+  } = useBoostFarmWithdrawal({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,
@@ -108,9 +108,11 @@ export const BoostFarmWithdrawalTab = ({
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
                       slippageWarning={selectedFarm.isBooster}
-                      lowSlippageTokenLabels={selectedFarm.isBooster
-                        ? selectedFarm.lowSlippageTokenLabels
-                        : null}
+                      lowSlippageTokenLabels={
+                        selectedFarm.isBooster
+                          ? selectedFarm.lowSlippageTokenLabels
+                          : null
+                      }
                     />
                   </Box>
                 </Box>

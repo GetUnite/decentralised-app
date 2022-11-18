@@ -2,22 +2,33 @@ import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
   depositIntoBoosterFarm,
-  depositStableCoin
+  depositStableCoin,
+  getAllowance,
+  getBalanceOf,
+  getDecimals
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
-export const useDeposit = ({
+export const useFarmDeposit = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+  // other control files
   const { setNotification } = useNotification();
+
+  // inputs
   const [depositValue, setDepositValue] = useState<string>();
   const [depositValueError, setDepositValueError] = useState<string>('');
+
+  // data
+  const [supportedTokenInfo, setSupportedTokenInfo] = useState<any>({balance: 0, allowance: 0});
+
+  // loading control
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(false);
@@ -27,11 +38,31 @@ export const useDeposit = ({
       //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
-  
+
   const resetState = () => {
     setDepositValueError('');
     setIsApproving(false);
     setIsDepositing(false);
+  };
+
+  useEffect(() => {
+    if (selectedFarm) {
+      updateBalanceAndAllowance();
+    }
+  }, [selectedSupportedToken]);
+
+  const updateBalanceAndAllowance = async () => {
+    const decimals = await getDecimals(
+      selectedSupportedToken.address,
+      selectedFarm.chain,
+    );
+    const allowance = await getAllowance(selectedSupportedToken.address, selectedFarm.farmAddress, selectedFarm.chain);
+    const balance = await getBalanceOf(
+      selectedSupportedToken.address,
+      decimals,
+      selectedFarm.chain,
+    );
+    setSupportedTokenInfo({balance: balance, allowance: allowance});
   };
 
   const handleApprove = async () => {
@@ -101,6 +132,7 @@ export const useDeposit = ({
   return {
     depositValue,
     handleDepositValueChange,
+    supportedTokenInfo,
     isApproving,
     handleApprove,
     isDepositing,

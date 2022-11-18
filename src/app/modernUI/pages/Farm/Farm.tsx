@@ -7,7 +7,7 @@ import {
 import { ResponsiveContext } from 'grommet';
 import { useParams } from 'react-router-dom';
 import {
-  DepositFormTab,
+  FarmDepositTab,
   FarmWithdrawalTab
 } from './blocks';
 
@@ -35,7 +35,7 @@ export const Farm = () => {
           >
             <Tabs>
               <Tab title="Deposit">
-                <DepositFormTab
+                <FarmDepositTab
                   selectedFarm={selectedFarm}
                   isLoading={isLoading}
                   updateFarmInfo={updateFarmInfo}

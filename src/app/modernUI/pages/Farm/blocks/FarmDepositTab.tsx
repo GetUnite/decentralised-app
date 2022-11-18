@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useDeposit } from 'app/common/state/farm';
+import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -9,9 +9,9 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from '../components/TopHeader';
+import { TopHeader } from '../components';
 
-export const DepositFormTab = ({
+export const FarmDepositTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -30,7 +30,8 @@ export const DepositFormTab = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-  } = useDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+    supportedTokenInfo
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
@@ -59,7 +60,8 @@ export const DepositFormTab = ({
                   tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
-                  maxValue={selectedSupportedToken?.balance}
+                  maxValue={supportedTokenInfo.balance}
+                  maxButton={true}
                   tokenOptions={selectedFarm.supportedTokens || []}
                   selectedToken={selectedSupportedToken}
                   setSelectedToken={selectSupportedToken}
@@ -106,13 +108,13 @@ export const DepositFormTab = ({
           }
           label={
             +depositValue > 0
-              ? +selectedSupportedToken?.allowance >= +depositValue
+              ? supportedTokenInfo.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +selectedSupportedToken?.allowance >= +depositValue
+            supportedTokenInfo.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }
