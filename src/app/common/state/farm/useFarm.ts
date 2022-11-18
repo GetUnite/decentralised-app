@@ -5,7 +5,8 @@ import {
 import { EChain } from 'app/common/constants/chains';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  getInterest, getTotalAssetSupply,
+  getInterest,
+  getTotalAssetSupply,
   getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -26,12 +27,6 @@ export const farmOptions: Array<TFarm> = [
     icons: ['USDC', 'USDT', 'DAI'],
     supportedTokens: [
       {
-        label: 'USDT',
-        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
-        decimals: 6,
-        sign: '$',
-      },
-      {
         label: 'DAI',
         address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
         decimals: 18,
@@ -40,6 +35,12 @@ export const farmOptions: Array<TFarm> = [
       {
         label: 'USDC',
         address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
         decimals: 6,
         sign: '$',
       },
@@ -232,6 +233,25 @@ export const useFarm = ({ id }) => {
   }, [walletAccountAtom, selectedFarm]);
 
   useEffect(() => {
+    const selectFarm = async id => {
+      try {
+        let farm = availableFarms.find(availableFarm => availableFarm.id == id);
+        if (!farm) {
+          navigate('/');
+          return;
+        }
+
+        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+
+        setSelectedFarm(farm);
+        setSelectedsupportedToken(farm.supportedTokens[0]);
+      } catch (error) {
+        console.log(error);
+      }
+
+      setIsLoading(false);
+    };
+
     selectFarm(id);
   }, [walletAccountAtom]);
 
@@ -274,27 +294,6 @@ export const useFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const selectFarm = async id => {
-    setIsLoading(true);
-
-    try {
-      const farm = await getUpdatedFarmInfo(
-        availableFarms.find(availableFarm => availableFarm.id == id),
-      );
-      if (!farm) {
-        navigate('/');
-      }
-      setSelectedFarm(farm);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
-      );
-    } catch (error) {
-      console.log(error);
-    }
-
-    setIsLoading(false);
   };
 
   const selectSupportedToken = supportedToken => {

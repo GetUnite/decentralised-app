@@ -26,9 +26,13 @@ export const useFarmDeposit = ({
   const [depositValueError, setDepositValueError] = useState<string>('');
 
   // data
-  const [supportedTokenInfo, setSupportedTokenInfo] = useState<any>({balance: 0, allowance: 0});
+  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] = useState<any>({
+    balance: 0,
+    allowance: 0,
+  });
 
   // loading control
+  const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] = useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(false);
@@ -46,24 +50,32 @@ export const useFarmDeposit = ({
   };
 
   useEffect(() => {
-    if (selectedFarm) {
+    const updateBalanceAndAllowance = async () => {
+      setIsFetchingSupportedTokenInfo(true);
+
+      const decimals = await getDecimals(
+        selectedSupportedToken.address,
+        selectedFarm.chain,
+      );
+      const allowance = await getAllowance(
+        selectedSupportedToken.address,
+        selectedFarm.farmAddress,
+        selectedFarm.chain,
+      );
+      const balance = await getBalanceOf(
+        selectedSupportedToken.address,
+        decimals,
+        selectedFarm.chain,
+      );
+      setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+
+      setIsFetchingSupportedTokenInfo(false);
+    };
+
+    if (selectedFarm && selectedSupportedToken) {
       updateBalanceAndAllowance();
     }
   }, [selectedSupportedToken]);
-
-  const updateBalanceAndAllowance = async () => {
-    const decimals = await getDecimals(
-      selectedSupportedToken.address,
-      selectedFarm.chain,
-    );
-    const allowance = await getAllowance(selectedSupportedToken.address, selectedFarm.farmAddress, selectedFarm.chain);
-    const balance = await getBalanceOf(
-      selectedSupportedToken.address,
-      decimals,
-      selectedFarm.chain,
-    );
-    setSupportedTokenInfo({balance: balance, allowance: allowance});
-  };
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -88,7 +100,7 @@ export const useFarmDeposit = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setDepositValueError('Write a valid number');
-    } else if (+value > +selectedSupportedToken?.balance) {
+    } else if (+value > +selectedSupportedTokenInfo.balance) {
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
@@ -132,7 +144,7 @@ export const useFarmDeposit = ({
   return {
     depositValue,
     handleDepositValueChange,
-    supportedTokenInfo,
+    selectedSupportedTokenInfo,
     isApproving,
     handleApprove,
     isDepositing,
@@ -142,5 +154,6 @@ export const useFarmDeposit = ({
     resetState,
     depositValueError,
     hasErrors: depositValueError != '',
+    isFetchingSupportedTokenInfo
   };
 };

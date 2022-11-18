@@ -1,11 +1,10 @@
+import { useTransfer } from 'app/common/state/transfer';
 import {
-  Spinner,
-  SubmitButton,
   FeeInfo,
-  NumericInput,
+  NumericInput, Spinner,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box, Text, TextInput } from 'grommet';
-import { useTransfer } from 'app/common/state/transfer';
 import { TopHeader } from './TopHeader';
 
 export const TransferTab = ({ ...rest }) => {
@@ -49,6 +48,7 @@ export const TransferTab = ({ ...rest }) => {
                 onValueChange={handleTransferValueChange}
                 value={transferValue}
                 maxValue={selectedIbAlluoInfo?.balance}
+                maxButton={true}
                 tokenOptions={ibAlluosInfo}
                 selectedToken={selectedIbAlluoInfo}
                 setSelectedToken={setSelectedIbAlluoBySymbol}

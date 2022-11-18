@@ -43,7 +43,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableAddress: EEthereumAddresses.USDC,
     },
     lPTokenAddress: EEthereumAddresses.FRAXUSDC,
-    supportedTokensAddresses: [
+    supportedTokens: [
       { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
       { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
       { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
@@ -78,7 +78,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableAddress: EEthereumAddresses.USDC,
     },
     lPTokenAddress: EEthereumAddresses.CVXETH,
-    supportedTokensAddresses: [
+    supportedTokens: [
       { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
       { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
       { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
@@ -113,7 +113,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableAddress: EEthereumAddresses.USDC,
     },
     lPTokenAddress: EEthereumAddresses.STETHETH,
-    supportedTokensAddresses: [
+    supportedTokens: [
       { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
       { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
       { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
@@ -228,7 +228,7 @@ export const useBoostFarm = ({ id }) => {
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
           valueOf1LPinUSDC,
         supportedTokensList: await Promise.all(
-          farm.supportedTokensAddresses.map(async supportedtoken => {
+          farm.supportedTokens.map(async supportedtoken => {
             return {
               ...(await getSupportedTokensBasicInfo(
                 supportedtoken.address,
