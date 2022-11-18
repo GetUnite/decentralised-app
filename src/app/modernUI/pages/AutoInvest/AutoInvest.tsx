@@ -1,9 +1,10 @@
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import { HeadingText, Layout, Spinner } from 'app/modernUI/components';
+import { Layout, Spinner } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
+import { HeadingText } from './components';
 import { StreamCard } from './components/StreamCard';
 
 export const AutoInvest = () => {
@@ -15,6 +16,7 @@ export const AutoInvest = () => {
     fundedUntilByStreamOptions,
     isStoppingStream,
     handleStopStream,
+    canStartStreams,
   } = useAutoInvest();
 
   return (
@@ -38,12 +40,14 @@ export const AutoInvest = () => {
                       <Text size="36px" weight="bold">
                         {streams?.length || 0} active streams
                       </Text>{' '}
-                      <Link to={'/autoinvest/add'}>
-                        <Button
-                          label="Start new stream"
-                          style={{ width: '170px' }}
-                        />
-                      </Link>
+                      {canStartStreams && (
+                        <Link to={'/autoinvest/add'}>
+                          <Button
+                            label="Start new stream"
+                            style={{ width: '170px' }}
+                          />
+                        </Link>
+                      )}
                     </Box>
                   )}
                   <Box margin={{ top: '36px' }} gap="6px">
@@ -114,12 +118,9 @@ export const AutoInvest = () => {
                                     to={stream.to}
                                     toAddress={stream.toAddress}
                                     tvs={stream.tvs}
-                                    tvsInUSD={stream.tvsInUSD}
                                     flowPerMonth={stream.flowPerMonth}
-                                    flowPerMonthInUSD={
-                                      stream.flowPerMonthInUSD
-                                    }
                                     startDate={stream.startDate}
+                                    endDate={stream.endDate}
                                     fundedUntilDate={
                                       fundedUntilByStreamOptions.find(
                                         fundedUntilByStreamOption =>

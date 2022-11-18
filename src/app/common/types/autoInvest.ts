@@ -27,5 +27,5 @@ export type TStreamOption = {
 export type TSupportedStreamToken = TSupportedToken & {
   // Is immediatly streamable for auto invest
   isStreamable?: boolean;
-  canStreamTo: TSupportedToken[];
+  canStreamTo?: TSupportedToken[];
 };

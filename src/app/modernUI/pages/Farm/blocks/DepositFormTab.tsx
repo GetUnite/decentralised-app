@@ -9,7 +9,7 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from './TopHeader';
+import { TopHeader } from '../components/TopHeader';
 
 export const DepositFormTab = ({
   isLoading,

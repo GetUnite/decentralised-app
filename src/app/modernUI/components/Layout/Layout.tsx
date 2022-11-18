@@ -103,7 +103,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             <Box
               width="xlarge"
               pad={{ horizontal: 'medium', vertical: 'medium' }}
-              style={{ marginTop: '12px', marginBottom: '123px' }}
+              style={{ marginTop: '12px', marginBottom: '123px', minHeight: '510px'}}
             >
               {children}
             </Box>
