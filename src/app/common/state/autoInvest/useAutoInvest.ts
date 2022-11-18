@@ -1,20 +1,17 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-    convertToUSDC,
-    getStreamFlow,
-    stopStream
+  getStreamEndDate,
+  getStreamFlow,
+  stopStream
 } from 'app/common/functions/autoInvest';
 import { toExactFixed } from 'app/common/functions/utils';
-import {
-    getBalance,
-    getBalanceOf,
-    getSupportedTokensBasicInfo,
-    getSupportedTokensList
-} from 'app/common/functions/web3Client';
+import { getBalance, getBalanceOf } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
-import { farmOptions } from 'app/common/state/farm/useFarm';
-import { TStreamOption } from 'app/common/types/autoInvest';
+import {
+  TStreamOption,
+  TSupportedStreamToken
+} from 'app/common/types/autoInvest';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -76,6 +73,65 @@ const streamOptions: TStreamOption[] = [
   },
 ];
 
+const streamFromOptions: TSupportedStreamToken[] = [
+  {
+    label: 'Your USD farm',
+    address: EPolygonAddresses.IBALLUOUSD,
+    decimals: 18,
+    sign: '$',
+    isStreamable: true,
+  },
+  {
+    label: 'USDC',
+    address: EPolygonAddresses.USDC,
+    decimals: 6,
+    sign: '$',
+  },
+  {
+    label: 'DAI',
+    address: EPolygonAddresses.DAI,
+    decimals: 18,
+    sign: '$',
+  },
+  {
+    label: 'USDT',
+    address: EPolygonAddresses.USDT,
+    decimals: 6,
+    sign: '$',
+  },
+  {
+    label: 'Your ETH farm',
+    address: EPolygonAddresses.IBALLUOETH,
+    decimals: 18,
+    sign: 'Ξ',
+    isStreamable: true,
+  },
+  {
+    label: 'WETH',
+    address: EPolygonAddresses.WETH,
+    decimals: 18,
+    sign: 'Ξ',
+  },
+  {
+    label: 'Your BTC farm',
+    address: EPolygonAddresses.IBALLUOBTC,
+    decimals: 18,
+    sign: '₿',
+    isStreamable: true,
+  },
+  {
+    label: 'WBTC',
+    address: EPolygonAddresses.WBTC,
+    decimals: 18,
+    sign: '₿',
+  },
+];
+
+const ricochetMarketAddressOptions: string[] = [
+  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
+  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC
+];
+
 export const useAutoInvest = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -91,6 +147,9 @@ export const useAutoInvest = () => {
   const [streams, setStreams] = useState<any>([]);
   const [fundedUntilByStreamOptions, setFundedUntilByStreamOptions] =
     useState<any>();
+
+  // control actions
+  const [canStartStreams, setCanStartStreams] = useState<boolean>(true);
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -133,59 +192,20 @@ export const useAutoInvest = () => {
 
   const fetchAssetsInfo = async () => {
     try {
-      let supportedTokensWithBalance = new Array<any>();
+      let numberOfAssets = 0;
 
-      await Promise.all(
-        farmOptions
-          .map(async farm => {
-            const supportedTokens = await getSupportedTokensList(farm.type, farm.chain);
-
-            if (walletAccountAtom) {
-              for (const supportedToken of supportedTokens) {
-                supportedTokensWithBalance.push({
-                  ...supportedToken,
-                  chain: farm.chain,
-                });
-              }
-            }
-          }),
-      ).then(async () => {
-        let numberOfAssets = 0;
-        let chainsWithAssets = new Set();
-
-        if (walletAccountAtom) {
-          const uniqueSupportedTokensWithBalance =
-            supportedTokensWithBalance.filter(
-              (value, index, self) =>
-                index ===
-                self.findIndex(
-                  t =>
-                    t.tokenAddress === value.tokenAddress &&
-                    t.chain === value.chain,
-                ),
-            );
-
-          await Promise.all(
-            uniqueSupportedTokensWithBalance.map(
-              async supportedTokenWithBalance => {
-                const balance = await getBalanceOf(
-                  supportedTokenWithBalance.tokenAddress,
-                  supportedTokenWithBalance.decimals,
-                  supportedTokenWithBalance.chain,
-                );
-                if (+toExactFixed(balance, 2) > 0) {
-                  numberOfAssets++;
-                  chainsWithAssets.add(supportedTokenWithBalance.chain);
-                }
-              },
-            ),
-          );
+      for (let index = 0; index < streamFromOptions.length; index++) {
+        const supportedToken = streamFromOptions[index];
+        const balance = supportedToken.isStreamable
+          ? await getBalance(supportedToken.address, supportedToken.decimals)
+          : await getBalanceOf(supportedToken.address, supportedToken.decimals);
+        if (+balance > 0) {
+          numberOfAssets++;
         }
+      }
 
-        setAssetsInfo({
-          numberOfAssets: numberOfAssets,
-          numberOfChainsWithAssets: chainsWithAssets.size,
-        });
+      setAssetsInfo({
+        numberOfAssets: numberOfAssets,
       });
     } catch (error) {
       console.log(error);
@@ -194,88 +214,79 @@ export const useAutoInvest = () => {
 
   const fetchStreamsInfo = async () => {
     const currentTime = new Date().getTime();
-    let fundedUntilArray = [];
-    let streamsArray = [];
+    const ricochetMarketAddressesWithStreams = [];
+    const fundedUntilArray = [];
+    const streamsArray = [];
 
     for (let index = 0; index < streamOptions.length; index++) {
       const element = streamOptions[index];
-        const streamFlow = await getStreamFlow(
-          element.fromStIbAlluoAddress,
-          element.ricochetMarketAddress
+      const streamFlow = await getStreamFlow(
+        element.fromStIbAlluoAddress,
+        element.ricochetMarketAddress,
+      );
+      if (+streamFlow.flowPerSecond > 0) {
+        ricochetMarketAddressesWithStreams.push(element.ricochetMarketAddress);
+
+        const ibAlluoBalance = await getBalance(
+          element.fromIbAlluoAddress,
+          18,
+          EChain.POLYGON,
         );
-        if (+streamFlow.flowPerSecond > 0) {
-          const ibAlluoBalance = await getBalance(
-            element.fromIbAlluoAddress,
-            18,
-            EChain.POLYGON,
-          );
-          const flowPerSecond = +streamFlow.flowPerSecond;
-          const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
-          const tvs = toExactFixed(
-            (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
-            6,
-          );
-          streamsArray.push({
+        const flowPerSecond = +streamFlow.flowPerSecond;
+        const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
+        const tvs = toExactFixed(
+          (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
+          6,
+        );
+        const endDateTimestamp = await getStreamEndDate(
+          element.fromIbAlluoAddress,
+          element.ricochetMarketAddress,
+          streamFlow.timestamp,
+        );
+        const endDate = new Date(0);
+        endDate.setSeconds(endDateTimestamp);
+        streamsArray.push({
+          from: element.fromLabel,
+          fromAddress: element.fromIbAlluoAddress,
+          to: element.toLabel,
+          toAddress: element.ricochetMarketAddress,
+          flowPerSecond: flowPerSecond,
+          flowPerMonth: toExactFixed(flowPerMonth, 6).toLocaleString(),
+          startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
+          endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
+          tvs: tvs.toLocaleString(),
+          sign: element.fromSign,
+        });
+
+        let fundedUntil = fundedUntilArray.find(
+          fundedUntil => fundedUntil.from == element.fromLabel,
+        );
+
+        if (fundedUntil) {
+          fundedUntil.flowPerSecond = fundedUntil.flowPerSecond + flowPerSecond;
+          const remainingFundedMiliseconds =
+            (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
+          fundedUntil.fundedUntilDate = new Date(
+            currentTime + remainingFundedMiliseconds,
+          ).toLocaleDateString();
+        } else {
+          const remainingFundedMiliseconds =
+            (+ibAlluoBalance / flowPerSecond) * 1000;
+
+          fundedUntilArray.push({
             from: element.fromLabel,
-            fromAddress: element.fromIbAlluoAddress,
-            to: element.toLabel,
-            toAddress: element.ricochetMarketAddress,
             flowPerSecond: flowPerSecond,
-            flowPerMonth: toExactFixed(flowPerMonth, 6),
-            flowPerMonthInUSD: toExactFixed(
-              await convertToUSDC(
-                flowPerMonth,
-                element.fromIbAlluoAddress,
-                18,
-                element.underlyingTokenAddress,
-                18,
-              ),
-              6,
-            ),
-            startDate: new Date(
-              streamFlow.timestamp * 1000,
-            ).toLocaleDateString(),
-            tvs: tvs,
-            tvsInUSD: toExactFixed(
-              await convertToUSDC(
-                tvs,
-                element.fromIbAlluoAddress,
-                18,
-                element.underlyingTokenAddress,
-                18,
-              ),
-              6,
-            ),
-            sign: element.fromSign,
-          });
-
-          let fundedUntil = fundedUntilArray.find(
-            fundedUntil => fundedUntil.from == element.fromLabel,
-          );
-
-          if (fundedUntil) {
-            fundedUntil.flowPerSecond =
-              fundedUntil.flowPerSecond + flowPerSecond;
-            const remainingFundedMiliseconds =
-              (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
-            fundedUntil.fundedUntilDate = new Date(
+            fundedUntilDate: new Date(
               currentTime + remainingFundedMiliseconds,
-            ).toLocaleDateString();
-          } else {
-            const remainingFundedMiliseconds =
-              (+ibAlluoBalance / flowPerSecond) * 1000;
-
-            fundedUntilArray.push({
-              from: element.fromLabel,
-              flowPerSecond: flowPerSecond,
-              fundedUntilDate: new Date(
-                currentTime + remainingFundedMiliseconds,
-              ).toLocaleDateString(),
-            });
-          }
+            ).toLocaleDateString(),
+          });
         }
       }
+    }
 
+    if(ricochetMarketAddressesWithStreams.length >= ricochetMarketAddressOptions.length){
+      setCanStartStreams(false);
+    }
     setFundedUntilByStreamOptions(fundedUntilArray);
     setStreams(streamsArray);
   };
@@ -285,7 +296,7 @@ export const useAutoInvest = () => {
     const streamOption = streamOptions.find(
       so =>
         so.fromIbAlluoAddress == fromAddress &&
-        so.ricochetMarketAddress == toAddress
+        so.ricochetMarketAddress == toAddress,
     );
     if (streamOption) {
       try {
@@ -308,6 +319,7 @@ export const useAutoInvest = () => {
     }
     setIsStoppingStream(false);
   };
+
   return {
     walletAccountAtom,
     isLoading,
@@ -316,5 +328,6 @@ export const useAutoInvest = () => {
     assetsInfo,
     fundedUntilByStreamOptions,
     handleStopStream,
+    canStartStreams
   };
 };
