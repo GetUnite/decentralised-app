@@ -30,7 +30,8 @@ export const FarmDepositTab = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-    supportedTokenInfo
+    selectedSupportedTokenInfo,
+    isFetchingSupportedTokenInfo
   } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
@@ -60,7 +61,8 @@ export const FarmDepositTab = ({
                   tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
-                  maxValue={supportedTokenInfo.balance}
+                  maxValue={selectedSupportedTokenInfo.balance}
+                  isLoadingMaxValue={isFetchingSupportedTokenInfo}
                   maxButton={true}
                   tokenOptions={selectedFarm.supportedTokens || []}
                   selectedToken={selectedSupportedToken}
@@ -104,17 +106,18 @@ export const FarmDepositTab = ({
             isApproving ||
             isDepositing ||
             !(+depositValue > 0) ||
+            isFetchingSupportedTokenInfo ||
             hasErrors
           }
           label={
             +depositValue > 0
-              ? supportedTokenInfo.allowance >= +depositValue
+              ? selectedSupportedTokenInfo.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            supportedTokenInfo.allowance >= +depositValue
+            selectedSupportedTokenInfo.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }
