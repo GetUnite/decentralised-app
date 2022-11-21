@@ -1,3 +1,3 @@
-export * from './DepositForm';
-export * from './WithdrawalForm';
-export * from './BoosterFarmPresentation';
+export * from './FarmDepositTab';
+export * from './FarmWithdrawalTab';
+

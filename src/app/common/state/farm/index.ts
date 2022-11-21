@@ -1,4 +1,4 @@
-export * from './useDeposit';
 export * from './useFarm';
-export * from './useWithdrawal';
+export * from './useFarmDeposit';
+export * from './useFarmWithdrawal';
 

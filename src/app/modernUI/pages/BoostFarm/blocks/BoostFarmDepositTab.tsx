@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useDeposit } from 'app/common/state/farm';
+import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -9,9 +9,9 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from '../components/TopHeader';
+import { TopHeader } from '../components';
 
-export const DepositForm = ({
+export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -30,7 +30,7 @@ export const DepositForm = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-  } = useDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
@@ -55,11 +55,7 @@ export const DepositForm = ({
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
                   label={'Deposit ' + selectedSupportedToken.label}
-                  tokenSign={
-                    selectedFarm.isBooster
-                      ? selectedSupportedToken.sign
-                      : selectedFarm.sign
-                  }
+                  tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
                   maxValue={selectedSupportedToken?.balance}

@@ -156,7 +156,7 @@ export const FarmCard = ({
                     <Box direction="row" justify="between" align="center">
                       <span>{interest}%</span>
                       {walletAccountAtom ? (
-                        <Link to={'/farm/' + id}>
+                        <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                           <Button label={'Farm'} />
                         </Link>
                       ) : (
@@ -184,7 +184,7 @@ export const FarmCard = ({
                     <span>{sign + balance}</span>
                     <Box direction="row" justify="between" align="center">
                       <span>{interest}%</span>
-                      <Link to={'/farm/' + id}>
+                      <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                         <Button label={'Farm'} />
                       </Link>
                     </Box>

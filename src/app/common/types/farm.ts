@@ -31,9 +31,11 @@ export type TFarm = {
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;
   poolShare?: number;
-  
-  // For booster farms
   isBooster?: boolean;
+};
+
+export type TBoostFarm = TFarm & {
+  // For booster farms
   rewards?: TBoostFarmRewards;
   supportedTokensAddresses?: TSupportedToken[];
   lPTokenAddress?: string;
@@ -42,4 +44,4 @@ export type TFarm = {
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
-};
+}

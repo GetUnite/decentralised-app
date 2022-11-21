@@ -155,3 +155,15 @@ export const getNextMonday = (date = new Date())  => {
 
   return nextMonday;
 }
+
+export const depositDivided = depositedAmount => {
+  if (depositedAmount == 0) return { first: '0.0', second: '0' };
+  const depositedAmountString = depositedAmount.toString();
+  const dotIndex = depositedAmountString.indexOf('.');
+  const balanceFirstPart = depositedAmountString.substring(0, dotIndex + 3);
+  const balanceSecondPart = depositedAmountString.substring(
+    dotIndex + 3,
+    dotIndex + 9,
+  );
+  return { first: balanceFirstPart, second: balanceSecondPart };
+};
