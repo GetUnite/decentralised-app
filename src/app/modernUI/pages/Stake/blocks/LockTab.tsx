@@ -49,6 +49,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
                   tokenSign="$"
                   onValueChange={handleLockValueChange}
                   value={lockValue}
+                  maxButton={true}
                   maxValue={alluoInfo?.balance}
                   error={lockValueError}
                 />
