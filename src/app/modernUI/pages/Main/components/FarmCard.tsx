@@ -154,7 +154,7 @@ export const FarmCard = ({
                     <ChainBadge chain={chain} />
                     <span>{tvl}</span>
                     <Box direction="row" justify="between" align="center">
-                      <span>{interest}%</span>
+                    <span>{toExactFixed(interest,2).toLocaleString()}%</span>
                       {walletAccountAtom ? (
                         <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                           <Button label={'Farm'} />
@@ -183,7 +183,7 @@ export const FarmCard = ({
                     <span>{tvl}</span>
                     <span>{sign + balance}</span>
                     <Box direction="row" justify="between" align="center">
-                      <span>{interest}%</span>
+                      <span>{toExactFixed(interest,2).toLocaleString()}%</span>
                       <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                         <Button label={'Farm'} />
                       </Link>

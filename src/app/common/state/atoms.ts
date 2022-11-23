@@ -114,10 +114,11 @@ type TNotification = {
   message: string;
   txHash?: string;
   chain?: EChain;
+  stick?: boolean;
 };
 export const notification: RecoilState<TNotification> = atom({
   key: 'notification',
-  default: { id: null, type: '', message: '', txHash: '', chain: EChain.POLYGON},
+  default: { id: null, type: '', message: '', txHash: '', chain: EChain.POLYGON, stick: false},
 });
 
 export type TStableCoinCodes = {

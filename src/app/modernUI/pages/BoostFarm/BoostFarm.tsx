@@ -37,7 +37,7 @@ export const BoostFarm = () => {
     showBoosterWithdrawalConfirmation,
     startBoosterWithdrawalConfirmation,
     cancelBoosterWithdrawalConfirmation,
-    pendingRewards,
+    rewardsInfo,
     losablePendingRewards
   } = useBoostFarm({
     id,
@@ -103,7 +103,7 @@ export const BoostFarm = () => {
             )}
           </>
         </Modal>
-        {selectedFarm?.isBooster && showTabs && walletAccountAtom && (
+        {walletAccountAtom && (
           <Box gap="22px">
             <Box
               round={'medium'}
@@ -149,13 +149,13 @@ export const BoostFarm = () => {
                   >
                     <Text weight="bold" size="16px">
                       {seeRewardsAsStable
-                        ? selectedFarm?.rewards.stableLabel
-                        : selectedFarm?.rewards.label}
+                        ? rewardsInfo.stableLabel
+                        : rewardsInfo.label}
                     </Text>
                     <Text weight="bold" size="16px">
                       {seeRewardsAsStable
-                        ? '$' + selectedFarm?.rewards.stableValue
-                        : selectedFarm?.rewards.value}
+                        ? '$' + toExactFixed(rewardsInfo.stableValue, 6)
+                        : toExactFixed(rewardsInfo.value, 6)}
                     </Text>
                   </Box>
                   <Box gap="12px">
@@ -164,8 +164,8 @@ export const BoostFarm = () => {
                       label={
                         'Withdraw ' +
                         (seeRewardsAsStable
-                          ? selectedFarm?.rewards.stableLabel
-                          : selectedFarm?.rewards.label)
+                          ? rewardsInfo.stableLabel
+                          : rewardsInfo.label)
                       }
                       style={{ borderRadius: '58px', width: '197px' }}
                       onClick={claimRewards}
@@ -174,9 +174,9 @@ export const BoostFarm = () => {
                       label={
                         seeRewardsAsStable
                           ? 'Prefer ' +
-                            selectedFarm?.rewards.label +
+                          rewardsInfo.label +
                             ' LP tokens?'
-                          : 'Prefer ' + selectedFarm?.rewards.stableLabel
+                          : 'Prefer ' + rewardsInfo.stableLabel
                       }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
                       plain
@@ -232,7 +232,7 @@ export const BoostFarm = () => {
                       {selectedFarm?.rewards.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + toExactFixed(pendingRewards, 6)}
+                      {'$' + toExactFixed(rewardsInfo.pendingValue, 6)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>

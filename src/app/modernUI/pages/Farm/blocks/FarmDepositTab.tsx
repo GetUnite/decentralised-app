@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
@@ -31,7 +32,7 @@ export const FarmDepositTab = ({
     setUseBiconomy,
     useBiconomy,
     selectedSupportedTokenInfo,
-    isFetchingSupportedTokenInfo
+    isFetchingSupportedTokenInfo,
   } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
@@ -78,7 +79,7 @@ export const FarmDepositTab = ({
                 interest={selectedFarm.interest}
                 sign={selectedFarm.sign}
               />
-              <Info label="APY" value={selectedFarm.interest + '%'} />
+              <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
               <Info
                 label="Pool liquidity"
                 value={

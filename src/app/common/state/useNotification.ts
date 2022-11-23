@@ -14,7 +14,13 @@ export const useNotification = () => {
       txHash: '',
     });
 
-  const setNotification = (message, type, txHash = null, chain = EChain.POLYGON) =>
+  const setNotification = (
+    message,
+    type,
+    txHash = null,
+    chain = EChain.POLYGON,
+    stick = false,
+  ) => {
     setNotificationAtom({
       id: null,
       type: type,
@@ -22,6 +28,12 @@ export const useNotification = () => {
       txHash: txHash,
       chain: chain,
     });
+    if (!stick) {
+      setTimeout(() => {
+        resetNotification();
+      }, 10000);
+    }
+  };
 
   return {
     notification: notificationAtom,
