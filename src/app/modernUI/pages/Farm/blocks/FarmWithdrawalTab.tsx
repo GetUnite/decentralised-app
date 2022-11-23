@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useFarmWithdrawal } from 'app/common/state/farm';
 import {
   FeeInfo,
@@ -67,6 +68,7 @@ export const FarmWithdrawalTab = ({
                     tokenSign={selectedFarm.sign}
                     onValueChange={handleWithdrawalFieldChange}
                     value={withdrawValue}
+                    maxButton={true}
                     maxValue={selectedFarm.depositedAmount}
                     tokenOptions={selectedFarm.supportedTokens || []}
                     selectedToken={selectedSupportedToken}
@@ -83,7 +85,7 @@ export const FarmWithdrawalTab = ({
                   interest={selectedFarm.interest}
                   sign={selectedFarm.sign}
                 />
-                <Info label="APY" value={selectedFarm.interest + '%'} />
+                <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
                 <Info
                   label="Pool liquidity"
                   value={

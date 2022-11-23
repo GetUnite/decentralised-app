@@ -6,7 +6,7 @@ export type TSupportedToken = {
   allowance?: string;
   sign?: string;
   // To store boost farm deposited amount converted to the supported token value to improve ui and functionality
-  boosterDepositedAmount?: number;
+  boostDepositedAmount?: number;
 };
 
 // Used to save allowances
@@ -15,4 +15,3 @@ export type TAllowance = {
   toTokenAddress: string;
   allowance: string;
 };
-

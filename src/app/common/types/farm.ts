@@ -37,7 +37,6 @@ export type TFarm = {
 export type TBoostFarm = TFarm & {
   // For booster farms
   rewards?: TBoostFarmRewards;
-  supportedTokensAddresses?: TSupportedToken[];
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
   apyFarmAddresses?: TApyFarmAddresses;
