@@ -39,7 +39,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
+    lPTokenAddress: EEthereumAddresses.FRAXUSDC,
     supportedTokens: [
       {
         label: 'agEUR',
@@ -207,7 +207,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
+    lPTokenAddress: EEthereumAddresses.STETHETH,
     supportedTokens: [
       {
         label: 'agEUR',
