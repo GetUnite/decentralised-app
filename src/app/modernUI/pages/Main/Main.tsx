@@ -7,8 +7,7 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
-import { HeadingText } from '../AutoInvest/components';
-import { FarmCard, Filter } from './components';
+import { FarmCard, Filter, HeadingText } from './components';
 
 export const Main = () => {
   const {
