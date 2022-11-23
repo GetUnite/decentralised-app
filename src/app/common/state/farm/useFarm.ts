@@ -261,7 +261,7 @@ export const useFarm = ({ id }) => {
       const farm = await getUpdatedFarmInfo(selectedFarm);
       setSelectedsupportedToken(
         farm.supportedTokens?.find(
-          stableCoin => stableCoin?.address == selectedSupportedToken?.address,
+          st => st?.address == selectedSupportedToken?.address,
         ),
       );
       setSelectedFarm(farm);

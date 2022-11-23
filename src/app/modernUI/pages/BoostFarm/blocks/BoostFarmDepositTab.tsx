@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
@@ -30,6 +31,8 @@ export const BoostFarmDepositTab = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
+    isFetchingSupportedTokenInfo,
+    selectedSupportedTokenInfo
   } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
@@ -58,7 +61,9 @@ export const BoostFarmDepositTab = ({
                   tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
-                  maxValue={selectedSupportedToken?.balance}
+                  isLoadingMaxValue={isFetchingSupportedTokenInfo}
+                  maxButton={true}
+                  maxValue={selectedSupportedTokenInfo?.balance}
                   tokenOptions={selectedFarm.supportedTokens || []}
                   selectedToken={selectedSupportedToken}
                   setSelectedToken={selectSupportedToken}
@@ -73,7 +78,7 @@ export const BoostFarmDepositTab = ({
                 interest={selectedFarm.interest}
                 sign={selectedFarm.sign}
               />
-              <Info label="APY" value={selectedFarm.interest + '%'} />
+              <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
               <Info
                 label="Pool liquidity"
                 value={
@@ -101,17 +106,18 @@ export const BoostFarmDepositTab = ({
             isApproving ||
             isDepositing ||
             !(+depositValue > 0) ||
+            isFetchingSupportedTokenInfo ||
             hasErrors
           }
           label={
             +depositValue > 0
-              ? +selectedSupportedToken?.allowance >= +depositValue
+              ? +selectedSupportedTokenInfo?.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +selectedSupportedToken?.allowance >= +depositValue
+            +selectedSupportedTokenInfo?.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }

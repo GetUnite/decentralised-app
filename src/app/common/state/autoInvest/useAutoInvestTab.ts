@@ -613,7 +613,7 @@ export const useAutoInvestTab = () => {
 
     try {
       // TODO: currently biconomy doesn't work here
-      await approve(
+      const tx = await approve(
         selectedSupportedFromToken.address,
         selectedStreamOption.fromIbAlluoAddress,
         EChain.POLYGON,
@@ -621,7 +621,7 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotification('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -635,13 +635,13 @@ export const useAutoInvestTab = () => {
 
     try {
       // TODO: currently biconomy doesn't work here
-      await approveSuperfluidSubscriptions(
+      const tx = await approveSuperfluidSubscriptions(
         unapprovedSuperfluidSubscriptions,
         useBiconomy,
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotification('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -671,7 +671,7 @@ export const useAutoInvestTab = () => {
         ...selectedSupportedFromToken,
         balance: balance,
       });
-      setNotification('Deposit successfully', 'success');
+      setNotification('Deposit successfully', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -687,7 +687,7 @@ export const useAutoInvestTab = () => {
       const timeToStreamInSeconds = Math.floor(
         (new Date(endDate).getTime() - new Date().getTime()) / 1000);
       // data from the selected output
-      await startStream(
+      const tx = await startStream(
         selectedStreamOption.fromIbAlluoAddress,
         selectedStreamOption.fromStIbAlluoAddress,
         selectedStreamOption.toStIbAlluoAddress,
@@ -696,7 +696,7 @@ export const useAutoInvestTab = () => {
         useEndDate ? timeToStreamInSeconds : null,
         useBiconomy,
       );
-      setNotification('Stream started successfully', 'success');
+      setNotification('Stream started successfully', 'success',tx.transactionHash, EChain.POLYGON);
       navigate('/autoinvest');
     } catch (error) {
       setNotification(error, 'error');

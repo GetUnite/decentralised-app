@@ -16,9 +16,7 @@ import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
 import {
   fromDecimals,
-  maximumUint256Value,
-  roundNumberDown,
-  toDecimals
+  maximumUint256Value, toDecimals
 } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
@@ -486,8 +484,8 @@ export const QueryFilter = async (
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
-    const logs = await contract.queryFilter(event, blockNumber, blockNumber)
-    
+    const logs = await contract.queryFilter(event, blockNumber, blockNumber);
+
     return logs;
   } catch (error) {
     console.log(abi, address, eventSignature, params);
@@ -496,27 +494,37 @@ export const QueryFilter = async (
   }
 };
 
-export const binarySearchForBlock = async (startTimestamp: number, chain: EChain) : Promise<number> => {
+export const binarySearchForBlock = async (
+  startTimestamp: number,
+  chain: EChain,
+): Promise<number> => {
   const provider = getReadOnlyProvider(chain);
   let highestEstimatedBlockNumber = await provider.getBlockNumber();
-  let highestEstimatedBlock = await provider.getBlock(highestEstimatedBlockNumber)
-  let lowestEstimatedBlock = await provider.getBlock(highestEstimatedBlock.number - Math.floor((highestEstimatedBlock.timestamp - startTimestamp)))
+  let highestEstimatedBlock = await provider.getBlock(
+    highestEstimatedBlockNumber,
+  );
+  let lowestEstimatedBlock = await provider.getBlock(
+    highestEstimatedBlock.number -
+      Math.floor(highestEstimatedBlock.timestamp - startTimestamp),
+  );
   let closestBlock;
 
   while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
-      closestBlock = await provider.getBlock(Math.floor((highestEstimatedBlock.number + lowestEstimatedBlock.number)/2))
-      if (closestBlock.timestamp == startTimestamp) {
-          return closestBlock.number
-      } 
-      else if (closestBlock.timestamp > startTimestamp) {
-          highestEstimatedBlock = closestBlock
-      }
-      else {
-          lowestEstimatedBlock = closestBlock;
-      }
+    closestBlock = await provider.getBlock(
+      Math.floor(
+        (highestEstimatedBlock.number + lowestEstimatedBlock.number) / 2,
+      ),
+    );
+    if (closestBlock.timestamp == startTimestamp) {
+      return closestBlock.number;
+    } else if (closestBlock.timestamp > startTimestamp) {
+      highestEstimatedBlock = closestBlock;
+    } else {
+      lowestEstimatedBlock = closestBlock;
+    }
   }
   return 0;
-}
+};
 
 const marketApiURl =
   process.env.REACT_APP_NET === 'mainnet'
@@ -1506,15 +1514,12 @@ export const getBoosterFarmInterest = async (
   const baseRewardsAPR = baseApyData.apyReward / 100;
   const boostRewardsAPR = boostApyData.apyReward / 100;
 
-  return roundNumberDown(
-    (baseApy +
-      baseRewardsAPR *
-        fee *
-        (1 + boostApy) *
-        Math.pow(1 + boostRewardsAPR / 52, 52)) *
-      100,
-    2,
-  );
+  return (baseApy +
+    baseRewardsAPR *
+      fee *
+      (1 + boostApy) *
+      Math.pow(1 + boostRewardsAPR / 52, 52)) *
+    100;
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
@@ -1648,8 +1653,7 @@ export const withdrawStableCoin = async (
       useBiconomy,
     );
 
-    console.log(tx);
-    return tx.blockNumber;
+    return tx;
   } catch (error) {
     throw error;
   }

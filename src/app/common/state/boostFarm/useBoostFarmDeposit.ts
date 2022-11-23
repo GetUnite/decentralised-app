@@ -2,11 +2,11 @@ import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
-  depositIntoBoosterFarm,
-  depositStableCoin
+  depositIntoBoosterFarm, getAllowance,
+  getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
@@ -16,14 +16,31 @@ export const useBoostFarmDeposit = ({
   updateFarmInfo,
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
+  // other state control files
   const { setNotification } = useNotification();
+
+  // inputs
   const [depositValue, setDepositValue] = useState<string>();
   const [depositValueError, setDepositValueError] = useState<string>('');
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
+
+  // data
+  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
+    useState<any>({
+      balance: 0,
+      allowance: 0,
+    });
+
+  // biconomy
   const [useBiconomy, setUseBiconomy] = useState(
     isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
   );
+
+  // loading control
+  const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
+    useState(true);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
   const resetState = () => {
     setDepositValueError('');
@@ -31,18 +48,42 @@ export const useBoostFarmDeposit = ({
     setIsDepositing(false);
   };
 
+  useEffect(() => {
+    const updateBalanceAndAllowance = async () => {
+      setIsFetchingSupportedTokenInfo(true);
+
+      const allowance = await getAllowance(
+        selectedSupportedToken.address,
+        selectedFarm.farmAddress,
+        selectedFarm.chain,
+      );
+      const balance = await getBalanceOf(
+        selectedSupportedToken.address,
+        selectedSupportedToken.decimals,
+        selectedFarm.chain,
+      );
+      setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+
+      setIsFetchingSupportedTokenInfo(false);
+    };
+
+    if (selectedFarm && selectedSupportedToken) {
+      updateBalanceAndAllowance();
+    }
+  }, [selectedSupportedToken]);
+
   const handleApprove = async () => {
     setIsApproving(true);
 
     try {
-      await approveStableCoin(
+      const tx = await approveStableCoin(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         selectedFarm.chain,
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotification('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success', tx.transactionHash, selectedFarm.chain);
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -64,8 +105,7 @@ export const useBoostFarmDeposit = ({
     setIsDepositing(true);
 
     try {
-      if (selectedFarm?.isBooster) {
-        await depositIntoBoosterFarm(
+        const tx = await depositIntoBoosterFarm(
           selectedFarm.farmAddress,
           selectedSupportedToken.address,
           depositValue,
@@ -73,19 +113,9 @@ export const useBoostFarmDeposit = ({
           selectedFarm.chain,
           useBiconomy,
         );
-      } else {
-        await depositStableCoin(
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      }
       resetState();
       setDepositValue(null);
-      setNotification('Deposit successfully', 'success');
+      setNotification('Deposit successfully', 'success',tx.transactionHash, selectedFarm.chain);
       await updateFarmInfo();
     } catch (error) {
       resetState();
@@ -107,5 +137,7 @@ export const useBoostFarmDeposit = ({
     resetState,
     depositValueError,
     hasErrors: depositValueError != '',
+    isFetchingSupportedTokenInfo,
+    selectedSupportedTokenInfo,
   };
 };

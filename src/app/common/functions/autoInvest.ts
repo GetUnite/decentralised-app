@@ -426,7 +426,7 @@ export const approveSuperfluidSubscriptions = async (
     );
 
     if (subscriptionOperations.length > 0) {
-      await sendTransaction(
+      const tx = await sendTransaction(
         superfluidAbi,
         superfluidAddress,
         useBiconomy
@@ -436,6 +436,8 @@ export const approveSuperfluidSubscriptions = async (
         EChain.POLYGON,
         useBiconomy,
       );
+
+      return tx;
     }
   } catch (error) {
     throw error;
