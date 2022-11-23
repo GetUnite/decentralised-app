@@ -1,8 +1,5 @@
-import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
-import {
-  withdrawStableCoin
-} from 'app/common/functions/web3Client';
+import { withdrawStableCoin } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -42,7 +39,12 @@ export const useFarmWithdrawal = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
-    } else if (+value > (selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : +selectedFarm?.depositedAmount)) {
+    } else if (
+      +value >
+      (selectedFarm.isBooster
+        ? selectedSupportedToken.boosterDepositedAmount
+        : +selectedFarm?.depositedAmount)
+    ) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
@@ -57,30 +59,20 @@ export const useFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
-      let blockNumber;
-      if (selectedFarm?.isBooster) {
-        blockNumber = await withdrawFromBoosterFarm(
-          selectedFarm.farmAddress,
-          selectedSupportedToken.address,
-          // The withdraw value is always referent to the selected supported token
-          // But the contract for booster farm withdrawal expects the value as LP/Shares
-          // Thus, convert the value into LP
-          await convertToLP(withdrawValue, selectedSupportedToken.address, selectedSupportedToken.decimals, selectedFarm.valueOf1LPinUSDC),
-          selectedSupportedToken.decimals,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      } else {
-        blockNumber = await withdrawStableCoin(
-          selectedSupportedToken.address,
-          withdrawValue,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      }
+      const tx = await withdrawStableCoin(
+        selectedSupportedToken.address,
+        withdrawValue,
+        selectedFarm.type,
+        selectedFarm.chain,
+        useBiconomy,
+      );
       resetState();
-      setNotification("Successfully withdrew", 'success');
+      setNotification(
+        'Successfully withdrew',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
       await updateFarmInfo();
     } catch (error) {
       resetState();

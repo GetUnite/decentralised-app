@@ -1,10 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
+import { useNotification } from 'app/common/state';
 import { notification } from 'app/common/state/atoms';
-import { Box, Text } from 'grommet';
+import { Box, Button, Text } from 'grommet';
+import { FormClose } from 'grommet-icons';
 import { useRecoilState } from 'recoil';
 
 export const Notification = ({ ...rest }) => {
   const [notificationAtom] = useRecoilState(notification);
+  const { resetNotification } = useNotification();
 
   const colors = { success: 'success', error: 'error', info: 'info' };
   const bgColors = {
@@ -12,7 +15,7 @@ export const Notification = ({ ...rest }) => {
     error: 'errorSoft',
     info: 'infoSoft',
   };
-  const backgroundColor = bgColors[notificationAtom.type] || 'transparent';
+  const backgroundColor = bgColors[notificationAtom.type];
   const color = colors[notificationAtom.type];
 
   return (
@@ -38,11 +41,34 @@ export const Notification = ({ ...rest }) => {
                 ? `https://polygonscan.com/tx/${notificationAtom.txHash}`
                 : `https://etherscan.io/tx/${notificationAtom.txHash}`
             }
-            style={{color: color}}
+            style={{ color: color }}
           >
             View transaction
           </a>
         </Text>
+      )}
+      {!notificationAtom.stick && (
+        <Button
+          plain
+          fill="vertical"
+          onClick={resetNotification}
+          style={{
+            position: 'absolute',
+            right: '20px',
+          }}
+        >
+          <Box
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: 16,
+            }}
+            justify="center"
+            align="center"
+          >
+            <FormClose size="medium" color="black" />
+          </Box>
+        </Button>
       )}
     </Box>
   );

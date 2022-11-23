@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
   FeeInfo,
@@ -30,11 +31,12 @@ export const BoostFarmWithdrawalTab = ({
     withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
-    isWithdrawalRequestsLoading,
+    isFetchingSupportedTokenInfo,
     isWithdrawing,
     handleWithdraw,
     useBiconomy,
     setUseBiconomy,
+    selectedSupportedTokenInfo,
   } = useBoostFarmWithdrawal({
     selectedFarm,
     selectedSupportedToken,
@@ -67,10 +69,7 @@ export const BoostFarmWithdrawalTab = ({
           />
         ) : (
           <>
-            {isLoading ||
-            !selectedSupportedToken ||
-            isWithdrawing ||
-            isWithdrawalRequestsLoading ? (
+            {isLoading || !selectedSupportedToken || isWithdrawing ? (
               <Box
                 align="center"
                 justify="center"
@@ -87,31 +86,19 @@ export const BoostFarmWithdrawalTab = ({
                     <NumericInput
                       label={'Withdraw ' + selectedSupportedToken.label}
                       available={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.boosterDepositedAmount
-                          : selectedFarm.depositedAmount
+                        selectedSupportedTokenInfo.boostDepositedAmount
                       }
-                      tokenSign={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.sign
-                          : selectedFarm.sign
-                      }
+                      tokenSign={selectedSupportedToken.sign}
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
-                      maxValue={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.boosterDepositedAmount
-                          : selectedFarm.depositedAmount
-                      }
+                      maxValue={selectedSupportedTokenInfo.boostDepositedAmount}
                       tokenOptions={selectedFarm.supportedTokens || []}
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
                       slippageWarning={selectedFarm.isBooster}
                       lowSlippageTokenLabels={
-                        selectedFarm.isBooster
-                          ? selectedFarm.lowSlippageTokenLabels
-                          : null
+                        selectedFarm.lowSlippageTokenLabels
                       }
                     />
                   </Box>
@@ -124,7 +111,7 @@ export const BoostFarmWithdrawalTab = ({
                     interest={selectedFarm.interest}
                     sign={selectedFarm.sign}
                   />
-                  <Info label="APY" value={selectedFarm.interest + '%'} />
+                  <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
                   <Info
                     label="Pool liquidity"
                     value={
@@ -154,7 +141,7 @@ export const BoostFarmWithdrawalTab = ({
             disabled={
               isLoading ||
               isWithdrawing ||
-              isWithdrawalRequestsLoading ||
+              isFetchingSupportedTokenInfo ||
               !+withdrawValue ||
               hasErrors
             }

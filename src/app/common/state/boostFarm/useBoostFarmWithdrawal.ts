@@ -1,12 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
-import { convertToLP, withdrawFromBoosterFarm } from 'app/common/functions/farm';
-import { isNumeric } from 'app/common/functions/utils';
+import { convertFromUSDC } from 'app/common/functions/boosterFarm';
 import {
-  getIfUserHasWithdrawalRequest,
-  isExpectedPolygonEvent,
-  listenToHandler,
-  withdrawStableCoin
-} from 'app/common/functions/web3Client';
+  convertToLP,
+  withdrawFromBoosterFarm
+} from 'app/common/functions/farm';
+import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -33,94 +31,52 @@ export const useBoostFarmWithdrawal = ({
   const [withdrawValue, setWithdrawValue] = useState<string>();
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
 
+  // data
+  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
+    useState<any>({
+      boostDepositedAmount: 0,
+    });
+
   // loading control
-  const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
-    useState<boolean>(false);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [blockNumber, setBlockNumber] = useState<number>();
+  const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
+    useState(true);
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      fetchIfUserHasWithdrawalRequest();
-    }
-  }, [walletAccountAtom]);
+    const updateAvailable = async () => {
+      setIsFetchingSupportedTokenInfo(true);
 
-  const fetchIfUserHasWithdrawalRequest = async () => {
-    // This method of getting if the user already has an withdraw request only works for iballuo farms which are now not the only ones....
-    if (selectedFarm.type == 'booster') return;
-    resetState();
-    setIsWithdrawalRequestsLoading(true);
-    try {
-      const userRequests = await getIfUserHasWithdrawalRequest(
-        walletAccountAtom,
-        selectedFarm.farmAddress,
-        selectedFarm.chain,
+      // For booster farm withdrawals
+      // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
+      // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
+      const boostDepositedAmount = await convertFromUSDC(
+        selectedSupportedToken.address,
+        selectedSupportedToken.decimals,
+        // here the deposited amount is in USDC
+        selectedFarm.depositedAmount,
       );
-      const userRequestslength = userRequests.length;
-      if (userRequestslength > 0) {
-        const FULL_DAY_IN_HOURS = 86400;
-        const lastRequest = userRequests[userRequestslength - 1];
-        const remainingSeconds =
-          Math.trunc(new Date().getTime() / 1000) - +lastRequest.time;
-        const remainingTime = new Date(
-          (FULL_DAY_IN_HOURS - remainingSeconds) * 1000,
-        )
-          .toISOString()
-          .substr(11, 8);
-        const message = `You have ${userRequestslength} ${
-          userRequestslength === 1 ? 'request' : 'requests'
-        } accepted, will be processed within ${remainingTime}`;
-        setNotification(message, 'success');
-      }
-    } catch (err) {
-      setWithdrawValueError(err.message);
-    }
-    setIsWithdrawalRequestsLoading(false);
-  };
+      setSelectedSupportedTokenInfo({
+        boostDepositedAmount: boostDepositedAmount,
+      });
 
-  useEffect(() => {
-    let bufferListener;
-    if (blockNumber) {
-      bufferListener = listenToHandler(blockNumber);
-      bufferListener.WithdrawalSatisfied(
-        { fromBlock: blockNumber },
-        async function (error, event) {
-          if (error) console.error(error);
-          if (
-            event.blockNumber === blockNumber &&
-            isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
-          ) {
-            setWithdrawValue(null);
-            setIsWithdrawing(false);
-            setNotification('Withdrew successfully', 'success');
-          }
-        },
-      );
-      bufferListener.AddedToQueue(
-        { fromBlock: blockNumber },
-        function (error, event) {
-          if (error) console.error(error);
-          if (
-            event.blockNumber === blockNumber &&
-            isExpectedPolygonEvent(selectedFarm.type, event.returnValues?.[0])
-          ) {
-            setIsWithdrawing(false);
-            setNotification(
-              'Request accepted and will be processed within 24 hours',
-              'success',
-            );
-          }
-        },
-      );
+      setIsFetchingSupportedTokenInfo(false);
+    };
+
+    if (selectedFarm && selectedSupportedToken) {
+      updateAvailable();
     }
-    return () => {};
-  }, [blockNumber]);
+  }, [selectedSupportedToken]);
 
   const handleWithdrawalFieldChange = value => {
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
-    } else if (+value > (selectedFarm.isBooster ? selectedSupportedToken.boosterDepositedAmount : +selectedFarm?.depositedAmount)) {
+    } else if (
+      +value >
+      (selectedFarm.isBooster
+        ? selectedSupportedToken.boosterDepositedAmount
+        : +selectedFarm?.depositedAmount)
+    ) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
@@ -135,31 +91,30 @@ export const useBoostFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
-      let blockNumber;
-      if (selectedFarm?.isBooster) {
-        blockNumber = await withdrawFromBoosterFarm(
-          selectedFarm.farmAddress,
-          selectedSupportedToken.address,
-          // The withdraw value is always referent to the selected supported token
-          // But the contract for booster farm withdrawal expects the value as LP/Shares
-          // Thus, convert the value into LP
-          await convertToLP(withdrawValue, selectedSupportedToken.address, selectedSupportedToken.decimals, selectedFarm.valueOf1LPinUSDC),
-          selectedSupportedToken.decimals,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      } else {
-        blockNumber = await withdrawStableCoin(
-          selectedSupportedToken.address,
+      const tx = await withdrawFromBoosterFarm(
+        selectedFarm.farmAddress,
+        selectedSupportedToken.address,
+        // The withdraw value is always referent to the selected supported token
+        // But the contract for booster farm withdrawal expects the value as LP/Shares
+        // Thus, convert the value into LP
+        await convertToLP(
           withdrawValue,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      }
+          selectedSupportedToken.address,
+          selectedSupportedToken.decimals,
+          selectedFarm.valueOf1LPinUSDC,
+        ),
+        selectedSupportedToken.decimals,
+        selectedFarm.chain,
+        useBiconomy,
+      );
       resetState();
-      setBlockNumber(blockNumber);
       await updateFarmInfo();
+      setNotification(
+        'Withdrew successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
     } catch (error) {
       resetState();
       setNotification(error, 'error');
@@ -172,12 +127,13 @@ export const useBoostFarmWithdrawal = ({
     withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
-    isWithdrawalRequestsLoading,
     isWithdrawing,
     handleWithdraw,
     resetState,
     setUseBiconomy,
     useBiconomy,
     hasErrors: withdrawValueError != '',
+    isFetchingSupportedTokenInfo,
+    selectedSupportedTokenInfo,
   };
 };
