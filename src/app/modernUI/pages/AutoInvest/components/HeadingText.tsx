@@ -27,7 +27,7 @@ export const HeadingText = ({ isLoading, numberOfAssets, ...rest }) => {
     <>
       <Text size="36px" weight="bold">
         {!walletAccountAtom
-          ? 'Connect your wallet to see your available assets to farm.'
+          ? 'Connect your wallet to see your available assets to stream.'
           : headingText}
       </Text>
       <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
