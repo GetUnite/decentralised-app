@@ -39,7 +39,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
+    lPTokenAddress: EEthereumAddresses.FRAXUSDC,
     supportedTokens: [
       {
         label: 'agEUR',
@@ -207,7 +207,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
+    lPTokenAddress: EEthereumAddresses.STETHETH,
     supportedTokens: [
       {
         label: 'agEUR',
@@ -301,12 +301,15 @@ export const useBoostFarm = ({ id }) => {
 
   // booster farm rewards control
   const [rewardsInfo, setRewardsInfo] = useState<any>(false);
+  const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
+  const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
+    useState<boolean>(false);
 
   // information/confirmation control
   const showBoostFarmPresentation =
@@ -424,27 +427,37 @@ export const useBoostFarm = ({ id }) => {
 
   const updateRewardsInfo = async () => {
     setIsLoadingRewards(true);
+    setIsLoadingPendingRewards(true);
     try {
+      const CVXETHInUSDC = await getValueOf1LPinUSDC(
+        EEthereumAddresses.CVXETH,
+        selectedFarm.chain,
+      );
+      // Rewards
       const updatedRewards = {
         ...selectedFarm.rewards,
         ...(await getBoosterFarmRewards(
           selectedFarm.farmAddress,
-          selectedFarm.valueOf1LPinUSDC,
+          CVXETHInUSDC,
           selectedFarm.chain,
         )),
-        pendingValue:
-          selectedFarm.totalAssetSupply > 0
-            ? await getBoosterFarmPendingRewards(
-                selectedFarm.farmAddress,
-                selectedFarm.chain,
-              )
-            : 0,
       };
       setRewardsInfo(updatedRewards);
+      setIsLoadingRewards(false);
+
+      // Pending Rewards
+      const updatedPendingRewards =
+        selectedFarm.totalAssetSupply > 0
+          ? await getBoosterFarmPendingRewards(
+              selectedFarm.farmAddress,
+              selectedFarm.chain,
+            )
+          : 0;
+      setPendingRewardsInfo(updatedPendingRewards);
+      setIsLoadingPendingRewards(false);
     } catch (error) {
       console.log(error);
     }
-    setIsLoadingRewards(false);
   };
 
   const claimRewards = async () => {
@@ -474,7 +487,7 @@ export const useBoostFarm = ({ id }) => {
     setShowBoosterWithdrawalConfirmation(true);
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
-      selectedFarm.rewards.pendingValue *
+      pendingRewardsInfo.pendingValue *
       (+withdrawValue / +selectedSupportedToken.boostDepositedAmount);
     setLosablePendingRewards(projectedLosableRewards);
   };
@@ -504,5 +517,7 @@ export const useBoostFarm = ({ id }) => {
     cancelBoosterWithdrawalConfirmation,
     rewardsInfo,
     losablePendingRewards,
+    pendingRewardsInfo,
+    isLoadingPendingRewards,
   };
 };
