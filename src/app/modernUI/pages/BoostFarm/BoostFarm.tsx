@@ -38,7 +38,9 @@ export const BoostFarm = () => {
     startBoosterWithdrawalConfirmation,
     cancelBoosterWithdrawalConfirmation,
     rewardsInfo,
-    losablePendingRewards
+    losablePendingRewards,
+    pendingRewardsInfo,
+    isLoadingPendingRewards
   } = useBoostFarm({
     id,
   });
@@ -218,7 +220,7 @@ export const BoostFarm = () => {
                   : {}
               }
             >
-              {isLoading || isClamingRewards || isLoadingRewards || !selectedSupportedToken ? (
+              {isLoading || isClamingRewards || isLoadingPendingRewards || !selectedSupportedToken ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
@@ -229,10 +231,10 @@ export const BoostFarm = () => {
                   </Text>
                   <Box direction="row" justify="between">
                     <Text weight="bold" size="16px">
-                      {selectedFarm?.rewards.stableLabel}
+                      {rewardsInfo.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + toExactFixed(rewardsInfo.pendingValue, 6)}
+                      {'$' + toExactFixed(pendingRewardsInfo, 6)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>
