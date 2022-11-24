@@ -1,5 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
-import { useWithdrawal } from 'app/common/state/farm';
+import { toExactFixed } from 'app/common/functions/utils';
+import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
   FeeInfo,
   Info,
@@ -9,10 +10,10 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from '../components/TopHeader';
-import { BoosterFarmWithdrawalConfirmation } from './BoosterFarmWithdrawalConfirmation';
+import { TopHeader } from '../components';
+import { BoostFarmWithdrawalConfirmation } from './BoostFarmWithdrawalConfirmation';
 
-export const WithdrawalForm = ({
+export const BoostFarmWithdrawalTab = ({
   selectedFarm,
   isLoading,
   updateFarmInfo,
@@ -30,12 +31,13 @@ export const WithdrawalForm = ({
     withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
-    isWithdrawalRequestsLoading,
+    isFetchingSupportedTokenInfo,
     isWithdrawing,
     handleWithdraw,
     useBiconomy,
     setUseBiconomy,
-  } = useWithdrawal({
+    selectedSupportedTokenInfo,
+  } = useBoostFarmWithdrawal({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,
@@ -54,7 +56,7 @@ export const WithdrawalForm = ({
         justify="center"
       >
         {showBoosterWithdrawalConfirmation ? (
-          <BoosterFarmWithdrawalConfirmation
+          <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
             withdrawTokenLabel={selectedSupportedToken.label}
@@ -67,10 +69,7 @@ export const WithdrawalForm = ({
           />
         ) : (
           <>
-            {isLoading ||
-            !selectedSupportedToken ||
-            isWithdrawing ||
-            isWithdrawalRequestsLoading ? (
+            {isLoading || !selectedSupportedToken || isWithdrawing ? (
               <Box
                 align="center"
                 justify="center"
@@ -87,30 +86,20 @@ export const WithdrawalForm = ({
                     <NumericInput
                       label={'Withdraw ' + selectedSupportedToken.label}
                       available={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.boosterDepositedAmount
-                          : selectedFarm.depositedAmount
+                        selectedSupportedTokenInfo.boostDepositedAmount
                       }
-                      tokenSign={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.sign
-                          : selectedFarm.sign
-                      }
+                      tokenSign={selectedSupportedToken.sign}
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
-                      maxValue={
-                        selectedFarm.isBooster
-                          ? selectedSupportedToken.boosterDepositedAmount
-                          : selectedFarm.depositedAmount
-                      }
+                      maxValue={selectedSupportedTokenInfo.boostDepositedAmount}
                       tokenOptions={selectedFarm.supportedTokens || []}
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
                       slippageWarning={selectedFarm.isBooster}
-                      lowSlippageTokenLabels={selectedFarm.isBooster
-                        ? selectedFarm.lowSlippageTokenLabels
-                        : null}
+                      lowSlippageTokenLabels={
+                        selectedFarm.lowSlippageTokenLabels
+                      }
                     />
                   </Box>
                 </Box>
@@ -122,7 +111,7 @@ export const WithdrawalForm = ({
                     interest={selectedFarm.interest}
                     sign={selectedFarm.sign}
                   />
-                  <Info label="APY" value={selectedFarm.interest + '%'} />
+                  <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
                   <Info
                     label="Pool liquidity"
                     value={
@@ -152,7 +141,7 @@ export const WithdrawalForm = ({
             disabled={
               isLoading ||
               isWithdrawing ||
-              isWithdrawalRequestsLoading ||
+              isFetchingSupportedTokenInfo ||
               !+withdrawValue ||
               hasErrors
             }

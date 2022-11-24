@@ -1,5 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
-import { useDeposit } from 'app/common/state/farm';
+import { toExactFixed } from 'app/common/functions/utils';
+import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -9,9 +10,9 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
-import { TopHeader } from '../components/TopHeader';
+import { TopHeader } from '../components';
 
-export const DepositForm = ({
+export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarm,
   updateFarmInfo,
@@ -30,7 +31,9 @@ export const DepositForm = ({
     handleDeposit,
     setUseBiconomy,
     useBiconomy,
-  } = useDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+    isFetchingSupportedTokenInfo,
+    selectedSupportedTokenInfo
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>
@@ -55,14 +58,12 @@ export const DepositForm = ({
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
                   label={'Deposit ' + selectedSupportedToken.label}
-                  tokenSign={
-                    selectedFarm.isBooster
-                      ? selectedSupportedToken.sign
-                      : selectedFarm.sign
-                  }
+                  tokenSign={selectedFarm.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
-                  maxValue={selectedSupportedToken?.balance}
+                  isLoadingMaxValue={isFetchingSupportedTokenInfo}
+                  maxButton={true}
+                  maxValue={selectedSupportedTokenInfo?.balance}
                   tokenOptions={selectedFarm.supportedTokens || []}
                   selectedToken={selectedSupportedToken}
                   setSelectedToken={selectSupportedToken}
@@ -77,7 +78,7 @@ export const DepositForm = ({
                 interest={selectedFarm.interest}
                 sign={selectedFarm.sign}
               />
-              <Info label="APY" value={selectedFarm.interest + '%'} />
+              <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
               <Info
                 label="Pool liquidity"
                 value={
@@ -105,17 +106,18 @@ export const DepositForm = ({
             isApproving ||
             isDepositing ||
             !(+depositValue > 0) ||
+            isFetchingSupportedTokenInfo ||
             hasErrors
           }
           label={
             +depositValue > 0
-              ? +selectedSupportedToken?.allowance >= +depositValue
+              ? +selectedSupportedTokenInfo?.allowance >= +depositValue
                 ? 'Deposit'
                 : 'Approve'
               : 'Enter amount'
           }
           onClick={
-            +selectedSupportedToken?.allowance >= +depositValue
+            +selectedSupportedTokenInfo?.allowance >= +depositValue
               ? handleDeposit
               : handleApprove
           }

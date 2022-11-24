@@ -1,3 +1,4 @@
+import { EChain } from 'app/common/constants/chains';
 import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -37,7 +38,13 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     setIsApproving(true);
 
     try {
-      await approveAlluoStaking();
+      const tx = await approveAlluoStaking();
+      setNotification(
+        'Successfully approved',
+        'success',
+        tx.transactionHash,
+        EChain.ETHEREUM,
+      );
       await updateAlluoInfo();
     } catch (err) {
       console.error('Error', err.message);
@@ -52,8 +59,13 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     setIsLocking(true);
 
     try {
-      await lockAlluo(lockValue);
-      setNotification('Successfully locked', 'success');
+      const tx = await lockAlluo(lockValue);
+      setNotification(
+        'Successfully locked',
+        'success',
+        tx.transactionHash,
+        EChain.ETHEREUM,
+      );
       await updateAlluoInfo();
       setLockValue(null);
     } catch (error) {

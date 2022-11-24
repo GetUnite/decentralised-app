@@ -1,3 +1,4 @@
+import { EChain } from 'app/common/constants/chains';
 import { unlockAllAlluo, unlockAlluo } from 'app/common/functions/stake';
 import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -37,13 +38,14 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
   const handleUnlock = async () => {
     resetState();
     setIsUnlocking(true);
+    let tx;
     try {
       if (+unlockValue === 100) {
-        await unlockAllAlluo();
+        tx = await unlockAllAlluo();
       } else {
-        await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
+        tx = await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
       }
-      setNotification('Successfully unlocked', 'success');
+      setNotification('Successfully unlocked', 'success', tx.transactionHash, EChain.ETHEREUM);
       await updateAlluoInfo();
     } catch (error) {
       setNotification(error, 'error');

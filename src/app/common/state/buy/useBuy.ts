@@ -112,8 +112,9 @@ export const useBuy = () => {
     setIsApproving(true);
 
     try {
-      await approveAlluoPurchaseInWETH();
+      const tx = await approveAlluoPurchaseInWETH();
       await updateBuyInfo();
+      setNotification('Approved successfully', 'success', tx.transactionHash, EChain.ETHEREUM);
     } catch (err) {
       console.log('Error', err.message);
       setNotification(err.message, 'error');
@@ -127,10 +128,10 @@ export const useBuy = () => {
     setIsBuying(true);
 
     try {
-      await buyAlluoWithWETH(inputValue);
+      const tx = await buyAlluoWithWETH(inputValue);
       setInputValue(null);
       await updateBuyInfo();
-      setNotification('Successfully bought', 'success');
+      setNotification('Successfully bought', 'success', tx.transactionHash, EChain.ETHEREUM);
     } catch (err) {
       console.log('Error', err);
       setNotification(err, 'error');
@@ -155,9 +156,9 @@ export const useBuy = () => {
       if (+alluoStakingAllowance < difference) {
         await approveAlluoStaking();
       }
-      await lockAlluo(difference);
+      const tx = await lockAlluo(difference);
       await updateBuyInfo();
-      setNotification('Successfully bought and locked', 'success');
+      setNotification('Successfully bought and locked', 'success', tx.transactionHash, EChain.ETHEREUM);
     } catch (err) {
       console.log('Error', err.message);
       setNotification(err.message, 'error');

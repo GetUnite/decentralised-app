@@ -3,11 +3,7 @@ import { Box, Paragraph, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { useRecoilState } from 'recoil';
 
-export const HeadingText = ({
-  isLoading,
-  numberOfAssets,
-  ...rest
-}) => {
+export const HeadingText = ({ isLoading, numberOfAssets, ...rest }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   const headingText = isLoading ? (
@@ -20,8 +16,8 @@ export const HeadingText = ({
         'You don’t have any available assets to stream in your wallet.'
       ) : (
         <span>
-          You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '} available to
-          stream.
+          You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '}
+          available to stream.
         </span>
       )}
     </>
@@ -31,12 +27,13 @@ export const HeadingText = ({
     <>
       <Text size="36px" weight="bold">
         {!walletAccountAtom
-          ? 'Connect your wallet to see your available assets to farm.'
+          ? 'Connect your wallet to see your available assets to stream.'
           : headingText}
       </Text>
       <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
-        Fund your wallet using crypto or fiat currency here to start investing.
-        Withdraw at any time with no cost and no lock-in period.
+        AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC, or
+        ETH and BTC to dollar-pegged stablecoins and earn yield on all assets
+        your streams.
       </Paragraph>
     </>
   );

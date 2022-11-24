@@ -3,133 +3,20 @@ import {
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
+import { depositDivided } from 'app/common/functions/utils';
 import {
-  convertFromUSDC,
-  getBoosterFarmPendingRewards,
-  getBoosterFarmRewards,
-  getValueOf1LPinUSDC
-} from 'app/common/functions/farm';
-import {
-  claimBoosterFarmLPRewards,
-  claimBoosterFarmNonLPRewards,
-  getBoosterFarmInterest,
   getInterest,
-  getSupportedTokensAdvancedInfo,
-  getSupportedTokensBasicInfo,
-  getSupportedTokensList,
-  getTotalAssets,
   getTotalAssetSupply,
-  getUserDepositedAmount,
-  getUserDepositedLPAmount
+  getUserDepositedAmount
 } from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
 
-export const initialAvailableFarmsState: Array<TFarm> = [
-  {
-    id: 8,
-    farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
-    type: 'booster',
-    chain: EChain.ETHEREUM,
-    name: 'FRAX/USDC',
-    sign: '$',
-    icons: ['FRAX', 'USDC'],
-    isBooster: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['FRAX', 'USDC'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.FRAXUSDC,
-    supportedTokensAddresses: [
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
-      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
-      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
-      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
-      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
-      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
-      //{ address: EEthereumAddresses.STETHETH, label: 'stETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
-      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
-    ],
-    lowSlippageTokenLabels: ['FRAX', 'USDC'],
-    apyFarmAddresses: { baseApyAddress: "bd072651-d99c-4154-aeae-51f12109c054", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
-  },
-  {
-    id: 9,
-    farmAddress: EEthereumAddresses.CVXETHVAULT,
-    type: 'booster',
-    chain: EChain.ETHEREUM,
-    name: 'CVX/ETH',
-    sign: '$',
-    icons: ['CVX', 'ETH'],
-    isBooster: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
-    supportedTokensAddresses: [
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
-      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
-      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
-      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
-      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
-      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
-      //{ address: EEthereumAddresses.STETHETH, label: 'stETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
-      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
-    ],
-    lowSlippageTokenLabels: ['CVX', 'WETH'],
-    apyFarmAddresses: { baseApyAddress: "25d9dc49-3182-493a-bda4-0db53b25f457", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
-  },
-  {
-    id: 10,
-    farmAddress: EEthereumAddresses.STETHETHVAULT,
-    type: 'booster',
-    chain: EChain.ETHEREUM,
-    name: 'stETH/ETH',
-    sign: '$',
-    icons: ['stETH', 'ETH'],
-    isBooster: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['stETH', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.STETHETH,
-    supportedTokensAddresses: [
-      { address: EEthereumAddresses.AGEUR, label: 'agEUR', sign: '€' },
-      { address: EEthereumAddresses.CRV, label: 'CRV', sign: '' },
-      { address: EEthereumAddresses.CVX, label: 'CVX', sign: '' },
-      { address: EEthereumAddresses.DAI, label: 'DAI', sign: '$' },
-      { address: EEthereumAddresses.EURS, label: 'EURS', sign: '€' },
-      { address: EEthereumAddresses.EURT, label: 'EURT', sign: '€' },
-      { address: EEthereumAddresses.FRAX, label: 'FRAX', sign: '$' },
-      //{ address: EEthereumAddresses.STETHETH, label: 'stETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.USDC, label: 'USDC', sign: '$' },
-      { address: EEthereumAddresses.WETH, label: 'WETH', sign: 'Ξ' },
-      { address: EEthereumAddresses.WBTC, label: 'WTBC', sign: '₿' },
-    ],
-    lowSlippageTokenLabels: [//'stETH', 
-    'wETH'],
-    apyFarmAddresses: { baseApyAddress: "5ce23e7e-3800-4c9c-ad30-6db3db0515a1", boostApyAddress :"25d9dc49-3182-493a-bda4-0db53b25f457" },
-  },
+export const farmOptions: Array<TFarm> = [
   {
     id: 0,
     farmAddress: EPolygonAddresses.IBALLUOUSD,
@@ -138,6 +25,26 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+        decimals: 6,
+        sign: '$',
+      },
+    ],
   },
   {
     id: 1,
@@ -147,6 +54,32 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'jEUR'],
+    supportedTokens: [
+      {
+        label: 'EURS',
+        address: '0xE111178A87A3BFf0c8d18DECBa5798827539Ae99',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'PAR',
+        address: '0xE2Aa7db6dA1dAE97C5f5C6914d285fBfCC32A128',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'jEUR',
+        address: '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0x7BDF330f423Ea880FF95fC41A280fD5eCFD3D09f',
+        decimals: 6,
+        sign: '€',
+      },
+    ],
   },
   {
     id: 2,
@@ -156,6 +89,14 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
   },
   {
     id: 3,
@@ -165,6 +106,14 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
   },
   {
     id: 4,
@@ -174,6 +123,26 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    supportedTokens: [
+      {
+        label: 'USDC',
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'DAI',
+        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+        decimals: 6,
+        sign: '$',
+      },
+    ],
   },
   {
     id: 5,
@@ -183,6 +152,26 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'agEUR'],
+    supportedTokens: [
+      {
+        label: 'EURS',
+        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'agEUR',
+        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        decimals: 18,
+        sign: '€',
+      },
+    ],
   },
   {
     id: 6,
@@ -192,6 +181,14 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
   },
   {
     id: 7,
@@ -201,50 +198,33 @@ export const initialAvailableFarmsState: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
   },
 ];
 
 export const useFarm = ({ id }) => {
   // react
   const navigate = useNavigate();
-  const [cookies] = useCookies(['has_seen_boost_farms']);
 
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
-  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
-  // other state control files
-  const { setNotification } = useNotification();
-
   // selected farm control
-  const [availableFarms] = useState<TFarm[]>(initialAvailableFarmsState);
+  const [availableFarms] = useState<TFarm[]>(farmOptions);
   const [selectedFarm, setSelectedFarm] = useState<TFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
     useState<TSupportedToken>();
 
-  // booster farm rewards control
-  const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
-
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
-  const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
-
-  // information/confirmation control
-  const showBoosterFarmPresentation = !isSafeAppAtom && selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
-
-  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
-  const nextHarvestDate = moment().subtract(1, 'days').add(1, 'week').day('Monday');
-  const [
-    showBoosterWithdrawalConfirmation,
-    setShowBoosterWithdrawalConfirmation,
-  ] = useState<boolean>(false);
-  const [pendingRewards, setPendingRewards] = useState<number>();
-  const [losablePendingRewards, setLosablePendingRewards] = useState<number>();
-
-  const showTabs = !showBoosterFarmPresentation;
-  //&& !showBoosterWithdrawalConfirmation;
 
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
@@ -253,91 +233,27 @@ export const useFarm = ({ id }) => {
   }, [walletAccountAtom, selectedFarm]);
 
   useEffect(() => {
+    const selectFarm = async id => {
+      try {
+        let farm = availableFarms.find(availableFarm => availableFarm.id == id);
+        if (!farm) {
+          navigate('/');
+          return;
+        }
+
+        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+
+        setSelectedFarm(farm);
+        setSelectedsupportedToken(farm.supportedTokens[0]);
+      } catch (error) {
+        console.log(error);
+      }
+
+      setIsLoading(false);
+    };
+
     selectFarm(id);
   }, [walletAccountAtom]);
-
-  useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      //here update the actual selected token. 
-    }
-  }, [selectedSupportedToken]);
-
-  const fetchFarmInfo = async farm => {
-    let farmInfo;
-    farmInfo = {
-      interest: await getInterest(farm.type, farm.chain),
-      totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
-      supportedTokensList: await getSupportedTokensList(farm.type, farm.chain),
-      depositedAmount: 0,
-    };
-    if (walletAccountAtom) {
-      farmInfo.depositedAmount = await getUserDepositedAmount(
-        farm.type,
-        farm.chain,
-      );
-      farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
-    }
-
-    return farmInfo;
-  };
-
-  const fetchBoosterFarmInfo = async farm => {
-    let farmInfo;
-
-    const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
-      farm.lPTokenAddress,
-      farm.chain,
-    );
-
-    farmInfo = {
-      interest: await getBoosterFarmInterest(
-        farm.farmAddress,
-        farm.apyFarmAddresses,
-        farm.chain,
-      ),
-      totalAssetSupply:
-        +(await getTotalAssets(farm.farmAddress, farm.chain)) *
-        valueOf1LPinUSDC,
-      supportedTokensList: await Promise.all(
-        farm.supportedTokensAddresses.map(async supportedtoken => {
-          return {
-            ...(await getSupportedTokensBasicInfo(
-              supportedtoken.address,
-              farm.chain,
-            )),
-            sign: supportedtoken.sign,
-          };
-        }),
-      ),
-      depositedAmount: 0,
-      valueOf1LPinUSDC: valueOf1LPinUSDC,
-    };
-    if (walletAccountAtom) {
-      farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
-        farm.farmAddress,
-        farm.chain,
-      );
-      // Let's use the depositedAmount to store the deposited amount in USD(C)
-      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount =
-        +farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
-      farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAmount);
-      farmInfo.rewards = {
-        ...farm.rewards,
-        ...(await getBoosterFarmRewards(
-          farm.farmAddress,
-          farmInfo.valueOf1LPinUSDC,
-          farm.chain,
-        )),
-      };
-      farmInfo.rewards.pendingValue =
-        farmInfo.totalAssetSupply > 0
-          ? await getBoosterFarmPendingRewards(farm.farmAddress, farm.chain)
-          : 0;
-    }
-
-    return farmInfo;
-  };
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
@@ -345,12 +261,9 @@ export const useFarm = ({ id }) => {
       const farm = await getUpdatedFarmInfo(selectedFarm);
       setSelectedsupportedToken(
         farm.supportedTokens?.find(
-          stableCoin => stableCoin?.address == selectedSupportedToken?.address,
+          st => st?.address == selectedSupportedToken?.address,
         ),
       );
-      if (farm.isBooster) {
-        setPendingRewards(farm.rewards.pendingValue);
-      }
       setSelectedFarm(farm);
     } catch (error) {
       console.log(error);
@@ -360,39 +273,20 @@ export const useFarm = ({ id }) => {
 
   const getUpdatedFarmInfo = async (farm = selectedFarm) => {
     try {
-      let farmInfo = farm?.isBooster
-        ? await fetchBoosterFarmInfo(farm)
-        : await fetchFarmInfo(farm);
+      let farmInfo;
 
+      farmInfo = {
+        interest: await getInterest(farm.type, farm.chain),
+        totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
+        depositedAmount: 0,
+      };
       if (walletAccountAtom) {
-        farmInfo.supportedTokens = await Promise.all(
-          farmInfo.supportedTokensList.map(async supportedToken => {
-            const advancedSupportedTokenInfo =
-              await getSupportedTokensAdvancedInfo(
-                farm.farmAddress,
-                supportedToken,
-                farm.chain,
-              );
-            return {
-              label: supportedToken.symbol,
-              address: supportedToken.tokenAddress,
-              balance: advancedSupportedTokenInfo.balance,
-              allowance: advancedSupportedTokenInfo.allowance,
-              decimals: supportedToken.decimals,
-              sign: supportedToken.sign,
-              // For booster farm withdrawals
-              // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
-              // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
-              boosterDepositedAmount: farm.isBooster
-                ? await convertFromUSDC(
-                    supportedToken.tokenAddress,
-                    supportedToken.decimals,
-                    // here the deposited amount is in USDC
-                    farmInfo.depositedAmount,
-                  )
-                : 0,
-            };
-          }),
+        farmInfo.depositedAmount = await getUserDepositedAmount(
+          farm.type,
+          farm.chain,
+        );
+        farmInfo.depositDividedAmount = depositDivided(
+          farmInfo.depositedAmount,
         );
       }
 
@@ -402,109 +296,8 @@ export const useFarm = ({ id }) => {
     }
   };
 
-  const selectFarm = async id => {
-    setIsLoading(true);
-
-    try {
-      const farm = await getUpdatedFarmInfo(
-        availableFarms.find(availableFarm => availableFarm.id == id),
-      );
-      if (!farm) {
-        navigate('/');
-      }
-      setSelectedFarm(farm);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.length > 0 ? farm.supportedTokens[0] : undefined,
-      );
-      if (farm.isBooster) {
-        setPendingRewards(farm.rewards.pendingValue);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-    setIsLoading(false);
-  };
-
   const selectSupportedToken = supportedToken => {
     setSelectedsupportedToken(supportedToken);
-  };
-
-  const depositDivided = depositedAmount => {
-    if (depositedAmount == 0) return { first: '0.0', second: '0' };
-    const depositedAmountString = depositedAmount.toString();
-    const dotIndex = depositedAmountString.indexOf('.');
-    const balanceFirstPart = depositedAmountString.substring(0, dotIndex + 3);
-    const balanceSecondPart = depositedAmountString.substring(
-      dotIndex + 3,
-      dotIndex + 9,
-    );
-    return { first: balanceFirstPart, second: balanceSecondPart };
-  };
-
-  const updateRewardsInfo = async () => {
-    setIsLoadingRewards(true);
-    try {
-      const updatedRewards = {
-        ...selectedFarm.rewards,
-        ...(await getBoosterFarmRewards(
-          selectedFarm.farmAddress,
-          selectedFarm.valueOf1LPinUSDC,
-          selectedFarm.chain,
-        )),
-        pendingValue:
-          selectedFarm.totalAssetSupply > 0
-            ? await getBoosterFarmPendingRewards(
-                selectedFarm.farmAddress,
-                selectedFarm.chain,
-              )
-            : 0,
-      };
-      setSelectedFarm({ ...selectedFarm, rewards: updatedRewards });
-    } catch (error) {
-      console.log(error);
-    }
-    setIsLoadingRewards(false);
-  };
-
-  const claimRewards = async () => {
-    setIsClamingRewards(true);
-    try {
-      if (selectedFarm?.isBooster) {
-        seeRewardsAsStable
-          ? await claimBoosterFarmNonLPRewards(
-              selectedFarm.farmAddress,
-              selectedFarm.rewards.stableAddress,
-              selectedFarm.chain,
-            )
-          : await claimBoosterFarmLPRewards(
-              selectedFarm.farmAddress,
-              selectedFarm.chain,
-            );
-      }
-      await updateRewardsInfo();
-      setNotification('Rewards claimed successfully', 'success');
-    } catch (error) {
-      setNotification(error, 'error');
-    }
-    setIsClamingRewards(false);
-  };
-
-  const startBoosterWithdrawalConfirmation = async withdrawValue => {
-    setShowBoosterWithdrawalConfirmation(true);
-    // Losable rewards will be the pending value * % of shares to withdraw
-    const projectedLosableRewards =
-      selectedFarm.rewards.pendingValue *
-      (+withdrawValue / +selectedSupportedToken.boosterDepositedAmount);
-    setPendingRewards(
-      selectedFarm.rewards.pendingValue - projectedLosableRewards,
-    );
-    setLosablePendingRewards(projectedLosableRewards);
-  };
-
-  const cancelBoosterWithdrawalConfirmation = async () => {
-    setShowBoosterWithdrawalConfirmation(false);
-    setPendingRewards(selectedFarm.rewards.pendingValue);
   };
 
   return {
@@ -514,19 +307,5 @@ export const useFarm = ({ id }) => {
     updateFarmInfo,
     selectedSupportedToken,
     selectSupportedToken,
-    seeRewardsAsStable,
-    setSeeRewardsAsStable,
-    claimRewards,
-    isClamingRewards,
-    isLoadingRewards,
-    showTabs,
-    showBoosterFarmPresentation,
-    previousHarvestDate,
-    nextHarvestDate,
-    showBoosterWithdrawalConfirmation,
-    startBoosterWithdrawalConfirmation,
-    cancelBoosterWithdrawalConfirmation,
-    pendingRewards,
-    losablePendingRewards,
   };
 };
