@@ -1,12 +1,12 @@
 import {
-    changeNetwork, getChainNameById, getCurrentChainId, onWalletUpdated, trySafeAppConnection
+  changeNetwork, getChainNameById, getCurrentChainId, onWalletUpdated, trySafeAppConnection
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import {
-    isCorrectNetwork,
-    isSafeApp,
-    walletAccount,
-    wantedChain
+  isCorrectNetwork,
+  isSafeApp,
+  walletAccount,
+  wantedChain
 } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -73,6 +73,9 @@ export const useWallet = () => {
           chainIdToUse,
         )}`,
         'info',
+        null,
+        null,
+        true
       );
     } else {
       resetNotification();

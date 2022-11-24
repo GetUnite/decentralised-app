@@ -8,6 +8,8 @@ import { MenuItem } from '../Menu/blocks';
 import { Menu, Notification } from 'app/modernUI/components';
 
 import { modernUiPaths } from 'app/common/hooks';
+import { notification } from 'app/common/state/atoms';
+import { useRecoilState } from 'recoil';
 import discordDark from '../../images/discord-dark.svg';
 import discord from '../../images/discord.svg';
 import logoDark from '../../images/logo-dark.svg';
@@ -23,6 +25,7 @@ import twitter from '../../images/twitter.svg';
 
 export const Layout = ({ children, notificationId = null, ...rest }) => {
   const { isLightMode } = useMode();
+  const [notificationAtom] = useRecoilState(notification);
 
   useEffect(() => {
     if (isLightMode) document.body.style.backgroundColor = 'white';
@@ -49,7 +52,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="center"
             fill="horizontal"
-            style={{ position: 'sticky',top: '0px' }}
+            style={{ position: 'sticky', top: '0px' }}
           >
             <Nav
               background="bg"
@@ -90,6 +93,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               )}
               <Menu />
             </Nav>
+            {notificationAtom.message != '' && <Notification id={notificationId} />}
           </Box>
           <Box
             fill
@@ -99,11 +103,14 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             flex="grow"
           >
-            <Notification id={notificationId} />
             <Box
               width="xlarge"
               pad={{ horizontal: 'medium', vertical: 'medium' }}
-              style={{ marginTop: '12px', marginBottom: '123px', minHeight: '510px'}}
+              style={{
+                marginTop: '12px',
+                marginBottom: '123px',
+                minHeight: '510px',
+              }}
             >
               {children}
             </Box>

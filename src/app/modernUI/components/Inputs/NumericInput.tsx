@@ -3,6 +3,7 @@ import { TSupportedToken } from 'app/common/types/global';
 import { Box, Select, Text, TextInput } from 'grommet';
 import { Down } from 'grommet-icons';
 import { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import NumberFormat from 'react-number-format';
 import styled from 'styled-components';
 import { TokenIcon } from '../Icons';
@@ -31,8 +32,10 @@ interface INumericInput {
   tokenOptions?: TSupportedToken[];
   error: string;
   maxValue?: string | number;
+  maxButton?: boolean;
   slippageWarning?: boolean;
   lowSlippageTokenLabels?: string[];
+  isLoadingMaxValue?: boolean;
 }
 
 export const NumericInput = ({
@@ -41,6 +44,7 @@ export const NumericInput = ({
   value,
   available,
   maxValue,
+  maxButton = false,
   onValueChange,
   tokenOptions,
   selectedToken,
@@ -48,6 +52,7 @@ export const NumericInput = ({
   slippageWarning = false,
   lowSlippageTokenLabels,
   error,
+  isLoadingMaxValue = false,
   ...rest
 }: INumericInput) => {
   const [formattedValue, setFormattedValue] = useState('');
@@ -61,18 +66,22 @@ export const NumericInput = ({
           <Text size="medium" color="soul">
             {label}
           </Text>
-          <Text size="medium" color="soul">
-            {available != undefined ? (
-              'Available: ' + tokenSign + roundNumberDown(+available)
-            ) : (
-              <>
-                {!!selectedToken &&
-                  'Wallet: ' +
-                    tokenSign +
-                    roundNumberDown(+(+selectedToken?.balance))}
-              </>
-            )}
-          </Text>
+          {isLoadingMaxValue ? (
+            <Box width="100px">
+              <Skeleton count={1} />
+            </Box>
+          ) : (
+            <Text size="medium" color="soul">
+              {available != undefined ? (
+                'Available: ' + tokenSign + roundNumberDown(+available)
+              ) : (
+                <>
+                  {!!selectedToken &&
+                    'Wallet: ' + tokenSign + roundNumberDown(+(+maxValue))}
+                </>
+              )}
+            </Text>
+          )}
         </Box>
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
@@ -88,7 +97,7 @@ export const NumericInput = ({
             }}
           />
           <AbsoluteBox direction="row" gap="xsmall">
-            {maxValue != undefined && (
+            {maxButton && maxValue != undefined && (
               <MaxButton
                 primary
                 onClick={() => {
@@ -116,7 +125,10 @@ export const NumericInput = ({
             )}
           </AbsoluteBox>
         </RelativeBox>
-        <Box margin={{top: "small"}} height={slippageWarning ? '60px' : 'auto'}>
+        <Box
+          margin={{ top: 'small' }}
+          height={slippageWarning ? '60px' : 'auto'}
+        >
           {error ? (
             <Text color="error" size="small">
               {error}
@@ -126,8 +138,9 @@ export const NumericInput = ({
               {slippageWarning && (
                 <>
                   <Text size="small" color="soul">
-                    Withdrawing in any token other than {lowSlippageTokenLabels.join('/')} increases
-                    slippage. Values shown are an approximation and may change subject to
+                    Withdrawing in any token other than{' '}
+                    {lowSlippageTokenLabels.join('/')} increases slippage.
+                    Values shown are an approximation and may change subject to
                     exhange rates
                   </Text>
                 </>

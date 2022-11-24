@@ -1,23 +1,37 @@
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositIntoBoosterFarm,
-  depositStableCoin
+  approveStableCoin, depositStableCoin,
+  getAllowance,
+  getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
-export const useDeposit = ({
+export const useFarmDeposit = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+  // other control files
   const { setNotification } = useNotification();
+
+  // inputs
   const [depositValue, setDepositValue] = useState<string>();
   const [depositValueError, setDepositValueError] = useState<string>('');
+
+  // data
+  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
+    useState<any>({
+      balance: 0,
+      allowance: 0,
+    });
+
+  // loading control
+  const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
+    useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
   const [useBiconomy, setUseBiconomy] = useState(false);
@@ -27,25 +41,49 @@ export const useDeposit = ({
       //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
-  
+
   const resetState = () => {
     setDepositValueError('');
     setIsApproving(false);
     setIsDepositing(false);
   };
 
+  useEffect(() => {
+    const updateBalanceAndAllowance = async () => {
+      setIsFetchingSupportedTokenInfo(true);
+
+      const allowance = await getAllowance(
+        selectedSupportedToken.address,
+        selectedFarm.farmAddress,
+        selectedFarm.chain,
+      );
+      const balance = await getBalanceOf(
+        selectedSupportedToken.address,
+        selectedSupportedToken.decimals,
+        selectedFarm.chain,
+      );
+      setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+
+      setIsFetchingSupportedTokenInfo(false);
+    };
+
+    if (selectedFarm && selectedSupportedToken) {
+      updateBalanceAndAllowance();
+    }
+  }, [selectedSupportedToken]);
+
   const handleApprove = async () => {
     setIsApproving(true);
 
     try {
-      await approveStableCoin(
+      const tx = await approveStableCoin(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         selectedFarm.chain,
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotification('Approved successfully', 'success');
+      setNotification('Approved successfully', 'success', tx.transactionHash, selectedFarm.chain);
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -57,7 +95,7 @@ export const useDeposit = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setDepositValueError('Write a valid number');
-    } else if (+value > +selectedSupportedToken?.balance) {
+    } else if (+value > +selectedSupportedTokenInfo.balance) {
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
@@ -67,28 +105,22 @@ export const useDeposit = ({
     setIsDepositing(true);
 
     try {
-      if (selectedFarm?.isBooster) {
-        await depositIntoBoosterFarm(
-          selectedFarm.farmAddress,
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      } else {
-        await depositStableCoin(
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.type,
-          selectedFarm.chain,
-          useBiconomy,
-        );
-      }
+      const tx = await depositStableCoin(
+        selectedSupportedToken.address,
+        depositValue,
+        selectedSupportedToken.decimals,
+        selectedFarm.type,
+        selectedFarm.chain,
+        useBiconomy,
+      );
       resetState();
       setDepositValue(null);
-      setNotification('Deposit successfully', 'success');
+      setNotification(
+        'Deposit successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
       await updateFarmInfo();
     } catch (error) {
       resetState();
@@ -101,6 +133,7 @@ export const useDeposit = ({
   return {
     depositValue,
     handleDepositValueChange,
+    selectedSupportedTokenInfo,
     isApproving,
     handleApprove,
     isDepositing,
@@ -110,5 +143,6 @@ export const useDeposit = ({
     resetState,
     depositValueError,
     hasErrors: depositValueError != '',
+    isFetchingSupportedTokenInfo,
   };
 };
