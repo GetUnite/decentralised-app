@@ -14,10 +14,8 @@ import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
-import {
-  fromDecimals,
-  maximumUint256Value, toDecimals
-} from './utils';
+import { heapTrack } from './heapClient';
+import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
 const ethereumMainnetProviderUrl =
@@ -156,6 +154,10 @@ export const connectToWallet = async (connectOptions?) => {
       walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
       web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
+      heapTrack('walletConnected', {
+        walletType: wallets[0].label,
+        chain: wallets[0].chains[0].id,
+      });
       return walletAddress;
     }
   } catch (error) {
@@ -1514,12 +1516,14 @@ export const getBoosterFarmInterest = async (
   const baseRewardsAPR = baseApyData.apyReward / 100;
   const boostRewardsAPR = boostApyData.apyReward / 100;
 
-  return (baseApy +
-    baseRewardsAPR *
-      fee *
-      (1 + boostApy) *
-      Math.pow(1 + boostRewardsAPR / 52, 52)) *
-    100;
+  return (
+    (baseApy +
+      baseRewardsAPR *
+        fee *
+        (1 + boostApy) *
+        Math.pow(1 + boostRewardsAPR / 52, 52)) *
+    100
+  );
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
