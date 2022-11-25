@@ -10,6 +10,7 @@ import {
   getUnapprovedSuperfluidSubscriptions,
   startStream
 } from 'app/common/functions/autoInvest';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approve,
@@ -392,6 +393,7 @@ export const useAutoInvestTab = () => {
   // updates the entire modal
   useEffect(() => {
     if (walletAccountAtom) {
+      heapTrack('clickAutoInvest');
       (async () => {
         // sets the wanted chain as Polygon
         setWantedChainAtom(EChain.POLYGON);
@@ -593,6 +595,7 @@ export const useAutoInvestTab = () => {
     supportedFromToken: TSupportedStreamToken,
   ) => {
     setSelectedSupportedFromToken(supportedFromToken);
+    heapTrack('autoInvestTokenSelected', {token: supportedFromToken.label})
     // updates the list of possible "to" tokens
     setSupportedToTokens(supportedFromToken.canStreamTo);
     // changes the "to" token to the first one on the list
@@ -634,6 +637,7 @@ export const useAutoInvestTab = () => {
     setIsApproving(true);
 
     try {
+      heapTrack('approvedTransactionMined',  {currency: selectedStreamOption.fromIbAlluoAddress, amount: streamValue})
       // TODO: currently biconomy doesn't work here
       const tx = await approveSuperfluidSubscriptions(
         unapprovedSuperfluidSubscriptions,
@@ -654,6 +658,7 @@ export const useAutoInvestTab = () => {
     setIsDepositing(true);
 
     try {
+      heapTrack('startedAutoinvestDeposit', { token: selectedSupportedFromToken.label, amount: streamValue });
       const tx = await depositIntoAlluo(
         selectedSupportedFromToken.address,
         selectedStreamOption.fromIbAlluoAddress,
@@ -671,6 +676,7 @@ export const useAutoInvestTab = () => {
         ...selectedSupportedFromToken,
         balance: balance,
       });
+      heapTrack('depositTransactionMined', { currency: selectedSupportedFromToken.label, amount: streamValue });
       setNotification('Deposit successfully', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (err) {
       setNotification(err, 'error');

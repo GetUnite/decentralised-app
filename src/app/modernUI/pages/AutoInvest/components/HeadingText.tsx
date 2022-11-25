@@ -3,7 +3,12 @@ import { Box, Paragraph, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { useRecoilState } from 'recoil';
 
-export const HeadingText = ({ isLoading, numberOfAssets, ...rest }) => {
+export const HeadingText = ({
+  isLoading,
+  numberOfAssets,
+  canStartStreams,
+  ...rest
+}) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   const headingText = isLoading ? (
@@ -12,13 +17,22 @@ export const HeadingText = ({ isLoading, numberOfAssets, ...rest }) => {
     </Box>
   ) : (
     <>
-      {numberOfAssets == 0 ? (
-        'You don’t have any available assets to stream in your wallet.'
-      ) : (
+      {!canStartStreams ? (
         <span>
-          You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '}
-          available to stream.
+          Great job, you are streaming the maximum number of concurrent streams
+          available.
         </span>
+      ) : (
+        <>
+          {numberOfAssets == 0 ? (
+            'You don’t have any available assets to stream in your wallet.'
+          ) : (
+            <span>
+              You have {numberOfAssets}{' '}
+              {numberOfAssets > 1 ? 'assets' : 'asset'} available to stream.
+            </span>
+          )}
+        </>
       )}
     </>
   );
@@ -31,9 +45,9 @@ export const HeadingText = ({ isLoading, numberOfAssets, ...rest }) => {
           : headingText}
       </Text>
       <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
-        AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC, or
-        ETH and BTC to dollar-pegged stablecoins and earn yield on all assets
-        your streams.
+        AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC and
+        ETH and BTC to dollar-pegged stablecoins (one way at a time) whilst
+        earning yield on all assets you stream.
       </Paragraph>
     </>
   );
