@@ -166,7 +166,7 @@ export const useAutoInvest = () => {
     setIsLoading(true);
     const numberOfStreams = await fetchStreamsInfo();
     // if all streams options are being used there is no need to get the assets
-    if (numberOfStreams < ricochetMarketAddressOptions.length) {
+    if (!(numberOfStreams > 1)) {
       await fetchAssetsInfo();
     }
 
