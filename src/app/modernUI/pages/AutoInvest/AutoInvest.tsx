@@ -28,6 +28,7 @@ export const AutoInvest = () => {
               isLoading={isLoading}
               numberOfAssets={assetsInfo?.numberOfAssets}
               numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
+              hasStreams={streams.length > 0}
               canStartStreams={canStartStreams}
             />
             <Box margin={{ top: '72px' }}>
@@ -36,11 +37,7 @@ export const AutoInvest = () => {
                   {isLoading ? (
                     <Skeleton count={1} height="36px" />
                   ) : (
-                    <Box direction="row" justify="between" align="center">
-                      {' '}
-                      <Text size="36px" weight="bold">
-                        {streams?.length || 0} active streams
-                      </Text>{' '}
+                    <Box direction="row" justify="end">
                       {canStartStreams && (
                         <Link to={'/autoinvest/add'}>
                           <Button
