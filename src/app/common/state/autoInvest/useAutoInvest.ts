@@ -317,7 +317,7 @@ export const useAutoInvest = () => {
           toAddress,
           false, // use biconomy here
         );
-        setNotification('Steam was stopped successfully', 'success');
+        setNotification('Steam was stopped successfully', 'success', tx.transactionHash, EChain.POLYGON);
         // remove stream from the list
         await updateAutoInvestInfo();
       } catch (err) {

@@ -587,6 +587,8 @@ export const stopStream = async (
     EChain.POLYGON,
     useBiconomy,
   );
+
+  return tx;
 };
 
 export const convertToUSDC = async (
