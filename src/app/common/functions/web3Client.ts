@@ -5,19 +5,17 @@ import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import uauthModule from '@web3-onboard/uauth';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
-import {
-  fromDecimals,
-  maximumUint256Value, toDecimals
-} from './utils';
+import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
 const ethereumMainnetProviderUrl =
@@ -50,6 +48,10 @@ const walletConnect = walletConnectModule({
 });
 const gnosis = gnosisModule();
 const coinbase = coinbaseWalletModule();
+const uauth = uauthModule({
+  clientID: process.env.REACT_APP_CLIENT_ID!,
+  redirectUri: process.env.REACT_APP_REDIRECT_URI!,
+});
 
 const chains = [
   {
@@ -104,6 +106,7 @@ onboard.state.actions.setWalletModules([
   walletConnect,
   gnosis,
   coinbase,
+  uauth,
 ]);
 
 const permitOnlyTokenAddresses = [
@@ -148,14 +151,19 @@ export const trySafeAppConnection = async callback => {
 
 export const connectToWallet = async (connectOptions?) => {
   let wallets;
+  let walletAddress = { domain: null, address: null };
 
   try {
     wallets = await onboard.connectWallet(connectOptions);
 
     if (wallets[0]) {
+      const unstoppableUser = wallets[0].label === 'Unstoppable' ? true : false;
       walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
       web3 = new Web3(walletProvider);
-      walletAddress = wallets[0].accounts[0].address;
+      walletAddress.domain = unstoppableUser
+        ? wallets[0].instance.user.sub
+        : null;
+      walletAddress.address = wallets[0].accounts[0].address;
       return walletAddress;
     }
   } catch (error) {
@@ -1514,12 +1522,14 @@ export const getBoosterFarmInterest = async (
   const baseRewardsAPR = baseApyData.apyReward / 100;
   const boostRewardsAPR = boostApyData.apyReward / 100;
 
-  return (baseApy +
-    baseRewardsAPR *
-      fee *
-      (1 + boostApy) *
-      Math.pow(1 + boostRewardsAPR / 52, 52)) *
-    100;
+  return (
+    (baseApy +
+      baseRewardsAPR *
+        fee *
+        (1 + boostApy) *
+        Math.pow(1 + boostRewardsAPR / 52, 52)) *
+    100
+  );
 };
 
 export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
