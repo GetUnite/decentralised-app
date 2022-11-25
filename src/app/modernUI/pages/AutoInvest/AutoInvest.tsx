@@ -28,6 +28,7 @@ export const AutoInvest = () => {
               isLoading={isLoading}
               numberOfAssets={assetsInfo?.numberOfAssets}
               numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
+              canStartStreams={canStartStreams}
             />
             <Box margin={{ top: '72px' }}>
               {walletAccountAtom ? (
