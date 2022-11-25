@@ -7,6 +7,7 @@ export const HeadingText = ({
   isLoading,
   numberOfAssets,
   canStartStreams,
+  hasStreams,
   ...rest
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -24,13 +25,21 @@ export const HeadingText = ({
         </span>
       ) : (
         <>
-          {numberOfAssets == 0 ? (
-            'You don’t have any available assets to stream in your wallet.'
-          ) : (
+          {hasStreams ? (
             <span>
-              You have {numberOfAssets}{' '}
-              {numberOfAssets > 1 ? 'assets' : 'asset'} available to stream.
+              You have 1 active stream and 1 more stream available.
             </span>
+          ) : (
+            <>
+              {numberOfAssets == 0 ? (
+                'You have no assets available to stream.'
+              ) : (
+                <span>
+                  You have {numberOfAssets}{' '}
+                  {numberOfAssets > 1 ? 'assets' : 'asset'} available to stream.
+                </span>
+              )}
+            </>
           )}
         </>
       )}

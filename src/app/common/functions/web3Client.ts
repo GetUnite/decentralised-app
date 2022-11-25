@@ -151,7 +151,7 @@ export const connectToWallet = async (connectOptions?) => {
     wallets = await onboard.connectWallet(connectOptions);
 
     if (wallets[0]) {
-      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
+      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
       web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
       heapTrack('walletConnected', {
@@ -443,7 +443,7 @@ const dataToSign = JSON.stringify({
 export const getReadOnlyProvider = chain => {
   const providerUrl =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  return new ethers.providers.JsonRpcProvider(providerUrl);
+  return new ethers.providers.JsonRpcProvider(providerUrl, "any");
 };
 
 export const callContract = async (

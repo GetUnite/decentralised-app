@@ -129,7 +129,7 @@ const streamFromOptions: TSupportedStreamToken[] = [
 
 const ricochetMarketAddressOptions: string[] = [
   EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
-  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC
+  EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
 ];
 
 export const useAutoInvest = () => {
@@ -164,8 +164,12 @@ export const useAutoInvest = () => {
 
   const updateAutoInvestInfo = async () => {
     setIsLoading(true);
-    await fetchStreamsInfo();
-    await fetchAssetsInfo();
+    const numberOfStreams = await fetchStreamsInfo();
+    // if all streams options are being used there is no need to get the assets
+    if (numberOfStreams < ricochetMarketAddressOptions.length) {
+      await fetchAssetsInfo();
+    }
+
     setIsLoading(false);
   };
 
@@ -233,7 +237,10 @@ export const useAutoInvest = () => {
           EChain.POLYGON,
         );
         const flowPerSecond = +streamFlow.flowPerSecond;
-        const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
+        const flowPerMonth = toExactFixed(
+          (flowPerSecond * 60 * 60 * 24 * 365) / 12,
+          2,
+        );
         const tvs = toExactFixed(
           (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
           6,
@@ -284,11 +291,16 @@ export const useAutoInvest = () => {
       }
     }
 
-    if(ricochetMarketAddressesWithStreams.length >= ricochetMarketAddressOptions.length){
+    if (
+      ricochetMarketAddressesWithStreams.length >=
+      ricochetMarketAddressOptions.length
+    ) {
       setCanStartStreams(false);
     }
     setFundedUntilByStreamOptions(fundedUntilArray);
     setStreams(streamsArray);
+
+    return ricochetMarketAddressesWithStreams.length;
   };
 
   const handleStopStream = async (fromAddress, toAddress) => {
@@ -328,6 +340,6 @@ export const useAutoInvest = () => {
     assetsInfo,
     fundedUntilByStreamOptions,
     handleStopStream,
-    canStartStreams
+    canStartStreams,
   };
 };
