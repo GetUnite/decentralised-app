@@ -1,8 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
   approveStableCoin,
-  depositIntoBoosterFarm, getAllowance,
+  depositIntoBoosterFarm,
+  getAllowance,
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
@@ -83,7 +85,17 @@ export const useBoostFarmDeposit = ({
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotification('Approved successfully', 'success', tx.transactionHash, selectedFarm.chain);
+      heapTrack('approvedTransactionMined', {
+        pool: 'boost',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      setNotification(
+        'Approved successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -105,17 +117,32 @@ export const useBoostFarmDeposit = ({
     setIsDepositing(true);
 
     try {
-        const tx = await depositIntoBoosterFarm(
-          selectedFarm.farmAddress,
-          selectedSupportedToken.address,
-          depositValue,
-          selectedSupportedToken.decimals,
-          selectedFarm.chain,
-          useBiconomy,
-        );
+      heapTrack('startedDepositing', {
+        pool: 'boost',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      const tx = await depositIntoBoosterFarm(
+        selectedFarm.farmAddress,
+        selectedSupportedToken.address,
+        depositValue,
+        selectedSupportedToken.decimals,
+        selectedFarm.chain,
+        useBiconomy,
+      );
       resetState();
       setDepositValue(null);
-      setNotification('Deposit successfully', 'success',tx.transactionHash, selectedFarm.chain);
+      heapTrack('depositTransactionMined', {
+        pool: 'boost',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      setNotification(
+        'Deposit successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
       await updateFarmInfo();
     } catch (error) {
       resetState();

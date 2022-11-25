@@ -3,6 +3,7 @@ import {
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   getInterest,
@@ -243,6 +244,7 @@ export const useFarm = ({ id }) => {
 
         farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
 
+        heapTrack('farm', { pool: 'Ib', currency: farm.type });
         setSelectedFarm(farm);
         setSelectedsupportedToken(farm.supportedTokens[0]);
       } catch (error) {
