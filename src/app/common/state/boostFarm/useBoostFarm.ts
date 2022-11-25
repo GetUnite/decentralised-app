@@ -5,6 +5,7 @@ import {
   getBoosterFarmRewards,
   getValueOf1LPinUSDC
 } from 'app/common/functions/farm';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   claimBoosterFarmLPRewards,
@@ -352,6 +353,7 @@ export const useBoostFarm = ({ id }) => {
 
         farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
 
+        heapTrack('farm', { pool: 'boost', currency: farm.name });
         setSelectedFarm(farm);
         setSelectedsupportedToken(farm.supportedTokens[0]);
         setIsLoading(false);
