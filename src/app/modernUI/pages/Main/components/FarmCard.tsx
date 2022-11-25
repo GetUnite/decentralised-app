@@ -75,8 +75,7 @@ export const FarmCard = ({
             <Card
               onClick={() => {
                 if (!disabled && !!walletAccountAtom) navigate('/farm/' + id);
-                else
-                  setNotification('Connect your wallet', 'error');
+                else setNotification('Connect your wallet', 'error');
               }}
               style={{ position: 'relative' }}
               pad={{ horizontal: 'medium', vertical: 'medium' }}
@@ -123,9 +122,7 @@ export const FarmCard = ({
           ) : (
             <Card
               pad={{ horizontal: 'medium', vertical: 'none' }}
-              margin={{ top: 'small' }}
-              height="120px"
-              background="card"
+              height="90px"
               align="center"
               justify="center"
               fill="horizontal"
@@ -134,7 +131,7 @@ export const FarmCard = ({
                 fill="horizontal"
                 rows="xxsmall"
                 align="center"
-                columns={{ size: 'xsmall', count: 'fit' }}
+                columns={['270px', '200px', '155px', '155px', '105px', 'auto']}
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
@@ -153,8 +150,7 @@ export const FarmCard = ({
                     </Box>
                     <ChainBadge chain={chain} />
                     <span>{tvl}</span>
-                    <Box direction="row" justify="between" align="center">
-                    <span>{toExactFixed(interest,2).toLocaleString()}%</span>
+                      <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
                       {walletAccountAtom ? (
                         <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                           <Button label={'Farm'} />
@@ -168,7 +164,6 @@ export const FarmCard = ({
                           {...rest}
                         />
                       )}
-                    </Box>
                   </>
                 ) : (
                   <>
@@ -182,12 +177,10 @@ export const FarmCard = ({
                     <span>{poolShare}%</span>
                     <span>{tvl}</span>
                     <span>{sign + balance}</span>
-                    <Box direction="row" justify="between" align="center">
-                      <span>{toExactFixed(interest,2).toLocaleString()}%</span>
-                      <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
-                        <Button label={'Farm'} />
-                      </Link>
-                    </Box>
+                    <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
+                    <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
+                      <Button label={'Farm'} />
+                    </Link>
                   </>
                 )}
               </Grid>
