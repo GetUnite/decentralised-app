@@ -59,6 +59,7 @@ export const useFarmDeposit = ({
         selectedFarm.farmAddress,
         selectedFarm.chain,
       );
+      console.log({a:selectedSupportedToken.address, b:selectedFarm.farmAddress, c: allowance});
       const balance = await getBalanceOf(
         selectedSupportedToken.address,
         selectedSupportedToken.decimals,
