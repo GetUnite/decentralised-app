@@ -1,7 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useCurrentPath } from 'app/common/hooks';
-import { useNotification } from 'app/common/state';
+import { useMode, useNotification } from 'app/common/state';
 import { walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
@@ -58,6 +58,7 @@ export const FarmCard = ({
   poolShare,
   ...rest
 }: IFarmCard) => {
+  const { isLightMode } = useMode();
   const { navigate } = useCurrentPath();
   const { setNotification } = useNotification();
   const { handleConnectWallet } = useConnectionButton();
@@ -70,6 +71,7 @@ export const FarmCard = ({
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
+  const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -129,7 +131,7 @@ export const FarmCard = ({
               align="center"
               justify="center"
               fill="horizontal"
-              background={isHover ? '#F4F8FF' : ''}
+              background={isHover ? hoverColor : ''}
               onMouseEnter={() => setIsHover(true)}
               onMouseLeave={() => setIsHover(false)}
             >
