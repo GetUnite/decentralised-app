@@ -1,6 +1,8 @@
+import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin, depositStableCoin,
+  approveStableCoin,
+  depositStableCoin,
   getAllowance,
   getBalanceOf
 } from 'app/common/functions/web3Client';
@@ -83,7 +85,17 @@ export const useFarmDeposit = ({
         useBiconomy,
       );
       await updateFarmInfo();
-      setNotification('Approved successfully', 'success', tx.transactionHash, selectedFarm.chain);
+      heapTrack('approvedTransactionMined', {
+        pool: 'Ib',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      setNotification(
+        'Approved successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -105,6 +117,11 @@ export const useFarmDeposit = ({
     setIsDepositing(true);
 
     try {
+      heapTrack('startedDepositing', {
+        pool: 'Ib',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
       const tx = await depositStableCoin(
         selectedSupportedToken.address,
         depositValue,
@@ -115,6 +132,11 @@ export const useFarmDeposit = ({
       );
       resetState();
       setDepositValue(null);
+      heapTrack('depositTransactionMined', {
+        pool: 'Ib',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
       setNotification(
         'Deposit successfully',
         'success',
