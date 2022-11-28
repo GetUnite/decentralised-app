@@ -1,9 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
-import { roundNumberDown, timerIsFinished } from 'app/common/functions/utils';
+import {
+  roundNumberDown,
+  timerIsFinished,
+  toExactFixed
+} from 'app/common/functions/utils';
 import { useStake } from 'app/common/state/stake';
 import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Grid, ResponsiveContext, Text } from 'grommet';
+import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
 import { LockTab } from './blocks/LockTab';
 import { UnlockTab } from './blocks/UnlockTab';
 import { UnlockCountdown } from './components/UnlockCountdown';
@@ -19,6 +23,16 @@ export const Stake = ({ ...rest }) => {
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
+    seeRewardsAsStable,
+    setSeeRewardsAsStable,
+    isClamingRewards,
+    isLoadingRewards,
+    rewardsInfo,
+    pendingRewardsInfo,
+    claimRewards,
+    nextHarvestDate,
+    previousHarvestDate,
+    isLoadingPendingRewards,
   } = useStake();
 
   const allTimersAreFinished =
@@ -118,145 +132,114 @@ export const Stake = ({ ...rest }) => {
             </Tab>
           </Tabs>
         </Modal>
-        <Box gap="22px">
-          {/*<Box
-            round={'medium'}
-            overflow="hidden"
-            width="245px"
-            align="start"
-            height="224px"
-            justify="between"
-            gap="small"
-            direction="column"
-            background="modal"
-            pad={{ vertical: 'medium', horizontal: 'medium' }}
-          >
-            {isLoading || isClamingRewards || isLoadingRewards ? (
-              <Box align="center" justify="center" fill>
-                <Spinner pad="large" />
-              </Box>
-            ) : (
-              <Box fill>
-                <Heading
-                  size="small"
-                  level={3}
-                  margin={{ bottom: '16px', top: '0px' }}
-                  fill
-                >
-                  <Box direction="row" justify="between" fill>
+        {walletAccountAtom && (
+          <Box gap="22px">
+            <Box
+              round={'medium'}
+              overflow="hidden"
+              width="245px"
+              align="start"
+              height="224px"
+              justify="between"
+              gap="small"
+              direction="column"
+              background="modal"
+              pad={{ vertical: 'medium', horizontal: 'medium' }}
+            >
+              {isLoading || isClamingRewards || isLoadingRewards ? (
+                <Box align="center" justify="center" fill>
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <Box fill>
+                  <Heading
+                    size="small"
+                    level={3}
+                    margin={{ bottom: '16px', top: '0px' }}
+                    fill
+                  >
                     <Text size="18px">Rewards</Text>
-                    <Box direction="row">
-                      {selectedFarm?.rewards?.icons?.map((icon, i) => (
-                        <TokenIcon
-                          key={i}
-                          label={icon}
-                          style={i > 0 ? { marginLeft: '-0.6rem' } : {}}
-                        />
-                      ))}
-                    </Box>
+                  </Heading>
+                  <Box
+                    direction="row"
+                    justify="between"
+                    margin={{ bottom: '28px' }}
+                  >
+                    <Text weight="bold" size="16px">
+                      {seeRewardsAsStable
+                        ? rewardsInfo.stableLabel
+                        : rewardsInfo.label}
+                    </Text>
+                    <Text weight="bold" size="16px">
+                      {seeRewardsAsStable
+                        ? '$' + rewardsInfo.stableValue
+                        : rewardsInfo.value}
+                    </Text>
                   </Box>
-                </Heading>
-                <Box
-                  direction="row"
-                  justify="between"
-                  margin={{ bottom: '28px' }}
-                >
-                  <Text weight="bold" size="16px">
-                    {seeRewardsAsStable
-                      ? selectedFarm?.rewards.stableLabel
-                      : selectedFarm?.rewards.label}
+                  <Box gap="12px">
+                    <Button
+                      primary
+                      label={'Withdraw ' + rewardsInfo.label}
+                      style={{ borderRadius: '58px', width: '197px' }}
+                      onClick={claimRewards}
+                    />
+                    <Button
+                      label={
+                        seeRewardsAsStable
+                          ? 'Show in ' + rewardsInfo.label + ' LP tokens?'
+                          : 'Show in ' + rewardsInfo.stableLabel
+                      }
+                      onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
+                      plain
+                      style={{
+                        textAlign: 'center',
+                        color: '#2A73FF',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
+            </Box>
+            <Box
+              round={'medium'}
+              overflow="hidden"
+              width="245px"
+              align="start"
+              height="122pxpx"
+              justify="between"
+              gap="small"
+              direction="column"
+              background="modal"
+              pad={{ vertical: 'medium', horizontal: 'medium' }}
+            >
+              {isLoading || isClamingRewards || isLoadingPendingRewards ? (
+                <Box align="center" justify="center" fill>
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <Box fill gap="12px">
+                  <Text size="16px" weight="bold">
+                    Pending rewards
                   </Text>
-                  <Text weight="bold" size="16px">
-                    {seeRewardsAsStable
-                      ? '$' + selectedFarm?.rewards.stableValue
-                      : selectedFarm?.rewards.value}
+                  <Box direction="row" justify="between">
+                    <Text weight="bold" size="16px">
+                      {rewardsInfo.stableLabel}
+                    </Text>
+                    <Text weight="bold" size="16px">
+                      {'$' + toExactFixed(pendingRewardsInfo, 6)}
+                    </Text>
+                  </Box>
+                  <Text size="8px" weight={400}>
+                    Available {nextHarvestDate.format('DD MMM')} · Last
+                    harvested {previousHarvestDate.format('DD MMM')}
                   </Text>
                 </Box>
-                <Box gap="12px">
-                  <Button
-                    primary
-                    label={
-                      'Withdraw ' +
-                      (seeRewardsAsStable
-                        ? selectedFarm?.rewards.stableLabel
-                        : selectedFarm?.rewards.label)
-                    }
-                    style={{ borderRadius: '58px', width: '197px' }}
-                    onClick={claimRewards}
-                  />
-                  <Button
-                    label={
-                      seeRewardsAsStable
-                        ? 'Prefer ' +
-                          selectedFarm?.rewards.label +
-                          ' LP tokens?'
-                        : 'Prefer ' + selectedFarm?.rewards.stableLabel
-                    }
-                    onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
-                    plain
-                    style={{
-                      textAlign: 'center',
-                      color: '#2A73FF',
-                      fontSize: '12px',
-                      fontWeight: 500,
-                    }}
-                  />
-                </Box>
-              </Box>
-            )}
+              )}
+            </Box>
           </Box>
-          <Box
-            round={'medium'}
-            overflow="hidden"
-            width="245px"
-            align="start"
-            height="122pxpx"
-            justify="between"
-            gap="small"
-            direction="column"
-            background="modal"
-            pad={{ vertical: 'medium', horizontal: 'medium' }}
-            border={
-              showBoosterWithdrawalConfirmation
-                ? {
-                    color: '#F59F31',
-                    size: '0.5px',
-                  }
-                : { size: '0px' }
-            }
-            style={
-              showBoosterWithdrawalConfirmation
-                ? {
-                    boxShadow: '0px 0px 10px 0px #FF981133',
-                  }
-                : {}
-            }
-          >
-            {isLoading || isClamingRewards || isLoadingRewards ? (
-              <Box align="center" justify="center" fill>
-                <Spinner pad="large" />
-              </Box>
-            ) : (
-              <Box fill gap="12px">
-                <Text size="16px" weight="bold">
-                  Pending rewards
-                </Text>
-                <Box direction="row" justify="between">
-                  <Text weight="bold" size="16px">
-                    {selectedFarm?.rewards.stableLabel}
-                  </Text>
-                  <Text weight="bold" size="16px">
-                    {'$' + toExactFixed(pendingRewards, 6)}
-                  </Text>
-                </Box>
-                <Text size="8px" weight={400}>
-                  Available {nextHarvestDate.format('DD MMM')} · Last harvested{' '}
-                  {previousHarvestDate.format('DD MMM')}
-                </Text>
-              </Box>
-            )}
-          </Box>
-            */}</Box>
+        )}
       </>
     );
   };

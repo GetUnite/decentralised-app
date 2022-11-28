@@ -120,32 +120,3 @@ export const notification: RecoilState<TNotification> = atom({
   key: 'notification',
   default: { id: null, type: '', message: '', txHash: '', chain: EChain.POLYGON, stick: false},
 });
-
-export type TStableCoinCodes = {
-  usd?: string | number;
-  eur?: string | number;
-  eth?: string | number;
-  btc?: string | number;
-};
-export type TFarmDepositCoinType = keyof TStableCoinCodes;
-export const farmDepositCoinType = atom<TFarmDepositCoinType>({
-  key: 'farmDepositCoinType',
-  default: 'usd',
-});
-
-type TPolygonInfo = {
-  isLoading?: boolean;
-  totalAssetSupply?: TStableCoinCodes;
-  coins?: any; //Array<TStableCoinInfoData>;
-};
-
-export const polygonInfo: RecoilState<TPolygonInfo> = atom({
-  key: 'polygonInfo',
-  default: { isLoading: false, totalAssetSupply: {}, coins: [{}] },
-});
-
-export const alluoPrice: RecoilState<number> = atom({
-  key: 'alluoPrice',
-  default: 0,
-  effects_UNSTABLE: [persistAtom],
-});
