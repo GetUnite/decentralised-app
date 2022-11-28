@@ -16,6 +16,11 @@ export const walletAccount = atom({
   default: null,
 });
 
+export const walletDomain = atom({
+  key: 'walletDomain',
+  default: null,
+});
+
 export const wantedChain = atom({
   key: 'wantedChain',
   default: null,
