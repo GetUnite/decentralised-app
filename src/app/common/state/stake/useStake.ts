@@ -1,13 +1,14 @@
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import {
-    getAlluoBalance,
-    getAlluoStakingAllowance,
-    getAlluoStakingAPR,
-    getAlluoStakingWalletAddressInfo,
-    getEarnedAlluo,
-    getTotalAlluoLocked,
-    getUnlockedAlluo,
-    withdrawAlluo
+  getAlluoBalance,
+  getAlluoStakingAllowance,
+  getAlluoStakingAPR,
+  getAlluoStakingWalletAddressInfo,
+  getEarnedAlluo,
+  getTotalAlluoLocked,
+  getUnlockedAlluo,
+  withdrawAlluo
 } from 'app/common/functions/stake';
 import { roundNumberDown } from 'app/common/functions/utils';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -50,6 +51,7 @@ export const useStake = () => {
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      heapTrack('stake');
       updateAlluoInfo();
     }
   }, [walletAccountAtom]);
