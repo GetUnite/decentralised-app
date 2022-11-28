@@ -15,6 +15,7 @@ import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
+import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
@@ -158,12 +159,16 @@ export const connectToWallet = async (connectOptions?) => {
 
     if (wallets[0]) {
       const unstoppableUser = wallets[0].label === 'Unstoppable' ? true : false;
-      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider);
+      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
       web3 = new Web3(walletProvider);
       walletAddress.domain = unstoppableUser
         ? wallets[0].instance.user.sub
         : null;
       walletAddress.address = wallets[0].accounts[0].address;
+      heapTrack('walletConnected', {
+        walletType: wallets[0].label,
+        chain: wallets[0].chains[0].id,
+      });
       return walletAddress;
     }
   } catch (error) {
@@ -449,7 +454,7 @@ const dataToSign = JSON.stringify({
 export const getReadOnlyProvider = chain => {
   const providerUrl =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  return new ethers.providers.JsonRpcProvider(providerUrl);
+  return new ethers.providers.JsonRpcProvider(providerUrl, "any");
 };
 
 export const callContract = async (

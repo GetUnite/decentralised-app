@@ -1,7 +1,9 @@
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import {
-  getIbAlluoInfo, transferToAddress
+  getIbAlluoInfo,
+  transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -20,7 +22,7 @@ export const useTransfer = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false);//useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(false); //useState(!isSafeAppAtom);
 
   // ibAlluos
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);
@@ -39,6 +41,7 @@ export const useTransfer = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
+      heapTrack('transfer');
       setWantedChainAtom(EChain.POLYGON);
       fetchIbAlluosInfo();
     }
@@ -124,6 +127,9 @@ export const useTransfer = () => {
     setIsTransferring(true);
 
     try {
+      heapTrack('transferAmount', { amount: transferValue });
+      heapTrack('transferRecipient', {recipient: recipientAddress});
+      heapTrack('transferButtonClicked');
       const tx = await transferToAddress(
         selectedIbAlluoInfo.address,
         transferValue,
@@ -134,7 +140,12 @@ export const useTransfer = () => {
       await fetchIbAlluosInfo();
       setTransferValue('');
       setRecipientAddress('');
-      setNotification('Transfer completed successfully', 'success', tx.transactionHash, EChain.POLYGON);
+      setNotification(
+        'Transfer completed successfully',
+        'success',
+        tx.transactionHash,
+        EChain.POLYGON,
+      );
     } catch (error) {
       console.error(error);
       setNotification(error, 'error');
