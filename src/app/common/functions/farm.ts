@@ -150,37 +150,6 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
   );
 };
 
-export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: 'token', type: 'address' },
-        { internalType: 'uint256', name: 'fiatId', type: 'uint256' },
-      ],
-      name: 'getPrice',
-      outputs: [
-        { internalType: 'uint256', name: 'value', type: 'uint256' },
-        { internalType: 'uint8', name: 'decimals', type: 'uint8' },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
-
-  // The fiatId for USDC is 1
-  const priceInUSDC = await callContract(
-    abi,
-    priceFeedRouter,
-    'getPrice(address,uint256)',
-    [lPTokenAddress, 1],
-    chain,
-  );
-
-  return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
-};
-
 export const getBoosterFarmRewards = async (
   farmAddress,
   valueOf1LPinUSDC,

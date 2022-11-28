@@ -7,7 +7,8 @@ import {
   getTotalAssets,
   getTotalAssetSupply,
   getUserDepositedAmount,
-  getUserDepositedLPAmount
+  getUserDepositedLPAmount,
+  getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
@@ -18,7 +19,6 @@ import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
-import { getValueOf1LPinUSDC } from '../functions/farm';
 import { toExactFixed } from '../functions/utils';
 
 export const useMain = () => {
@@ -26,20 +26,27 @@ export const useMain = () => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
+  // other state control files
   const { resetNotification } = useNotification();
 
+  // farms
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>([]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>();
+  const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
+  // filters
   const [networkFilter, setNetworkFilter] = useState<string>();
   const [tokenFilter, setTokenFilter] = useState<string>();
   const [viewType, setViewType] = useState<string>(null);
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
   const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
-  const [filteredFarms, setFilteredFarms] = useState<TFarm>();
+  
 
+  // header info
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
 
+  // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
@@ -78,7 +85,7 @@ export const useMain = () => {
             depositedAmount,
             poolShare,
           } = availableFarm.isBooster
-            ? await fetchBoosterFarmInfo(availableFarm)
+            ? await fetchBoostFarmInfo(availableFarm)
             : await fetchFarmInfo(availableFarm);
 
           supportedTokens.map(async supportedToken => {
@@ -171,7 +178,7 @@ export const useMain = () => {
     return farmInfo;
   };
 
-  const fetchBoosterFarmInfo = async farm => {
+  const fetchBoostFarmInfo = async farm => {
     let farmInfo;
 
     const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
@@ -304,13 +311,15 @@ export const useMain = () => {
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }
 
-    setFilteredFarms(filteredFarms);
+    setFilteredFarms(filteredFarms.filter(farm => !farm.isBooster));
+    setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBooster))
   };
 
   return {
     isLoading,
     error,
     filteredFarms,
+    filteredBoostFarms,
     assetsInfo,
     showAllFarms,
     showYourFarms,
