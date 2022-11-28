@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -59,6 +60,8 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     setIsLocking(true);
 
     try {
+      heapTrack('stakeLockAmount', { amount: lockValue });
+      heapTrack('stakeLockButtonClicked');
       const tx = await lockAlluo(lockValue);
       setNotification(
         'Successfully locked',

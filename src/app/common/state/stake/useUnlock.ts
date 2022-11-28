@@ -1,4 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
+import { heapTrack } from 'app/common/functions/heapClient';
 import { unlockAllAlluo, unlockAlluo } from 'app/common/functions/stake';
 import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -40,6 +41,8 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     setIsUnlocking(true);
     let tx;
     try {
+      heapTrack('stakeUnlockAmount', { amount: unlockValue });
+      heapTrack('stakeUnlockButtonClicked');
       if (+unlockValue === 100) {
         tx = await unlockAllAlluo();
       } else {

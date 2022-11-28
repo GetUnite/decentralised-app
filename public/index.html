@@ -17,93 +17,6 @@
     <meta name="theme-color" content="#1a4ca4" />
     <meta name="description" content="Stake, earn and claim" />
 
-    <!-- Tracking of user traffic and other metrics with Heap -->
-    <script type="text/javascript">
-      let url = window.location.href;
-      if (url.includes('herokuapp')) {
-        console.log('DEV: In dev loop');
-        window.heap = window.heap || [];
-        heap.load = function (e, t) {
-          window.heap.appid = e;
-          window.heap.config = t = t || {};
-          var r = document.createElement('script');
-          r.type = 'text/javascript';
-          r.async = !0;
-          r.src = 'https://cdn.heapanalytics.com/js/heap-' + e + '.js';
-          var a = document.getElementsByTagName('script')[0];
-          a.parentNode.insertBefore(r, a);
-          for (
-            var n = function (e) {
-                return function () {
-                  heap.push(
-                    [e].concat(Array.prototype.slice.call(arguments, 0)),
-                  );
-                };
-              },
-              p = [
-                'addEventProperties',
-                'addUserProperties',
-                'clearEventProperties',
-                'identify',
-                'resetIdentity',
-                'removeEventProperty',
-                'setEventProperties',
-                'track',
-                'unsetEventProperty',
-              ],
-              o = 0;
-            o < p.length;
-            o++
-          )
-            heap[p[o]] = n(p[o]);
-        };
-        heap.load('51020501');
-      } else {
-        console.log('PROD: In prod loop');
-        window.heap = window.heap || [];
-        heap.load = function (e, t) {
-          window.heap.appid = e;
-          window.heap.config = t = t || {};
-          var r = document.createElement('script');
-          r.type = 'text/javascript';
-          r.async = !0;
-          r.src = 'https://cdn.heapanalytics.com/js/heap-' + e + '.js';
-          var a = document.getElementsByTagName('script')[0];
-          a.parentNode.insertBefore(r, a);
-          for (
-            var n = function (e) {
-                return function () {
-                  heap.push(
-                    [e].concat(Array.prototype.slice.call(arguments, 0)),
-                  );
-                };
-              },
-              p = [
-                'addEventProperties',
-                'addUserProperties',
-                'clearEventProperties',
-                'identify',
-                'resetIdentity',
-                'removeEventProperty',
-                'setEventProperties',
-                'track',
-                'unsetEventProperty',
-              ],
-              o = 0;
-            o < p.length;
-            o++
-          )
-            heap[p[o]] = n(p[o]);
-        };
-        heap.load('3721726964');
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-NGWNVQS');
-      }
-    </script>
-
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -142,6 +55,7 @@
       height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <!-- End Google Tag Manager (noscript) -->
     </noscript>
+    <div class="powr-popup" id="536940ec_1669312815"></div><script src="https://www.powr.io/powr.js?platform=html"></script>
     <div id="root"></div>
     <!--
       This HTML file is a template.
