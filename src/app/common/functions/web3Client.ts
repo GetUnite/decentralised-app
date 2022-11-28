@@ -1375,7 +1375,7 @@ export const getAllowance = async (
     chain,
   );
 
-  return allowance;
+  return ethers.utils.formatEther(allowance);
 };
 
 export const getDecimals = async (tokenAddress, chain = EChain.POLYGON) => {
