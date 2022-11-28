@@ -52,7 +52,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="center"
             fill="horizontal"
-            style={{ position: 'sticky', top: '0px' }}
+            style={{ position: 'sticky', top: '0px', zIndex: 1}}
           >
             <Nav
               background="bg"
