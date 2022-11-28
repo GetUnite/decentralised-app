@@ -211,6 +211,9 @@ export const getAlluoStakingWalletAddressInfo = async () => {
       alluoStakingWalletAddressInfo.withdrawUnlockTime_.toString(),
     depositUnlockTime:
       alluoStakingWalletAddressInfo.depositUnlockTime_.toString(),
+    cvxRewards: ethers.utils.formatEther(
+      alluoStakingWalletAddressInfo.claimCvx_,
+    ),
   };
 };
 
@@ -362,4 +365,103 @@ export const withdrawAlluo = async () => {
   );
 
   return tx;
+};
+
+export const claimStakingRewards = async () => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'claim',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const ethereumVlAlluoAddress = EEthereumAddresses.VLALLUO;
+
+  const tx = await sendTransaction(
+    abi,
+    ethereumVlAlluoAddress,
+    'claim()',
+    [],
+    EChain.ETHEREUM,
+  );
+
+  return tx;
+};
+
+export const getStakingPendingRewards = async chain => {
+  const abi = [
+    {
+      inputs: [{ internalType: 'address', name: '_staker', type: 'address' }],
+      name: 'stakerAccruedRewards',
+      outputs: [
+        {
+          components: [
+            { internalType: 'address', name: 'token', type: 'address' },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+          ],
+          internalType: 'struct IAlluoVault.RewardData[]',
+          name: '',
+          type: 'tuple[]',
+        },
+        {
+          components: [
+            { internalType: 'address', name: 'token', type: 'address' },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+          ],
+          internalType: 'struct IAlluoVault.RewardData[]',
+          name: '',
+          type: 'tuple[]',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const cvxDistributorAddress = EEthereumAddresses.CVXDISTRIBUTOR;
+
+  const stakerAccruedRewards = await callContract(
+    abi,
+    cvxDistributorAddress,
+    'stakerAccruedRewards(address)',
+    [getCurrentWalletAddress()],
+    chain,
+  );
+
+  let pendingRewardsByToken = [];
+  for (const pendingRewardsArray of stakerAccruedRewards) {
+    for (const pendingRewards of pendingRewardsArray) {
+      const rewardByToken = pendingRewardsByToken.find(
+        prbt => prbt.token == pendingRewards.token,
+      );
+      if (rewardByToken) {
+        rewardByToken.amount = rewardByToken.amount.add(pendingRewards.amount);
+      } else {
+        pendingRewardsByToken.push({
+          token: pendingRewards.token,
+          amount: pendingRewards.amount,
+        });
+      }
+    }
+  }
+
+  const pendingRewardsInUSDC = await Promise.all(
+    pendingRewardsByToken.map(async prbt => {
+      const tokenPrice = await getPrice(
+        prbt.token,
+        EEthereumAddresses.USDC,
+        18,
+        6,
+      );
+      return +ethers.utils.formatUnits(prbt.amount.toString(), 18) * tokenPrice;
+    }),
+  );
+
+  return pendingRewardsInUSDC.reduce(
+    (previous, current) => previous + current,
+    0,
+  );
 };

@@ -1,17 +1,22 @@
+import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
+  claimStakingRewards,
   getAlluoBalance,
   getAlluoStakingAllowance,
   getAlluoStakingAPR,
   getAlluoStakingWalletAddressInfo,
   getEarnedAlluo,
+  getStakingPendingRewards,
   getTotalAlluoLocked,
   getUnlockedAlluo,
   withdrawAlluo
 } from 'app/common/functions/stake';
-import { roundNumberDown } from 'app/common/functions/utils';
+import { roundNumberDown, toExactFixed } from 'app/common/functions/utils';
+import { getValueOf1LPinUSDC } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
@@ -27,6 +32,13 @@ export type TAlluoStakingInfo = {
   unlocked?: string;
   depositUnlockTime?: string;
   withdrawUnlockTime?: string;
+  cvxRewards?: string | number;
+};
+
+const defaultRewards = {
+  label: 'CVX-ETH',
+  stableLabel: 'USDC',
+  stableAddress: EEthereumAddresses.USDC,
 };
 
 export const useStake = () => {
@@ -40,9 +52,23 @@ export const useStake = () => {
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
+  //rewards control
+  const [rewardsInfo, setRewardsInfo] = useState<any>(false);
+  const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
+  const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
+  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
+  const nextHarvestDate = moment()
+    .subtract(1, 'days')
+    .add(1, 'week')
+    .day('Monday');
+
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
+  const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
+  const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
+    useState<boolean>(false);
 
   // confirmation/information control
   const [showReunlockConfirmation, setShowReunlockConfirmation] =
@@ -62,6 +88,12 @@ export const useStake = () => {
     setIsWithdrawing(false);
   };
 
+  useEffect(() => {
+    if (walletAccountAtom && alluoInfo) {
+      updateRewardsInfo();
+    }
+  }, [alluoInfo]);
+
   const updateAlluoInfo = async () => {
     setShowReunlockConfirmation(false);
     setIsLoading(true);
@@ -78,10 +110,10 @@ export const useStake = () => {
         await getAlluoStakingWalletAddressInfo();
       info.locked = alluoStakingWalletAddressInfo.locked;
       info.lockedInLp = alluoStakingWalletAddressInfo.lockedInLp;
-      info.depositUnlockTime =
-        await alluoStakingWalletAddressInfo.depositUnlockTime;
+      info.depositUnlockTime = alluoStakingWalletAddressInfo.depositUnlockTime;
       info.withdrawUnlockTime =
-        await alluoStakingWalletAddressInfo.withdrawUnlockTime;
+        alluoStakingWalletAddressInfo.withdrawUnlockTime;
+      info.cvxRewards = alluoStakingWalletAddressInfo.cvxRewards;
 
       setAlluoInfo(info);
     } catch (error) {
@@ -112,6 +144,51 @@ export const useStake = () => {
     setShowReunlockConfirmation(false);
   };
 
+  const updateRewardsInfo = async () => {
+    setIsLoadingRewards(true);
+    setIsLoadingPendingRewards(true);
+    try {
+      const CVXETHInUSDC = await getValueOf1LPinUSDC(
+        EEthereumAddresses.CVXETH,
+        EChain.ETHEREUM,
+      );
+      // Rewards
+      const updatedRewards = {
+        ...defaultRewards,
+        value: toExactFixed(alluoInfo.cvxRewards, 8),
+        stableValue: CVXETHInUSDC * +alluoInfo.cvxRewards,
+      };
+      setRewardsInfo(updatedRewards);
+      setIsLoadingRewards(false);
+
+      // Pending Rewards
+      const updatedPendingRewards = await getStakingPendingRewards(
+        EChain.ETHEREUM,
+      );
+      setPendingRewardsInfo(updatedPendingRewards);
+      setIsLoadingPendingRewards(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const claimRewards = async () => {
+    setIsClamingRewards(true);
+    try {
+      const tx = await claimStakingRewards();
+      await updateAlluoInfo();
+      setNotification(
+        'Rewards claimed successfully',
+        'success',
+        tx.transactionHash,
+        EChain.ETHEREUM,
+      );
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+    setIsClamingRewards(false);
+  };
+
   return {
     walletAccountAtom,
     isLoading,
@@ -122,5 +199,15 @@ export const useStake = () => {
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
+    seeRewardsAsStable,
+    setSeeRewardsAsStable,
+    isClamingRewards,
+    isLoadingRewards,
+    rewardsInfo,
+    pendingRewardsInfo,
+    claimRewards,
+    nextHarvestDate,
+    previousHarvestDate,
+    isLoadingPendingRewards,
   };
 };
