@@ -16,6 +16,11 @@ export const walletAccount = atom({
   default: null,
 });
 
+export const walletDomain = atom({
+  key: 'walletDomain',
+  default: null,
+});
+
 export const wantedChain = atom({
   key: 'wantedChain',
   default: null,
@@ -118,7 +123,14 @@ type TNotification = {
 };
 export const notification: RecoilState<TNotification> = atom({
   key: 'notification',
-  default: { id: null, type: '', message: '', txHash: '', chain: EChain.POLYGON, stick: false},
+  default: {
+    id: null,
+    type: '',
+    message: '',
+    txHash: '',
+    chain: EChain.POLYGON,
+    stick: false,
+  },
 });
 
 export type TStableCoinCodes = {

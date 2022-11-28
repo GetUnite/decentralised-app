@@ -18,6 +18,7 @@
     "@web3-onboard/core": "^2.8.3",
     "@web3-onboard/gnosis": "^2.1.2",
     "@web3-onboard/injected-wallets": "^2.2.2",
+    "@web3-onboard/uauth": "^2.0.0",
     "@web3-onboard/walletconnect": "^2.1.2",
     "crypto-js": "^4.1.1",
     "ethers": "^5.7.1",
