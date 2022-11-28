@@ -1,12 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useCurrentPath } from 'app/common/hooks';
-import { useNotification } from 'app/common/state';
-import { TFarmDepositCoinType, walletAccount } from 'app/common/state/atoms';
+import { useMode, useNotification } from 'app/common/state';
+import { walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
@@ -25,13 +26,13 @@ const Disabled = () => {
 
 interface IFarmCard {
   id: number;
-  type?: TFarmDepositCoinType;
+  type?: string;
   name: string;
   totalAssetSupply: string | number;
   interest: string | number;
   isLoading: any;
   sign: string;
-  icons: Array<{ src: string }>;
+  icons: string[];
   disabled: boolean;
   chain: EChain;
   isBooster: boolean;
@@ -57,6 +58,7 @@ export const FarmCard = ({
   poolShare,
   ...rest
 }: IFarmCard) => {
+  const { isLightMode } = useMode();
   const { navigate } = useCurrentPath();
   const { setNotification } = useNotification();
   const { handleConnectWallet } = useConnectionButton();
@@ -67,6 +69,11 @@ export const FarmCard = ({
     ? 'Loading...'
     : sign + (+toExactFixed(totalAssetSupply, 2))?.toLocaleString();
 
+  const [isHover, setIsHover] = useState<boolean>(false);
+
+  const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
+
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -75,8 +82,7 @@ export const FarmCard = ({
             <Card
               onClick={() => {
                 if (!disabled && !!walletAccountAtom) navigate('/farm/' + id);
-                else
-                  setNotification('Connect your wallet', 'error');
+                else setNotification('Connect your wallet', 'error');
               }}
               style={{ position: 'relative' }}
               pad={{ horizontal: 'medium', vertical: 'medium' }}
@@ -121,20 +127,34 @@ export const FarmCard = ({
               <Box fill="horizontal" margin={{ top: 'medium' }} />
             </Card>
           ) : (
-            <Card
-              pad={{ horizontal: 'medium', vertical: 'none' }}
-              margin={{ top: 'small' }}
-              height="120px"
-              background="card"
+            <Box
+              pad={{ horizontal: 'medium', vertical: 'none'}}
+              style={{borderTop: `2px solid ${dividerColor}`}}
+              height="90px"
               align="center"
               justify="center"
               fill="horizontal"
+              background={isHover ? hoverColor : ''}
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
             >
               <Grid
                 fill="horizontal"
                 rows="xxsmall"
                 align="center"
-                columns={{ size: 'xsmall', count: 'fit' }}
+                columns={
+                  viewType != 'your'
+                    ? ['270px', '200px', '155px', '155px', '105px', 'auto']
+                    : [
+                        '240px',
+                        '155px',
+                        '155px',
+                        '155px',
+                        '145px',
+                        '105px',
+                        'auto',
+                      ]
+                }
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
@@ -153,8 +173,8 @@ export const FarmCard = ({
                     </Box>
                     <ChainBadge chain={chain} />
                     <span>{tvl}</span>
-                    <Box direction="row" justify="between" align="center">
-                    <span>{toExactFixed(interest,2).toLocaleString()}%</span>
+                    <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
+                    <Box justify="end">
                       {walletAccountAtom ? (
                         <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                           <Button label={'Farm'} />
@@ -182,8 +202,8 @@ export const FarmCard = ({
                     <span>{poolShare}%</span>
                     <span>{tvl}</span>
                     <span>{sign + balance}</span>
-                    <Box direction="row" justify="between" align="center">
-                      <span>{toExactFixed(interest,2).toLocaleString()}%</span>
+                    <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
+                    <Box justify="end" fill>
                       <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
                         <Button label={'Farm'} />
                       </Link>
@@ -191,7 +211,7 @@ export const FarmCard = ({
                   </>
                 )}
               </Grid>
-            </Card>
+            </Box>
           )}
         </>
       )}

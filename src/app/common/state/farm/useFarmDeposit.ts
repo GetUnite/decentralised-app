@@ -51,29 +51,34 @@ export const useFarmDeposit = ({
   };
 
   useEffect(() => {
-    const updateBalanceAndAllowance = async () => {
-      setIsFetchingSupportedTokenInfo(true);
-
-      const allowance = await getAllowance(
-        selectedSupportedToken.address,
-        selectedFarm.farmAddress,
-        selectedFarm.chain,
-      );
-      const balance = await getBalanceOf(
-        selectedSupportedToken.address,
-        selectedSupportedToken.decimals,
-        selectedFarm.chain,
-      );
-      setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
-
-      setIsFetchingSupportedTokenInfo(false);
-    };
-
     if (selectedFarm && selectedSupportedToken) {
       updateBalanceAndAllowance();
     }
   }, [selectedSupportedToken]);
 
+  const updateBalanceAndAllowance = async () => {
+    setIsFetchingSupportedTokenInfo(true);
+
+    const allowance = await getAllowance(
+      selectedSupportedToken.address,
+      selectedFarm.farmAddress,
+      selectedFarm.chain,
+    );
+    console.log({
+      a: selectedSupportedToken.address,
+      b: selectedFarm.farmAddress,
+      c: allowance,
+    });
+    const balance = await getBalanceOf(
+      selectedSupportedToken.address,
+      selectedSupportedToken.decimals,
+      selectedFarm.chain,
+    );
+    setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+
+    setIsFetchingSupportedTokenInfo(false);
+  };
+  
   const handleApprove = async () => {
     setIsApproving(true);
 
@@ -84,7 +89,7 @@ export const useFarmDeposit = ({
         selectedFarm.chain,
         useBiconomy,
       );
-      await updateFarmInfo();
+      await updateBalanceAndAllowance();
       heapTrack('approvedTransactionMined', {
         pool: 'Ib',
         currency: selectedSupportedToken.label,

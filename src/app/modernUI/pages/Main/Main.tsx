@@ -1,18 +1,17 @@
-import { EChain } from 'app/common/constants/chains';
 import { useMain } from 'app/common/state';
+import { Layout, Spinner } from 'app/modernUI/components';
 import {
-  Layout,
-  SortIcon,
-  Spinner
-} from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Card, Grid, ResponsiveContext } from 'grommet';
-import { FarmCard, Filter, HeadingText } from './components';
+  Box,
+  Button,
+  Card, ResponsiveContext
+} from 'grommet';
+import { FarmsBlock, Filter, HeadingText } from './components';
 
 export const Main = () => {
   const {
     assetsInfo,
     filteredFarms,
+    filteredBoostFarms,
     isLoading,
     showAllFarms,
     showYourFarms,
@@ -121,77 +120,6 @@ export const Main = () => {
                         />
                       </Box>
                     </Box>
-                    {!isSmall(size) && (
-                      <Card
-                        pad={{ horizontal: 'medium', vertical: 'none' }}
-                        height="65px"
-                        background="card"
-                        margin="none"
-                        align="center"
-                        justify="center"
-                        fill="horizontal"
-                      >
-                        <Grid
-                          fill="horizontal"
-                          rows="xxsmall"
-                          align="center"
-                          columns={{ size: 'xsmall', count: 'fit' }}
-                          pad="none"
-                          style={{ fontSize: '16px' }}
-                        >
-                          {viewType != 'your' ? (
-                            <>
-                              <span>asset</span>
-                              <span>supported tokens</span>
-                              <span>network</span>
-                              <span>TVL</span>
-                              <Box gap="4px" direction="row">
-                                <span>APY</span>
-                                <SortIcon
-                                  onClick={() =>
-                                    sortBy('apy', !sortDirectionIsAsc)
-                                  }
-                                  isAsc={sortDirectionIsAsc}
-                                />
-                              </Box>
-                            </>
-                          ) : (
-                            <>
-                              <span>asset</span>
-                              <span>network</span>
-                              <Box gap="4px" direction="row">
-                                <span>pool share</span>
-                                <SortIcon
-                                  onClick={() =>
-                                    sortBy('pool share', !sortDirectionIsAsc)
-                                  }
-                                  isAsc={sortDirectionIsAsc}
-                                />
-                              </Box>
-                              <span>TVL</span>
-                              <Box gap="4px" direction="row">
-                                <span>balance</span>
-                                <SortIcon
-                                  onClick={() =>
-                                    sortBy('balance', !sortDirectionIsAsc)
-                                  }
-                                  isAsc={sortDirectionIsAsc}
-                                />
-                              </Box>
-                              <Box gap="4px" direction="row">
-                                <span>APY</span>
-                                <SortIcon
-                                  onClick={() =>
-                                    sortBy('apy', !sortDirectionIsAsc)
-                                  }
-                                  isAsc={sortDirectionIsAsc}
-                                />
-                              </Box>
-                            </>
-                          )}
-                        </Grid>
-                      </Card>
-                    )}
                     {isLoading ? (
                       <Card
                         pad={{ horizontal: 'medium', vertical: 'none' }}
@@ -205,29 +133,37 @@ export const Main = () => {
                         <Spinner pad="medium" />
                       </Card>
                     ) : (
-                      <Box gap="6px">
-                        {Array.isArray(filteredFarms) &&
-                          filteredFarms.map(farm => {
-                            return (
-                              <FarmCard
-                                id={farm.id}
-                                key={farm.id}
-                                type={farm.type}
-                                name={farm.name}
-                                totalAssetSupply={farm.totalAssetSupply}
-                                poolShare={farm.poolShare}
-                                balance={farm.depositedAmount}
-                                interest={farm.interest}
-                                disabled={false}
-                                sign={farm.sign}
-                                icons={farm.icons}
-                                isLoading={isLoading}
-                                chain={farm.chain as EChain}
-                                isBooster={farm.isBooster}
-                                viewType={viewType}
-                              />
-                            );
-                          })}
+                      <Box gap="60px">
+                        <FarmsBlock
+                          heading="Fixed-rate farms"
+                          description={`Our fixed-rate farms have a guaranteed rate of
+                          return for 2 weeks until our next liquidity
+                          direction governance vote on "date here". Once
+                          customer funds are deposited they start earning
+                          yield immediately. In the background the protocol
+                          creates the LP and stakes that in the relevant
+                          farm. Read less`}
+                          farms={filteredFarms}
+                          viewType={viewType}
+                          sortBy={sortBy}
+                          sortDirectionIsAsc={sortDirectionIsAsc}
+                          isLoading={isLoading}
+                          size={size}
+                        />
+                        <FarmsBlock
+                          heading="Boost farms"
+                          description={`Our Boost farms are multi-pool auto-compounding
+                          strategies that give access to more complex
+                          boosted yields. Rates are variable, and depositers
+                          earn CVX/ETH rewards, which can be claimed in
+                          USDC. Rewards are harvested weekly. Read less`}
+                          farms={filteredBoostFarms}
+                          viewType={viewType}
+                          sortBy={sortBy}
+                          sortDirectionIsAsc={sortDirectionIsAsc}
+                          isLoading={isLoading}
+                          size={size}
+                        />
                       </Box>
                     )}
                   </Box>
