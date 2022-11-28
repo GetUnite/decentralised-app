@@ -6,7 +6,7 @@ import { FarmCard } from './FarmCard';
 
 export const FarmsBlock = ({ size, heading, description, viewType, sortDirectionIsAsc, sortBy, isLoading, farms }) => {
   return (
-    <Box gap="20px" background="card" round="8px">
+    <Box gap="20px" background="card" round="8px" pad={{bottom: "20px"}}>
       <Box
         pad={{
           horizontal: 'medium',
@@ -94,6 +94,7 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
                 </>
               )}
             </Grid>
+            <div style={{ borderTop: "2px solid #fff ", marginLeft: 20, marginRight: 20 }}></div>
           </Card>
         )}
         <Box>

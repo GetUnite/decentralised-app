@@ -72,6 +72,8 @@ export const FarmCard = ({
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
+  const dividerColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
+
   return (
     <ResponsiveContext.Consumer>
       {size => (
@@ -125,8 +127,9 @@ export const FarmCard = ({
               <Box fill="horizontal" margin={{ top: 'medium' }} />
             </Card>
           ) : (
-            <Card
-              pad={{ horizontal: 'medium', vertical: 'none' }}
+            <Box
+              pad={{ horizontal: 'medium', vertical: 'none'}}
+              style={{borderTop: `2px solid ${dividerColor}`}}
               height="90px"
               align="center"
               justify="center"
@@ -208,7 +211,7 @@ export const FarmCard = ({
                   </>
                 )}
               </Grid>
-            </Card>
+            </Box>
           )}
         </>
       )}
