@@ -2,8 +2,7 @@ import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   getBoosterFarmPendingRewards,
-  getBoosterFarmRewards,
-  getValueOf1LPinUSDC
+  getBoosterFarmRewards
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
@@ -12,7 +11,8 @@ import {
   claimBoosterFarmNonLPRewards,
   getBoosterFarmInterest,
   getTotalAssets,
-  getUserDepositedLPAmount
+  getUserDepositedLPAmount,
+  getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
@@ -465,20 +465,18 @@ export const useBoostFarm = ({ id }) => {
   const claimRewards = async () => {
     setIsClamingRewards(true);
     try {
-      if (selectedFarm?.isBooster) {
-        seeRewardsAsStable
-          ? await claimBoosterFarmNonLPRewards(
-              selectedFarm.farmAddress,
-              selectedFarm.rewards.stableAddress,
-              selectedFarm.chain,
-            )
-          : await claimBoosterFarmLPRewards(
-              selectedFarm.farmAddress,
-              selectedFarm.chain,
-            );
-      }
+      const tx = seeRewardsAsStable
+        ? await claimBoosterFarmNonLPRewards(
+            selectedFarm.farmAddress,
+            selectedFarm.rewards.stableAddress,
+            selectedFarm.chain,
+          )
+        : await claimBoosterFarmLPRewards(
+            selectedFarm.farmAddress,
+            selectedFarm.chain,
+          );
       await updateRewardsInfo();
-      setNotification('Rewards claimed successfully', 'success');
+      setNotification('Rewards claimed successfully', 'success', tx.transactionHash, selectedFarm.chain);
     } catch (error) {
       setNotification(error, 'error');
     }
