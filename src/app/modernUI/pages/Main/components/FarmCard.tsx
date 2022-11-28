@@ -72,7 +72,7 @@ export const FarmCard = ({
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
-  const dividerColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
     <ResponsiveContext.Consumer>
