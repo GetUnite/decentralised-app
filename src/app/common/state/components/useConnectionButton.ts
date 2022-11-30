@@ -14,7 +14,7 @@ export const useConnectionButton = () => {
     setWalletAccountAtom(walletAddress?.address);
     setWalletDomainAtom(walletAddress?.domain);
     const userHash = CryptoJs.HmacSHA256(
-      walletAddress,
+      walletAddress.address,
       process.env.REACT_APP_INTERCOM_SECRET_KEY,
     );
     var userHashInHex = CryptoJs.enc.Hex.stringify(userHash);
