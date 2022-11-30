@@ -32,6 +32,7 @@ export type TFarm = {
   farmAddress?: string;
   poolShare?: number;
   isBooster?: boolean;
+  isNewest?: boolean;
 };
 
 export type TBoostFarm = TFarm & {

@@ -94,7 +94,6 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
                 </>
               )}
             </Grid>
-            <div style={{ borderTop: "2px solid #fff ", marginLeft: 20, marginRight: 20 }}></div>
           </Card>
         )}
         <Box>

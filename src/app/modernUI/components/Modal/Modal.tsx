@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { useNotification } from 'app/common/state';
+import { useMode, useNotification } from 'app/common/state';
 import { ENotificationId, walletAccount } from 'app/common/state/atoms';
 import { ChainBadge, ConnectionButton, Spinner } from 'app/modernUI/components';
 import { Box, Button, Heading, Text } from 'grommet';
@@ -27,6 +27,7 @@ export const Modal = ({
   noHeading = false,
   closeAction,
 }: IModal) => {
+  const { isLightMode } = useMode();
   const { resetNotification } = useNotification();
   const navigate = useNavigate();
   const closeModal = () => {
@@ -48,6 +49,7 @@ export const Modal = ({
         direction="column"
         background="modal"
         pad={{ vertical: 'medium', horizontal: 'medium' }}
+        style={isLightMode ? {border: "1px solid #EBEBEB"} : {}}
       >
         <Box fill flex="grow" height="100vh">
           <Box
