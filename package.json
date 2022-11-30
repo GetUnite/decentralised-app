@@ -42,6 +42,7 @@
     "react-router-dom": "6",
     "react-scripts": "4.0.3",
     "react-swipezor": "^1.0.7",
+    "react-switch": "^7.0.0",
     "react-tooltip": "^4.2.21",
     "react-use-intercom": "^2.0.0",
     "react95": "^3.10.0",

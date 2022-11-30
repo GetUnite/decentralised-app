@@ -1,19 +1,24 @@
 import { EChain } from 'app/common/constants/chains';
-import { useNotification } from 'app/common/state';
+import { useMode, useNotification } from 'app/common/state';
 import { notification } from 'app/common/state/atoms';
 import { Box, Button, Text } from 'grommet';
 import { FormClose } from 'grommet-icons';
 import { useRecoilState } from 'recoil';
 
 export const Notification = ({ ...rest }) => {
+  const { isLightMode } = useMode();
   const [notificationAtom] = useRecoilState(notification);
   const { resetNotification } = useNotification();
 
   const colors = { success: 'success', error: 'error', info: 'info' };
-  const bgColors = {
+  const bgColors = isLightMode ? {
     success: 'successSoft',
     error: 'errorSoft',
     info: 'infoSoft',
+  } : {
+    success: 'darkSuccessSoft',
+    error: 'darkErrorSoft',
+    info: 'darkInfoSoft',
   };
   const backgroundColor = bgColors[notificationAtom.type];
   const color = colors[notificationAtom.type];

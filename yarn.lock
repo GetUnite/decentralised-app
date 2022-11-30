@@ -13110,6 +13110,13 @@ react-swipezor@^1.0.7:
     react-swipeable "^5.5.1"
     webpack "^4.44.1"
 
+react-switch@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/react-switch/-/react-switch-7.0.0.tgz#400990bb9822864938e343ed24f13276a617bdc0"
+  integrity sha512-KkDeW+cozZXI6knDPyUt3KBN1rmhoVYgAdCJqAh7st7tk8YE6N0iR89zjCWO8T8dUTeJGTR0KU+5CHCRMRffiA==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-tooltip@^4.2.21:
   version "4.2.21"
   resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-4.2.21.tgz#840123ed86cf33d50ddde8ec8813b2960bfded7f"
