@@ -1,7 +1,7 @@
 import { useMain } from 'app/common/state';
 import { Layout, Spinner } from 'app/modernUI/components';
 import { Box, Card, ResponsiveContext } from 'grommet';
-
+import { useState } from 'react';
 import { Filters } from './blocks/Filters';
 import { FarmsBlock, HeadingText } from './components';
 
@@ -29,6 +29,9 @@ export const Main = () => {
     possibleNetworks,
     possibleTypes,
   } = useMain();
+
+  const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] = useState<boolean>(false);
+  const [seeAllBoostFarmsDescription, setSeeAllBoostFarmsDescription] = useState<boolean>(false);
 
   return (
     <Layout>
@@ -96,11 +99,14 @@ export const Main = () => {
                           return for 2 weeks until our next liquidity
                           direction governance vote on ${nextVoteDay.format(
                             'Do MMMM',
-                          )}. Once
-                          customer funds are deposited they start earning
-                          yield immediately. In the background the protocol
-                          creates the LP and stakes that in the relevant
-                          farm. Read less`}
+                          )}.`}
+                          readMoreDescription="Once
+                            customer funds are deposited they start earning
+                            yield immediately. In the background the protocol
+                            creates the LP and stakes that in the relevant
+                            farm."
+                          readMoreStatus={seeAllFixedFarmsDescription}
+                          onReadMore={() => setSeeAllFixedFarmsDescription(!seeAllFixedFarmsDescription)}
                           farms={filteredFarms}
                           viewType={viewType}
                           sortBy={sortBy}
@@ -112,9 +118,12 @@ export const Main = () => {
                           heading="Boost farms"
                           description={`Our Boost farms are multi-pool auto-compounding
                           strategies that give access to more complex
-                          boosted yields. Rates are variable, and depositers
+                          boosted yields.`}
+                          readMoreDescription="Rates are variable, and depositers
                           earn CVX/ETH rewards, which can be claimed in
-                          USDC. Rewards are harvested weekly. Read less`}
+                          USDC. Rewards are harvested weekly."
+                          readMoreStatus={seeAllBoostFarmsDescription}
+                          onReadMore={() => setSeeAllBoostFarmsDescription(!seeAllBoostFarmsDescription)}
                           farms={filteredBoostFarms}
                           viewType={viewType}
                           sortBy={sortBy}
