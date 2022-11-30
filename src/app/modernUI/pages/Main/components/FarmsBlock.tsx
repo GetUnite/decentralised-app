@@ -4,9 +4,21 @@ import { colors, isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, Heading, Text } from 'grommet';
 import { FarmCard } from './FarmCard';
 
-export const FarmsBlock = ({ size, heading, description, viewType, sortDirectionIsAsc, sortBy, isLoading, farms, readMoreDescription = null, readMoreStatus = false , onReadMore = null}) => {
+export const FarmsBlock = ({
+  size,
+  heading,
+  description,
+  viewType,
+  sortDirectionIsAsc,
+  sortBy,
+  isLoading,
+  farms,
+  readMoreDescription = null,
+  readMoreStatus = false,
+  onReadMore = null,
+}) => {
   return (
-    <Box gap="20px" background="card" round="8px" pad={{bottom: "20px"}}>
+    <Box gap="20px" background="card" round="8px" pad={{ bottom: '20px' }}>
       <Box
         pad={{
           horizontal: 'medium',
@@ -16,8 +28,21 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
       >
         <Heading size="24px">{heading}</Heading>
         <Text size="16px">
-          {description} {readMoreDescription && readMoreStatus && (<Text size="16px">{readMoreDescription} </Text>)}{readMoreDescription && (<Button plain onClick={onReadMore}><Text size="16px" style={{textDecoration: "underline"}} color={colors.BLUE}>{readMoreStatus ? ("Read less") : ("Read more")}</Text></Button>)}
-          
+          {description}{' '}
+          {readMoreDescription && readMoreStatus && (
+            <Text size="16px">{readMoreDescription} </Text>
+          )}
+          {readMoreDescription && (
+            <Button plain onClick={onReadMore}>
+              <Text
+                size="16px"
+                style={{ textDecoration: 'underline' }}
+                color={colors.BLUE}
+              >
+                {readMoreStatus ? 'Read less' : 'Read more'}
+              </Text>
+            </Button>
+          )}
         </Text>
       </Box>
       <Box>
@@ -35,7 +60,7 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
               rows="xxsmall"
               align="center"
               columns={
-                viewType != 'your'
+                viewType != 'View my farms only'
                   ? ['270px', '200px', '155px', '155px', '105px', 'auto']
                   : [
                       '240px',
@@ -50,7 +75,7 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
               pad="none"
               style={{ fontSize: '16px' }}
             >
-              {viewType != 'your' ? (
+              {viewType != 'View my farms only' ? (
                 <>
                   <span>asset</span>
                   <span>supported tokens</span>

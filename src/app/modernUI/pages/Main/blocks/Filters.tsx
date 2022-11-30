@@ -1,11 +1,12 @@
 import { useMode } from 'app/common/state';
 import filter from 'app/modernUI/images/filter.svg';
 import { colors } from 'app/modernUI/theme';
-import { Box, CheckBoxGroup, Text } from 'grommet';
+import { Box, CheckBoxGroup, RadioButtonGroup, Text } from 'grommet';
 import Switch from 'react-switch';
 import { Filter } from '../components';
 
 export const Filters = ({
+  walletAccountAtom,
   possibleTypes,
   typeFilter,
   setTypeFilter,
@@ -16,6 +17,9 @@ export const Filters = ({
   setNetworkFilter,
   tokenFilter,
   networkFilter,
+  possibleViewTypes,
+  setViewType,
+  viewType,
   ...rest
 }) => {
   const { isLightMode } = useMode();
@@ -81,10 +85,31 @@ export const Filters = ({
             onChange={event => {
               setTypeFilter(event.value);
             }}
-            style={{
-              borderBottom: `2px solid ${dividerColor}`,
-            }}
+            style={
+              !walletAccountAtom
+                ? { borderBottom: `2px solid ${dividerColor}` }
+                : {}
+            }
           />
+          {walletAccountAtom && (
+            <>
+              <Text size="14px" margin={{ bottom: '12px' }}>
+                Your active farms
+              </Text>
+              <RadioButtonGroup
+                name="teste"
+                pad={{ bottom: '28px' }}
+                options={possibleViewTypes}
+                value={viewType}
+                onChange={event => {
+                  setViewType(event.target.value);
+                }}
+                style={{
+                  borderBottom: `2px solid ${dividerColor}`,
+                }}
+              />
+            </>
+          )}
           <Box
             direction="row"
             justify="between"
@@ -181,9 +206,6 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-            style={{
-              borderBottom: `2px solid ${dividerColor}`,
-            }}
           />
         </Filter>
         <Filter
@@ -231,10 +253,23 @@ export const Filters = ({
             onChange={event => {
               setTypeFilter(event.value);
             }}
-            style={{
-              borderBottom: `2px solid ${dividerColor}`,
-            }}
           />
+          {walletAccountAtom && (
+            <>
+              <Text size="14px" margin={{ bottom: '12px' }}>
+                Your active farms
+              </Text>
+              <RadioButtonGroup
+                name="teste"
+                pad={{ bottom: '28px' }}
+                options={possibleViewTypes}
+                value={viewType}
+                onChange={event => {
+                  setViewType(event.target.value);
+                }}
+              />
+            </>
+          )}
         </Filter>
         <Filter
           heading="Tokens"
@@ -297,9 +332,6 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-            style={{
-              borderBottom: `2px solid ${dividerColor}`,
-            }}
           />
         </Filter>
         <Filter
@@ -344,9 +376,6 @@ export const Filters = ({
             value={networkFilter}
             onChange={event => {
               setNetworkFilter(event.value);
-            }}
-            style={{
-              borderBottom: `2px solid ${dividerColor}`,
             }}
           />
         </Filter>
