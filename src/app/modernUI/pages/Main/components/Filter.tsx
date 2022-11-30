@@ -21,7 +21,8 @@ export const Filter = ({
       theme = require('./filter-dark.css');
     }
   }, [isLightMode]);
-
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
+  
   return (
     <>
       <DropButton
@@ -55,7 +56,9 @@ export const Filter = ({
               <Heading size="18px">{heading}</Heading>
               {children}
             </Box>
-            <Box justify="end" direction="row" fill pad="8px">
+            <Box justify="end" direction="row" fill pad="8px" style={{
+              borderTop: `2px solid ${dividerColor}`,
+            }}>
               <Button plain onClick={onClear}>
                 <Text size="13px" color="#808080">
                   Clear all

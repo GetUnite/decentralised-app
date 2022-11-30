@@ -11,16 +11,14 @@ export const Main = () => {
     filteredFarms,
     filteredBoostFarms,
     isLoading,
-    showAllFarms,
-    showYourFarms,
     viewType,
     tokenFilter,
     setTokenFilter,
     networkFilter,
     setNetworkFilter,
-    walletAccountAtom,
     sortBy,
     sortDirectionIsAsc,
+    walletAccountAtom,
     nextVoteDay,
     typeFilter,
     setTypeFilter,
@@ -28,10 +26,14 @@ export const Main = () => {
     possibleNonStableTokens,
     possibleNetworks,
     possibleTypes,
+    possibleViewTypes,
+    setViewType,
   } = useMain();
 
-  const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] = useState<boolean>(false);
-  const [seeAllBoostFarmsDescription, setSeeAllBoostFarmsDescription] = useState<boolean>(false);
+  const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] =
+    useState<boolean>(false);
+  const [seeAllBoostFarmsDescription, setSeeAllBoostFarmsDescription] =
+    useState<boolean>(false);
 
   return (
     <Layout>
@@ -68,6 +70,7 @@ export const Main = () => {
                     margin={{ top: '72px' }}
                   >
                     <Filters
+                      walletAccountAtom={walletAccountAtom}
                       possibleTypes={possibleTypes}
                       typeFilter={typeFilter}
                       setTypeFilter={setTypeFilter}
@@ -78,6 +81,9 @@ export const Main = () => {
                       setNetworkFilter={setNetworkFilter}
                       tokenFilter={tokenFilter}
                       networkFilter={networkFilter}
+                      possibleViewTypes={possibleViewTypes}
+                      viewType={viewType}
+                      setViewType={setViewType}
                     />
                     {isLoading ? (
                       <Card
@@ -106,7 +112,11 @@ export const Main = () => {
                             creates the LP and stakes that in the relevant
                             farm."
                           readMoreStatus={seeAllFixedFarmsDescription}
-                          onReadMore={() => setSeeAllFixedFarmsDescription(!seeAllFixedFarmsDescription)}
+                          onReadMore={() =>
+                            setSeeAllFixedFarmsDescription(
+                              !seeAllFixedFarmsDescription,
+                            )
+                          }
                           farms={filteredFarms}
                           viewType={viewType}
                           sortBy={sortBy}
@@ -119,11 +129,15 @@ export const Main = () => {
                           description={`Our Boost farms are multi-pool auto-compounding
                           strategies that give access to more complex
                           boosted yields.`}
-                          readMoreDescription="Rates are variable, and depositers
+                          readMoreDescription="Rates are variable, and depositors
                           earn CVX/ETH rewards, which can be claimed in
                           USDC. Rewards are harvested weekly."
                           readMoreStatus={seeAllBoostFarmsDescription}
-                          onReadMore={() => setSeeAllBoostFarmsDescription(!seeAllBoostFarmsDescription)}
+                          onReadMore={() =>
+                            setSeeAllBoostFarmsDescription(
+                              !seeAllBoostFarmsDescription,
+                            )
+                          }
                           farms={filteredBoostFarms}
                           viewType={viewType}
                           sortBy={sortBy}
