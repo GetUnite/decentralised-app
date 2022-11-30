@@ -35,6 +35,7 @@ const possibleStableTokens = [
 const possibleNonStableTokens = ['CRV', 'CVX', 'FRAX', 'WBTC', 'WETH'];
 const possibleNetworks = ['Polygon', 'Ethereum'];
 const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
+const possibleViewTypes = ['View my farms only', 'View all farms'];
 
 export const useMain = () => {
   // atoms
@@ -56,7 +57,7 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>(null);
+  const [viewType, setViewType] = useState<string>("View all farms");
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -244,16 +245,6 @@ export const useMain = () => {
     return farmInfo;
   };
 
-  const showAllFarms = () => {
-    setNetworkFilter(null);
-    setTokenFilter(null);
-    setViewType(null);
-  };
-
-  const showYourFarms = () => {
-    setViewType('your');
-  };
-
   const sortBy = (field, isAsc) => {
     setSortField(field);
     setSortDirectionIsAsc(isAsc);
@@ -263,7 +254,7 @@ export const useMain = () => {
     let filteredFarms;
 
     filteredFarms =
-      viewType == 'your'
+      viewType == 'View my farms only'
         ? availableFarms.filter(farm => +farm.depositedAmount > 0)
         : availableFarms;
 
@@ -331,10 +322,10 @@ export const useMain = () => {
         case 'balance':
           filteredFarms = filteredFarms.sort(function (a, b) {
             return sortDirectionIsAsc
-              ? +b.balance > +a.balance
+              ? +b.depositedAmount > +a.depositedAmount
                 ? 1
                 : -1
-              : +a.balance > +b.balance
+              : +a.depositedAmount > +b.depositedAmount
               ? 1
               : -1;
           });
@@ -362,8 +353,6 @@ export const useMain = () => {
     filteredFarms,
     filteredBoostFarms,
     assetsInfo,
-    showAllFarms,
-    showYourFarms,
     viewType,
     tokenFilter,
     setTokenFilter,
@@ -379,5 +368,7 @@ export const useMain = () => {
     possibleNonStableTokens,
     possibleNetworks,
     possibleTypes,
+    possibleViewTypes,
+    setViewType
   };
 };
