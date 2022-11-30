@@ -1,10 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
 import { SortIcon } from 'app/modernUI/components';
-import { isSmall } from 'app/modernUI/theme';
-import { Box, Card, Grid, Heading, Text } from 'grommet';
+import { colors, isSmall } from 'app/modernUI/theme';
+import { Box, Button, Card, Grid, Heading, Text } from 'grommet';
 import { FarmCard } from './FarmCard';
 
-export const FarmsBlock = ({ size, heading, description, viewType, sortDirectionIsAsc, sortBy, isLoading, farms }) => {
+export const FarmsBlock = ({ size, heading, description, viewType, sortDirectionIsAsc, sortBy, isLoading, farms, readMoreDescription = null, readMoreStatus = false , onReadMore = null}) => {
   return (
     <Box gap="20px" background="card" round="8px" pad={{bottom: "20px"}}>
       <Box
@@ -16,7 +16,8 @@ export const FarmsBlock = ({ size, heading, description, viewType, sortDirection
       >
         <Heading size="24px">{heading}</Heading>
         <Text size="16px">
-          {description}
+          {description} {readMoreDescription && readMoreStatus && (<Text size="16px">{readMoreDescription} </Text>)}{readMoreDescription && (<Button plain onClick={onReadMore}><Text size="16px" style={{textDecoration: "underline"}} color={colors.BLUE}>{readMoreStatus ? ("Read less") : ("Read more")}</Text></Button>)}
+          
         </Text>
       </Box>
       <Box>
