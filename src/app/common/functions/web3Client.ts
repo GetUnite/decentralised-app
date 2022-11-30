@@ -4,12 +4,12 @@ import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
-import walletConnectModule from '@web3-onboard/walletconnect';
 import uauthModule from '@web3-onboard/uauth';
+import walletConnectModule from '@web3-onboard/walletconnect';
 import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import {
   EEthereumAddresses,
-  EPolygonAddresses,
+  EPolygonAddresses
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
@@ -152,7 +152,7 @@ export const trySafeAppConnection = async callback => {
 
 export const connectToWallet = async (connectOptions?) => {
   let wallets;
-  let walletAddress = { domain: null, address: null };
+  let wa = { domain: null, address: null };
 
   try {
     wallets = await onboard.connectWallet(connectOptions);
@@ -161,15 +161,16 @@ export const connectToWallet = async (connectOptions?) => {
       const unstoppableUser = wallets[0].label === 'Unstoppable' ? true : false;
       walletProvider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
       web3 = new Web3(walletProvider);
-      walletAddress.domain = unstoppableUser
+      walletAddress = wallets[0].accounts[0].address;
+      wa.domain = unstoppableUser
         ? wallets[0].instance.user.sub
         : null;
-      walletAddress.address = wallets[0].accounts[0].address;
+      wa.address = wallets[0].accounts[0].address;
       heapTrack('walletConnected', {
         walletType: wallets[0].label,
         chain: wallets[0].chains[0].id,
       });
-      return walletAddress;
+      return wa;
     }
   } catch (error) {
     console.log(error);
