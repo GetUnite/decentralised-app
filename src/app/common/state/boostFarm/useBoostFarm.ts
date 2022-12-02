@@ -108,6 +108,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
+    isNewest: true
   },
   {
     id: 9,
@@ -192,6 +193,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
+    isNewest: true
   },
   {
     id: 10,
@@ -279,6 +281,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
+    isNewest: true,
   },
 ];
 

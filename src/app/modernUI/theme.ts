@@ -36,7 +36,8 @@ export enum colors {
   PURPLE = '#8247E5',
 }
 
-export const isSmall = size => size === 'xsmall' || size === 'small' || size === 'xmedium';
+export const isSmall = size =>
+  size === 'xsmall' || size === 'small' || size === 'xmedium';
 
 export const theme = deepMerge(grommet, {
   global: {
@@ -47,8 +48,8 @@ export const theme = deepMerge(grommet, {
         value: 500,
       },
       xmedium: {
-        value: 980
-      }
+        value: 980,
+      },
     },
     font: {
       family: 'Poppins',
@@ -61,8 +62,12 @@ export const theme = deepMerge(grommet, {
       primaryStatic: colors.BLUE,
       error: colors.ERROR,
       errorSoft: 'rgb(250,243,243)',
+      darkErrorSoft:
+        'linear-gradient(90.03deg, rgba(57, 2, 13, 0.95) 6.3%, rgba(32, 32, 32, 0.95) 95.91%);',
       info: colors.BLUE,
       infoSoft: 'rgb(229,237,251)',
+      darkInfoSoft:
+        'linear-gradient(90.08deg, rgba(23, 46, 91, 0.95) -1.24%, rgba(32, 32, 32, 0.95) 70.29%);',
       border: { light: colors.BLACK_20 },
       // brand: { light: 'rgba(255,255,255,.2)', dark: 'red' },
       brand: { light: colors.BLUE, dark: 'white' },
@@ -72,6 +77,8 @@ export const theme = deepMerge(grommet, {
       text: { light: colors.BLACK, dark: colors.WHITE },
       softText: '#CCCCCC',
       successSoft: 'rgb(238,248,238)',
+      darkSuccessSoft:
+        'linear-gradient(90.03deg, rgba(10, 50, 16, 0.9) 6.3%, rgba(32, 33, 32, 0.9) 95.91%);',
       success: colors.GREEN,
       soul: colors.BLACK_40,
       casper: { light: colors.BLACK_8, dark: colors.WHITE_10 },
@@ -86,7 +93,8 @@ export const theme = deepMerge(grommet, {
       softButton: { light: colors.BLACK_3, dark: colors.WHITE },
       tabSwitch: { light: colors.BLACK_3, dark: colors.BLACK },
       container: {
-        light: 'linear-gradient(40deg, #EAF1FF 0%, #FAFAFA 30%);',
+        light:
+          'linear-gradient(360deg, rgba(250, 252, 255, 0.36) 0%, #FAFAFA 104.31%);',
         dark: 'linear-gradient(40deg, #0B1D41 0%, #000 30%);',
       },
     },
@@ -254,7 +262,7 @@ export const theme = deepMerge(grommet, {
   },
   anchor: { color: 'text' },
   select: {
-     //container: { extend: `background-color: bg` },
+    //container: { extend: `background-color: bg` },
     options: {
       text: { color: 'text' },
       container: {
@@ -341,5 +349,11 @@ export const theme = deepMerge(grommet, {
     item: { gap: '50px' },
     icons: { color: { dark: colors.WHITE, light: colors.BLACK } },
     group: { container: { pad: { horizontal: 'medium' } } },
+  },
+  checkBoxGroup:{
+    background: "red"
+  },
+  checkBox: {
+    border: { color: { dark: '#FFFFFF', light: '#CCCCCC' } },
   },
 });

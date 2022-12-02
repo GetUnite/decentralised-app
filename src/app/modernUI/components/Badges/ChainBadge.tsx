@@ -1,13 +1,13 @@
 import { EChain } from 'app/common/constants/chains';
-import { Box, Text, BoxExtendedProps } from 'grommet';
+import { Box, BoxExtendedProps, Text } from 'grommet';
 
 interface IChainBadge extends BoxExtendedProps {
   chain: EChain;
 }
 
 export const ChainBadge = ({ chain, ...rest }: IChainBadge) => {
-  const backgroundColor = chain === EChain.ETHEREUM ? '#EEF0FB' : '';
-  const textColor = chain === EChain.ETHEREUM ? '#687DE3' : '';
+  const backgroundColor = chain === EChain.ETHEREUM ? '#BDC5FF' : '';
+  const textColor = chain === EChain.ETHEREUM ? '#5262B2' : '';
   const chainName = chain === EChain.ETHEREUM ? 'Ethereum' : 'Polygon';
   
   return (
