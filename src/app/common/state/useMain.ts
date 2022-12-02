@@ -16,10 +16,26 @@ import { farmOptions } from 'app/common/state/farm/useFarm';
 import { useNotification } from 'app/common/state/useNotification';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
 import { toExactFixed } from '../functions/utils';
+
+const possibleStableTokens = [
+  'agEUR',
+  'DAI',
+  'EURS',
+  'EURT',
+  'jEUR',
+  'PAR',
+  'USDC',
+  'USDT',
+];
+const possibleNonStableTokens = ['CRV', 'CVX', 'FRAX', 'WBTC', 'WETH'];
+const possibleNetworks = ['Polygon', 'Ethereum'];
+const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
+const possibleViewTypes = ['View my farms only', 'View all farms'];
 
 export const useMain = () => {
   // atoms
@@ -35,13 +51,15 @@ export const useMain = () => {
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
   // filters
-  const [networkFilter, setNetworkFilter] = useState<string>();
-  const [tokenFilter, setTokenFilter] = useState<string>();
-  const [viewType, setViewType] = useState<string>(null);
+  const [networkFilter, setNetworkFilter] = useState<any>(possibleNetworks);
+  const [tokenFilter, setTokenFilter] = useState<any>([
+    ...possibleStableTokens,
+    ...possibleNonStableTokens,
+  ]);
+  const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
+  const [viewType, setViewType] = useState<string>("View all farms");
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
-  const [allSupportedTokens, setAllSupportedTokens] = useState<string[]>([]);
-  
 
   // header info
   const [assetsInfo, setAssetsInfo] = useState<TAssetsInfo>();
@@ -50,8 +68,18 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // misc
+  const [nextVoteDay, setNextVoteDay] = useState<any>();
+
   useEffect(() => {
     resetNotification();
+    const confirmedVoteDay = moment('2022/11/28/');
+
+    let voteDay = confirmedVoteDay.add(2, 'weeks');
+    while (voteDay < moment()) {
+      voteDay.add(2, 'weeks');
+    }
+    setNextVoteDay(voteDay);
   }, []);
 
   useEffect(() => {
@@ -68,13 +96,13 @@ export const useMain = () => {
     isSafeAppAtom,
     tokenFilter,
     networkFilter,
+    typeFilter,
   ]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
     try {
       const supportedTokensWithBalance = new Array<any>();
-      const allSupportedTokens = new Set<string>();
 
       await Promise.all(
         [...boostFarmOptions, ...farmOptions].map(async availableFarm => {
@@ -87,10 +115,6 @@ export const useMain = () => {
           } = availableFarm.isBooster
             ? await fetchBoostFarmInfo(availableFarm)
             : await fetchFarmInfo(availableFarm);
-
-          supportedTokens.map(async supportedToken => {
-            allSupportedTokens.add(supportedToken.label);
-          });
 
           if (walletAccountAtom) {
             for (let index = 0; index < supportedTokens.length; index++) {
@@ -144,7 +168,6 @@ export const useMain = () => {
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
         setAvailableFarms(mappedFarms);
-        setAllSupportedTokens(Array.from(allSupportedTokens));
       });
     } catch (error) {
       setError(error);
@@ -222,16 +245,6 @@ export const useMain = () => {
     return farmInfo;
   };
 
-  const showAllFarms = () => {
-    setNetworkFilter(null);
-    setTokenFilter(null);
-    setViewType(null);
-  };
-
-  const showYourFarms = () => {
-    setViewType('your');
-  };
-
   const sortBy = (field, isAsc) => {
     setSortField(field);
     setSortDirectionIsAsc(isAsc);
@@ -241,25 +254,44 @@ export const useMain = () => {
     let filteredFarms;
 
     filteredFarms =
-      viewType == 'your'
+      viewType == 'View my farms only'
         ? availableFarms.filter(farm => +farm.depositedAmount > 0)
         : availableFarms;
 
-    filteredFarms = tokenFilter
-      ? filteredFarms.filter(farm =>
-          farm.supportedTokens
-            .map(supportedToken => supportedToken.label)
-            .includes(tokenFilter),
-        )
-      : filteredFarms;
+    filteredFarms = filteredFarms.filter(farm => {
+      const supportedTokensLabels = farm.supportedTokens.map(
+        supportedToken => supportedToken.label,
+      );
 
-    filteredFarms = networkFilter
-      ? filteredFarms.filter(
-          farm =>
-            farm.chain ==
-            (networkFilter == 'Ethereum' ? EChain.ETHEREUM : EChain.POLYGON),
-        )
-      : filteredFarms;
+      for (let index = 0; index < supportedTokensLabels.length; index++) {
+        const label = supportedTokensLabels[index];
+
+        if (tokenFilter.includes(label)) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    filteredFarms = filteredFarms.filter(farm => {
+      return networkFilter.includes(
+        farm.chain == EChain.ETHEREUM ? 'Ethereum' : 'Polygon',
+      );
+    });
+
+    filteredFarms = filteredFarms.filter(farm => {
+      let result = false;
+      if (typeFilter.includes('Fixed-rate farms')) {
+        result = result || !farm.isBooster;
+      }
+      if (typeFilter.includes('Boost farms')) {
+        result = result || farm.isBooster;
+      }
+      if (typeFilter.includes('Newest farms')) {
+        result = result || farm.isNewest;
+      }
+      return result;
+    });
 
     if (sortField) {
       switch (sortField) {
@@ -290,10 +322,10 @@ export const useMain = () => {
         case 'balance':
           filteredFarms = filteredFarms.sort(function (a, b) {
             return sortDirectionIsAsc
-              ? +b.balance > +a.balance
+              ? +b.depositedAmount > +a.depositedAmount
                 ? 1
                 : -1
-              : +a.balance > +b.balance
+              : +a.depositedAmount > +b.depositedAmount
               ? 1
               : -1;
           });
@@ -312,7 +344,7 @@ export const useMain = () => {
     }
 
     setFilteredFarms(filteredFarms.filter(farm => !farm.isBooster));
-    setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBooster))
+    setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBooster));
   };
 
   return {
@@ -321,10 +353,7 @@ export const useMain = () => {
     filteredFarms,
     filteredBoostFarms,
     assetsInfo,
-    showAllFarms,
-    showYourFarms,
     viewType,
-    allSupportedTokens,
     tokenFilter,
     setTokenFilter,
     networkFilter,
@@ -332,5 +361,14 @@ export const useMain = () => {
     walletAccountAtom,
     sortBy,
     sortDirectionIsAsc,
+    nextVoteDay,
+    typeFilter,
+    setTypeFilter,
+    possibleStableTokens,
+    possibleNonStableTokens,
+    possibleNetworks,
+    possibleTypes,
+    possibleViewTypes,
+    setViewType
   };
 };

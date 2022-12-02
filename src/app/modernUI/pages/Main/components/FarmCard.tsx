@@ -143,7 +143,7 @@ export const FarmCard = ({
                 rows="xxsmall"
                 align="center"
                 columns={
-                  viewType != 'your'
+                  viewType != 'View my farms only'
                     ? ['270px', '200px', '155px', '155px', '105px', 'auto']
                     : [
                         '240px',
@@ -158,7 +158,7 @@ export const FarmCard = ({
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
-                {viewType != 'your' ? (
+                {viewType != 'View my farms only' ? (
                   <>
                     <span style={{ fontWeight: 'bold' }}>
                       {name}
