@@ -157,6 +157,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     </Text>
                     <a
                       href="https://alluo.com/about"
+                      target="_blank"
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
