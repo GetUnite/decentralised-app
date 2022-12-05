@@ -27,11 +27,11 @@ export const Filters = ({
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
-    <Box direction="row">
+    <Box direction="row" margin={{bottom: "13px"}}>
       <Box
         direction="row"
         justify="start"
-        gap="20px"
+        gap="13px"
         style={{ fontSize: '16px' }}
       >
         <Filter

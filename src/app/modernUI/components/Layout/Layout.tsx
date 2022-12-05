@@ -56,6 +56,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="center"
             fill="horizontal"
+            height="100px"
             style={{ position: 'sticky', top: '0px', zIndex: 1 }}
           >
             <Nav
@@ -67,7 +68,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               gap="none"
               fill
             >
-              <Box direction="row" align="end" style={{ flex: 1 }}>
+              <Box direction="row" align="center" style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                   <Link to={modernUiPaths.MAIN}>
                     <Image
