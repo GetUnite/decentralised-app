@@ -350,10 +350,14 @@ export const theme = deepMerge(grommet, {
     icons: { color: { dark: colors.WHITE, light: colors.BLACK } },
     group: { container: { pad: { horizontal: 'medium' } } },
   },
-  checkBoxGroup:{
-    background: "red"
+  checkBoxGroup: {
+    background: 'red',
   },
   checkBox: {
     border: { color: { dark: '#FFFFFF', light: '#CCCCCC' } },
+    size: '18px',
+    extend: () => `
+      font-size: 14px;
+      `,
   },
 });
