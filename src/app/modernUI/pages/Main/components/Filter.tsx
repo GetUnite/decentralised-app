@@ -1,7 +1,7 @@
 import { useMode } from 'app/common/state';
 import { Box, Button, DropButton, Heading, Text } from 'grommet';
 import { Down } from 'grommet-icons';
-import { useEffect } from 'react';
+import './Filter.css';
 
 export const Filter = ({
   icon = null,
@@ -12,16 +12,9 @@ export const Filter = ({
   ...rest
 }) => {
   const { isLightMode } = useMode();
-
-  let theme;
-  useEffect(() => {
-    if (isLightMode) {
-      theme = require('./filter.css');
-    } else {
-      theme = require('./filter-dark.css');
-    }
-  }, [isLightMode]);
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
+  const backgroundColor = isLightMode ? '#FFFFFF' : '#1D1D1D';
+  const textColor = isLightMode ? 'black' : 'white';
   
   return (
     <>
@@ -50,7 +43,7 @@ export const Filter = ({
             pad={{ horizontal: 'medium', vertical: '8px' }}
             round="8px"
             width="373px"
-            style={{ display: 'block' }}
+            style={{ display: 'block', background: backgroundColor, color: textColor}}
           >
             <Box fill>
               <Heading size="18px">{heading}</Heading>
