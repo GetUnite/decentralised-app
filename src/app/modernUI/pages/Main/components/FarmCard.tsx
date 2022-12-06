@@ -8,6 +8,7 @@ import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
@@ -128,8 +129,8 @@ export const FarmCard = ({
             </Card>
           ) : (
             <Box
-              pad={{ horizontal: 'medium', vertical: 'none'}}
-              style={{borderTop: `2px solid ${dividerColor}`}}
+              pad={{ horizontal: 'medium', vertical: 'none' }}
+              style={{ borderTop: `2px solid ${dividerColor}` }}
               height="90px"
               align="center"
               justify="center"
@@ -158,56 +159,84 @@ export const FarmCard = ({
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
-                {viewType != 'View my farms only' ? (
+                {isLoading ? (
                   <>
-                    <span style={{ fontWeight: 'bold' }}>
-                      {name}
-                      {isBooster && (
-                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
-                      )}
-                    </span>
-                    <Box direction="row" gap="small">
-                      {icons.map((icon, i) => (
-                        <TokenIcon key={i} label={icon} size={26} />
-                      ))}
-                    </Box>
-                    <ChainBadge chain={chain} />
-                    <span>{tvl}</span>
-                    <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
-                    <Box justify="end">
-                      {walletAccountAtom ? (
-                        <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
-                          <Button label={'Farm'} />
-                        </Link>
-                      ) : (
-                        <Button
-                          style={{ borderWidth: '1px' }}
-                          size={isSmall(size) ? 'small' : undefined}
-                          label={'Connect wallet'}
-                          onClick={handleConnectWallet}
-                          {...rest}
-                        />
-                      )}
+                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton count={1} height="14px" width="76px" />
+                    <Box direction="row" justify="end" fill align='center'>
+                      <Skeleton count={1} height="14px" width="76px" />
                     </Box>
                   </>
                 ) : (
                   <>
-                    <span style={{ fontWeight: 'bold' }}>
-                      {name}
-                      {isBooster && (
-                        <span style={{ color: '#1C1CFF' }}> BOOST</span>
-                      )}
-                    </span>
-                    <ChainBadge chain={chain} />
-                    <span>{poolShare}%</span>
-                    <span>{tvl}</span>
-                    <span>{sign + balance}</span>
-                    <span>{toExactFixed(interest, 2).toLocaleString()}%</span>
-                    <Box justify="end" fill>
-                      <Link to={(isBooster ? '/boostfarm/' : '/farm/') + id}>
-                        <Button label={'Farm'} />
-                      </Link>
-                    </Box>
+                    {viewType != 'View my farms only' ? (
+                      <>
+                        <span style={{ fontWeight: 'bold' }}>
+                          {name}
+                          {isBooster && (
+                            <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                          )}
+                        </span>
+                        <Box direction="row" gap="small">
+                          {icons.map((icon, i) => (
+                            <TokenIcon
+                              key={i}
+                              label={icon}
+                              size={40}
+                              style={i > 0 ? { marginLeft: '-1.2rem' } : {}}
+                            />
+                          ))}
+                        </Box>
+                        <ChainBadge chain={chain} />
+                        <span>{tvl}</span>
+                        <span>
+                          {toExactFixed(interest, 2).toLocaleString()}%
+                        </span>
+                        <Box justify="end">
+                          {walletAccountAtom ? (
+                            <Link
+                              to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                            >
+                              <Button label={'Farm'} />
+                            </Link>
+                          ) : (
+                            <Button
+                              style={{ borderWidth: '1px' }}
+                              size={isSmall(size) ? 'small' : undefined}
+                              label={'Connect wallet'}
+                              onClick={handleConnectWallet}
+                              {...rest}
+                            />
+                          )}
+                        </Box>
+                      </>
+                    ) : (
+                      <>
+                        <span style={{ fontWeight: 'bold' }}>
+                          {name}
+                          {isBooster && (
+                            <span style={{ color: '#1C1CFF' }}> BOOST</span>
+                          )}
+                        </span>
+                        <ChainBadge chain={chain} />
+                        <span>{poolShare}%</span>
+                        <span>{tvl}</span>
+                        <span>{sign + balance}</span>
+                        <span>
+                          {toExactFixed(interest, 2).toLocaleString()}%
+                        </span>
+                        <Box justify="end" fill>
+                          <Link
+                            to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                          >
+                            <Button label={'Farm'} />
+                          </Link>
+                        </Box>
+                      </>
+                    )}{' '}
                   </>
                 )}
               </Grid>

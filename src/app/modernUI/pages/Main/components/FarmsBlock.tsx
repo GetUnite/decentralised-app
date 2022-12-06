@@ -123,7 +123,7 @@ export const FarmsBlock = ({
           </Card>
         )}
         <Box>
-          {Array.isArray(farms) &&
+          {Array.isArray(farms) && farms.length > 0 ? (
             farms.map(farm => {
               return (
                 <FarmCard
@@ -144,7 +144,12 @@ export const FarmsBlock = ({
                   viewType={viewType}
                 />
               );
-            })}
+            })
+          ) : (
+            <Box direction="row" justify="center" height="90px" align="center">
+              <span>No farms selected</span>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>
