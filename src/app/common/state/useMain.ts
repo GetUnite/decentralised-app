@@ -13,10 +13,8 @@ import {
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
 import { farmOptions } from 'app/common/state/farm/useFarm';
-import { useNotification } from 'app/common/state/useNotification';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
@@ -42,12 +40,9 @@ export const useMain = () => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  // other state control files
-  const { resetNotification } = useNotification();
-
   // farms
-  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([]);
-  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>();
+  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([...boostFarmOptions, ...farmOptions]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>([...boostFarmOptions, ...farmOptions]);
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
   // filters
@@ -67,20 +62,6 @@ export const useMain = () => {
   // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-
-  // misc
-  const [nextVoteDay, setNextVoteDay] = useState<any>();
-
-  useEffect(() => {
-    resetNotification();
-    const confirmedVoteDay = moment('2022/11/28/');
-
-    let voteDay = confirmedVoteDay.add(2, 'weeks');
-    while (voteDay < moment()) {
-      voteDay.add(2, 'weeks');
-    }
-    setNextVoteDay(voteDay);
-  }, []);
 
   useEffect(() => {
     fetchFarmsInfo();
@@ -361,7 +342,6 @@ export const useMain = () => {
     walletAccountAtom,
     sortBy,
     sortDirectionIsAsc,
-    nextVoteDay,
     typeFilter,
     setTypeFilter,
     possibleStableTokens,
