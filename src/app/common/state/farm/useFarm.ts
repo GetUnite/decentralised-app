@@ -26,6 +26,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EPolygonAddresses.USDC,
     supportedTokens: [
       {
         label: 'DAI',
@@ -55,6 +56,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'jEUR'],
+    underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       {
         label: 'EURS',
@@ -90,6 +92,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    underlyingTokenAddress: EPolygonAddresses.WETH,
     supportedTokens: [
       {
         label: 'WETH',
@@ -107,6 +110,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    underlyingTokenAddress: EPolygonAddresses.WBTC,
     supportedTokens: [
       {
         label: 'WBTC',
@@ -124,6 +128,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EEthereumAddresses.USDC,
     supportedTokens: [
       {
         label: 'USDC',
@@ -153,6 +158,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Euro',
     sign: '€',
     icons: ['EURT', 'EURS', 'agEUR'],
+    underlyingTokenAddress: EEthereumAddresses.EURT,
     supportedTokens: [
       {
         label: 'EURS',
@@ -182,6 +188,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
+    underlyingTokenAddress: EEthereumAddresses.WETH,
     supportedTokens: [
       {
         label: 'WETH',
@@ -199,6 +206,7 @@ export const farmOptions: Array<TFarm> = [
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
+    underlyingTokenAddress: EEthereumAddresses.WBTC,
     supportedTokens: [
       {
         label: 'WBTC',

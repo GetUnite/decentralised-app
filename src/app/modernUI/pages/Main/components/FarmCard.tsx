@@ -185,7 +185,7 @@ export const FarmCard = ({
                             <TokenIcon
                               key={i}
                               label={icon}
-                              size={40}
+                              size={24}
                               style={i > 0 ? { marginLeft: '-1.2rem' } : {}}
                             />
                           ))}

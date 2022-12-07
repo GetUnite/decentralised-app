@@ -32,7 +32,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'FRAX/USDC',
     sign: '$',
-    icons: ['FRAX', 'USDC'],
+    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
@@ -117,7 +117,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'CVX/ETH',
     sign: '$',
-    icons: ['CVX', 'ETH'],
+    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
@@ -202,7 +202,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'stETH/ETH',
     sign: '$',
-    icons: ['stETH', 'ETH'],
+    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',

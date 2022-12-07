@@ -159,12 +159,13 @@ export const connectToWallet = async (connectOptions?) => {
 
     if (wallets[0]) {
       const unstoppableUser = wallets[0].label === 'Unstoppable' ? true : false;
-      walletProvider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
+      walletProvider = new ethers.providers.Web3Provider(
+        wallets[0].provider,
+        'any',
+      );
       web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
-      wa.domain = unstoppableUser
-        ? wallets[0].instance.user.sub
-        : null;
+      wa.domain = unstoppableUser ? wallets[0].instance.user.sub : null;
       wa.address = wallets[0].accounts[0].address;
       heapTrack('walletConnected', {
         walletType: wallets[0].label,
@@ -455,7 +456,7 @@ const dataToSign = JSON.stringify({
 export const getReadOnlyProvider = chain => {
   const providerUrl =
     chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  return new ethers.providers.JsonRpcProvider(providerUrl, "any");
+  return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
 };
 
 export const callContract = async (
@@ -1463,6 +1464,38 @@ export const getUserDepositedAmount = async (
     address,
     'getBalance(address)',
     [walletAddress],
+    chain,
+  );
+
+  return Web3.utils.fromWei(userDepositedAmount);
+};
+
+export const converToAssetValue = async (
+  contractAddress,
+  amount,
+  chain = EChain.POLYGON,
+) => {
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: '_amountInTokenValue',
+          type: 'uint256',
+        },
+      ],
+      name: 'convertToAssetValue',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const userDepositedAmount = await callContract(
+    abi,
+    contractAddress,
+    'convertToAssetValue(uint256)',
+    [amount],
     chain,
   );
 
