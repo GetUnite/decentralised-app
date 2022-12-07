@@ -27,7 +27,7 @@ export const Filters = ({
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
-    <Box direction="row" margin={{bottom: "13px"}}>
+    <Box direction="row" margin={{ bottom: '13px' }}>
       <Box
         direction="row"
         justify="start"
@@ -90,7 +90,15 @@ export const Filters = ({
                 ? { borderBottom: `2px solid ${dividerColor}` }
                 : {}
             }
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           {walletAccountAtom && (
             <>
               <Text size="14px" margin={{ bottom: '12px' }}>
@@ -154,7 +162,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Text size="14px" margin={{ bottom: '12px' }}>
             Other tokens
           </Text>
@@ -168,7 +184,15 @@ export const Filters = ({
             style={{
               borderBottom: `2px solid ${dividerColor}`,
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Box
             direction="row"
             justify="between"
@@ -206,7 +230,15 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
         <Filter
           heading="Farms"
@@ -253,7 +285,15 @@ export const Filters = ({
             onChange={event => {
               setTypeFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           {walletAccountAtom && (
             <>
               <Text size="14px" margin={{ bottom: '12px' }}>
@@ -321,7 +361,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Text size="14px" margin={{ bottom: '12px' }}>
             Other tokens
           </Text>
@@ -332,7 +380,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
         <Filter
           heading="Networks"
@@ -377,7 +433,15 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-          />
+            >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
       </Box>
     </Box>
