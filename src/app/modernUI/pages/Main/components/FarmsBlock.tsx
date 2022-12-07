@@ -147,7 +147,14 @@ export const FarmsBlock = ({
             })
           ) : (
             <Box direction="row" justify="center" height="90px" align="center">
-              <span>No farms selected</span>
+              <Box justify='center'>
+                <Text size="16px" weight={600} textAlign='center'>
+                  No farms matching your filters
+                </Text>
+                <Text size="13px" textAlign='center' weight={400}>
+                  Try clearing your filters to see results
+                </Text>
+              </Box>
             </Box>
           )}
         </Box>

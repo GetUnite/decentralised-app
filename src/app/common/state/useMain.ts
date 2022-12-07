@@ -3,8 +3,7 @@ import {
   getBoosterFarmInterest,
   getChainById,
   getCurrentChainId,
-  getInterest,
-  getTotalAssets,
+  getInterest, getTotalAssets,
   getTotalAssetSupply,
   getUserDepositedAmount,
   getUserDepositedLPAmount,
@@ -41,8 +40,14 @@ export const useMain = () => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   // farms
-  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([...boostFarmOptions, ...farmOptions]);
-  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>([...boostFarmOptions, ...farmOptions]);
+  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
+    ...boostFarmOptions,
+    ...farmOptions,
+  ]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>([
+    ...boostFarmOptions,
+    ...farmOptions,
+  ]);
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
   // filters
@@ -52,7 +57,7 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>("View all farms");
+  const [viewType, setViewType] = useState<string>('View all farms');
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -155,6 +160,22 @@ export const useMain = () => {
       console.log(error);
     }
     setIsLoading(false);
+    // We can probably get away with calculating total value invested in usd after showing the first screen
+    let totalDepositedAmountInUsd = 0;
+    const farmsWithDepositedAmount = availableFarms.filter(
+      farm => +farm.depositedAmount > 0,
+    );
+    for (let index = 0; index < farmsWithDepositedAmount.length; index++) {
+      const farm = farmsWithDepositedAmount[index];
+
+      if (farm.isBooster) {
+        totalDepositedAmountInUsd =
+          totalDepositedAmountInUsd + +farm.depositedAmount;
+      }else{
+        //const assetValue = await converToAssetValue(farm.farmAddress, farm.depositedAmount, farm.chain);
+        //const valueOfAssetInUSDC = getPrice(farm.underlyingTokenAddress, farm.chain == EChain.ETHEREUM ? EEthereumAddresses.USDC : EPolygonAddresses. USDC)
+      }
+    }
   };
 
   const fetchFarmInfo = async farm => {
@@ -349,6 +370,6 @@ export const useMain = () => {
     possibleNetworks,
     possibleTypes,
     possibleViewTypes,
-    setViewType
+    setViewType,
   };
 };
