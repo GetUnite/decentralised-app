@@ -130,7 +130,7 @@ let walletProvider;
 let web3;
 
 export const trySafeAppConnection = async callback => {
-  const gnosisLabel = 'Gnosis Safe';
+  const gnosisLabel = 'Safe';
   const onboardState = onboard.state.get();
 
   if (
