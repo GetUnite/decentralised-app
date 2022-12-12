@@ -23,6 +23,15 @@ export const AutoInvest = () => {
     <Layout>
       <ResponsiveContext.Consumer>
         {size => (
+          <Box
+          align="center"
+          justify="start"
+          gap="none"
+          pad="xsmall"
+          margin={{ top: 'small' }}
+          direction="column"
+          fill="horizontal"
+        >
           <Box justify="center" fill direction="column">
             <HeadingText
               isLoading={isLoading}
@@ -144,6 +153,7 @@ export const AutoInvest = () => {
                 </Text>
               )}
             </Box>
+          </Box>
           </Box>
         )}
       </ResponsiveContext.Consumer>

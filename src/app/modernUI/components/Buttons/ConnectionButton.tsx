@@ -1,9 +1,9 @@
+import { mode, walletAccount, walletDomain } from 'app/common/state/atoms';
+import { useConnectionButton } from 'app/common/state/components';
+import { isSmall, theme } from 'app/modernUI/theme';
+import { Button, Grommet, ResponsiveContext } from 'grommet';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { Grommet, ResponsiveContext, Button } from 'grommet';
-import { isSmall, theme } from 'app/modernUI/theme';
-import { useConnectionButton } from 'app/common/state/components';
-import { walletAccount, walletDomain, mode } from 'app/common/state/atoms';
 
 const StyledButton = styled(Button)`
   ${props =>
@@ -30,7 +30,7 @@ export const ConnectionButton = ({ ...rest }) => {
             layer: { overlay: { background: 'rgba(0, 0, 0, 0.5)' } },
           }}
           themeMode={modeAtom}
-          style={{ background: 'transparent' }}
+          style={{ background: 'transparent'}}
         >
           <StyledButton
             size={isSmall(size) ? 'small' : undefined}

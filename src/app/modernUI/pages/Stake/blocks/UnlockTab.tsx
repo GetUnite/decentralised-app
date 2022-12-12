@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useUnlock } from 'app/common/state/stake';
 import {
   Info,
@@ -56,7 +56,7 @@ export const UnlockTab = ({
               <>
                 <Box margin={{ top: 'large' }}>
                   <Text textAlign="center" margin="auto" weight="bold">
-                    You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO
+                    You have {toExactFixed(alluoInfo.locked, 2)} $ALLUO
                     staked
                   </Text>
 
@@ -78,7 +78,7 @@ export const UnlockTab = ({
                     <Info label="$ALLUO earned" value={alluoInfo.earned} />
                     <Info
                       label="$ALLUO unlocked"
-                      value={roundNumberDown(alluoInfo.unlocked, 2)}
+                      value={toExactFixed(alluoInfo.unlocked, 2)}
                     />
                     <Info
                       label="Total $ALLUO staked"
