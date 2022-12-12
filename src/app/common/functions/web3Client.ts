@@ -130,7 +130,7 @@ let walletProvider;
 let web3;
 
 export const trySafeAppConnection = async callback => {
-  const gnosisLabel = 'Gnosis Safe';
+  const gnosisLabel = 'Safe';
   const onboardState = onboard.state.get();
 
   if (
@@ -139,11 +139,11 @@ export const trySafeAppConnection = async callback => {
     )
   ) {
     try {
-      callback(
-        await connectToWallet({
-          autoSelect: { label: gnosisLabel, disableModals: true },
-        }),
-      );
+      const connection = await connectToWallet({
+        autoSelect: { label: gnosisLabel, disableModals: true },
+      });
+
+      callback(connection.address);
     } catch (error) {
       console.log(error);
     }
@@ -174,6 +174,7 @@ export const connectToWallet = async (connectOptions?) => {
     }
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
