@@ -139,11 +139,11 @@ export const trySafeAppConnection = async callback => {
     )
   ) {
     try {
-      callback(
-        await connectToWallet({
-          autoSelect: { label: gnosisLabel, disableModals: true },
-        }),
-      );
+      const connection = await connectToWallet({
+        autoSelect: { label: gnosisLabel, disableModals: true },
+      });
+
+      callback(connection.address);
     } catch (error) {
       console.log(error);
     }
@@ -175,6 +175,7 @@ export const connectToWallet = async (connectOptions?) => {
     }
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
