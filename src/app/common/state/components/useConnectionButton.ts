@@ -10,16 +10,18 @@ export const useConnectionButton = () => {
   const { trackEvent, update } = useIntercom();
 
   const handleConnectWallet = async () => {
-    const walletAddress = await connectToWallet();
-    setWalletAccountAtom(walletAddress?.address);
-    setWalletDomainAtom(walletAddress?.domain);
-    const userHash = CryptoJs.HmacSHA256(
-      walletAddress.address,
-      process.env.REACT_APP_INTERCOM_SECRET_KEY,
-    );
-    var userHashInHex = CryptoJs.enc.Hex.stringify(userHash);
-    update({ userId: walletAddress?.address, userHash: userHashInHex });
-    trackEvent('connected-wallet');
+    try {
+      const walletAddress = await connectToWallet();
+      setWalletAccountAtom(walletAddress?.address);
+      setWalletDomainAtom(walletAddress?.domain);
+      const userHash = CryptoJs.HmacSHA256(
+        walletAddress.address,
+        process.env.REACT_APP_INTERCOM_SECRET_KEY,
+      );
+      var userHashInHex = CryptoJs.enc.Hex.stringify(userHash);
+      update({ userId: walletAddress?.address, userHash: userHashInHex });
+      trackEvent('connected-wallet');
+    } catch (error) {}
   };
 
   return {
