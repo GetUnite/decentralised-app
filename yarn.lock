@@ -3712,41 +3712,41 @@
     ethers "5.5.4"
     joi "^17.6.1"
 
-"@web3-onboard/core@^2.8.3":
-  version "2.8.3"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.8.3.tgz#e41c3e11b5a38d7b5e2ee15d4dc2cf49307d38c5"
-  integrity sha512-3CKc33dKqC9jurbf0+7mfvddBJgvCU4n9ADu68XlmCws3xP8Gq1nji4Y/AEUqcfhfdPWno6vIgc/j1cYseCIhw==
+"@web3-onboard/core@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.11.0.tgz#267db444fa39cc9059850bc462286646f4531ed0"
+  integrity sha512-bNQEVgZKiKiddI/+wDS4KzmNUsqAiNL9xpPyBWSjtGC7/S/N9602quqDQzQxle8ZC/BnrQhaIpNexHvydaVaEQ==
   dependencies:
-    "@web3-onboard/common" "^2.2.2"
+    "@web3-onboard/common" "^2.2.3"
     bignumber.js "^9.0.0"
-    bnc-sdk "^4.4.1"
+    bnc-sdk "^4.6.2"
     bowser "^2.11.0"
     ethers "5.5.3"
     eventemitter3 "^4.0.7"
-    joi "17.6.0"
+    joi "^17.6.1"
     lodash.merge "^4.6.2"
     lodash.partition "^4.6.0"
     nanoid "^4.0.0"
-    rxjs "^7.5.2"
+    rxjs "^7.5.5"
     svelte "^3.49.0"
     svelte-i18n "^3.3.13"
 
-"@web3-onboard/gnosis@^2.1.2":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/gnosis/-/gnosis-2.1.2.tgz#e73ebf47af8e515c1847b4752b743975af14ddaf"
-  integrity sha512-GNriUwQ9xqHymQq4O2RXwa7zdI+unFwffqyrEe3qsFOm0Ow9VWZ6QGydk/6Q5bynJZy/zG7x6ooxtcOS/tX0hw==
+"@web3-onboard/gnosis@^2.1.5":
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/gnosis/-/gnosis-2.1.5.tgz#c49b1734fca7042543029312581fc0e29bc4cb66"
+  integrity sha512-u5kL7kazROlotXEckjOn3Bm5FdHT1tgnOiYqjL7g/ypn+VzlpVpGQrpaW9SOa4DD8FGYCm8XkCsQZXlNUcvp/A==
   dependencies:
     "@gnosis.pm/safe-apps-provider" "^0.9.2"
     "@gnosis.pm/safe-apps-sdk" "^6.1.1"
-    "@web3-onboard/common" "^2.2.2"
+    "@web3-onboard/common" "^2.2.3"
 
-"@web3-onboard/injected-wallets@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/injected-wallets/-/injected-wallets-2.2.2.tgz#035e798b35506d51a9e0be29408fe7c1739f4b85"
-  integrity sha512-msJNdbmWkhPzYcfE3K4hDOvF0T9T4sQB19N2W4RL/kdufi3qCwvZaVW3+tkvcPnOsOKPS9+D4N2GFfY0khqMqg==
+"@web3-onboard/injected-wallets@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/injected-wallets/-/injected-wallets-2.4.0.tgz#84e48830605f899601aadc3bc7c79d1ed5787534"
+  integrity sha512-v27NdfD5vemPTNhqk+7gpMYXuTDsHTSPWWdJt6ybJoks6GlRSgF1fnCkmERNzo3+9S97fEKrzHrlSkpsFgn2Mw==
   dependencies:
-    "@web3-onboard/common" "^2.2.2"
-    joi "^17.4.2"
+    "@web3-onboard/common" "^2.2.3"
+    joi "^17.6.1"
     lodash.uniqby "^4.7.0"
 
 "@web3-onboard/uauth@^2.0.0":
@@ -4767,10 +4767,10 @@ bn.js@^5.0.0, bn.js@^5.1.1, bn.js@^5.1.2, bn.js@^5.2.0, bn.js@^5.2.1:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.1.tgz#0bc527a6a0d18d0aa8d5b0538ce4a77dccfa7b70"
   integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
 
-bnc-sdk@^4.4.1:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/bnc-sdk/-/bnc-sdk-4.6.0.tgz#968d80d53863336007b7b46cceff795cb0bc84fe"
-  integrity sha512-ESN5pRkbAXwYqcgoi4vuDkVBjdVwV0DcNbQKWShYTh0I0anzsIZd52mKM929HPi4iuSnfmNkqSrDqvFcMCAvFQ==
+bnc-sdk@^4.6.2:
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/bnc-sdk/-/bnc-sdk-4.6.3.tgz#c852f091a5e84bb77864543b0775b35ebdbb1724"
+  integrity sha512-rva+LyJuAm+U6xwZYqlsDxKaMy3EpHBqkOL93UDih7iwXDYnUr87n27pnGCw3B8xRBeRhCBC/VZMuzRFeea/Hw==
   dependencies:
     crypto-es "^1.2.2"
     nanoid "^3.3.1"
@@ -10020,7 +10020,7 @@ jest@26.6.0:
     import-local "^3.0.2"
     jest-cli "^26.6.0"
 
-joi@17.6.0, joi@^17.4.2:
+joi@^17.4.2:
   version "17.6.0"
   resolved "https://registry.yarnpkg.com/joi/-/joi-17.6.0.tgz#0bb54f2f006c09a96e75ce687957bd04290054b2"
   integrity sha512-OX5dG6DTbcr/kbMFj0KGYxuew69HPcAE3K/sZpEV2nP6e/j/C0HV+HNiBPCASxdx5T7DMoa0s8UeHWMnb6n2zw==
@@ -13649,6 +13649,13 @@ rxjs@^7.5.2:
   version "7.5.6"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.6.tgz#0446577557862afd6903517ce7cae79ecb9662bc"
   integrity sha512-dnyv2/YsXhnm461G+R/Pe5bWP41Nm6LBXEYWI6eiFP4fiwx6WRI/CD0zbdVAudd9xwLEF2IDcKXLHit0FYjUzw==
+  dependencies:
+    tslib "^2.1.0"
+
+rxjs@^7.5.5:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.6.0.tgz#361da5362b6ddaa691a2de0b4f2d32028f1eb5a2"
+  integrity sha512-DDa7d8TFNUalGC9VqXvQ1euWNN7sc63TrUCuM9J998+ViviahMIjKSOU7rfcgFOF+FCD71BhDRv4hrFz+ImDLQ==
   dependencies:
     tslib "^2.1.0"
 
