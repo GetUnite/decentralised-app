@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { toExactFixed } from 'app/common/functions/utils';
+import { shuffleArray, toExactFixed } from 'app/common/functions/utils';
 import { useCurrentPath } from 'app/common/hooks';
 import { useMode, useNotification } from 'app/common/state';
 import { walletAccount } from 'app/common/state/atoms';
@@ -68,12 +68,19 @@ export const FarmCard = ({
 
   const tvl = isLoading
     ? 'Loading...'
-    : sign + (+toExactFixed(totalAssetSupply, 2))?.toLocaleString();
+    : sign + (toExactFixed(totalAssetSupply, 2));
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
+
+  const [seeAllSupportedTokens, setSeeAllSupportedTokens] =
+    useState<boolean>(false);
+  const [shuffledIcons] = useState(
+    Array.isArray(icons) ? shuffleArray(icons.slice(2, icons.length)) : [],
+  );
+  const [randomIcon] = useState(shuffledIcons.pop());
 
   return (
     <ResponsiveContext.Consumer>
@@ -129,8 +136,8 @@ export const FarmCard = ({
             </Card>
           ) : (
             <Box
-              pad={{ horizontal: 'medium', vertical: 'none' }}
-              style={{ borderTop: `2px solid ${dividerColor}` }}
+              pad={{ horizontal: '34px', vertical: 'none' }}
+              style={{ borderTop: `0.5px solid ${dividerColor}` }}
               height="90px"
               align="center"
               justify="center"
@@ -145,7 +152,7 @@ export const FarmCard = ({
                 align="center"
                 columns={
                   viewType != 'View my farms only'
-                    ? ['270px', '200px', '155px', '155px', '105px', 'auto']
+                    ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                     : [
                         '240px',
                         '155px',
@@ -166,7 +173,7 @@ export const FarmCard = ({
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
-                    <Box direction="row" justify="end" fill align='center'>
+                    <Box direction="row" justify="end" fill align="center">
                       <Skeleton count={1} height="14px" width="76px" />
                     </Box>
                   </>
@@ -181,14 +188,61 @@ export const FarmCard = ({
                           )}
                         </span>
                         <Box direction="row" gap="small">
-                          {icons.map((icon, i) => (
-                            <TokenIcon
-                              key={i}
-                              label={icon}
-                              size={24}
-                              style={i > 0 ? { marginLeft: '-1.2rem' } : {}}
-                            />
-                          ))}
+                          {icons.length < 4 || seeAllSupportedTokens ? (
+                            icons.map((icon, i) => (
+                              <TokenIcon
+                                key={i}
+                                label={icon}
+                                size={24}
+                                style={i > 0 ? { marginLeft: '-1.2rem' } : {}}
+                              />
+                            ))
+                          ) : (
+                            <>
+                              {icons.slice(0, 2).map((icon, i) => (
+                                <TokenIcon
+                                  key={i}
+                                  label={icon}
+                                  size={24}
+                                  style={
+                                    i > 0
+                                      ? seeAllSupportedTokens
+                                        ? { marginLeft: '-1.2rem' }
+                                        : { marginLeft: '-0.4rem' }
+                                      : {}
+                                  }
+                                />
+                              ))}
+                              <TokenIcon
+                                key={2}
+                                label={randomIcon}
+                                size={24}
+                                style={
+                                  seeAllSupportedTokens
+                                    ? { marginLeft: '-1.2rem' }
+                                    : { marginLeft: '-0.4rem' }
+                                }
+                              />
+                              {seeAllSupportedTokens ? (
+                                shuffledIcons.map((icon, i) => (
+                                  <TokenIcon
+                                    key={i}
+                                    label={icon}
+                                    size={24}
+                                    style={{ marginLeft: '-1.2rem' }}
+                                  />
+                                ))
+                              ) : (
+                                <Text
+                                  size="18px"
+                                  onClick={() => setSeeAllSupportedTokens(true)}
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  ...
+                                </Text>
+                              )}
+                            </>
+                          )}
                         </Box>
                         <ChainBadge chain={chain} />
                         <span>{tvl}</span>
@@ -199,8 +253,13 @@ export const FarmCard = ({
                           {walletAccountAtom ? (
                             <Link
                               to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'end',
+                                textDecoration: 'none',
+                              }}
                             >
-                              <Button label={'Farm'} />
+                              <Button label={'Farm'}></Button>
                             </Link>
                           ) : (
                             <Button
@@ -232,11 +291,13 @@ export const FarmCard = ({
                           <Link
                             to={(isBooster ? '/boostfarm/' : '/farm/') + id}
                           >
-                            <Button label={'Farm'} />
+                            <Box justify="end" fill>
+                              <Button label={'Farm'} />
+                            </Box>
                           </Link>
                         </Box>
                       </>
-                    )}{' '}
+                    )}
                   </>
                 )}
               </Grid>

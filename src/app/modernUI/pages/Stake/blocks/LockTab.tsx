@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useLock } from 'app/common/state/stake';
 import {
   Info,
@@ -41,7 +41,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
           <>
             <Box margin={{ top: 'large' }}>
               <Text textAlign="center" weight="bold">
-                You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO staked
+                You have {toExactFixed(alluoInfo.locked, 2)} $ALLUO staked
               </Text>
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
@@ -56,7 +56,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
-              <Info label="Unstaked $ALLUO balance" value={roundNumberDown(alluoInfo.balance, 2)} />
+              <Info label="Unstaked $ALLUO balance" value={toExactFixed(alluoInfo.balance, 2)} />
               <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
               <Info label="$ALLUO earned" value={alluoInfo.earned} />
               <Info label="Total $ALLUO staked" value={alluoInfo.totalLocked} />
