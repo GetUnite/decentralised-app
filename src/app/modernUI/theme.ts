@@ -357,4 +357,11 @@ export const theme = deepMerge(grommet, {
       font-size: 14px;
       `,
   },
+  tip: {
+    content: {
+      elevation: 'none',
+      margin: '10px',
+      pad: '0px',
+    },
+  },
 });
