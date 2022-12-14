@@ -2,8 +2,9 @@ import { toExactFixed } from 'app/common/functions/utils';
 import { Text } from 'grommet';
 
 export const TopHeader = ({ ibAlluosInfo, ...rest }) => {
+  console.log(ibAlluosInfo)
   const alluoTextBalances = ibAlluosInfo
-    .filter(token => Number(toExactFixed(token.balance, 2)) > 0)
+    .filter(token => token.balance > 0)
     .map(token => {
       return toExactFixed(token.balance, 5) + ' ' + token.label;
     });

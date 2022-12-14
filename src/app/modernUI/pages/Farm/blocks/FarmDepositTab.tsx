@@ -100,7 +100,6 @@ export const FarmDepositTab = ({
         )}
       </Box>
       <Box margin={{ top: 'medium' }}>
-         {console.log(selectedSupportedTokenInfo.allowance >= +depositValue, selectedSupportedTokenInfo.allowance , depositValue)}
         <SubmitButton
           primary
           disabled={

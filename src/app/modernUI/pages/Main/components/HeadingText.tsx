@@ -38,7 +38,7 @@ export const HeadingText = ({
           : headingText}
       </Text>
       <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
-        Fund your wallet using crypto or fiat currency here to start investing.
+        Fund your wallet using crypto or fiat currency to start investing.
         Withdraw at any time with no cost and no lock-in period.
       </Paragraph>
     </>
