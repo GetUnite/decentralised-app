@@ -32,7 +32,18 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'FRAX/USDC',
     sign: '$',
-    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
+    icons: [
+      'FRAX',
+      'USDC',
+      'agEUR',
+      'CRV',
+      'CVX',
+      'DAI',
+      'EURS',
+      'EURT',
+      'WETH',
+      'WBTC',
+    ],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
@@ -108,7 +119,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
-    isNewest: true
+    isNewest: true,
   },
   {
     id: 9,
@@ -117,7 +128,18 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'CVX/ETH',
     sign: '$',
-    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
+    icons: [
+      'CVX',
+      'WETH',
+      'EURS',
+      'agEUR',
+      'CRV',
+      'EURT',
+      'FRAX',
+      'USDC',
+      'WBTC',
+      'DAI',
+    ],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
@@ -193,7 +215,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
-    isNewest: true
+    isNewest: true,
   },
   {
     id: 10,
@@ -202,7 +224,18 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     chain: EChain.ETHEREUM,
     name: 'stETH/ETH',
     sign: '$',
-    icons: ['agEUR', 'CRV', 'CVX', 'DAI', 'EURS', 'EURT', 'FRAX', 'USDC', 'WETH', 'WBTC'],
+    icons: [
+      'WETH',
+      'USDC',
+      'DAI',
+      'EURS',
+      'EURT',
+      'FRAX',
+      'WBTC',
+      'agEUR',
+      'CRV',
+      'CVX',
+    ],
     isBooster: true,
     rewards: {
       label: 'CVX-ETH',
@@ -479,7 +512,12 @@ export const useBoostFarm = ({ id }) => {
             selectedFarm.chain,
           );
       await updateRewardsInfo();
-      setNotification('Rewards claimed successfully', 'success', tx.transactionHash, selectedFarm.chain);
+      setNotification(
+        'Rewards claimed successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarm.chain,
+      );
     } catch (error) {
       setNotification(error, 'error');
     }

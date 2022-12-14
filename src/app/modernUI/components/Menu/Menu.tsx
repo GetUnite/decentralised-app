@@ -54,6 +54,20 @@ export const Menu = ({ ...rest }) => {
             style={{ flex: 1 }}
             justify="end"
           >
+            {!isSmall(size) && (
+              <a
+                href="https://alluo.com/about"
+                target="_blank"
+                style={{
+                  color: isLightMode ? 'black' : 'white',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  marginRight: '34px'
+                }}
+              >
+                About Alluo
+              </a>
+            )}
             {!isSmall(size) && <ConnectionButton />}
             {isSmall(size) && isModalOpen && (
               <Button

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
-import { fromDecimals, roundNumberDown, toDecimals } from './utils';
+import { fromDecimals, toDecimals, toExactFixed } from './utils';
 import {
   callContract,
   getCurrentWalletAddress,
@@ -178,7 +178,7 @@ export const getBoosterFarmRewards = async (
   const stableValue = +valueAmountInDecimals * valueOf1LPinUSDC;
 
   return {
-    value: roundNumberDown(valueAmountInDecimals, 8),
+    value: toExactFixed(valueAmountInDecimals, 8),
     stableValue: stableValue,
   };
 };

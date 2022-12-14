@@ -343,7 +343,7 @@ export const useAutoInvestTab = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false); //useState(isSafeAppAtom ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom ? false : true);
 
   // stream
   const [possibleStreamOptions, setPossibleStreamOptions] = useState<
@@ -677,7 +677,7 @@ export const useAutoInvestTab = () => {
         balance: balance,
       });
       heapTrack('depositTransactionMined', { currency: selectedSupportedFromToken.label, amount: streamValue });
-      setNotification('Deposit successfully', 'success', tx.transactionHash, EChain.POLYGON);
+      setNotification('Deposit successful', 'success', tx.transactionHash, EChain.POLYGON);
     } catch (err) {
       setNotification(err, 'error');
     }

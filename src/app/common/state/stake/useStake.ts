@@ -13,7 +13,7 @@ import {
   getUnlockedAlluo,
   withdrawAlluo
 } from 'app/common/functions/stake';
-import { roundNumberDown, toExactFixed } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { getValueOf1LPinUSDC } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import moment from 'moment';
@@ -102,8 +102,8 @@ export const useStake = () => {
         balance: await getAlluoBalance(),
         allowance: await getAlluoStakingAllowance(),
         apr: (await getAlluoStakingAPR()).toLocaleString(),
-        totalLocked: roundNumberDown(await getTotalAlluoLocked(), 2),
-        earned: roundNumberDown(await getEarnedAlluo(), 2),
+        totalLocked: toExactFixed(await getTotalAlluoLocked(), 2),
+        earned: toExactFixed(await getEarnedAlluo(), 2),
         unlocked: await getUnlockedAlluo(),
       };
       const alluoStakingWalletAddressInfo =

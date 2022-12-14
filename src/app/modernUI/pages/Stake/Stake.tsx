@@ -1,6 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  roundNumberDown,
   timerIsFinished,
   toExactFixed
 } from 'app/common/functions/utils';
@@ -66,7 +65,7 @@ export const Stake = ({ ...rest }) => {
                       <>
                         <Text size="18px" weight="bold">
                           Your unlocked balance is{' '}
-                          {roundNumberDown(alluoInfo.unlocked, 2)}
+                          {toExactFixed(alluoInfo.unlocked, 2)}
                         </Text>
                         <Button
                           primary
@@ -84,7 +83,7 @@ export const Stake = ({ ...rest }) => {
                     <UnlockCountdown
                       date={+alluoInfo?.depositUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
-                      label={`${roundNumberDown(
+                      label={`${toExactFixed(
                         alluoInfo.locked,
                         2,
                       )} TOKENS LOCKED UNTIL`}
@@ -98,7 +97,7 @@ export const Stake = ({ ...rest }) => {
                     <UnlockCountdown
                       date={+alluoInfo.withdrawUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
-                      label={`UNLOCKING ${roundNumberDown(
+                      label={`UNLOCKING ${toExactFixed(
                         alluoInfo.unlocked,
                         2,
                       )} TOKENS IN`}
