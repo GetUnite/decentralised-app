@@ -1,4 +1,4 @@
-import { roundNumberDown, toExactFixed } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useBuy } from 'app/common/state/buy';
 import {
   Info,
@@ -78,7 +78,7 @@ export const BuyTab = ({ ...rest }) => {
               <Info
                 label="You percentage of total supply"
                 value={
-                  roundNumberDown(
+                  toExactFixed(
                     ((+alluoBeingBought + +vlAlluoBalance) / +totalSupply) *
                       100,
                     3,

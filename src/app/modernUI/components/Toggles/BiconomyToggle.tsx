@@ -1,37 +1,6 @@
-import { mode } from 'app/common/state/atoms';
-import { Box, Button, Text } from 'grommet';
-import ReactTooltip from 'react-tooltip';
-import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
-
-const ReactTooltipStyledDark = styled(ReactTooltip)`
-  &.place-bottom {
-    background: #44444;
-    border-radius: 8px;
-    width: 262px;
-    height: 48px;
-    color: #FFFFF;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 18px;
-  }
-`;
-
-const ReactTooltipStyledLight = styled(ReactTooltip)`
-  &.place-bottom {
-    background: #f4f8ff;
-    border-radius: 8px;
-    width: 262px;
-    height: 48px;
-    color: #4c4c4c;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 18px;
-  }
-`;
+import { Box, Button, Text, Tip } from 'grommet';
 
 export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
-  const [modeAtom] = useRecoilState(mode);
   const useBiconomyButton = useBiconomy ? 'row' : 'row-reverse';
   const useBiconomyButtonColor = !useBiconomy ? '#CCCCCC' : '#2A73FF';
 
@@ -49,18 +18,34 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
           margin={{ right: '8px' }}
           color="#999999"
           weight={500}
+          style={{cursor: "default"}}
         >
-          <span
-            style={{ textDecoration: 'underline', marginLeft: '5px' }}
-            data-tip
-            data-for="biconomyTip"
-          >
-            Biconomy
-          </span>{' '}
-          ON/OFF?
+          <>
+            <Tip
+              content={
+                <Box
+                  pad="12px"
+                  background="modal"
+                  round="8px"
+                  style={{
+                    boxShadow: '0px 0px 10px #2a73ff',
+                  }}
+                >
+                  <span>
+                    Turning off Biconomy means Alluo will no longer pay your
+                    transaction fee.
+                  </span>
+                </Box>
+              }
+            >
+              <span style={{ textDecoration: 'underline', marginLeft: '5px' }}>
+                Biconomy
+              </span>
+            </Tip>{' '}
+            ON/OFF?
+          </>
         </Text>
-        <Button disabled={true} onClick={() => setUseBiconomy(!useBiconomy)}>
-          {/*<Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>*/}
+<Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>
           <Box
             width="46px"
             height="20px"
@@ -86,25 +71,6 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
                 border: 'none',
               }}
             ></span>
-            {modeAtom === 'light' ? (
-              <ReactTooltipStyledLight
-                id="biconomyTip"
-                place="bottom"
-                effect="float"
-              >
-                Turning off Biconomy means Alluo will no longer pay your
-                transaction fee.
-              </ReactTooltipStyledLight>
-            ) : (
-              <ReactTooltipStyledDark
-                id="biconomyTip"
-                place="bottom"
-                effect="float"
-              >
-                Turning off Biconomy means Alluo will no longer pay your
-                transaction fee.
-              </ReactTooltipStyledDark>
-            )}
           </Box>
         </Button>
       </Box>

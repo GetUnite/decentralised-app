@@ -1,7 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { unlockAllAlluo, unlockAlluo } from 'app/common/functions/stake';
-import { isNumeric, roundNumberDown } from 'app/common/functions/utils';
+import { isNumeric, toExactFixed } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 
@@ -32,7 +32,7 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     }
     setUnlockValue(value);
     setProjectedUnlockValue(
-      roundNumberDown((value / 100) * +alluoInfo.locked, 2),
+      toExactFixed((value / 100) * +alluoInfo.locked, 2),
     );
   };
 

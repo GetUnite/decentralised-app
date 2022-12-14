@@ -35,7 +35,7 @@ export const Main = () => {
   const [seeAllBoostFarmsDescription, setSeeAllBoostFarmsDescription] =
     useState<boolean>(false);
 
-  const confirmedVoteDay = moment('2022/11/28/');
+  const confirmedVoteDay = moment('2022-11-28');
 
   let nextVoteDay = confirmedVoteDay.add(2, 'weeks');
   while (nextVoteDay < moment()) {

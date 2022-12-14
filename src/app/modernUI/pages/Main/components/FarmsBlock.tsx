@@ -18,12 +18,18 @@ export const FarmsBlock = ({
   onReadMore = null,
 }) => {
   return (
-    <Box gap="20px" background="card" round="8px" pad={{ bottom: '20px' }}>
+    <Box
+      gap="20px"
+      background="card"
+      round="8px"
+      pad={{ bottom: '20px' }}
+      style={{ boxShadow: '0px -1px 4px #CCCCCC' }}
+    >
       <Box
         pad={{
-          horizontal: 'medium',
+          horizontal: '34px',
           bottom: '23px',
-          top: '43px',
+          top: '27px',
         }}
       >
         <Heading size="24px">{heading}</Heading>
@@ -48,7 +54,7 @@ export const FarmsBlock = ({
       <Box>
         {!isSmall(size) && (
           <Card
-            pad={{ horizontal: 'medium', vertical: 'none' }}
+            pad={{ horizontal: '34px', vertical: 'none' }}
             height="65px"
             margin="none"
             align="center"
@@ -61,7 +67,7 @@ export const FarmsBlock = ({
               align="center"
               columns={
                 viewType != 'View my farms only'
-                  ? ['270px', '200px', '155px', '155px', '105px', 'auto']
+                  ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                   : [
                       '240px',
                       '155px',
@@ -147,11 +153,11 @@ export const FarmsBlock = ({
             })
           ) : (
             <Box direction="row" justify="center" height="90px" align="center">
-              <Box justify='center'>
-                <Text size="16px" weight={600} textAlign='center'>
+              <Box justify="center">
+                <Text size="16px" weight={600} textAlign="center">
                   No farms matching your filters
                 </Text>
-                <Text size="13px" textAlign='center' weight={400}>
+                <Text size="13px" textAlign="center" weight={400}>
                   Try clearing your filters to see results
                 </Text>
               </Box>

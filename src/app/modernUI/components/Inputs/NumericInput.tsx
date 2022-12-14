@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { TSupportedToken } from 'app/common/types/global';
 import { Box, Select, Text, TextInput } from 'grommet';
 import { Down } from 'grommet-icons';
@@ -73,11 +73,11 @@ export const NumericInput = ({
           ) : (
             <Text size="medium" color="soul">
               {available != undefined ? (
-                'Available: ' + tokenSign + roundNumberDown(+available)
+                'Available: ' + tokenSign + toExactFixed(+available, 5)
               ) : (
                 <>
                   {!!selectedToken &&
-                    'Wallet: ' + tokenSign + roundNumberDown(+(+maxValue))}
+                    'Wallet: ' + tokenSign + toExactFixed(+maxValue, 5)}
                 </>
               )}
             </Text>
@@ -101,7 +101,7 @@ export const NumericInput = ({
               <MaxButton
                 primary
                 onClick={() => {
-                  setFormattedValue(roundNumberDown(maxValue));
+                  setFormattedValue(toExactFixed(maxValue, 5));
                 }}
               >
                 Max
