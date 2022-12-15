@@ -58,7 +58,8 @@ export const AutoInvest = () => {
                         )}
                       </Box>
                     )}
-                    <Box margin={{ top: '36px' }} gap="6px">
+                    <Box margin={{ top: '36px' }} gap="6px" background="card"
+      round="8px" style={{ boxShadow: '0px -1px 4px #CCCCCC' }}>
                       {!isSmall(size) && (
                         <Card
                           pad={{ horizontal: 'medium', vertical: 'none' }}

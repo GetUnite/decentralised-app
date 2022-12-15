@@ -1,3 +1,4 @@
+import { useMode } from 'app/common/state';
 import { TokenIcon } from 'app/modernUI/components';
 import { Box, Card, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
@@ -33,7 +34,9 @@ export const StreamCard = ({
   sign,
   ...rest
 }: IStreamCard) => {
+  const { isLightMode } = useMode();
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
     <ResponsiveContext.Consumer>
@@ -43,6 +46,7 @@ export const StreamCard = ({
             pad={{ horizontal: 'medium', vertical: 'none' }}
             margin={{ top: 'small' }}
             height="120px"
+            style={{ borderTop: `0.5px solid ${dividerColor}` }}
             background="card"
             align="center"
             justify="center"
@@ -67,23 +71,15 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {sign}{tvs}
+                    {sign}
+                    {tvs}
                   </span>
-                  {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
-                    <Box justify="center" fill>
-                      <img src={swap} />
-                    </Box>
-      </Button>*/}
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {sign}{flowPerMonth}/m
+                    {sign}
+                    {flowPerMonth}/m
                   </span>
-                  {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
-                  <Box justify="center" fill>
-                      <img src={swap} />
-                    </Box>
-                  </Button>*/}
                 </Box>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
