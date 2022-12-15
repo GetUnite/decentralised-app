@@ -227,7 +227,7 @@ export const Stake = ({ ...rest }) => {
                       {rewardsInfo.stableLabel}
                     </Text>
                     <Text weight="bold" size="16px">
-                      {'$' + toExactFixed(pendingRewardsInfo, 6)}
+                      {'$' + toExactFixed(pendingRewardsInfo, 4)}
                     </Text>
                   </Box>
                   <Text size="8px" weight={400}>
