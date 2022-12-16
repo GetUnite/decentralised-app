@@ -13,7 +13,6 @@ export const MenuItem = ({ ...rest }) => {
   } = useCurrentPath();
 
   const selectedStyle = {
-    paddingBottom: '2px',
     textDecorationLine: 'underline',
     textDecorationColor: colors.BLUE,
     textDecorationThickness: '1px',
@@ -25,35 +24,35 @@ export const MenuItem = ({ ...rest }) => {
       <Anchor
         label="farm"
         size="medium"
-        weight={isFarmPage ? 'bold' : 'normal'}
+        weight={isFarmPage ? 700 : 'normal'}
         style={isFarmPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.MAIN)}
       />
       <Anchor
         label="autoInvest"
         size="medium"
-        weight={isAutoInvestPage ? 'bold' : 'normal'}
+        weight={isAutoInvestPage ? 700 : 'normal'}
         style={isAutoInvestPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.AUTOINVEST)}
       />
       <Anchor
         label="transfer"
         size="medium"
-        weight={isTransferPage ? 'bold' : 'normal'}
+        weight={isTransferPage ? 700 : 'normal'}
         style={isTransferPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.TRANSFER)}
       />
       <Anchor
         label="stake"
         size="medium"
-        weight={isStakePage ? 'bold' : 'normal'}
+        weight={isStakePage ? 700 : 'normal'}
         style={isStakePage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.STAKE)}
       />
       <Anchor
         label="buy"
         size="medium"
-        weight={isBuyPage ? 'bold' : 'normal'}
+        weight={isBuyPage ? 700 : 'normal'}
         style={isBuyPage ? selectedStyle : {}}
         onClick={() =>
           //navigate(modernUiPaths.BUY)

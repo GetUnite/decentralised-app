@@ -94,7 +94,11 @@ export const Filters = ({
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -105,7 +109,7 @@ export const Filters = ({
                 Your active farms
               </Text>
               <RadioButtonGroup
-                name="teste"
+                name="viewType"
                 pad={{ bottom: '28px' }}
                 options={possibleViewTypes}
                 value={viewType}
@@ -115,7 +119,19 @@ export const Filters = ({
                 style={{
                   borderBottom: `2px solid ${dividerColor}`,
                 }}
-              />
+              >
+                {(option, { checked }) => (
+                  <Box direction="row" gap="12px" align="center">
+                    <input
+                      type="radio"
+                      checked={checked}
+                      onChange={e => e.target.parentElement.click()}
+                      style={{ margin: '3px' }}
+                    />
+                    <Text size="14px">{option}</Text>
+                  </Box>
+                )}
+              </RadioButtonGroup>
             </>
           )}
           <Box
@@ -162,11 +178,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -184,11 +204,15 @@ export const Filters = ({
             style={{
               borderBottom: `2px solid ${dividerColor}`,
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -230,11 +254,15 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -285,11 +313,15 @@ export const Filters = ({
             onChange={event => {
               setTypeFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -300,14 +332,26 @@ export const Filters = ({
                 Your active farms
               </Text>
               <RadioButtonGroup
-                name="teste"
+                name="viewType"
                 pad={{ bottom: '28px' }}
                 options={possibleViewTypes}
                 value={viewType}
                 onChange={event => {
                   setViewType(event.target.value);
                 }}
-              />
+              >
+                {(option, { checked }) => (
+                  <Box direction="row" gap="12px" align="center">
+                    <input
+                      type="radio"
+                      checked={checked}
+                      onChange={e => e.target.parentElement.click()}
+                      style={{ margin: '3px' }}
+                    />
+                    <Text size="14px">{option}</Text>
+                  </Box>
+                )}
+              </RadioButtonGroup>
             </>
           )}
         </Filter>
@@ -361,11 +405,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -380,11 +428,15 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
@@ -433,11 +485,15 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-            >
+          >
             {(option, { checked }) => {
               return (
                 <Box>
-                  <input type="checkbox" checked={checked} onChange={(e) => e.target.parentElement.click()}/>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
                 </Box>
               );
             }}
