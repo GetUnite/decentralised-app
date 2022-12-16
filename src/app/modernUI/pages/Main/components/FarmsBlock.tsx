@@ -56,8 +56,8 @@ export const FarmsBlock = ({
           )}
         </Text>
         {readMoreStatus && (
-          <Box direction="row" gap="4px" align='center' margin={{top: '10px'}}>
-            <DocumentText size='16px'/>
+          <Box direction="row" gap="4px" align='center' margin={{top: '8px'}}>
+            <DocumentText size='20px' color='text'/>
             <a
               target="_blank"
               href={factsheetLink}
