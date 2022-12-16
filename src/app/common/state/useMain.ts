@@ -3,7 +3,8 @@ import {
   getBoosterFarmInterest,
   getChainById,
   getCurrentChainId,
-  getInterest, getTotalAssets,
+  getInterest,
+  getTotalAssets,
   getTotalAssetSupply,
   getUserDepositedAmount,
   getUserDepositedLPAmount,
@@ -171,7 +172,7 @@ export const useMain = () => {
       if (farm.isBooster) {
         totalDepositedAmountInUsd =
           totalDepositedAmountInUsd + +farm.depositedAmount;
-      }else{
+      } else {
         //const assetValue = await converToAssetValue(farm.farmAddress, farm.depositedAmount, farm.chain);
         //const valueOfAssetInUSDC = getPrice(farm.underlyingTokenAddress, farm.chain == EChain.ETHEREUM ? EEthereumAddresses.USDC : EPolygonAddresses. USDC)
       }
@@ -187,10 +188,11 @@ export const useMain = () => {
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = toExactFixed(
-        await getUserDepositedAmount(farm.type, farm.chain),
-        4,
+      farmInfo.depositedAmount = await getUserDepositedAmount(
+        farm.type,
+        farm.chain,
       );
+
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
