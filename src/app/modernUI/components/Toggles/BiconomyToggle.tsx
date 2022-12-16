@@ -1,4 +1,5 @@
-import { Box, Button, Text, Tip } from 'grommet';
+import { Box, Button, Text } from 'grommet';
+import { Tooltip } from '../Tooltips';
 
 export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
   const useBiconomyButton = useBiconomy ? 'row' : 'row-reverse';
@@ -18,34 +19,24 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
           margin={{ right: '8px' }}
           color="#999999"
           weight={500}
-          style={{cursor: "default"}}
+          style={{ cursor: 'default' }}
         >
           <>
-            <Tip
-              content={
-                <Box
-                  pad="12px"
-                  background="modal"
-                  round="8px"
-                  style={{
-                    boxShadow: '0px 0px 10px #2a73ff',
-                  }}
-                >
-                  <span>
-                    Turning off Biconomy means Alluo will no longer pay your
-                    transaction fee.
-                  </span>
-                </Box>
-              }
+            <Tooltip
+              text="Turning off Biconomy means Alluo will no longer pay your
+                    transaction fee."
             >
               <span style={{ textDecoration: 'underline', marginLeft: '5px' }}>
                 Biconomy
               </span>
-            </Tip>{' '}
+            </Tooltip>{' '}
             ON/OFF?
           </>
         </Text>
-<Button disabled={disabled} onClick={() => setUseBiconomy(!useBiconomy)}>
+        <Button
+          disabled={disabled}
+          onClick={() => setUseBiconomy(!useBiconomy)}
+        >
           <Box
             width="46px"
             height="20px"

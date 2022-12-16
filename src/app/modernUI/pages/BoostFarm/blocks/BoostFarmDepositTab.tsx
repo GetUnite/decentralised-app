@@ -42,7 +42,7 @@ export const BoostFarmDepositTab = ({
           minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
         }}
       >
-        {isLoading || !selectedSupportedToken || isApproving || isDepositing ? (
+        {isApproving || isDepositing ? (
           <Box
             align="center"
             justify="center"
@@ -54,45 +54,49 @@ export const BoostFarmDepositTab = ({
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              <TopHeader selectedFarm={selectedFarm} />
+              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading}/>
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
-                  label={'Deposit ' + selectedSupportedToken.label}
-                  tokenSign={selectedFarm.sign}
+                  label={`Deposit ${selectedSupportedToken ? selectedSupportedToken?.label : ''}`}
+                  tokenSign={selectedFarm?.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
                   isLoadingMaxValue={isFetchingSupportedTokenInfo}
                   maxButton={true}
                   maxValue={selectedSupportedTokenInfo?.balance}
-                  tokenOptions={selectedFarm.supportedTokens || []}
+                  tokenOptions={selectedFarm?.supportedTokens || []}
                   selectedToken={selectedSupportedToken}
                   setSelectedToken={selectSupportedToken}
                   error={depositValueError}
+                  disabled={isLoading}
                 />
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
               <ProjectedWeeklyInfo
-                depositedAmount={selectedFarm.depositedAmount}
+                depositedAmount={selectedFarm?.depositedAmount}
                 inputValue={depositValue}
-                interest={selectedFarm.interest}
-                sign={selectedFarm.sign}
+                interest={selectedFarm?.interest}
+                sign={selectedFarm?.sign}
+                isLoading={isLoading}
               />
-              <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
+              <Info label="APY" value={toExactFixed(selectedFarm?.interest,2).toLocaleString() + '%'} isLoading={isLoading}/>
               <Info
                 label="Pool liquidity"
                 value={
-                  selectedFarm.sign +
-                  (+selectedFarm.totalAssetSupply).toLocaleString()
+                  selectedFarm?.sign +
+                  (+selectedFarm?.totalAssetSupply).toLocaleString()
                 }
+                isLoading={isLoading}
               />
               <FeeInfo
-                biconomyToggle={selectedFarm.chain == EChain.POLYGON}
+                biconomyToggle={selectedFarm?.chain == EChain.POLYGON}
                 useBiconomy={useBiconomy}
                 setUseBiconomy={setUseBiconomy}
                 showWalletFee={
-                  !useBiconomy || selectedFarm.chain != EChain.POLYGON
+                  !useBiconomy || selectedFarm?.chain != EChain.POLYGON
                 }
+                isLoading={isLoading}
               />
             </Box>
           </>

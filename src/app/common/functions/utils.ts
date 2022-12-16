@@ -77,6 +77,7 @@ export const fromDecimals = (
   // 9000000 => 9
   // 123456 => 0.123456
 };
+const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
 const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
 export const toExactFixed = (
@@ -173,4 +174,9 @@ export const shuffleArray = array => {
   }
 
   return newArray;
+};
+
+export const fromLocaleString = string => {
+  const formattedString = string.replace(thousandsSeparator, '').replace(decimalSeparator, '.');
+  return +formattedString;
 };

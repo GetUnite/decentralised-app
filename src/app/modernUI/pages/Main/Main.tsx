@@ -117,6 +117,7 @@ export const Main = () => {
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
                         size={size}
+                        factsheetLink="https://docsend.com/view/26j9j8se4vrfu2wh"
                       />
                       <FarmsBlock
                         heading="Boost farms"
@@ -138,6 +139,7 @@ export const Main = () => {
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
                         size={size}
+                        factsheetLink="https://docsend.com/view/26j9j8se4vrfu2wh"
                       />
                     </Box>
                   </Box>

@@ -318,6 +318,12 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   },
 ];
 
+const defaultRewards = {
+  label: 'CVX-ETH',
+  stableLabel: 'USDC',
+  stableAddress: EEthereumAddresses.USDC,
+};
+
 export const useBoostFarm = ({ id }) => {
   // react
   const navigate = useNavigate();
@@ -337,7 +343,7 @@ export const useBoostFarm = ({ id }) => {
     useState<TSupportedToken>();
 
   // booster farm rewards control
-  const [rewardsInfo, setRewardsInfo] = useState<any>(false);
+  const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
 
@@ -349,8 +355,7 @@ export const useBoostFarm = ({ id }) => {
     useState<boolean>(false);
 
   // information/confirmation control
-  const showBoostFarmPresentation =
-    selectedFarm?.isBooster && !cookies.has_seen_boost_farms;
+  const showBoostFarmPresentation = !cookies.has_seen_boost_farms;
 
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
   const nextHarvestDate = moment()

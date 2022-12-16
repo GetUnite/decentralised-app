@@ -11,9 +11,14 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
 import { useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { BoostFarmDepositTab, BoostFarmPresentation, BoostFarmWithdrawalTab } from './blocks';
+import {
+  BoostFarmDepositTab,
+  BoostFarmPresentation,
+  BoostFarmWithdrawalTab
+} from './blocks';
 
 export const BoostFarm = () => {
   const { id } = useParams();
@@ -40,7 +45,7 @@ export const BoostFarm = () => {
     rewardsInfo,
     losablePendingRewards,
     pendingRewardsInfo,
-    isLoadingPendingRewards
+    isLoadingPendingRewards,
   } = useBoostFarm({
     id,
   });
@@ -68,6 +73,7 @@ export const BoostFarm = () => {
               <BoostFarmPresentation
                 selectedFarm={selectedFarm}
                 farmName={farmName}
+                isLoading={isLoading}
               />
             )}
             {showTabs && (
@@ -103,9 +109,20 @@ export const BoostFarm = () => {
                 </Tab>
               </Tabs>
             )}
+            <Box margin={{ top: '26px' }} justify="center" direction="row">
+              <Text size="12px">
+                Find out where these funds are being invested{' '}
+                <a
+                  target="_blank"
+                  href="https://docsend.com/view/26j9j8se4vrfu2wh"
+                >
+                  here
+                </a>
+              </Text>
+            </Box>
           </>
         </Modal>
-        {walletAccountAtom && (
+        {walletAccountAtom && !showBoostFarmPresentation && (
           <Box gap="22px">
             <Box
               round={'medium'}
@@ -119,7 +136,7 @@ export const BoostFarm = () => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isLoading || isClamingRewards || isLoadingRewards || !selectedSupportedToken? (
+              {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
@@ -132,33 +149,43 @@ export const BoostFarm = () => {
                     fill
                   >
                     <Box direction="row" justify="between" fill>
-                      <Text size="18px">Rewards</Text>
-                      <Box direction="row">
-                        {selectedFarm?.rewards?.icons?.map((icon, i) => (
-                          <TokenIcon
-                            key={i}
-                            label={icon}
-                            style={i > 0 ? { marginLeft: '-0.6rem' } : {}}
-                          />
-                        ))}
-                      </Box>
+                      {isLoading || isLoadingRewards ? (
+                        <Box fill>
+                          <Skeleton height="18px" />
+                        </Box>
+                      ) : (
+                        <>
+                          <Text size="18px">Rewards</Text>
+                          <Box direction="row">
+                            {selectedFarm?.rewards?.icons?.map((icon, i) => (
+                              <TokenIcon
+                                key={i}
+                                label={icon}
+                                style={i > 0 ? { marginLeft: '-0.6rem' } : {}}
+                              />
+                            ))}
+                          </Box>
+                        </>
+                      )}
                     </Box>
                   </Heading>
-                  <Box
-                    direction="row"
-                    justify="between"
-                    margin={{ bottom: '28px' }}
-                  >
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? rewardsInfo.stableLabel
-                        : rewardsInfo.label}
-                    </Text>
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? '$' + toExactFixed(rewardsInfo.stableValue, 6)
-                        : toExactFixed(rewardsInfo.value, 6)}
-                    </Text>
+                  <Box margin={{ bottom: '28px' }}>
+                    {isLoading || isLoadingRewards ? (
+                      <Skeleton height="16px" />
+                    ) : (
+                      <Box direction="row" justify="between">
+                        <Text weight="bold" size="16px">
+                          {seeRewardsAsStable
+                            ? rewardsInfo.stableLabel
+                            : rewardsInfo.label}
+                        </Text>
+                        <Text weight="bold" size="16px">
+                          {seeRewardsAsStable
+                            ? '$' + toExactFixed(rewardsInfo.stableValue, 6)
+                            : toExactFixed(rewardsInfo.value, 6)}
+                        </Text>
+                      </Box>
+                    )}
                   </Box>
                   <Box gap="12px">
                     <Button
@@ -171,13 +198,12 @@ export const BoostFarm = () => {
                       }
                       style={{ borderRadius: '58px', width: '197px' }}
                       onClick={claimRewards}
+                      disabled={isLoading || isLoadingRewards}
                     />
                     <Button
                       label={
                         seeRewardsAsStable
-                          ? 'Prefer ' +
-                          rewardsInfo.label +
-                            ' LP tokens?'
+                          ? 'Prefer ' + rewardsInfo.label + ' LP tokens?'
                           : 'Prefer ' + rewardsInfo.stableLabel
                       }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
@@ -220,15 +246,17 @@ export const BoostFarm = () => {
                   : {}
               }
             >
-              {isLoading || isClamingRewards || isLoadingPendingRewards || !selectedSupportedToken ? (
-                <Box align="center" justify="center" fill>
-                  <Spinner pad="large" />
-                </Box>
-              ) : (
-                <Box fill gap="12px">
+              <Box fill gap="12px">
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton height="16px" />
+                ) : (
                   <Text size="16px" weight="bold">
                     Pending rewards
                   </Text>
+                )}
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton height="16px"/>
+                ) : (
                   <Box direction="row" justify="between">
                     <Text weight="bold" size="16px">
                       {rewardsInfo.stableLabel}
@@ -237,12 +265,15 @@ export const BoostFarm = () => {
                       {'$' + toExactFixed(pendingRewardsInfo, 6)}
                     </Text>
                   </Box>
-                  <Text size="8px" weight={400}>
-                    Available {nextHarvestDate.format('DD MMM')} · Last
-                    harvested {previousHarvestDate.format('DD MMM')}
-                  </Text>
-                </Box>
-              )}
+                )}
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton height="8px"/>
+                ) : (
+                <Text size="8px" weight={400}>
+                  Available {nextHarvestDate.format('DD MMM')} · Last harvested{' '}
+                  {previousHarvestDate.format('DD MMM')}
+                </Text>)}
+              </Box>
             </Box>
           </Box>
         )}

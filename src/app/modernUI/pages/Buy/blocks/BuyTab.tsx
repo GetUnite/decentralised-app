@@ -68,14 +68,17 @@ export const BuyTab = ({ ...rest }) => {
             </Box>
             <Box margin={{ top: 'medium' }}>
               <Info
+                isLoading={isLoading}
                 label="Amount of $ALLUO"
                 value={(+alluoBeingBought).toLocaleString()}
               />
               <Info
+                isLoading={isLoading}
                 label="Total $ALLUO locked"
                 value={(+totalSupply).toLocaleString()}
               />
               <Info
+                isLoading={isLoading}
                 label="You percentage of total supply"
                 value={
                   toExactFixed(

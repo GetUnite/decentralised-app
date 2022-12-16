@@ -57,7 +57,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             justify="center"
             fill="horizontal"
             height={notificationAtom.message != '' ? "148px" : "100px"}
-            style={{ position: 'sticky', top: '0px', zIndex: 1 }}
+            style={{ position: 'sticky', top: '0px', zIndex: 2 }}
           >
             <Nav
               background="bg"
