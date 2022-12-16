@@ -47,11 +47,7 @@ export const BoostFarmWithdrawalTab = ({
     <Box fill>
       <Box
         style={{
-          minHeight: selectedFarm?.isBooster
-            ? '504px'
-            : selectedFarm?.chain == EChain.POLYGON
-            ? '462px'
-            : '433px',
+          minHeight: '504px',
         }}
         justify="center"
       >
@@ -59,7 +55,7 @@ export const BoostFarmWithdrawalTab = ({
           <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
-            withdrawTokenLabel={selectedSupportedToken.label}
+            withdrawTokenLabel={selectedSupportedToken?.label}
             handleWithdraw={handleWithdraw}
             cancelBoosterWithdrawalConfirmation={
               cancelBoosterWithdrawalConfirmation
@@ -69,7 +65,7 @@ export const BoostFarmWithdrawalTab = ({
           />
         ) : (
           <>
-            {isLoading || !selectedSupportedToken || isWithdrawing ? (
+            {isWithdrawing ? (
               <Box
                 align="center"
                 justify="center"
@@ -81,51 +77,72 @@ export const BoostFarmWithdrawalTab = ({
             ) : (
               <>
                 <Box margin={{ top: 'large' }}>
-                  <TopHeader selectedFarm={selectedFarm} />
+                  <TopHeader
+                    selectedFarm={selectedFarm}
+                    isLoading={isLoading}
+                  />
                   <Box margin={{ top: 'medium' }}>
                     <NumericInput
-                      label={'Withdraw ' + selectedSupportedToken.label}
+                      label={`Withdraw ${
+                        selectedSupportedToken
+                          ? selectedSupportedToken?.label
+                          : ''
+                      }`}
                       available={
-                        selectedSupportedTokenInfo.boostDepositedAmount
+                        selectedSupportedTokenInfo?.boostDepositedAmount
                       }
-                      tokenSign={selectedSupportedToken.sign}
+                      tokenSign={selectedSupportedToken?.sign}
                       onValueChange={handleWithdrawalFieldChange}
                       value={withdrawValue}
-                      maxValue={selectedSupportedTokenInfo.boostDepositedAmount}
-                      tokenOptions={selectedFarm.supportedTokens || []}
+                      maxValue={
+                        selectedSupportedTokenInfo?.boostDepositedAmount
+                      }
+                      tokenOptions={selectedFarm?.supportedTokens || []}
                       selectedToken={selectedSupportedToken}
                       setSelectedToken={selectSupportedToken}
                       error={withdrawValueError}
-                      slippageWarning={selectedFarm.isBooster}
+                      slippageWarning={true}
                       lowSlippageTokenLabels={
-                        selectedFarm.lowSlippageTokenLabels
+                        selectedFarm?.lowSlippageTokenLabels
                       }
+                      disabled={isLoading}
                     />
                   </Box>
                 </Box>
 
                 <Box margin={{ top: 'medium' }}>
                   <ProjectedWeeklyInfo
-                    depositedAmount={selectedFarm.depositedAmount}
+                    depositedAmount={selectedFarm?.depositedAmount}
                     inputValue={-1 * +withdrawValue}
-                    interest={selectedFarm.interest}
-                    sign={selectedFarm.sign}
+                    interest={selectedFarm?.interest}
+                    sign={selectedFarm?.sign}
+                    isLoading={isLoading}
                   />
-                  <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
+                  <Info
+                    label="APY"
+                    value={
+                      toExactFixed(selectedFarm?.interest, 2).toLocaleString() +
+                      '%'
+                    }
+                    isLoading={isLoading}
+                  />
                   <Info
                     label="Pool liquidity"
                     value={
-                      selectedFarm.sign +
-                      (+selectedFarm.totalAssetSupply).toLocaleString()
+                      selectedFarm?.sign +
+                      (+selectedFarm?.totalAssetSupply).toLocaleString()
                     }
+                    isLoading={isLoading}
                   />
                   <FeeInfo
-                    biconomyToggle={selectedFarm.chain == EChain.POLYGON}
+                    biconomyToggle={selectedFarm?.chain == EChain.POLYGON}
                     useBiconomy={useBiconomy}
                     setUseBiconomy={setUseBiconomy}
                     showWalletFee={
-                      !useBiconomy || selectedFarm.chain != EChain.POLYGON
+                      !useBiconomy || selectedFarm?.chain != EChain.POLYGON
                     }
+                    disableBiconomy={isLoading}
+                    isLoading={isLoading}
                   />
                 </Box>
               </>
@@ -145,11 +162,7 @@ export const BoostFarmWithdrawalTab = ({
               !+withdrawValue ||
               hasErrors
             }
-            onClick={() =>
-              selectedFarm?.isBooster
-                ? startBoosterWithdrawalConfirmation(withdrawValue)
-                : handleWithdraw()
-            }
+            onClick={() => startBoosterWithdrawalConfirmation(withdrawValue)}
           />
         </Box>
       )}

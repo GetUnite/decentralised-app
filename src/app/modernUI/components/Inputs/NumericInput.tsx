@@ -1,14 +1,12 @@
 import { toExactFixed } from 'app/common/functions/utils';
 import { TSupportedToken } from 'app/common/types/global';
-import { Box, Select, Text, TextInput } from 'grommet';
-import { Down } from 'grommet-icons';
+import { Box, Text, TextInput } from 'grommet';
 import { useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import NumberFormat from 'react-number-format';
 import styled from 'styled-components';
-import { TokenIcon } from '../Icons';
 import { MaxButton } from './MaxButton';
 import { RelativeBox } from './RelativeBox';
+import { TokenSelector } from './TokenSelector';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
@@ -36,6 +34,7 @@ interface INumericInput {
   slippageWarning?: boolean;
   lowSlippageTokenLabels?: string[];
   isLoadingMaxValue?: boolean;
+  disabled?: boolean;
 }
 
 export const NumericInput = ({
@@ -53,6 +52,7 @@ export const NumericInput = ({
   lowSlippageTokenLabels,
   error,
   isLoadingMaxValue = false,
+  disabled = false,
   ...rest
 }: INumericInput) => {
   const [formattedValue, setFormattedValue] = useState('');
@@ -66,11 +66,7 @@ export const NumericInput = ({
           <Text size="medium" color="soul">
             {label}
           </Text>
-          {isLoadingMaxValue ? (
-            <Box width="100px">
-              <Skeleton count={1} />
-            </Box>
-          ) : (
+          {!disabled && (
             <Text size="medium" color="soul">
               {available != undefined ? (
                 'Available: ' + tokenSign + toExactFixed(+available, 5)
@@ -88,6 +84,7 @@ export const NumericInput = ({
             value={formattedValue}
             placeholder="0.00"
             customInput={TextInput}
+            disabled={disabled}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
             onValueChange={values => {
@@ -107,20 +104,11 @@ export const NumericInput = ({
                 Max
               </MaxButton>
             )}
-            {tokenOptions && (
-              <Select
-                width="10px"
-                plain
-                icon={<Down size="small" />}
-                dropAlign={{ right: 'right', top: 'bottom' }}
-                options={tokenOptions}
-                value={selectedToken?.label}
-                valueLabel={option => {
-                  return <TokenIcon label={option} />;
-                }}
-                onChange={({ option }) => setSelectedToken(option)}
-                labelKey="label"
-                valueKey="address"
+            {tokenOptions && !disabled && (
+              <TokenSelector
+                selectedToken={selectedToken}
+                tokenOptions={tokenOptions}
+                setSelectedToken={setSelectedToken}
               />
             )}
           </AbsoluteBox>
@@ -139,7 +127,7 @@ export const NumericInput = ({
                 <>
                   <Text size="small" color="soul">
                     Withdrawing in any token other than{' '}
-                    {lowSlippageTokenLabels.join('/')} increases slippage.
+                    {lowSlippageTokenLabels?.join('/')} increases slippage.
                     Values shown are an approximation and may change subject to
                     exhange rates
                   </Text>

@@ -1,15 +1,8 @@
 import { useFarm } from 'app/common/state/farm';
-import {
-  Layout,
-  Modal, Tab,
-  Tabs
-} from 'app/modernUI/components';
-import { ResponsiveContext } from 'grommet';
+import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
+import { Box, ResponsiveContext, Text } from 'grommet';
 import { useParams } from 'react-router-dom';
-import {
-  FarmDepositTab,
-  FarmWithdrawalTab
-} from './blocks';
+import { FarmDepositTab, FarmWithdrawalTab } from './blocks';
 
 export const Farm = () => {
   const { id } = useParams();
@@ -53,6 +46,17 @@ export const Farm = () => {
                 />
               </Tab>
             </Tabs>
+            <Box margin={{ top: '26px' }} justify="center" direction='row'>
+              <Text size="12px">
+                Find out where these funds are being invested{' '}
+                <a
+                  target="_blank"
+                  href="https://docsend.com/view/26j9j8se4vrfu2wh"
+                >
+                  here
+                </a>
+              </Text>
+            </Box>
           </Modal>
         </Layout>
       )}

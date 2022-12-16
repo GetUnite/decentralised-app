@@ -53,7 +53,7 @@ export const useStake = () => {
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
   //rewards control
-  const [rewardsInfo, setRewardsInfo] = useState<any>(false);
+  const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');

@@ -1,7 +1,7 @@
 import { useMode } from 'app/common/state';
+import 'app/modernUI/css/Dropdown.css';
 import { Box, Button, DropButton, Heading, Text } from 'grommet';
 import { Down } from 'grommet-icons';
-import './Filter.css';
 
 export const Filter = ({
   icon = null,
@@ -19,7 +19,7 @@ export const Filter = ({
   return (
     <>
       <DropButton
-        id="filter"
+        id="dropdown"
         plain
         label={
           <Box direction="row" gap={icon ? '4px' : '7px'} pad='5px 9px 5px 13px' align='center'>
