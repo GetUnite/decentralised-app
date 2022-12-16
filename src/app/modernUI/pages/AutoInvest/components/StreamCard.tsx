@@ -48,7 +48,6 @@ export const StreamCard = ({
         <>
           <Box
             pad={{ horizontal: 'medium', vertical: 'none' }}
-            margin={{ top: 'small' }}
             height="120px"
             style={{ borderTop: `0.5px solid ${dividerColor}` }}
             background={isHover ? hoverColor : ''}

@@ -68,7 +68,7 @@ export const FarmCard = ({
 
   const tvl = isLoading
     ? 'Loading...'
-    : sign + (toExactFixed(totalAssetSupply, 2));
+    : sign + toExactFixed(totalAssetSupply, 2);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
@@ -187,61 +187,73 @@ export const FarmCard = ({
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
                         </span>
-                        <Box direction="row" gap="small">
+                        <Box direction="row" gap="small" align="center">
                           {icons.length < 4 || seeAllSupportedTokens ? (
-                            icons.map((icon, i) => (
-                              <TokenIcon
-                                key={i}
-                                label={icon}
-                                size={24}
-                                style={i > 0 ? { marginLeft: '-1.2rem' } : {}}
-                              />
-                            ))
-                          ) : (
                             <>
-                              {icons.slice(0, 2).map((icon, i) => (
-                                <TokenIcon
-                                  key={i}
-                                  label={icon}
-                                  size={24}
-                                  style={
-                                    i > 0
-                                      ? seeAllSupportedTokens
-                                        ? { marginLeft: '-1.2rem' }
-                                        : { marginLeft: '-0.4rem' }
-                                      : {}
+                              {icons.length > 3 ? (
+                                <Button
+                                  onClick={() =>
+                                    setSeeAllSupportedTokens(
+                                      !seeAllSupportedTokens,
+                                    )
                                   }
-                                />
-                              ))}
-                              <TokenIcon
-                                key={2}
-                                label={randomIcon}
-                                size={24}
-                                style={
-                                  seeAllSupportedTokens
-                                    ? { marginLeft: '-1.2rem' }
-                                    : { marginLeft: '-0.4rem' }
-                                }
-                              />
-                              {seeAllSupportedTokens ? (
-                                shuffledIcons.map((icon, i) => (
+                                >
+                                  <Box align="center" direction="row">
+                                    {icons.map((icon, i) => (
+                                      <TokenIcon
+                                        key={i}
+                                        label={icon}
+                                        size={24}
+                                        style={
+                                          i > 0 ? { marginLeft: '-0.4rem' } : {}
+                                        }
+                                      />
+                                    ))}
+                                  </Box>
+                                </Button>
+                              ) : (
+                                <>
+                                  {icons.map((icon, i) => (
+                                    <TokenIcon
+                                      key={i}
+                                      label={icon}
+                                      size={24}
+                                      style={
+                                        i > 0 ? { marginLeft: '-0.4rem' } : {}
+                                      }
+                                    />
+                                  ))}
+                                </>
+                              )}
+                            </>
+                          ) : (
+                            <Button
+                              onClick={() =>
+                                setSeeAllSupportedTokens(!seeAllSupportedTokens)
+                              }
+                            >
+                              <Box align="center" direction="row">
+                                {icons.slice(0, 2).map((icon, i) => (
                                   <TokenIcon
                                     key={i}
                                     label={icon}
                                     size={24}
-                                    style={{ marginLeft: '-1.2rem' }}
+                                    style={
+                                      i > 0 ? { marginLeft: '-0.4rem' } : {}
+                                    }
                                   />
-                                ))
-                              ) : (
-                                <Text
-                                  size="18px"
-                                  onClick={() => setSeeAllSupportedTokens(true)}
-                                  style={{ cursor: 'pointer' }}
-                                >
+                                ))}
+                                <TokenIcon
+                                  key={2}
+                                  label={randomIcon}
+                                  size={24}
+                                  style={{ marginLeft: '-0.4rem' }}
+                                />
+                                <Text size="18px">
                                   ...
                                 </Text>
-                              )}
-                            </>
+                              </Box>
+                            </Button>
                           )}
                         </Box>
                         <ChainBadge chain={chain} />
@@ -283,10 +295,8 @@ export const FarmCard = ({
                         <ChainBadge chain={chain} />
                         <span>{poolShare}%</span>
                         <span>{tvl}</span>
-                        <span>{sign + balance}</span>
-                        <span>
-                          {toExactFixed(interest, 2).toLocaleString()}%
-                        </span>
+                        <span>{sign + toExactFixed(balance, 4)}</span>
+                        <span>{toExactFixed(interest, 2)}%</span>
                         <Box justify="end" fill>
                           <Link
                             to={(isBooster ? '/boostfarm/' : '/farm/') + id}
