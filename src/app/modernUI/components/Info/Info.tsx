@@ -1,6 +1,7 @@
 import { Box, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
 
-export const Info = ({ label, value, border = true, ...rest }) => {
+export const Info = ({ label, value, border = true, isLoading, ...rest }) => {
   return (
     <>
       <Box
@@ -9,10 +10,18 @@ export const Info = ({ label, value, border = true, ...rest }) => {
         pad="small"
         style={border ? { borderBottom: '1px solid #EDEDED' } : {}}
       >
-        <Text size="medium" color="soul">
-          {label}
-        </Text>
-        <Text size="medium">{value ? value : rest.children}</Text>
+        {isLoading ? (
+          <Box fill>
+            <Skeleton height="14px" />
+          </Box>
+        ) : (
+          <>
+            <Text size="14px" color="soul">
+              {label}
+            </Text>
+            <Text size="14px">{value ? value : rest.children}</Text>
+          </>
+        )}
       </Box>
     </>
   );

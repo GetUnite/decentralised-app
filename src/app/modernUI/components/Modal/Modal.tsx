@@ -48,7 +48,7 @@ export const Modal = ({
         gap="small"
         direction="column"
         background="modal"
-        pad={{ vertical: 'medium', horizontal: 'medium' }}
+        pad={walletAccountAtom ? { top: 'medium', horizontal: 'medium' } : { vertical: 'medium', horizontal: 'medium' }}
         style={isLightMode ? {border: "1px solid #EBEBEB"} : {}}
       >
         <Box fill flex="grow" height="100vh">
