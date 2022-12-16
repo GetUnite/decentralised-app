@@ -248,7 +248,7 @@ export const Stake = ({ ...rest }) => {
                     )}
                   </Box>
                 )}
-                {isLoading || isLoadingRewards ? (
+                {isLoading || isLoadingPendingRewards ? (
                   <Skeleton height="8px" />
                 ) : (
                   <Text size="8px" weight={400}>
