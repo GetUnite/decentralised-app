@@ -169,31 +169,6 @@ export const AutoInvest = () => {
                                       />
                                     );
                                   })}
-                                  {streams.map((stream, index) => {
-                                    return (
-                                      <StreamCard
-                                        key={index}
-                                        from={stream.from}
-                                        fromAddress={stream.fromAddress}
-                                        to={stream.to}
-                                        toAddress={stream.toAddress}
-                                        tvs={stream.tvs}
-                                        flowPerMonth={stream.flowPerMonth}
-                                        startDate={stream.startDate}
-                                        endDate={stream.endDate}
-                                        fundedUntilDate={
-                                          fundedUntilByStreamOptions.find(
-                                            fundedUntilByStreamOption =>
-                                              fundedUntilByStreamOption.from ==
-                                              stream.from,
-                                          ).fundedUntilDate
-                                        }
-                                        sign={stream.sign}
-                                        handleStopStream={handleStopStream}
-                                        isStoppingStream={isStoppingStream}
-                                      />
-                                    );
-                                  })}
                               </>
                             )}
                           </Box>
