@@ -742,7 +742,10 @@ export const useAutoInvestTab = () => {
 
   return {
     // loading control
-    isLoading: isUpdating || isStartingStream || isApproving || isDepositing,
+    isLoading: isUpdating,
+    isStartingStream ,
+    isApproving ,
+    isDepositing,
     isFetchingFarmInfo,
     isUpdatingSelectedStreamOption,
     // error control

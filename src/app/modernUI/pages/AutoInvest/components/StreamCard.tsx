@@ -1,6 +1,6 @@
 import { useMode } from 'app/common/state';
 import { TokenIcon } from 'app/modernUI/components';
-import { Box, Card, Grid, ResponsiveContext } from 'grommet';
+import { Box, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
@@ -36,21 +36,27 @@ export const StreamCard = ({
 }: IStreamCard) => {
   const { isLightMode } = useMode();
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
+
+  const [isHover, setIsHover] = useState<boolean>(false);
+
+  const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
     <ResponsiveContext.Consumer>
       {size => (
         <>
-          <Card
+          <Box
             pad={{ horizontal: 'medium', vertical: 'none' }}
             margin={{ top: 'small' }}
             height="120px"
             style={{ borderTop: `0.5px solid ${dividerColor}` }}
-            background="card"
+            background={isHover ? hoverColor : ''}
             align="center"
             justify="center"
             fill="horizontal"
+            onMouseEnter={() => setIsHover(true)}
+            onMouseLeave={() => setIsHover(false)}
           >
             <Grid
               fill="horizontal"
@@ -96,7 +102,7 @@ export const StreamCard = ({
                 </Box>
               </>
             </Grid>
-          </Card>
+          </Box>
         </>
       )}
     </ResponsiveContext.Consumer>

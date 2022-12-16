@@ -11,4 +11,5 @@ export * from './Selector';
 export * from './Spinner';
 export * from './Tabs';
 export * from './Toggles';
+export * from './Tooltips';
 

@@ -1,7 +1,9 @@
 import { EChain } from 'app/common/constants/chains';
-import { SortIcon } from 'app/modernUI/components';
+import { useMode } from 'app/common/state';
+import { SortIcon, Tooltip } from 'app/modernUI/components';
 import { colors, isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, Heading, Text } from 'grommet';
+import { DocumentText } from 'grommet-icons';
 import { FarmCard } from './FarmCard';
 
 export const FarmsBlock = ({
@@ -16,7 +18,10 @@ export const FarmsBlock = ({
   readMoreDescription = null,
   readMoreStatus = false,
   onReadMore = null,
+  factsheetLink,
 }) => {
+  const { isLightMode } = useMode();
+
   return (
     <Box
       gap="20px"
@@ -50,6 +55,21 @@ export const FarmsBlock = ({
             </Button>
           )}
         </Text>
+        {readMoreStatus && (
+          <Box direction="row" gap="4px" align='center' margin={{top: '10px'}}>
+            <DocumentText size='16px'/>
+            <a
+              target="_blank"
+              href={factsheetLink}
+              style={{
+                color: isLightMode ? 'black' : 'white',
+                fontSize: '16px',
+              }}
+            >
+              View {heading.toLowerCase()} farms fact sheet
+            </a>
+          </Box>
+        )}
       </Box>
       <Box>
         {!isSmall(size) && (
@@ -88,7 +108,9 @@ export const FarmsBlock = ({
                   <span>network</span>
                   <span>TVL</span>
                   <Box gap="4px" direction="row">
-                    <span>APY</span>
+                    <Tooltip text="Annual percentage yield is the real rate of return earned on your deposit, taking into account the effect of compounding">
+                      <span>APY</span>
+                    </Tooltip>
                     <SortIcon
                       onClick={() => sortBy('apy', !sortDirectionIsAsc)}
                       isAsc={sortDirectionIsAsc}

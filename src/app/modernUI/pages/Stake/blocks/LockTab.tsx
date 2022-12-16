@@ -7,6 +7,7 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
 
 export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
   const {
@@ -28,7 +29,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
         }}
         justify="center"
       >
-        {isLoading || isApproving || isLocking ? (
+        {isApproving || isLocking ? (
           <Box
             align="center"
             justify="center"
@@ -40,9 +41,13 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              <Text textAlign="center" weight="bold">
-                You have {toExactFixed(alluoInfo.locked, 2)} $ALLUO staked
-              </Text>
+              {isLoading ? (
+                <Skeleton />
+              ) : (
+                <Text textAlign="center" weight="bold">
+                  You have {toExactFixed(alluoInfo?.locked, 2)} $ALLUO staked
+                </Text>
+              )}
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
                   label="Lock"
@@ -52,14 +57,31 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
                   maxButton={true}
                   maxValue={alluoInfo?.balance}
                   error={lockValueError}
+                  disabled={isLoading}
                 />
               </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
-              <Info label="Unstaked $ALLUO balance" value={toExactFixed(alluoInfo.balance, 2)} />
-              <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
-              <Info label="$ALLUO earned" value={alluoInfo.earned} />
-              <Info label="Total $ALLUO staked" value={alluoInfo.totalLocked} />
+              <Info
+                label="Unstaked $ALLUO balance"
+                value={toExactFixed(alluoInfo?.balance, 2)}
+                isLoading={isLoading}
+              />
+              <Info
+                label="$ALLUO APR"
+                value={alluoInfo?.apr + '%'}
+                isLoading={isLoading}
+              />
+              <Info
+                label="$ALLUO earned"
+                value={alluoInfo?.earned}
+                isLoading={isLoading}
+              />
+              <Info
+                label="Total $ALLUO staked"
+                value={alluoInfo?.totalLocked}
+                isLoading={isLoading}
+              />
             </Box>
           </>
         )}
