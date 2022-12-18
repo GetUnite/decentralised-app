@@ -13,7 +13,7 @@ import {
   getUnlockedAlluo,
   withdrawAlluo
 } from 'app/common/functions/stake';
-import { roundNumberDown, toExactFixed } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { getValueOf1LPinUSDC } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import moment from 'moment';
@@ -53,7 +53,7 @@ export const useStake = () => {
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
   //rewards control
-  const [rewardsInfo, setRewardsInfo] = useState<any>(false);
+  const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
@@ -102,8 +102,8 @@ export const useStake = () => {
         balance: await getAlluoBalance(),
         allowance: await getAlluoStakingAllowance(),
         apr: (await getAlluoStakingAPR()).toLocaleString(),
-        totalLocked: roundNumberDown(await getTotalAlluoLocked(), 2),
-        earned: roundNumberDown(await getEarnedAlluo(), 2),
+        totalLocked: toExactFixed(await getTotalAlluoLocked(), 2),
+        earned: toExactFixed(await getEarnedAlluo(), 2),
         unlocked: await getUnlockedAlluo(),
       };
       const alluoStakingWalletAddressInfo =
@@ -156,7 +156,7 @@ export const useStake = () => {
       const updatedRewards = {
         ...defaultRewards,
         value: toExactFixed(alluoInfo.cvxRewards, 8),
-        stableValue: CVXETHInUSDC * +alluoInfo.cvxRewards,
+        stableValue: toExactFixed(CVXETHInUSDC * +alluoInfo.cvxRewards, 4),
       };
       setRewardsInfo(updatedRewards);
       setIsLoadingRewards(false);

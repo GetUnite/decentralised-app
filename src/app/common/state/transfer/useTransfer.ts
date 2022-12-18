@@ -24,7 +24,7 @@ export const useTransfer = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false); //useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
 
   // ibAlluos
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);
@@ -180,7 +180,7 @@ export const useTransfer = () => {
       await fetchIbAlluosInfo();
       setTransferValue('');
       setNotification(
-        'Transfer completed successfully',
+        'Transfer successful',
         'success',
         tx.transactionHash,
         EChain.POLYGON,

@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { useUnlock } from 'app/common/state/stake';
 import {
   Info,
@@ -7,6 +7,7 @@ import {
   SubmitButton
 } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
 import { ReunlockConfirmation } from './ReunlockConfirmation';
 
 export const UnlockTab = ({
@@ -36,7 +37,7 @@ export const UnlockTab = ({
         }}
         justify="center"
       >
-        {isLoading || isUnlocking ? (
+        {isUnlocking ? (
           <Box
             align="center"
             justify="center"
@@ -55,10 +56,14 @@ export const UnlockTab = ({
             ) : (
               <>
                 <Box margin={{ top: 'large' }}>
-                  <Text textAlign="center" margin="auto" weight="bold">
-                    You have {roundNumberDown(alluoInfo.locked, 2)} $ALLUO
-                    staked
-                  </Text>
+                  {isLoading ? (
+                    <Skeleton />
+                  ) : (
+                    <Text textAlign="center" weight="bold">
+                      You have {toExactFixed(alluoInfo?.locked, 2)} $ALLUO
+                      staked
+                    </Text>
+                  )}
 
                   <Box margin={{ top: 'medium' }}>
                     <RangeInput
@@ -73,16 +78,27 @@ export const UnlockTab = ({
                     <Info
                       label="$ALLUO being unlocked"
                       value={projectedUnlockValue}
+                      isLoading={isLoading}
                     />
-                    <Info label="$ALLUO APR" value={alluoInfo.apr + '%'} />
-                    <Info label="$ALLUO earned" value={alluoInfo.earned} />
+                    <Info
+                      label="$ALLUO APR"
+                      value={alluoInfo?.apr + '%'}
+                      isLoading={isLoading}
+                    />
+                    <Info
+                      label="$ALLUO earned"
+                      value={alluoInfo?.earned}
+                      isLoading={isLoading}
+                    />
                     <Info
                       label="$ALLUO unlocked"
-                      value={roundNumberDown(alluoInfo.unlocked, 2)}
+                      value={toExactFixed(alluoInfo?.unlocked, 2)}
+                      isLoading={isLoading}
                     />
                     <Info
                       label="Total $ALLUO staked"
-                      value={alluoInfo.totalLocked}
+                      value={alluoInfo?.totalLocked}
+                      isLoading={isLoading}
                     />
                   </Box>
                 </Box>
@@ -96,9 +112,11 @@ export const UnlockTab = ({
         <Box margin={{ top: 'large' }} style={{ height: 52 }}>
           <SubmitButton
             primary
-            disabled={(+unlockValue === 0) || isUnlocking}
+            disabled={+unlockValue === 0 || isUnlocking}
             label="Unlock"
-            onClick={!allTimersAreFinished ? startReunlockConfirmation : handleUnlock}
+            onClick={
+              !allTimersAreFinished ? startReunlockConfirmation : handleUnlock
+            }
           />
         </Box>
       )}

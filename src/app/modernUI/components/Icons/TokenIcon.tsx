@@ -2,7 +2,7 @@ import ageur from 'app/modernUI/images/ageur.svg';
 import crv from 'app/modernUI/images/crv.svg';
 import cvx from 'app/modernUI/images/cvx.svg';
 import dai from 'app/modernUI/images/dai.svg';
-import eurs from 'app/modernUI/images/eurs.svg';
+import eurs from 'app/modernUI/images/eurs.png';
 import eurt from 'app/modernUI/images/eurt.svg';
 import frax from 'app/modernUI/images/frax.svg';
 import iballuobtc from 'app/modernUI/images/iballuobtc.svg';

@@ -73,6 +73,7 @@ export const theme = deepMerge(grommet, {
       brand: { light: colors.BLUE, dark: 'white' },
       buttonMax: { light: colors.LIGHT_GREY, dark: '#151922' },
       modal: { light: '#FFFFFF', dark: '#1D1D1D' },
+      tooltip: { light: '#FFFFFF', dark: '#2d2d2d' },
       // whiteBlack:
       text: { light: colors.BLACK, dark: colors.WHITE },
       softText: '#CCCCCC',
@@ -350,10 +351,18 @@ export const theme = deepMerge(grommet, {
     icons: { color: { dark: colors.WHITE, light: colors.BLACK } },
     group: { container: { pad: { horizontal: 'medium' } } },
   },
-  checkBoxGroup:{
-    background: "red"
-  },
   checkBox: {
     border: { color: { dark: '#FFFFFF', light: '#CCCCCC' } },
+    size: '18px',
+    extend: () => `
+      font-size: 14px;
+      `,
+  },
+  tip: {
+    content: {
+      elevation: 'none',
+      margin: '10px',
+      pad: '0px',
+    },
   },
 });

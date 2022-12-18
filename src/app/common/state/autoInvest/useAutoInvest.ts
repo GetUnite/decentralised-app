@@ -5,7 +5,7 @@ import {
   getStreamFlow,
   stopStream
 } from 'app/common/functions/autoInvest';
-import { toExactFixed } from 'app/common/functions/utils';
+import { fromLocaleString, toExactFixed } from 'app/common/functions/utils';
 import { getBalance, getBalanceOf } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
@@ -179,7 +179,7 @@ export const useAutoInvest = () => {
       const interval = setInterval(() => {
         const streamsArray = [];
         for (const streamOption of streams) {
-          const tvs = +streamOption.tvs;
+          const tvs = fromLocaleString(streamOption.tvs);
           const fps = +streamOption.flowPerSecond * 3;
           streamsArray.push({
             ...streamOption,
@@ -237,14 +237,9 @@ export const useAutoInvest = () => {
           EChain.POLYGON,
         );
         const flowPerSecond = +streamFlow.flowPerSecond;
-        const flowPerMonth = toExactFixed(
-          (flowPerSecond * 60 * 60 * 24 * 365) / 12,
-          2,
-        );
-        const tvs = toExactFixed(
-          (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond,
-          6,
-        );
+        const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
+        const tvs = (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond;
+
         const endDateTimestamp = await getStreamEndDate(
           element.fromIbAlluoAddress,
           element.ricochetMarketAddress,
@@ -258,10 +253,10 @@ export const useAutoInvest = () => {
           to: element.toLabel,
           toAddress: element.ricochetMarketAddress,
           flowPerSecond: flowPerSecond,
-          flowPerMonth: toExactFixed(flowPerMonth, 6).toLocaleString(),
+          flowPerMonth: toExactFixed(flowPerMonth, 6),
           startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
           endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
-          tvs: tvs.toLocaleString(),
+          tvs: toExactFixed(tvs, 6),
           sign: element.fromSign,
         });
 
@@ -317,7 +312,12 @@ export const useAutoInvest = () => {
           toAddress,
           false, // use biconomy here
         );
-        setNotification('Steam was stopped successfully', 'success', tx.transactionHash, EChain.POLYGON);
+        setNotification(
+          'Steam was stopped successfully',
+          'success',
+          tx.transactionHash,
+          EChain.POLYGON,
+        );
         // remove stream from the list
         await updateAutoInvestInfo();
       } catch (err) {

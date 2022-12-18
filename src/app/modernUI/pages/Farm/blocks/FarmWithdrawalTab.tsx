@@ -45,10 +45,7 @@ export const FarmWithdrawalTab = ({
         justify="center"
       >
         <>
-          {isLoading ||
-          !selectedSupportedToken ||
-          isWithdrawing ||
-          isWithdrawalRequestsLoading ? (
+          {isWithdrawing || isWithdrawalRequestsLoading ? (
             <Box
               align="center"
               justify="center"
@@ -60,10 +57,14 @@ export const FarmWithdrawalTab = ({
           ) : (
             <>
               <Box margin={{ top: 'large' }}>
-                <TopHeader selectedFarm={selectedFarm} />
+                <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
                 <Box margin={{ top: 'medium' }}>
                   <NumericInput
-                    label={'Withdraw ' + selectedSupportedToken.label}
+                    label={`Withdraw ${
+                      selectedSupportedToken
+                        ? selectedSupportedToken?.label
+                        : ''
+                    }`}
                     available={selectedFarm.depositedAmount}
                     tokenSign={selectedFarm.sign}
                     onValueChange={handleWithdrawalFieldChange}
@@ -74,6 +75,7 @@ export const FarmWithdrawalTab = ({
                     selectedToken={selectedSupportedToken}
                     setSelectedToken={selectSupportedToken}
                     error={withdrawValueError}
+                    disabled={isLoading}
                   />
                 </Box>
               </Box>
@@ -84,14 +86,23 @@ export const FarmWithdrawalTab = ({
                   inputValue={-1 * +withdrawValue}
                   interest={selectedFarm.interest}
                   sign={selectedFarm.sign}
+                  isLoading={isLoading}
                 />
-                <Info label="APY" value={toExactFixed(selectedFarm.interest,2).toLocaleString() + '%'} />
+                <Info
+                  label="APY"
+                  value={
+                    toExactFixed(selectedFarm.interest, 2).toLocaleString() +
+                    '%'
+                  }
+                  isLoading={isLoading}
+                />
                 <Info
                   label="Pool liquidity"
                   value={
                     selectedFarm.sign +
                     (+selectedFarm.totalAssetSupply).toLocaleString()
                   }
+                  isLoading={isLoading}
                 />
                 <FeeInfo
                   biconomyToggle={selectedFarm.chain == EChain.POLYGON}
@@ -100,6 +111,7 @@ export const FarmWithdrawalTab = ({
                   showWalletFee={
                     !useBiconomy || selectedFarm.chain != EChain.POLYGON
                   }
+                  isLoading={isLoading}
                 />
               </Box>
             </>

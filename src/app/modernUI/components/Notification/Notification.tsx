@@ -1,6 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import { useMode, useNotification } from 'app/common/state';
 import { notification } from 'app/common/state/atoms';
+import { colors } from 'app/modernUI/theme';
 import { Box, Button, Text } from 'grommet';
 import { FormClose } from 'grommet-icons';
 import { useRecoilState } from 'recoil';
@@ -10,7 +11,7 @@ export const Notification = ({ ...rest }) => {
   const [notificationAtom] = useRecoilState(notification);
   const { resetNotification } = useNotification();
 
-  const colors = { success: 'success', error: 'error', info: 'info' };
+  const textColors = { success: colors.GREEN, error: colors.ERROR, info: colors.BLUE };
   const bgColors = isLightMode ? {
     success: 'successSoft',
     error: 'errorSoft',
@@ -21,7 +22,7 @@ export const Notification = ({ ...rest }) => {
     info: 'darkInfoSoft',
   };
   const backgroundColor = bgColors[notificationAtom.type];
-  const color = colors[notificationAtom.type];
+  const color = textColors[notificationAtom.type];
 
   return (
     <Box
@@ -31,6 +32,7 @@ export const Notification = ({ ...rest }) => {
       justify="center"
       align="center"
       direction="row"
+      animation="fadeIn"
       {...rest}
     >
       <Text textAlign="center" color={color}>

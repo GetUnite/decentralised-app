@@ -15,6 +15,9 @@ export const AutoInvestTab = ({ ...rest }) => {
   const {
     //loading
     isLoading,
+    isStartingStream,
+    isApproving,
+    isDepositing,
     isFetchingFarmInfo,
     isUpdatingSelectedStreamOption,
     // errors
@@ -40,13 +43,13 @@ export const AutoInvestTab = ({ ...rest }) => {
     endDateError,
     currentStep,
     selectedStreamOptionSteps,
-    handleCurrentStep
+    handleCurrentStep,
   } = useAutoInvestTab();
 
   return (
     <Box fill>
       <Box style={{ minHeight: '410px' }} justify="center">
-        {isLoading ? (
+        {isStartingStream || isApproving || isDepositing ? (
           <Box
             align="center"
             justify="center"
@@ -71,26 +74,28 @@ export const AutoInvestTab = ({ ...rest }) => {
                 selectedToToken={selectedSupportedToToken}
                 setSelectedToToken={selectSupportedToToken}
                 error={streamValueError}
-                disabled={disableInputs}
+                disabled={disableInputs || isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
               />
               <RightAlignToggle
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
-                disabled={disableInputs}
+                disabled={disableInputs || isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
               />
-              {useEndDate && (<>
-                <DateInput
-                  label="End date"
-                  date={endDate}
-                  setDate={setEndDate}
-                  disabled={disableInputs}
-                />
-                {endDateError && (
-                  <Text color="error" size="small" margin={{ top: 'small' }}>
-                    {endDateError}
-                  </Text>
-                )}</>
+              {useEndDate && (
+                <>
+                  <DateInput
+                    label="End date"
+                    date={endDate}
+                    setDate={setEndDate}
+                    disabled={disableInputs}
+                  />
+                  {endDateError && (
+                    <Text color="error" size="small" margin={{ top: 'small' }}>
+                      {endDateError}
+                    </Text>
+                  )}
+                </>
               )}
             </Box>
             <Box
@@ -98,34 +103,32 @@ export const AutoInvestTab = ({ ...rest }) => {
               style={{ minHeight: '224px' }}
               justify="center"
             >
-              {isFetchingFarmInfo || isUpdatingSelectedStreamOption ? (
-                <Box align="center" justify="center" fill="vertical">
-                  <Spinner pad="large" />
-                </Box>
-              ) : (
-                <>
-                  <ProjectedWeeklyInfo
-                    depositedAmount={targetFarmInfo.depositedAmount}
-                    inputValue={streamValueError}
-                    interest={targetFarmInfo.interest}
-                    sign={targetFarmInfo.sign}
-                  />
-                  <Info label="APY" value={targetFarmInfo.interest + '%'} />
-                  <Info
-                    label="Pool liquidity"
-                    value={
-                      targetFarmInfo.sign +
-                      (+targetFarmInfo.totalAssetSupply).toLocaleString()
-                    }
-                  />
-                  <FeeInfo
-                    useBiconomy={useBiconomy}
-                    setUseBiconomy={setUseBiconomy}
-                    disableBiconomy={true}
-                    showWalletFee={!useBiconomy}
-                  />
-                </>
-              )}
+              <ProjectedWeeklyInfo
+                depositedAmount={targetFarmInfo?.depositedAmount}
+                inputValue={streamValueError}
+                interest={targetFarmInfo?.interest}
+                sign={targetFarmInfo?.sign}
+                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+              />
+              <Info
+                label="APY"
+                value={targetFarmInfo?.interest + '%'}
+                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+              />
+              <Info
+                label="Pool liquidity"
+                value={
+                  targetFarmInfo?.sign +
+                  (+targetFarmInfo?.totalAssetSupply).toLocaleString()
+                }
+                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+              />
+              <FeeInfo
+                useBiconomy={useBiconomy}
+                setUseBiconomy={setUseBiconomy}
+                disableBiconomy={true}
+                showWalletFee={!useBiconomy}
+              />
             </Box>
           </Box>
         )}
@@ -142,9 +145,9 @@ export const AutoInvestTab = ({ ...rest }) => {
           label={
             isLoading || isUpdatingSelectedStreamOption
               ? 'Loading...'
-              : `Step ${currentStep + 1} of ${selectedStreamOptionSteps?.length}: ${
-                selectedStreamOptionSteps[currentStep]?.label
-                }`
+              : `Step ${currentStep + 1} of ${
+                  selectedStreamOptionSteps?.length
+                }: ${selectedStreamOptionSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
           glowing={currentStep > 0}

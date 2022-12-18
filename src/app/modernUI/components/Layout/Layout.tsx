@@ -56,7 +56,8 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="center"
             fill="horizontal"
-            style={{ position: 'sticky', top: '0px', zIndex: 1 }}
+            height={notificationAtom.message != '' ? "148px" : "100px"}
+            style={{ position: 'sticky', top: '0px', zIndex: 2 }}
           >
             <Nav
               background="bg"
@@ -65,9 +66,10 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               direction="row"
               pad={{ horizontal: 'medium', vertical: 'small' }}
               gap="none"
-              fill
+              fill="horizontal"
+              height="100px"
             >
-              <Box direction="row" align="end" style={{ flex: 1 }}>
+              <Box direction="row" align="center" style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                   <Link to={modernUiPaths.MAIN}>
                     <Image
@@ -157,6 +159,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     </Text>
                     <a
                       href="https://alluo.com/about"
+                      target="_blank"
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -176,13 +179,8 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     >
                       Blog
                     </a>
-                  </Box>
-                  <Box>
-                    <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
-                      Support
-                    </Text>
                     <a
-                      href="https://docs.alluo.com"
+                      href="https://docs.alluo.com/"
                       target="_blank"
                       style={{
                         color: isLightMode ? 'black' : 'white',
@@ -190,7 +188,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                         fontSize: '14px',
                       }}
                     >
-                      Developer docs
+                      Understanding Alluo
                     </a>
                   </Box>
                   <Box>
@@ -240,6 +238,22 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       }}
                     >
                       Telegram
+                    </a>
+                  </Box>
+                  <Box>
+                    <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
+                      Support
+                    </Text>
+                    <a
+                      href="https://docs.alluo.com"
+                      target="_blank"
+                      style={{
+                        color: isLightMode ? 'black' : 'white',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                      }}
+                    >
+                      Developer docs
                     </a>
                   </Box>
                 </Box>
