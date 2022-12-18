@@ -20,6 +20,7 @@ export const TransferTab = ({ ...rest }) => {
     handleTransfer,
     ibAlluosInfo,
     recipientAddress,
+    recipientAddressValue,
     handleRecipientAddressChange,
     useBiconomy,
     setUseBiconomy,
@@ -41,7 +42,7 @@ export const TransferTab = ({ ...rest }) => {
         ) : (
           <Box margin={{ top: 'large' }}>
             <TopHeader ibAlluosInfo={ibAlluosInfo} />
-            <Box margin={{ top: 'medium' }}>
+            <Box className="font-13" margin={{ top: 'medium' }}>
               <NumericInput
                 label="Transfer"
                 tokenSign={selectedIbAlluoInfo?.sign}
@@ -57,14 +58,14 @@ export const TransferTab = ({ ...rest }) => {
             </Box>
             <Box margin={{ top: 'medium' }}>
               <Box direction="row" justify="between">
-                <Text size="medium" color="soul">
-                  Recipient
+              <Text className="font-13" size="medium" color="soul">
+                   {recipientAddressValue === '' ? 'Recipient' : `Recipient: ${recipientAddressValue}`}
                 </Text>
               </Box>
               <TextInput
                 value={recipientAddress}
                 onChange={handleRecipientAddressChange}
-                placeholder="Address"
+                placeholder="Address or domain"
               />
               <Text color="error" size="small" margin={{ top: 'small' }}>
                 {recipientAddressError}
