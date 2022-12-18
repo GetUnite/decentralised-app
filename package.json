@@ -13,6 +13,8 @@
     "@biconomy/mexa": "2.0.35",
     "@ramp-network/ramp-instant-sdk": "^3.0.0",
     "@superfluid-finance/sdk-core": "^0.5.6",
+    "@unstoppabledomains/resolution": "^8.3.3",
+    "@unstoppabledomains/tldsresolverkeys": "^2.0.4",
     "@walletconnect/ethereum-provider": "^1.5.2",
     "@web3-onboard/coinbase": "^2.1.2",
     "@web3-onboard/core": "^2.11.0",

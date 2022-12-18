@@ -3391,7 +3391,7 @@
     global "^4.4.0"
     jose "^4.5.0"
 
-"@unstoppabledomains/resolution@^8.0":
+"@unstoppabledomains/resolution@^8.0", "@unstoppabledomains/resolution@^8.3.3":
   version "8.3.3"
   resolved "https://registry.yarnpkg.com/@unstoppabledomains/resolution/-/resolution-8.3.3.tgz#599c5e2f068a36e24bd19c0f9e2f753036264a3b"
   integrity sha512-jQ9757Lvx/xqU7Lg7JT4L9WQZuElHkMiJmtph0e6TSwfguIlkv1i5UgzURgVXDvVizVKpDejGS60kuvICkz9ZQ==
@@ -3401,6 +3401,11 @@
     cross-fetch "^3.1.4"
     crypto-js "^4.1.1"
     elliptic "^6.5.4"
+
+"@unstoppabledomains/tldsresolverkeys@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@unstoppabledomains/tldsresolverkeys/-/tldsresolverkeys-2.0.4.tgz#976816952eb00db605719c17e5fec40920cacf06"
+  integrity sha512-AAkdM9RV5tN0M9HPBmORsYcKiuuG+5XlOd2XhgPBXHkprHYCxVt6fcJMO2JsCDU0lGLzKdob0LHHLuX8zJu9lg==
 
 "@walletconnect/browser-utils@^1.7.7":
   version "1.7.7"
