@@ -5,6 +5,7 @@ export const ProjectedWeeklyInfo = ({
   inputValue,
   interest,
   sign,
+  isLoading,
   ...rest
 }) => {
   const balanceAndNewValue =
@@ -20,6 +21,7 @@ export const ProjectedWeeklyInfo = ({
           (Math.pow(1.0 + interest / 100.0, 1.0 / 52.0) - 1.0)
         ).toFixed(2)).toLocaleString()
       }
+      isLoading={isLoading}
     />
   );
 };

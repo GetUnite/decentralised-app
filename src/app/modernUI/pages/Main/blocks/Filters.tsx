@@ -27,11 +27,11 @@ export const Filters = ({
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
-    <Box direction="row">
+    <Box direction="row" margin={{ bottom: '13px' }}>
       <Box
         direction="row"
         justify="start"
-        gap="20px"
+        gap="13px"
         style={{ fontSize: '16px' }}
       >
         <Filter
@@ -90,14 +90,26 @@ export const Filters = ({
                 ? { borderBottom: `2px solid ${dividerColor}` }
                 : {}
             }
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           {walletAccountAtom && (
             <>
               <Text size="14px" margin={{ bottom: '12px' }}>
                 Your active farms
               </Text>
               <RadioButtonGroup
-                name="teste"
+                name="viewType"
                 pad={{ bottom: '28px' }}
                 options={possibleViewTypes}
                 value={viewType}
@@ -107,7 +119,19 @@ export const Filters = ({
                 style={{
                   borderBottom: `2px solid ${dividerColor}`,
                 }}
-              />
+              >
+                {(option, { checked }) => (
+                  <Box direction="row" gap="12px" align="center">
+                    <input
+                      type="radio"
+                      checked={checked}
+                      onChange={e => e.target.parentElement.click()}
+                      style={{ margin: '3px' }}
+                    />
+                    <Text size="14px">{option}</Text>
+                  </Box>
+                )}
+              </RadioButtonGroup>
             </>
           )}
           <Box
@@ -154,7 +178,19 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Text size="14px" margin={{ bottom: '12px' }}>
             Other tokens
           </Text>
@@ -168,7 +204,19 @@ export const Filters = ({
             style={{
               borderBottom: `2px solid ${dividerColor}`,
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Box
             direction="row"
             justify="between"
@@ -206,7 +254,19 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
         <Filter
           heading="Farms"
@@ -253,21 +313,45 @@ export const Filters = ({
             onChange={event => {
               setTypeFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           {walletAccountAtom && (
             <>
               <Text size="14px" margin={{ bottom: '12px' }}>
                 Your active farms
               </Text>
               <RadioButtonGroup
-                name="teste"
+                name="viewType"
                 pad={{ bottom: '28px' }}
                 options={possibleViewTypes}
                 value={viewType}
                 onChange={event => {
                   setViewType(event.target.value);
                 }}
-              />
+              >
+                {(option, { checked }) => (
+                  <Box direction="row" gap="12px" align="center">
+                    <input
+                      type="radio"
+                      checked={checked}
+                      onChange={e => e.target.parentElement.click()}
+                      style={{ margin: '3px' }}
+                    />
+                    <Text size="14px">{option}</Text>
+                  </Box>
+                )}
+              </RadioButtonGroup>
             </>
           )}
         </Filter>
@@ -321,7 +405,19 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
           <Text size="14px" margin={{ bottom: '12px' }}>
             Other tokens
           </Text>
@@ -332,7 +428,19 @@ export const Filters = ({
             onChange={event => {
               setTokenFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
         <Filter
           heading="Networks"
@@ -377,7 +485,19 @@ export const Filters = ({
             onChange={event => {
               setNetworkFilter(event.value);
             }}
-          />
+          >
+            {(option, { checked }) => {
+              return (
+                <Box>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={e => e.target.parentElement.click()}
+                  />
+                </Box>
+              );
+            }}
+          </CheckBoxGroup>
         </Filter>
       </Box>
     </Box>

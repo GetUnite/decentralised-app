@@ -1,42 +1,67 @@
 import { modernUiPaths, useCurrentPath } from 'app/common/hooks';
+import { colors } from 'app/modernUI/theme';
 import { Anchor, Box } from 'grommet';
 
 export const MenuItem = ({ ...rest }) => {
-  const {navigate, isStakePage, isBuyPage, isTransferPage, isAutoInvestPage } =
-    useCurrentPath();
+  const {
+    navigate,
+    isFarmPage,
+    isStakePage,
+    isBuyPage,
+    isTransferPage,
+    isAutoInvestPage,
+  } = useCurrentPath();
+
+  const selectedStyle = {
+    textDecorationLine: 'underline',
+    textDecorationColor: colors.BLUE,
+    textDecorationThickness: '1px',
+    textUnderlineOffset: '6px',
+  };
 
   return (
     <Box {...rest}>
       <Anchor
-        weight="normal"
         label="farm"
         size="medium"
+        weight={isFarmPage ? 700 : 'normal'}
+        style={isFarmPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.MAIN)}
       />
-      {<Anchor
+      <Anchor
         label="autoInvest"
         size="medium"
-        weight={isAutoInvestPage ? 'bold' : 'normal'}
+        weight={isAutoInvestPage ? 700 : 'normal'}
+        style={isAutoInvestPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.AUTOINVEST)}
-  />}
+      />
       <Anchor
         label="transfer"
         size="medium"
-        weight={isTransferPage ? 'bold' : 'normal'}
+        weight={isTransferPage ? 700 : 'normal'}
+        style={isTransferPage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.TRANSFER)}
       />
       <Anchor
         label="stake"
         size="medium"
-        weight={isStakePage ? 'bold' : 'normal'}
+        weight={isStakePage ? 700 : 'normal'}
+        style={isStakePage ? selectedStyle : {}}
         onClick={() => navigate(modernUiPaths.STAKE)}
       />
       <Anchor
         label="buy"
         size="medium"
-        weight={isBuyPage ? 'bold' : 'normal'}
-        onClick={() => //navigate(modernUiPaths.BUY)
-        window.open('https://app.uniswap.org/#/swap?theme=dark&inputCurrency=ETH&outputCurrency=0x1E5193ccC53f25638Aa22a940af899B692e10B09', '_blank', 'noopener,noreferrer')}
+        weight={isBuyPage ? 700 : 'normal'}
+        style={isBuyPage ? selectedStyle : {}}
+        onClick={() =>
+          //navigate(modernUiPaths.BUY)
+          window.open(
+            'https://app.uniswap.org/#/swap?theme=dark&inputCurrency=ETH&outputCurrency=0x1E5193ccC53f25638Aa22a940af899B692e10B09',
+            '_blank',
+            'noopener,noreferrer',
+          )
+        }
       />
     </Box>
   );

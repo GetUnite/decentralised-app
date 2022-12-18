@@ -26,9 +26,7 @@ export const HeadingText = ({
       ) : (
         <>
           {hasStreams ? (
-            <span>
-              You have 1 active stream and 1 more stream available.
-            </span>
+            <span>You have 1 active stream and 1 more stream available.</span>
           ) : (
             <>
               {numberOfAssets == 0 ? (
@@ -53,11 +51,19 @@ export const HeadingText = ({
           ? 'Connect your wallet to see your available assets to stream.'
           : headingText}
       </Text>
-      <Paragraph margin={{ top: '35px', bottom: '0px' }} fill>
-        AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC and
-        ETH and BTC to dollar-pegged stablecoins (one way at a time) whilst
-        earning yield on all assets you stream.
-      </Paragraph>
+      <Box margin={{ top: '35px' }}>
+        {isLoading && walletAccountAtom ? (
+          <Box fill>
+            <Skeleton count={2} height="18px" />
+          </Box>
+        ) : (
+          <Paragraph fill>
+            AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC
+            and ETH and BTC to dollar-pegged stablecoins (one way at a time)
+            whilst earning yield on all assets you stream.
+          </Paragraph>
+        )}{' '}
+      </Box>
     </>
   );
 };

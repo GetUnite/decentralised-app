@@ -1,4 +1,4 @@
-import { roundNumberDown } from 'app/common/functions/utils';
+import { toExactFixed } from 'app/common/functions/utils';
 import { TSupportedToken } from 'app/common/types/global';
 import { Box, Select, Text, TextInput, ThemeContext } from 'grommet';
 import { Down } from 'grommet-icons';
@@ -72,13 +72,13 @@ export const StreamInput = ({
             {!!selectedFromToken &&
               'Wallet: ' +
                 tokenSign +
-                roundNumberDown(+(+selectedFromToken?.balance))}
+                toExactFixed(+(+selectedFromToken?.balance), 5)}
           </Text>
         </Box>
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
             value={formattedValue}
-            placeholder={disabled ? value.toLocaleString() : "0.00".toLocaleString()}
+            placeholder={disabled ? value : "0.00".toLocaleString()}
             customInput={TextInput}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}

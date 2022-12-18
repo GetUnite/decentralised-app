@@ -13,10 +13,8 @@ import {
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
 import { farmOptions } from 'app/common/state/farm/useFarm';
-import { useNotification } from 'app/common/state/useNotification';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
@@ -42,12 +40,15 @@ export const useMain = () => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  // other state control files
-  const { resetNotification } = useNotification();
-
   // farms
-  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([]);
-  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>();
+  const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
+    ...boostFarmOptions,
+    ...farmOptions,
+  ]);
+  const [filteredFarms, setFilteredFarms] = useState<TFarm[]>([
+    ...boostFarmOptions,
+    ...farmOptions,
+  ]);
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
   // filters
@@ -57,7 +58,7 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>("View all farms");
+  const [viewType, setViewType] = useState<string>('View all farms');
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -67,20 +68,6 @@ export const useMain = () => {
   // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-
-  // misc
-  const [nextVoteDay, setNextVoteDay] = useState<any>();
-
-  useEffect(() => {
-    resetNotification();
-    const confirmedVoteDay = moment('2022/11/28/');
-
-    let voteDay = confirmedVoteDay.add(2, 'weeks');
-    while (voteDay < moment()) {
-      voteDay.add(2, 'weeks');
-    }
-    setNextVoteDay(voteDay);
-  }, []);
 
   useEffect(() => {
     fetchFarmsInfo();
@@ -174,6 +161,22 @@ export const useMain = () => {
       console.log(error);
     }
     setIsLoading(false);
+    // We can probably get away with calculating total value invested in usd after showing the first screen
+    let totalDepositedAmountInUsd = 0;
+    const farmsWithDepositedAmount = availableFarms.filter(
+      farm => +farm.depositedAmount > 0,
+    );
+    for (let index = 0; index < farmsWithDepositedAmount.length; index++) {
+      const farm = farmsWithDepositedAmount[index];
+
+      if (farm.isBooster) {
+        totalDepositedAmountInUsd =
+          totalDepositedAmountInUsd + +farm.depositedAmount;
+      } else {
+        //const assetValue = await converToAssetValue(farm.farmAddress, farm.depositedAmount, farm.chain);
+        //const valueOfAssetInUSDC = getPrice(farm.underlyingTokenAddress, farm.chain == EChain.ETHEREUM ? EEthereumAddresses.USDC : EPolygonAddresses. USDC)
+      }
+    }
   };
 
   const fetchFarmInfo = async farm => {
@@ -185,10 +188,11 @@ export const useMain = () => {
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = toExactFixed(
-        await getUserDepositedAmount(farm.type, farm.chain),
-        4,
+      farmInfo.depositedAmount = await getUserDepositedAmount(
+        farm.type,
+        farm.chain,
       );
+
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
           ? toExactFixed(
@@ -361,7 +365,6 @@ export const useMain = () => {
     walletAccountAtom,
     sortBy,
     sortDirectionIsAsc,
-    nextVoteDay,
     typeFilter,
     setTypeFilter,
     possibleStableTokens,
@@ -369,6 +372,6 @@ export const useMain = () => {
     possibleNetworks,
     possibleTypes,
     possibleViewTypes,
-    setViewType
+    setViewType,
   };
 };

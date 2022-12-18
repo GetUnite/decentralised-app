@@ -7,14 +7,19 @@ export const useCurrentPath = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isFarmPage =
+    modernUiPaths.MAIN === location.pathname ||
+    location.pathname.includes('farm') ||
+    location.pathname.includes('boostfarm');
   const isStakePage = modernUiPaths.STAKE === location.pathname;
   const isBuyPage = modernUiPaths.BUY === location.pathname;
   const isTransferPage = modernUiPaths.TRANSFER === location.pathname;
-  const isAutoInvestPage = modernUiPaths.AUTOINVEST === location.pathname;
+  const isAutoInvestPage = location.pathname.includes(modernUiPaths.AUTOINVEST);
   const goToMainPage = () => navigate(modernUiPaths.MAIN);
   return {
     path: location.pathname,
     isStakePage,
+    isFarmPage,
     isTransferPage,
     isBuyPage,
     isAutoInvestPage,

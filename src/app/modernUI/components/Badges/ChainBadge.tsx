@@ -16,7 +16,7 @@ export const ChainBadge = ({ chain, ...rest }: IChainBadge) => {
         background="badge"
         height="32px"
         align="center"
-        round="small"
+        round="8px"
         justify="center"
         width="80px"
         pad="small"

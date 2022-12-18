@@ -138,7 +138,7 @@ export const useBoostFarmDeposit = ({
         amount: depositValue,
       });
       setNotification(
-        'Deposit successfully',
+        'Deposit successful',
         'success',
         tx.transactionHash,
         selectedFarm.chain,

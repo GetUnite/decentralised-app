@@ -1,7 +1,8 @@
 import { useTransfer } from 'app/common/state/transfer';
 import {
   FeeInfo,
-  NumericInput, Spinner,
+  NumericInput,
+  Spinner,
   SubmitButton
 } from 'app/modernUI/components';
 import { Box, Text, TextInput } from 'grommet';
@@ -30,7 +31,7 @@ export const TransferTab = ({ ...rest }) => {
   return (
     <Box fill>
       <Box style={{ minHeight: '380px' }} justify="center">
-        {isLoading || isTransferring ? (
+        {isTransferring ? (
           <Box
             align="center"
             justify="center"
@@ -41,8 +42,8 @@ export const TransferTab = ({ ...rest }) => {
           </Box>
         ) : (
           <Box margin={{ top: 'large' }}>
-            <TopHeader ibAlluosInfo={ibAlluosInfo} />
-            <Box className="font-13" margin={{ top: 'medium' }}>
+            <TopHeader ibAlluosInfo={ibAlluosInfo} isLoading={isLoading} />
+            <Box margin={{ top: 'medium' }}>
               <NumericInput
                 label="Transfer"
                 tokenSign={selectedIbAlluoInfo?.sign}
@@ -54,6 +55,7 @@ export const TransferTab = ({ ...rest }) => {
                 selectedToken={selectedIbAlluoInfo}
                 setSelectedToken={setSelectedIbAlluoBySymbol}
                 error={transferValueError}
+                disabled={isLoading}
               />
             </Box>
             <Box margin={{ top: 'medium' }}>
@@ -66,6 +68,7 @@ export const TransferTab = ({ ...rest }) => {
                 value={recipientAddress}
                 onChange={handleRecipientAddressChange}
                 placeholder="Address or domain"
+                disabled={isLoading}
               />
               <Text color="error" size="small" margin={{ top: 'small' }}>
                 {recipientAddressError}
@@ -75,6 +78,8 @@ export const TransferTab = ({ ...rest }) => {
               useBiconomy={useBiconomy}
               setUseBiconomy={setUseBiconomy}
               showWalletFee={!useBiconomy}
+              disableBiconomy={isLoading}
+              isLoading={isLoading}
             />
           </Box>
         )}

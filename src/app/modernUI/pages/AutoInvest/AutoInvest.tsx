@@ -1,5 +1,11 @@
+import { useMode } from 'app/common/state';
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import { Layout, Spinner } from 'app/modernUI/components';
+import {
+  ConnectionButton,
+  Layout,
+  Spinner,
+  Tooltip
+} from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
@@ -19,26 +25,41 @@ export const AutoInvest = () => {
     canStartStreams,
   } = useAutoInvest();
 
+  const { isLightMode } = useMode();
+
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
+
   return (
     <Layout>
       <ResponsiveContext.Consumer>
         {size => (
-          <Box justify="center" fill direction="column">
-            <HeadingText
-              isLoading={isLoading}
-              numberOfAssets={assetsInfo?.numberOfAssets}
-              numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
-              hasStreams={streams.length > 0}
-              canStartStreams={canStartStreams}
-            />
-            <Box margin={{ top: '72px' }}>
-              {walletAccountAtom ? (
+          <Box
+            align="center"
+            justify="start"
+            gap="none"
+            pad="xsmall"
+            margin={{ top: 'small' }}
+            direction="column"
+            fill="horizontal"
+          >
+            <Box justify="center" fill direction="column">
+              <HeadingText
+                isLoading={isLoading}
+                numberOfAssets={assetsInfo?.numberOfAssets}
+                numberOfChainsWithAssets={assetsInfo?.numberOfChainsWithAssets}
+                hasStreams={streams.length > 0}
+                canStartStreams={canStartStreams}
+              />
+              <Box margin={{ top: '72px' }}>
                 <>
-                  {isLoading ? (
+                  {walletAccountAtom && isLoading ? (
                     <Skeleton count={1} height="36px" />
                   ) : (
-                    <Box direction="row" justify="end">
-                      {canStartStreams && (
+                    <Box direction="row" justify="between" align="center">
+                      <Text size="24px" weight={700}>
+                        Active Streams
+                      </Text>
+                      {walletAccountAtom && canStartStreams && (
                         <Link to={'/autoinvest/add'}>
                           <Button
                             label="Start new stream"
@@ -48,7 +69,13 @@ export const AutoInvest = () => {
                       )}
                     </Box>
                   )}
-                  <Box margin={{ top: '36px' }} gap="6px">
+                  <Box
+                    margin={{ top: '36px' }}
+                    pad={{bottom: "20px"}}
+                    background="card"
+                    round="8px"
+                    style={{ boxShadow: '0px -1px 4px #CCCCCC' }}
+                  >
                     {!isSmall(size) && (
                       <Card
                         pad={{ horizontal: 'medium', vertical: 'none' }}
@@ -69,7 +96,11 @@ export const AutoInvest = () => {
                           <>
                             <span>streams from</span>
                             <span>streams to</span>
-                            <span>TVS</span>
+                            <Box direction="row">
+                              <Tooltip text="total value streamed">
+                              <span>TVS</span>
+                              </Tooltip>
+                            </Box>
                             <span>flow rate</span>
                             <span>start</span>
                             <span>end</span>
@@ -78,71 +109,90 @@ export const AutoInvest = () => {
                         </Grid>
                       </Card>
                     )}
-                    {isLoading ? (
-                      <Card
-                        pad={{ horizontal: 'medium', vertical: 'none' }}
-                        height="xsmall"
+                    {isLoading && walletAccountAtom ? (
+                      <Box
+                        pad={{ horizontal: 'medium' }}
                         background="card"
                         margin="none"
                         align="center"
                         justify="center"
                         fill="horizontal"
+                        height="120px"
+                        style={{ borderTop: `0.5px solid ${dividerColor}` }}
                       >
                         <Spinner pad="medium" />
-                      </Card>
+                      </Box>
                     ) : (
-                      <Box>
-                        {streams.length < 1 ? (
-                          <Card
-                            pad={{ horizontal: 'medium', vertical: 'none' }}
-                            height="xsmall"
-                            background="card"
+                      <>
+                        {walletAccountAtom ? (
+                          <Box>
+                            {streams.length < 1 ? (
+                              <Box
+                                pad={{ horizontal: 'medium', vertical: '40px' }}
+                                background="card"
+                                margin="none"
+                                align="center"
+                                justify="center"
+                                fill="horizontal"
+                                height="120px"
+                                style={{
+                                  borderTop: `0.5px solid ${dividerColor}`,
+                                }}
+                              >
+                                <span>You don't have any stream running</span>
+                              </Box>
+                            ) : (
+                              <>
+                                {Array.isArray(streams) &&
+                                  streams.map((stream, index) => {
+                                    return (
+                                      <StreamCard
+                                        key={index}
+                                        from={stream.from}
+                                        fromAddress={stream.fromAddress}
+                                        to={stream.to}
+                                        toAddress={stream.toAddress}
+                                        tvs={stream.tvs}
+                                        flowPerMonth={stream.flowPerMonth}
+                                        startDate={stream.startDate}
+                                        endDate={stream.endDate}
+                                        fundedUntilDate={
+                                          fundedUntilByStreamOptions.find(
+                                            fundedUntilByStreamOption =>
+                                              fundedUntilByStreamOption.from ==
+                                              stream.from,
+                                          ).fundedUntilDate
+                                        }
+                                        sign={stream.sign}
+                                        handleStopStream={handleStopStream}
+                                        isStoppingStream={isStoppingStream}
+                                      />
+                                    );
+                                  })}
+                              </>
+                            )}
+                          </Box>
+                        ) : (
+                          <Box
+                            pad={{ horizontal: 'medium', vertical: '40px' }}
                             margin="none"
                             align="center"
                             justify="center"
+                            gap="24px"
                             fill="horizontal"
+                            style={{ borderTop: `0.5px solid ${dividerColor}` }}
                           >
-                            <span>You don't have any stream running</span>
-                          </Card>
-                        ) : (
-                          <>
-                            {Array.isArray(streams) &&
-                              streams.map((stream, index) => {
-                                return (
-                                  <StreamCard
-                                    key={index}
-                                    from={stream.from}
-                                    fromAddress={stream.fromAddress}
-                                    to={stream.to}
-                                    toAddress={stream.toAddress}
-                                    tvs={stream.tvs}
-                                    flowPerMonth={stream.flowPerMonth}
-                                    startDate={stream.startDate}
-                                    endDate={stream.endDate}
-                                    fundedUntilDate={
-                                      fundedUntilByStreamOptions.find(
-                                        fundedUntilByStreamOption =>
-                                          fundedUntilByStreamOption.from ==
-                                          stream.from,
-                                      ).fundedUntilDate
-                                    }
-                                    sign={stream.sign}
-                                    handleStopStream={handleStopStream}
-                                    isStoppingStream={isStoppingStream}
-                                  />
-                                );
-                              })}
-                          </>
+                            <Text>
+                              Connect your wallet to see active streams
+                            </Text>
+                            <ConnectionButton />
+                          </Box>
                         )}
-                      </Box>
+                      </>
                     )}
                   </Box>
                 </>
-              ) : (
-                <Text size="36px" weight="bold">
-                  Connect your wallet to see active streams
-                </Text>
-              )}
+              </Box>
             </Box>
           </Box>
         )}

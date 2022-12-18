@@ -1,3 +1,4 @@
+import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
@@ -36,11 +37,11 @@ export const useFarmDeposit = ({
     useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const [useBiconomy, setUseBiconomy] = useState(true);
 
   useEffect(() => {
     if (selectedFarm) {
-      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
 
@@ -64,11 +65,6 @@ export const useFarmDeposit = ({
       selectedFarm.farmAddress,
       selectedFarm.chain,
     );
-    console.log({
-      a: selectedSupportedToken.address,
-      b: selectedFarm.farmAddress,
-      c: allowance,
-    });
     const balance = await getBalanceOf(
       selectedSupportedToken.address,
       selectedSupportedToken.decimals,
@@ -143,7 +139,7 @@ export const useFarmDeposit = ({
         amount: depositValue,
       });
       setNotification(
-        'Deposit successfully',
+        'Deposit successful',
         'success',
         tx.transactionHash,
         selectedFarm.chain,

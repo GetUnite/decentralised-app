@@ -12,16 +12,6 @@ export const generateRandomInteger = (min, max) => {
   return Math.floor(min + Math.random() * (max + 1 - min));
 };
 
-export const roundNumberDown = (num, decimals = 5) => {
-  const factorOfTen = Math.pow(10, decimals);
-  const numberFloor = Number(toExactFixed(num, decimals));
-  return (
-    numberFloor > num ? numberFloor - 1 / factorOfTen : numberFloor
-  ).toLocaleString(undefined, {
-    minimumFractionDigits: numberFloor > 0 ? decimals : 0,
-  });
-};
-
 const repeatStringNumTimes = (string: string, times: string | number) => {
   const timesInNum = +times;
   if (timesInNum < 0) return '';
@@ -87,6 +77,8 @@ export const fromDecimals = (
   // 9000000 => 9
   // 123456 => 0.123456
 };
+const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
+const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
 export const toExactFixed = (
   number: number | string,
@@ -97,14 +89,17 @@ export const toExactFixed = (
   if (nonExponentialNumber === '0') {
     return '0';
   }
-  const dotIndex = nonExponentialNumber.indexOf('.');
+
+  nonExponentialNumber = (+nonExponentialNumber).toLocaleString();
+
+  const dotIndex = nonExponentialNumber.indexOf(decimalSeparator);
 
   const partAfterDot =
     dotIndex > -1 ? nonExponentialNumber.substring(dotIndex + 1) : '';
 
   if (withZeroEnds && partAfterDot.length < decimals) {
     const difference = decimals - partAfterDot.length;
-    if (dotIndex === -1) nonExponentialNumber += '.';
+    if (dotIndex === -1) nonExponentialNumber += decimalSeparator;
     nonExponentialNumber += repeatStringNumTimes('0', difference);
   }
 
@@ -112,14 +107,14 @@ export const toExactFixed = (
     0,
     dotIndex + +decimals + 1,
   );
-
+  
   const returnValueWithZeroEnds =
     dotIndex > -1 ? subNonExponentialNumber : nonExponentialNumber;
 
   return withZeroEnds
     ? returnValueWithZeroEnds
     : dotIndex > -1
-    ? String(+returnValueWithZeroEnds)
+    ? returnValueWithZeroEnds
     : returnValueWithZeroEnds;
 };
 
@@ -144,7 +139,7 @@ export const timerIsFinished = expectedTime => {
   return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
 };
 
-export const getNextMonday = (date = new Date())  => {
+export const getNextMonday = (date = new Date()) => {
   const dateCopy = new Date(date.getTime());
 
   const nextMonday = new Date(
@@ -154,7 +149,7 @@ export const getNextMonday = (date = new Date())  => {
   );
 
   return nextMonday;
-}
+};
 
 export const depositDivided = depositedAmount => {
   if (depositedAmount == 0) return { first: '0.0', second: '0' };
@@ -166,4 +161,22 @@ export const depositDivided = depositedAmount => {
     dotIndex + 9,
   );
   return { first: balanceFirstPart, second: balanceSecondPart };
+};
+
+export const shuffleArray = array => {
+  const newArray = [...array];
+
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = newArray[i];
+    newArray[i] = newArray[j];
+    newArray[j] = temp;
+  }
+
+  return newArray;
+};
+
+export const fromLocaleString = string => {
+  const formattedString = string.replace(thousandsSeparator, '').replace(decimalSeparator, '.');
+  return +formattedString;
 };

@@ -1,5 +1,6 @@
+import { useMode } from 'app/common/state';
 import { TokenIcon } from 'app/modernUI/components';
-import { Box, Card, Grid, ResponsiveContext } from 'grommet';
+import { Box, Grid, ResponsiveContext } from 'grommet';
 import { useState } from 'react';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
@@ -33,20 +34,28 @@ export const StreamCard = ({
   sign,
   ...rest
 }: IStreamCard) => {
+  const { isLightMode } = useMode();
   const [stopStreamConfirmation, setStopStreamConfirmation] = useState(false);
+
+  const [isHover, setIsHover] = useState<boolean>(false);
+
+  const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
+  const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
     <ResponsiveContext.Consumer>
       {size => (
         <>
-          <Card
+          <Box
             pad={{ horizontal: 'medium', vertical: 'none' }}
-            margin={{ top: 'small' }}
             height="120px"
-            background="card"
+            style={{ borderTop: `0.5px solid ${dividerColor}` }}
+            background={isHover ? hoverColor : ''}
             align="center"
             justify="center"
             fill="horizontal"
+            onMouseEnter={() => setIsHover(true)}
+            onMouseLeave={() => setIsHover(false)}
           >
             <Grid
               fill="horizontal"
@@ -67,23 +76,15 @@ export const StreamCard = ({
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {sign}{tvs}
+                    {sign}
+                    {tvs}
                   </span>
-                  {/*<Button onClick={() => setIsTvsInUSD(!isTvsInUSD)}>
-                    <Box justify="center" fill>
-                      <img src={swap} />
-                    </Box>
-      </Button>*/}
                 </Box>
                 <Box direction="row" gap="5px">
                   <span>
-                    {sign}{flowPerMonth}/m
+                    {sign}
+                    {flowPerMonth}/m
                   </span>
-                  {/*<Button onClick={() => setIsFlowRateInUSD(!isFlowRateInUSD)}>
-                  <Box justify="center" fill>
-                      <img src={swap} />
-                    </Box>
-                  </Button>*/}
                 </Box>
                 <span>{startDate}</span>
                 <span>{endDate || '∞'}</span>
@@ -100,7 +101,7 @@ export const StreamCard = ({
                 </Box>
               </>
             </Grid>
-          </Card>
+          </Box>
         </>
       )}
     </ResponsiveContext.Consumer>

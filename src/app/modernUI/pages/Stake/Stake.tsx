@@ -1,13 +1,10 @@
 import { EChain } from 'app/common/constants/chains';
-import {
-  roundNumberDown,
-  timerIsFinished,
-  toExactFixed
-} from 'app/common/functions/utils';
+import { timerIsFinished, toExactFixed } from 'app/common/functions/utils';
 import { useStake } from 'app/common/state/stake';
 import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
+import Skeleton from 'react-loading-skeleton';
 import { LockTab } from './blocks/LockTab';
 import { UnlockTab } from './blocks/UnlockTab';
 import { UnlockCountdown } from './components/UnlockCountdown';
@@ -66,7 +63,7 @@ export const Stake = ({ ...rest }) => {
                       <>
                         <Text size="18px" weight="bold">
                           Your unlocked balance is{' '}
-                          {roundNumberDown(alluoInfo.unlocked, 2)}
+                          {toExactFixed(alluoInfo.unlocked, 2)}
                         </Text>
                         <Button
                           primary
@@ -84,7 +81,7 @@ export const Stake = ({ ...rest }) => {
                     <UnlockCountdown
                       date={+alluoInfo?.depositUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
-                      label={`${roundNumberDown(
+                      label={`${toExactFixed(
                         alluoInfo.locked,
                         2,
                       )} TOKENS LOCKED UNTIL`}
@@ -98,7 +95,7 @@ export const Stake = ({ ...rest }) => {
                     <UnlockCountdown
                       date={+alluoInfo.withdrawUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
-                      label={`UNLOCKING ${roundNumberDown(
+                      label={`UNLOCKING ${toExactFixed(
                         alluoInfo.unlocked,
                         2,
                       )} TOKENS IN`}
@@ -146,7 +143,7 @@ export const Stake = ({ ...rest }) => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isLoading || isClamingRewards || isLoadingRewards ? (
+              {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
                   <Spinner pad="large" />
                 </Box>
@@ -158,30 +155,40 @@ export const Stake = ({ ...rest }) => {
                     margin={{ bottom: '16px', top: '0px' }}
                     fill
                   >
-                    <Text size="18px">Rewards</Text>
+                    {isLoading || isLoadingRewards ? (
+                      <Skeleton height="18px" />
+                    ) : (
+                      <Text size="18px">Rewards</Text>
+                    )}
                   </Heading>
-                  <Box
-                    direction="row"
-                    justify="between"
-                    margin={{ bottom: '28px' }}
-                  >
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? rewardsInfo.stableLabel
-                        : rewardsInfo.label}
-                    </Text>
-                    <Text weight="bold" size="16px">
-                      {seeRewardsAsStable
-                        ? '$' + rewardsInfo.stableValue
-                        : rewardsInfo.value}
-                    </Text>
+
+                  <Box margin={{ bottom: '28px' }}>
+                    {isLoading || isLoadingRewards ? (
+                      <Skeleton height="16px" />
+                    ) : (
+                      <Box direction="row" justify="between">
+                        <Text weight="bold" size="16px">
+                          {seeRewardsAsStable
+                            ? rewardsInfo.stableLabel
+                            : rewardsInfo.label}
+                        </Text>
+
+                        <Text weight="bold" size="16px">
+                          {seeRewardsAsStable
+                            ? '$' + rewardsInfo.stableValue
+                            : rewardsInfo.value}
+                        </Text>
+                      </Box>
+                    )}
                   </Box>
+
                   <Box gap="12px">
                     <Button
                       primary
                       label={'Withdraw ' + rewardsInfo.label}
                       style={{ borderRadius: '58px', width: '197px' }}
                       onClick={claimRewards}
+                      disabled={isLoading || isLoadingRewards}
                     />
                     <Button
                       label={
@@ -214,29 +221,42 @@ export const Stake = ({ ...rest }) => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
             >
-              {isLoading || isClamingRewards || isLoadingPendingRewards ? (
-                <Box align="center" justify="center" fill>
-                  <Spinner pad="large" />
-                </Box>
-              ) : (
-                <Box fill gap="12px">
+              <Box fill gap="12px">
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton height="16px"/>
+                ) : (
                   <Text size="16px" weight="bold">
                     Pending rewards
                   </Text>
+                )}
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton />
+                ) : (
                   <Box direction="row" justify="between">
-                    <Text weight="bold" size="16px">
-                      {rewardsInfo.stableLabel}
-                    </Text>
-                    <Text weight="bold" size="16px">
-                      {'$' + toExactFixed(pendingRewardsInfo, 6)}
-                    </Text>
+                    {isLoading || isLoadingRewards ? (
+                      <Skeleton height="16px" />
+                    ) : (
+                      <>
+                        <Text weight="bold" size="16px">
+                          {rewardsInfo.stableLabel}
+                        </Text>
+
+                        <Text weight="bold" size="16px">
+                          {'$' + toExactFixed(pendingRewardsInfo, 4)}
+                        </Text>
+                      </>
+                    )}
                   </Box>
+                )}
+                {isLoading || isLoadingPendingRewards ? (
+                  <Skeleton height="8px" />
+                ) : (
                   <Text size="8px" weight={400}>
                     Available {nextHarvestDate.format('DD MMM')} · Last
                     harvested {previousHarvestDate.format('DD MMM')}
                   </Text>
-                </Box>
-              )}
+                )}
+              </Box>
             </Box>
           </Box>
         )}
