@@ -114,7 +114,7 @@ export const BoostFarm = () => {
                 Find out where these funds are being invested{' '}
                 <a
                   target="_blank"
-                  href="https://docsend.com/view/26j9j8se4vrfu2wh"
+                  href="https://docsend.com/view/np9ypdn38jajb9zj"
                 >
                   here
                 </a>

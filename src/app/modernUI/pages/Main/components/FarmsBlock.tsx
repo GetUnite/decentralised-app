@@ -66,7 +66,7 @@ export const FarmsBlock = ({
                 fontSize: '16px',
               }}
             >
-              View {heading.toLowerCase()} farms fact sheet
+              View {heading.toLowerCase()} fact sheet
             </a>
           </Box>
         )}
