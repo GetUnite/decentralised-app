@@ -139,7 +139,7 @@ export const Main = () => {
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
                         size={size}
-                        factsheetLink="https://docsend.com/view/26j9j8se4vrfu2wh"
+                        factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />
                     </Box>
                   </Box>
