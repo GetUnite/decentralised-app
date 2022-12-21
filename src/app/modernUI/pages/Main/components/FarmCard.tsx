@@ -154,7 +154,7 @@ export const FarmCard = ({
                   viewType != 'View my farms only'
                     ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                     : [
-                        '240px',
+                        '220px',
                         '155px',
                         '155px',
                         '155px',
@@ -300,6 +300,11 @@ export const FarmCard = ({
                         <Box justify="end" fill>
                           <Link
                             to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'end',
+                              textDecoration: 'none',
+                            }}
                           >
                             <Box justify="end" fill>
                               <Button label={'Farm'} />

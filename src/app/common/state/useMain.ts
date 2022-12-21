@@ -16,6 +16,7 @@ import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
 import { toExactFixed } from '../functions/utils';
@@ -69,8 +70,13 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  const location = useLocation();
+
   useEffect(() => {
     fetchFarmsInfo();
+    if (walletAccountAtom && location.search.includes('view_type=my_farms')) {
+      setViewType('View my farms only');
+    }
   }, [walletAccountAtom]);
 
   useEffect(() => {

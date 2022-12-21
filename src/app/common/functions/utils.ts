@@ -90,7 +90,7 @@ export const toExactFixed = (
     return '0';
   }
 
-  nonExponentialNumber = (+nonExponentialNumber).toLocaleString();
+  nonExponentialNumber = (+nonExponentialNumber).toLocaleString(undefined, { minimumFractionDigits: 8 })
 
   const dotIndex = nonExponentialNumber.indexOf(decimalSeparator);
 
@@ -99,10 +99,10 @@ export const toExactFixed = (
 
   if (withZeroEnds && partAfterDot.length < decimals) {
     const difference = decimals - partAfterDot.length;
+    
     if (dotIndex === -1) nonExponentialNumber += decimalSeparator;
     nonExponentialNumber += repeatStringNumTimes('0', difference);
   }
-
   const subNonExponentialNumber = nonExponentialNumber.substring(
     0,
     dotIndex + +decimals + 1,
@@ -113,9 +113,7 @@ export const toExactFixed = (
 
   return withZeroEnds
     ? returnValueWithZeroEnds
-    : dotIndex > -1
-    ? returnValueWithZeroEnds
-    : returnValueWithZeroEnds;
+    :  returnValueWithZeroEnds;
 };
 
 const replaceRecursively = (pattern, oldString, newString) => {
@@ -152,11 +150,9 @@ export const getNextMonday = (date = new Date()) => {
 };
 
 export const depositDivided = depositedAmount => {
-  if (depositedAmount == 0) return { first: '0.0', second: '0' };
-  const depositedAmountString = depositedAmount.toString();
-  const dotIndex = depositedAmountString.indexOf('.');
-  const balanceFirstPart = depositedAmountString.substring(0, dotIndex + 3);
-  const balanceSecondPart = depositedAmountString.substring(
+  const dotIndex = depositedAmount.indexOf('.');
+  const balanceFirstPart = depositedAmount.substring(0, dotIndex + 3);
+  const balanceSecondPart = depositedAmount.substring(
     dotIndex + 3,
     dotIndex + 9,
   );

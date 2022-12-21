@@ -128,6 +128,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 setUseBiconomy={setUseBiconomy}
                 disableBiconomy={true}
                 showWalletFee={!useBiconomy}
+                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
               />
             </Box>
           </Box>

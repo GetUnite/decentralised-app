@@ -20,6 +20,8 @@ import logoIconDark from '../../images/logoIcon-dark.svg';
 import logoIcon from '../../images/logoIcon.svg';
 import mediumDark from '../../images/medium-dark.svg';
 import medium from '../../images/medium.svg';
+import proLogoDark from '../../images/proLogo-dark.svg';
+import proLogo from '../../images/proLogo.svg';
 import telegramDark from '../../images/telegram-dark.svg';
 import telegram from '../../images/telegram.svg';
 import twitterDark from '../../images/twitter-dark.svg';
@@ -77,10 +79,10 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                         isLightMode
                           ? isSmall(size)
                             ? logoIcon
-                            : logo
+                            : proLogo
                           : isSmall(size)
                           ? logoIconDark
-                          : logoDark
+                          : proLogoDark
                       }
                       fit="contain"
                       height={31}
@@ -136,7 +138,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 fill
               >
                 <Box>
-                  <img width="220px" src={isLightMode ? logo : logoDark} />
+                  <img width="137px" src={isLightMode ? logo : logoDark} />
                   <Box direction="row" gap="24px" margin={{ top: '60px' }}>
                     <a
                       href="https://apps.apple.com/us/app/alluo/id1604572992"

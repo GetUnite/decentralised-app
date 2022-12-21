@@ -291,13 +291,12 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        farmInfo.depositedAmount = await getUserDepositedAmount(
-          farm.type,
+        const depositedAmount = await getUserDepositedAmount(
+          farm.farmAddress,
           farm.chain,
         );
-        farmInfo.depositDividedAmount = depositDivided(
-          farmInfo.depositedAmount,
-        );
+        farmInfo.depositedAmount = depositedAmount;
+        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
       return { ...farm, ...farmInfo };

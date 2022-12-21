@@ -445,17 +445,16 @@ export const useBoostFarm = ({ id }) => {
         valueOf1LPinUSDC: valueOf1LPinUSDC,
       };
       if (walletAccountAtom) {
-        farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
+        const depositedAmountInLP = await getUserDepositedLPAmount(
           farm.farmAddress,
           farm.chain,
         );
+        farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        farmInfo.depositedAmount =
-          +farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
-        farmInfo.depositDividedAmount = depositDivided(
-          farmInfo.depositedAmount,
-        );
+        const depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+        farmInfo.depositedAmount = depositedAmount;
+        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
       return { ...farm, ...farmInfo };

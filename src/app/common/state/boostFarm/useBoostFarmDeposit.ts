@@ -9,6 +9,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
@@ -17,6 +18,10 @@ export const useBoostFarmDeposit = ({
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
+  // react
+  const navigate = useNavigate();
+
+  // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
@@ -143,7 +148,8 @@ export const useBoostFarmDeposit = ({
         tx.transactionHash,
         selectedFarm.chain,
       );
-      await updateFarmInfo();
+      navigate("/?view_type=my_farms");
+      //await updateFarmInfo();
     } catch (error) {
       resetState();
       setNotification(error, 'error');
