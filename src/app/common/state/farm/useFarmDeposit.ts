@@ -1,9 +1,9 @@
+import { EChain } from 'app/common/constants/chains';
+import { deposit } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositStableCoin,
-  getAllowance,
+  approve, getAllowance,
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
@@ -53,11 +53,13 @@ export const useFarmDeposit = ({
     useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const [useBiconomy, setUseBiconomy] = useState(true);
 
   useEffect(() => {
     if (selectedFarm) {
-      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      setUseBiconomy(
+        isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+      );
     }
   }, [selectedFarm]);
 
@@ -100,7 +102,7 @@ export const useFarmDeposit = ({
       selectedSupportedToken.decimals,
       selectedFarm.chain,
     );
-    
+
     setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
 
     // Deposit step is always there
@@ -115,7 +117,7 @@ export const useFarmDeposit = ({
     setIsApproving(true);
 
     try {
-      const tx = await approveStableCoin(
+      const tx = await approve(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         selectedFarm.chain,
@@ -161,11 +163,11 @@ export const useFarmDeposit = ({
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      const tx = await depositStableCoin(
+      const tx = await deposit(
         selectedSupportedToken.address,
+        selectedFarm.farmAddress,
         depositValue,
         selectedSupportedToken.decimals,
-        selectedFarm.type,
         selectedFarm.chain,
         useBiconomy,
       );
@@ -194,12 +196,12 @@ export const useFarmDeposit = ({
 
   // executes the handle for the current step
   const handleCurrentStep = async () => {
-    const currentStreamCreationStep = possibleDepositSteps.find(
+    const possibleDepositStep = possibleDepositSteps.find(
       possibleDepositStep =>
-        possibleDepositStep.id == possibleDepositSteps[currentStep].id,
+        possibleDepositStep.id == selectedSupportedTokenSteps[currentStep].id,
     );
 
-    switch (currentStreamCreationStep.id) {
+    switch (possibleDepositStep.id) {
       case 0:
         await handleApprove();
         break;
