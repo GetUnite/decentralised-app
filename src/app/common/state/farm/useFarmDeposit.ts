@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
@@ -54,13 +53,11 @@ export const useFarmDeposit = ({
     useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(true);
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(
-        isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-      );
+      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
 

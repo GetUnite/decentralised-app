@@ -148,7 +148,7 @@ export const useMain = () => {
                   supportedTokenWithBalance.decimals,
                   supportedTokenWithBalance.chain,
                 );
-                if (+toExactFixed(balance, 2) > 0) {
+                if (+balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
                 }

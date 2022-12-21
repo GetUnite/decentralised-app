@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
@@ -39,9 +38,9 @@ export const useBoostFarmDeposit = ({
     });
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(
-    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-  );
+  const [useBiconomy, setUseBiconomy] = useState(false)
+    /*isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+  );*/
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
