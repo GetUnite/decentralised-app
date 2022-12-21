@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { isNumeric } from 'app/common/functions/utils';
 import { withdrawStableCoin } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
@@ -19,7 +18,7 @@ export const useFarmWithdrawal = ({
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(true);
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -32,7 +31,7 @@ export const useFarmWithdrawal = ({
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
 
