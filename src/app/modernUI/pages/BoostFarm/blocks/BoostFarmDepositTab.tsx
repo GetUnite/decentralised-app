@@ -1,6 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
-import { useFarmDeposit } from 'app/common/state/farm';
+import { useBoostFarmDeposit } from 'app/common/state/boostFarm';
 import {
   FeeInfo,
   Info,
@@ -33,7 +33,7 @@ export const BoostFarmDepositTab = ({
     useBiconomy,
     isFetchingSupportedTokenInfo,
     selectedSupportedTokenInfo
-  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+  } = useBoostFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>

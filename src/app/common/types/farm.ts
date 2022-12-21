@@ -46,3 +46,8 @@ export type TBoostFarm = TFarm & {
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
 }
+
+export type TDepositStep = {
+  id: number;
+  label: string;
+};

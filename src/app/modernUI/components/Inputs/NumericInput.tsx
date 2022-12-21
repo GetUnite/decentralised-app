@@ -10,7 +10,7 @@ import { TokenSelector } from './TokenSelector';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
-  right: 0.4em;
+  right: 0;
   left: auto;
   bottom: 0;
   top: 0;
@@ -69,11 +69,11 @@ export const NumericInput = ({
           {!disabled && (
             <Text size="medium" color="soul">
               {available != undefined ? (
-                'Available: ' + tokenSign + toExactFixed(+available, 5)
+                'Available: ' + tokenSign + toExactFixed(+available, 6)
               ) : (
                 <>
                   {!!selectedToken &&
-                    'Wallet: ' + tokenSign + toExactFixed(+maxValue, 5)}
+                    'Wallet: ' + tokenSign + toExactFixed(+maxValue, 6)}
                 </>
               )}
             </Text>
@@ -93,12 +93,12 @@ export const NumericInput = ({
               setFormattedValue(formattedValue);
             }}
           />
-          <AbsoluteBox direction="row" gap="xsmall">
+          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "15px"} : {right: "0"}}>
             {maxButton && maxValue != undefined && (
               <MaxButton
                 primary
                 onClick={() => {
-                  setFormattedValue(toExactFixed(maxValue, 5));
+                  setFormattedValue(toExactFixed(maxValue, 6));
                 }}
               >
                 Max
