@@ -36,7 +36,7 @@ interface IFarmCard {
   icons: string[];
   disabled: boolean;
   chain: EChain;
-  isBooster: boolean;
+  isBoost: boolean;
   viewType: string;
   balance?: string;
   poolShare?: number;
@@ -54,7 +54,7 @@ export const FarmCard = ({
   icons,
   disabled,
   chain,
-  isBooster = false,
+  isBoost = false,
   viewType,
   poolShare,
   ...rest
@@ -183,7 +183,7 @@ export const FarmCard = ({
                       <>
                         <span style={{ fontWeight: 'bold' }}>
                           {name}
-                          {isBooster && (
+                          {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
                         </span>
@@ -264,7 +264,7 @@ export const FarmCard = ({
                         <Box justify="end">
                           {walletAccountAtom ? (
                             <Link
-                              to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                              to={(isBoost ? '/boostfarm/' : '/farm/') + id}
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
@@ -288,7 +288,7 @@ export const FarmCard = ({
                       <>
                         <span style={{ fontWeight: 'bold' }}>
                           {name}
-                          {isBooster && (
+                          {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
                         </span>
@@ -299,7 +299,7 @@ export const FarmCard = ({
                         <span>{toExactFixed(interest, 2)}%</span>
                         <Box justify="end" fill>
                           <Link
-                            to={(isBooster ? '/boostfarm/' : '/farm/') + id}
+                            to={(isBoost ? '/boostfarm/' : '/farm/') + id}
                             style={{
                               display: 'flex',
                               justifyContent: 'end',

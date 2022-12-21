@@ -13,54 +13,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
 import { EPolygonAddresses } from '../constants/addresses';
-import { fromDecimals, toDecimals } from './utils';
-
-export const getInterest = async (tokenAddress, chain = EChain.POLYGON) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'annualInterest',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const interest = await callContract(
-    abi,
-    tokenAddress,
-    'annualInterest()',
-    null,
-    chain,
-  );
-
-  return fromDecimals(interest, 2);
-};
-
-export const getTotalAssetSupply = async (
-  tokenAddress,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'totalAssetSupply',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const totalAssetSupply = await callContract(
-    abi,
-    tokenAddress,
-    'totalAssetSupply()',
-    null,
-    chain,
-  );
-
-  return ethers.utils.formatEther(totalAssetSupply);
-};
+import { toDecimals } from './utils';
 
 export const getDepositedAmount = async (
   tokenAddress,

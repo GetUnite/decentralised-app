@@ -60,7 +60,7 @@ export const TransferTab = ({ ...rest }) => {
             </Box>
             <Box margin={{ top: 'medium' }}>
               <Box direction="row" justify="between">
-              <Text className="font-13" size="medium" color="soul">
+              <Text size="13px" color="soul">
                    {recipientAddressValue === '' ? 'Recipient' : `Recipient: ${recipientAddressValue}`}
                 </Text>
               </Box>

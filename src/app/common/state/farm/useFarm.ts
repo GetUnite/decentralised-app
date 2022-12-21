@@ -286,8 +286,8 @@ export const useFarm = ({ id }) => {
       let farmInfo;
 
       farmInfo = {
-        interest: await getInterest(farm.type, farm.chain),
-        totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
+        interest: await getInterest(farm.farmAddress, farm.chain),
+        totalAssetSupply: await getTotalAssetSupply(farm.farmAddress, farm.chain),
         depositedAmount: 0,
       };
       if (walletAccountAtom) {

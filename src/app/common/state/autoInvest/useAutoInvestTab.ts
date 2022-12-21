@@ -2,11 +2,7 @@ import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   approveSuperfluidSubscriptions,
-  depositIntoAlluo,
-  getDepositedAmount,
-  getInterest,
-  getStreamFlow,
-  getTotalAssetSupply,
+  depositIntoAlluo, getStreamFlow,
   getUnapprovedSuperfluidSubscriptions,
   startStream
 } from 'app/common/functions/autoInvest';
@@ -15,8 +11,8 @@ import { isNumeric } from 'app/common/functions/utils';
 import {
   approve,
   getAllowance,
-  getBalance,
-  getBalanceOf
+  getBalance, getBalanceOf, getInterest,
+  getTotalAssetSupply
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
@@ -582,8 +578,9 @@ export const useAutoInvestTab = () => {
       sign: selectedToToken.sign,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = await getDepositedAmount(
+      farmInfo.depositedAmount = await getBalance(
         selectedToToken.address,
+        18
       );
     }
 

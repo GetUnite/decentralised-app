@@ -34,8 +34,7 @@ export function BiconomyToggle({ useBiconomy, setUseBiconomy, disabled }) {
           </>
         </Text>
         <Button
-          disabled={true}
-          //disabled={disabled}
+          disabled={disabled}
           onClick={() => setUseBiconomy(!useBiconomy)}
         >
           <Box

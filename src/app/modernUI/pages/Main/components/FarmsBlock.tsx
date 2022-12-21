@@ -168,7 +168,7 @@ export const FarmsBlock = ({
                   icons={farm.icons}
                   isLoading={isLoading}
                   chain={farm.chain as EChain}
-                  isBooster={farm.isBooster}
+                  isBoost={farm.isBoost}
                   viewType={viewType}
                 />
               );

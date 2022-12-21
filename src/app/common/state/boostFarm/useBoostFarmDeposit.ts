@@ -1,16 +1,15 @@
+import { depositIntoBoostFarm } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositIntoBoosterFarm,
+  approve,
+
   getAllowance,
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { isSafeApp } from '../atoms';
 
 export const useBoostFarmDeposit = ({
   selectedFarm,
@@ -19,9 +18,6 @@ export const useBoostFarmDeposit = ({
 }) => {
   // react
   const navigate = useNavigate();
-
-  // atoms
-  const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
   const { setNotification } = useNotification();
@@ -38,9 +34,7 @@ export const useBoostFarmDeposit = ({
     });
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false)
-    /*isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-  );*/
+  const [useBiconomy, setUseBiconomy] = useState(false);
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
@@ -82,11 +76,10 @@ export const useBoostFarmDeposit = ({
     setIsApproving(true);
 
     try {
-      const tx = await approveStableCoin(
+      const tx = await approve(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         selectedFarm.chain,
-        useBiconomy,
       );
       await updateFarmInfo();
       heapTrack('approvedTransactionMined', {
@@ -126,7 +119,7 @@ export const useBoostFarmDeposit = ({
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      const tx = await depositIntoBoosterFarm(
+      const tx = await depositIntoBoostFarm(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         depositValue,
@@ -147,7 +140,7 @@ export const useBoostFarmDeposit = ({
         tx.transactionHash,
         selectedFarm.chain,
       );
-      navigate("/?view_type=my_farms");
+      navigate('/?view_type=my_farms');
       //await updateFarmInfo();
     } catch (error) {
       resetState();
