@@ -1,9 +1,11 @@
+import { Resolution } from '@unstoppabledomains/resolution';
+import { udTlds } from '@unstoppabledomains/tldsresolverkeys';
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
   getIbAlluoInfo,
-  transferToAddress,
+  transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
@@ -11,8 +13,6 @@ import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TIbAlluoInfo } from 'app/common/types/transfer';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { Resolution } from '@unstoppabledomains/resolution';
-import { udTlds } from '@unstoppabledomains/tldsresolverkeys';
 
 export const useTransfer = () => {
   // atoms
@@ -24,7 +24,7 @@ export const useTransfer = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(false);//useState(!isSafeAppAtom);
 
   // ibAlluos
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);

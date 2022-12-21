@@ -1,4 +1,3 @@
-import { EChain } from 'app/common/constants/chains';
 import { convertFromUSDC } from 'app/common/functions/boosterFarm';
 import {
   convertToLP,
@@ -23,9 +22,9 @@ export const useBoostFarmWithdrawal = ({
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(
-    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-  );
+  const [useBiconomy, setUseBiconomy] = useState(false)
+    /*isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+  );*/
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
