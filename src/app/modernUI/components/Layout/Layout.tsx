@@ -129,7 +129,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               direction="column"
               margin={{
                 bottom: '80px',
-                horizontal: isSmall(size) ? '' : '217px',
+                horizontal: isSmall(size) ? '' : '150px',
               }}
             >
               <Box
@@ -144,13 +144,13 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       href="https://apps.apple.com/us/app/alluo/id1604572992"
                       target="_blank"
                     >
-                      <img src={appStore} width="200px" />
+                      <img src={appStore} width="170px" />
                     </a>
                     <a
                       href="https://play.google.com/store/apps/details?id=com.alluo"
                       target="_blank"
                     >
-                      <img src={googlePlay} width="200px" />
+                      <img src={googlePlay} width="183px" />
                     </a>
                   </Box>
                 </Box>

@@ -1,3 +1,5 @@
+import { Resolution } from '@unstoppabledomains/resolution';
+import { udTlds } from '@unstoppabledomains/tldsresolverkeys';
 import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
@@ -22,7 +24,7 @@ export const useTransfer = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
+  const [useBiconomy, setUseBiconomy] = useState(false);//useState(!isSafeAppAtom);
 
   // ibAlluos
   const [ibAlluosInfo, setIbAlluosInfo] = useState<Array<TIbAlluoInfo>>([]);
@@ -33,6 +35,8 @@ export const useTransfer = () => {
   const [transferValueError, setTransferValueError] = useState<string>('');
   const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [recipientAddressError, setRecipientAddressError] =
+    useState<string>('');
+  const [recipientAddressValue, setRecipientAddressValue] =
     useState<string>('');
 
   // loading control
@@ -114,32 +118,67 @@ export const useTransfer = () => {
 
   const handleRecipientAddressChange = e => {
     const { value } = e.target;
+    const resolution = new Resolution();
     setRecipientAddressError('');
-    if (!addressIsValid(value)) {
-      setRecipientAddressError('Recipient address is not valid');
-    } else {
+    setRecipientAddressValue('');
+
+    if (/\.(?=[^\.]+$)/.test(value)) {
+      const inputTld = value.split(/\.(?=[^\.]+$)/);
+      const found = udTlds.find(
+        ele => inputTld && inputTld.length > 0 && inputTld[1].includes(ele),
+      );
+      if (found) {
+        resolution
+          .owner(value)
+          .then(address => {
+            setRecipientAddressValue(address);
+            setRecipientAddressError('');
+            return address;
+          })
+          .catch(error => {
+            if (error.code === 'UnregisteredDomain') {
+              console.log('Domain is not registered');
+            }
+          });
+      }
+
+      if (!addressIsValid(value)) {
+        setRecipientAddressError(
+          'Recipient address or domain name is not valid',
+        );
+      }
+    } else if (/^[ A-Za-z0-9]*$/.test(value)) {
       setRecipientAddressError('');
+      if (!addressIsValid(value)) {
+        setRecipientAddressError(
+          'Recipient address or domain name is not valid',
+        );
+      }
+    } else {
+      setRecipientAddressError('Recipient address or domain name is not valid');
     }
     setRecipientAddress(value);
   };
 
   const handleTransfer = async () => {
     setIsTransferring(true);
-
+    let recipientAddressVal: any = recipientAddressValue;
+    if (/^[ A-Za-z0-9]*$/.test(recipientAddress)) {
+      recipientAddressVal = recipientAddress;
+    }
     try {
       heapTrack('transferAmount', { amount: transferValue });
-      heapTrack('transferRecipient', {recipient: recipientAddress});
+      heapTrack('transferRecipient', { recipient: recipientAddress });
       heapTrack('transferButtonClicked');
       const tx = await transferToAddress(
         selectedIbAlluoInfo.address,
         transferValue,
         selectedIbAlluoInfo.decimals,
-        recipientAddress,
+        recipientAddressVal,
         useBiconomy,
       );
       await fetchIbAlluosInfo();
       setTransferValue('');
-      setRecipientAddress('');
       setNotification(
         'Transfer successful',
         'success',
@@ -152,6 +191,8 @@ export const useTransfer = () => {
     }
 
     setIsTransferring(false);
+    setRecipientAddressValue('');
+    setRecipientAddress('');
   };
 
   const getTokenSign = (type = 'usd') => {
@@ -177,6 +218,7 @@ export const useTransfer = () => {
     handleTransfer,
     ibAlluosInfo,
     recipientAddress,
+    recipientAddressValue,
     handleRecipientAddressChange,
     setSelectedIbAlluoBySymbol,
     isSafeAppAtom,

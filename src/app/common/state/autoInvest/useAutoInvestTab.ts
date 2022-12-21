@@ -343,7 +343,7 @@ export const useAutoInvestTab = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(isSafeAppAtom ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(false);//useState(isSafeAppAtom ? false : true);
 
   // stream
   const [possibleStreamOptions, setPossibleStreamOptions] = useState<
