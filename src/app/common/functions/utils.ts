@@ -80,20 +80,23 @@ export const fromDecimals = (
 const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
 const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
+function roundDown(number, decimals) {
+  decimals = decimals || 0;
+  return ( Math.floor( number * Math.pow(10, decimals) ) / Math.pow(10, decimals) );
+}
+
 export const toExactFixed = (
   number: number | string,
   decimals: number,
   withZeroEnds = false,
 ): string => {
-  const numberAsString = (+number).toFixed(decimals);
-
-  const parsedNumber = parseFloat(numberAsString);
+  const roundedDownNumber = roundDown(+number, decimals);
 
   return withZeroEnds
-    ? parsedNumber.toLocaleString(undefined, {
+    ? roundedDownNumber.toLocaleString(undefined, {
         minimumFractionDigits: decimals,
       })
-    : parsedNumber.toLocaleString(undefined, {
+    : roundedDownNumber.toLocaleString(undefined, {
         maximumFractionDigits: decimals,
       });
 };
