@@ -321,17 +321,8 @@ export const sendTransaction = async (
 
     let finalTx;
     if (useBiconomy) {
-      const gasLimitEstimation = +(
-        await provider.estimateGas(rawTx)
-      ).toString();
-      const gasLimit = Math.floor(
-        gasLimitEstimation + gasLimitEstimation * 0.25,
-      );
-      const gasPriceEstimation = +(await provider.getGasPrice()).toString();
-      const gasPrice = Math.floor(
-        gasPriceEstimation + gasPriceEstimation * 0.25,
-      );
-      finalTx = { ...rawTx, gasLimit: gasLimit, gasPrice: gasPrice };
+      // Adding 5.000.000 as the internal gas limit because biconomy is awkward that way
+      finalTx = { ...rawTx, gasLimit: 5000000 };
     } else {
       finalTx = rawTx;
     }

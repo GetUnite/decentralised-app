@@ -265,7 +265,7 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'View my farms only'
-        ? availableFarms.filter(farm => +farm.depositedAmount > 0)
+        ? availableFarms.filter(farm => +farm.depositedAmount > 0.00001)
         : availableFarms;
 
     filteredFarms = filteredFarms.filter(farm => {
