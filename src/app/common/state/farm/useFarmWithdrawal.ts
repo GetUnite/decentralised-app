@@ -1,5 +1,6 @@
+import { EChain } from 'app/common/constants/chains';
+import { withdraw } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
-import { withdrawStableCoin } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -18,7 +19,7 @@ export const useFarmWithdrawal = ({
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const [useBiconomy, setUseBiconomy] = useState(true);
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -31,7 +32,7 @@ export const useFarmWithdrawal = ({
 
   useEffect(() => {
     if (selectedFarm) {
-      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
     }
   }, [selectedFarm]);
 
@@ -41,7 +42,7 @@ export const useFarmWithdrawal = ({
       setWithdrawValueError('Write a valid number');
     } else if (
       +value >
-      (selectedFarm.isBooster
+      (selectedFarm.isBoost
         ? selectedSupportedToken.boosterDepositedAmount
         : +selectedFarm?.depositedAmount)
     ) {
@@ -59,10 +60,10 @@ export const useFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
-      const tx = await withdrawStableCoin(
+      const tx = await withdraw(
         selectedSupportedToken.address,
+        selectedFarm.farmAddress,
         withdrawValue,
-        selectedFarm.type,
         selectedFarm.chain,
         useBiconomy,
       );

@@ -7,7 +7,7 @@ export const BoostFarmWithdrawalConfirmation = ({
   withdrawValue,
   withdrawTokenLabel,
   handleWithdraw,
-  cancelBoosterWithdrawalConfirmation,
+  cancelBoostWithdrawalConfirmation,
   nextHarvestDate,
   losablePendingRewards,
   ...rest
@@ -40,7 +40,7 @@ export const BoostFarmWithdrawalConfirmation = ({
             label={`Cancel withdraw and comeback on ${nextHarvestDate.format(
               'DD MMMM',
             )}`}
-            onClick={cancelBoosterWithdrawalConfirmation}
+            onClick={cancelBoostWithdrawalConfirmation}
             style={{
               textAlign: 'center',
               color: '#2A73FF',

@@ -27,7 +27,7 @@ export const Filters = ({
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
-    <Box direction="row" margin={{ bottom: '13px' }}>
+    <Box direction="row" margin={{ bottom: '13px' }} justify="between">
       <Box
         direction="row"
         justify="start"
@@ -147,7 +147,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -230,7 +230,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -289,7 +289,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -374,7 +374,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -461,7 +461,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -500,6 +500,32 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
       </Box>
+
+      {walletAccountAtom && (
+        <Box direction="row" gap="9px" align="center">
+          <Text size="14px">View my farms only</Text>
+          <Switch
+            onColor="#AAC7FF"
+            onHandleColor="#2A73FF"
+            offHandleColor="#FAFAFA"
+            activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
+            offColor="#CCCCCC"
+            handleDiameter={20}
+            height={14}
+            width={34}
+            checkedIcon={false}
+            uncheckedIcon={false}
+            onChange={() => {
+              if (viewType == 'View my farms only') {
+                setViewType('View all farms');
+              } else {
+                setViewType('View my farms only');
+              }
+            }}
+            checked={viewType == 'View my farms only'}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

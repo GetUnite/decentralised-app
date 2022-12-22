@@ -4,6 +4,9 @@ import Skeleton from 'react-loading-skeleton';
 
 export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
   const { first, second } = selectedFarm?.depositDividedAmount || 0;
+  const dotIndex = first?.indexOf('.');
+  const integerPart = (+first?.substring(0, dotIndex)).toLocaleString();
+  const floatPart = dotIndex < 0 ? '' : first?.substring(dotIndex);
   return (
     <>
       {isLoading ? (
@@ -13,12 +16,10 @@ export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
           Your balance currently earning <br />
           {toExactFixed(selectedFarm.interest, 2).toLocaleString()}% APY is{' '}
           {selectedFarm.sign}
-          {(+first).toLocaleString()}
-          {+second > 0 && (
-            <Text color="softText" margin={{ left: 'hair' }} size="18px">
-              {second}
-            </Text>
-          )}
+          {integerPart + floatPart}
+          <Text color="softText" margin={{ left: 'hair' }}>
+            {second}
+          </Text>
         </Text>
       )}
     </>

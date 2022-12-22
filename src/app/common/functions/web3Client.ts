@@ -6,14 +6,12 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
-import polygonHandlerAbi from 'app/common/abis/polygonHandler.json';
 import {
   EEthereumAddresses,
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
-import Web3 from 'web3';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
@@ -127,7 +125,6 @@ const usesNoncesAddresses = [
 
 let walletAddress;
 let walletProvider;
-let web3;
 
 export const trySafeAppConnection = async callback => {
   const gnosisLabel = 'Safe';
@@ -163,7 +160,6 @@ export const connectToWallet = async (connectOptions?) => {
         wallets[0].provider,
         'any',
       );
-      web3 = new Web3(walletProvider);
       walletAddress = wallets[0].accounts[0].address;
       wa.domain = unstoppableUser ? wallets[0].instance.user.sub : null;
       wa.address = wallets[0].accounts[0].address;
@@ -270,6 +266,28 @@ export const getProvider = chain => {
   return walletProvider;
 };
 
+export const processSendError = error => {
+  if (error.code == 4001) {
+    throw 'User denied message signature';
+  }
+
+  if (error.code == 417) {
+    throw 'Error while estimating gas. Please try again';
+  }
+
+  const errorString = error.toString();
+
+  if (errorString.includes('user rejected signing')) {
+    throw 'User denied message signature';
+  }
+
+  if (errorString.includes('reverted by the EVM')) {
+    throw 'Transaction has been reverted by the EVM. Please try again';
+  }
+
+  throw 'Something went wrong with your transaction. Please try again';
+};
+
 export const sendTransaction = async (
   abi,
   address,
@@ -321,32 +339,6 @@ export const sendTransaction = async (
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
     let receipt = await provider.waitForTransaction(transactionHash);
     return receipt;
-    /*const signer = provider.getSigner();
-    console.log(signer)
-    const signedTx = signer.signTransaction(rawTx);
-    return;
-    const contract = new ethers.Contract(address, abi as any, signer);
-
-    const gasEstimationPromise = contract.connect("0x86c80a8aa58e0a4fa09a69624c31ab2a6cad56b8").estimateGas[functionSignature].apply(
-      null,
-      params,
-    );
-    const gasLimitEstimation = +(await gasEstimationPromise).toString();
-    const gasLimit = Math.floor(gasLimitEstimation + gasLimitEstimation * 0.25);
-    const gasPriceEstimation = +(await provider.getGasPrice()).toString();
-    const gasPrice = Math.floor(gasPriceEstimation + gasPriceEstimation * 0.25);
-
-    console.log("sadas");
-    const method = contract[functionSignature].apply(null, [
-      ...params,
-      { gasLimit: gasLimit, gasPrice: gasPrice },
-    ]);
-
-    const tx = await method;
-
-    const receipt = await tx.wait();
-
-    return receipt;*/
   } catch (error) {
     console.log(error);
     console.log({
@@ -356,30 +348,11 @@ export const sendTransaction = async (
       params: params,
       walletAddress: walletAddress,
     });
-
-    if (error.code == 4001) {
-      throw 'User denied message signature';
-    }
-
-    if (error.code == 417) {
-      throw 'Error while estimating gas. Please try again';
-    }
-
-    const errorString = error.toString();
-
-    if (errorString.includes('user rejected signing')) {
-      throw 'User denied message signature';
-    }
-
-    if (errorString.includes('reverted by the EVM')) {
-      throw 'Transaction has been reverted by the EVM. Please try again';
-    }
-
-    throw 'Something went wrong with your transaction. Please try again';
+    return processSendError(error);
   }
 };
 
-/*export const sendMetaTransaction = async (
+export const sendMetaTransaction = async (
   abi,
   address,
   functionSignature,
@@ -387,41 +360,111 @@ export const sendTransaction = async (
   chain,
   useBiconomy = false,
 ) => {
-  let provider;
+  let provider, signer;
 
   try {
     if (useBiconomy) {
       const biconomy = await startBiconomy(chain, walletProvider);
       provider = biconomy.getEthersProvider();
-      console.log(provider);
+      signer = biconomy.getSignerByAddress(walletAddress);
     } else {
       provider = walletProvider;
+      signer = provider.getSigner();
     }
+    const metaTransactionAbi = [
+      {
+        inputs: [],
+        name: 'name',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
 
-    let contractInterface = new ethers.utils.Interface(abi);
+      {
+        inputs: [
+          { internalType: 'address', name: 'userAddress', type: 'address' },
+          { internalType: 'bytes', name: 'functionSignature', type: 'bytes' },
+          { internalType: 'bytes32', name: 'sigR', type: 'bytes32' },
+          { internalType: 'bytes32', name: 'sigS', type: 'bytes32' },
+          { internalType: 'uint8', name: 'sigV', type: 'uint8' },
+        ],
+        name: 'executeMetaTransaction',
+        outputs: [{ internalType: 'bytes', name: '', type: 'bytes' }],
+        stateMutability: 'payable',
+        type: 'function',
+      },
+    ];
 
-    let nonce = await contract.getNonce(userAddress);
+    const readOnlyProvider = await getReadOnlyProvider(chain);
+    const readOnlyContract = new ethers.Contract(
+      address,
+      metaTransactionAbi,
+      readOnlyProvider,
+    );
+    const contract = new ethers.Contract(address, metaTransactionAbi, signer);
+
+    const domainType = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'verifyingContract', type: 'address' },
+      { name: 'salt', type: 'bytes32' },
+    ];
+
+    const metaTransactionType = [
+      { name: 'nonce', type: 'uint256' },
+      { name: 'from', type: 'address' },
+      { name: 'functionSignature', type: 'bytes' },
+    ];
+
+    const domainData = {
+      name: await readOnlyContract.name(),
+      version: '1',
+      verifyingContract: address,
+      salt: ethers.utils.hexZeroPad(
+        ethers.BigNumber.from(await getCurrentChainId()).toHexString(),
+        32,
+      ),
+    };
+
+    const contractInterface = new ethers.utils.Interface(abi);
+
+    const nonce = await getAddressNonce(address, walletAddress, chain);
 
     const data = contractInterface.encodeFunctionData(
       functionSignature,
       params,
     );
-                
-let message = {nonce: parseInt(nonce),from: userAddress, functionSignature: data};
 
-const dataToSign = JSON.stringify({
-  types: {
-    EIP712Domain: domainType,
-    MetaTransaction: metaTransactionType
-  },
-  domain: domainData,
-  primaryType: "MetaTransaction",
-  message: message
-});
+    const message = {
+      nonce: parseInt(nonce),
+      from: walletAddress,
+      functionSignature: data,
+    };
 
-    let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
-    let receipt = await provider.waitForTransaction(transactionHash);
-    return receipt;
+    const dataToSign = JSON.stringify({
+      types: {
+        EIP712Domain: domainType,
+        MetaTransaction: metaTransactionType,
+      },
+      domain: domainData,
+      primaryType: 'MetaTransaction',
+      message: message,
+    });
+
+    const signature = await provider.send('eth_signTypedData_v4', [
+      walletAddress,
+      dataToSign,
+    ]);
+    const { r, s, v } = getSignatureParameters(signature);
+    const tx = await contract.executeMetaTransaction(
+      walletAddress,
+      data,
+      r,
+      s,
+      v,
+    );
+
+    return { transactionHash: tx.hash };
   } catch (error) {
     console.log(error);
     console.log({
@@ -431,28 +474,196 @@ const dataToSign = JSON.stringify({
       params: params,
       walletAddress: walletAddress,
     });
-
-    if (error.code == 4001) {
-      throw 'User denied message signature';
-    }
-
-    if (error.code == 417) {
-      throw 'Error while estimating gas. Please try again';
-    }
-
-    const errorString = error.toString();
-
-    if (errorString.includes('user rejected transaction')) {
-      throw 'User denied message signature';
-    }
-
-    if (errorString.includes('reverted by the EVM')) {
-      throw 'Transaction has been reverted by the EVM. Please try again';
-    }
-
-    throw 'Something went wrong with your transaction. Please try again';
+    throw processSendError(error);
   }
-};*/
+};
+
+export const sendPermit = async (
+  address,
+  spenderAddress,
+  chain,
+  useBiconomy = false,
+) => {
+  let provider, signer;
+
+  try {
+    if (useBiconomy) {
+      const biconomy = await startBiconomy(chain, walletProvider);
+      provider = biconomy.getEthersProvider();
+      signer = biconomy.getSignerByAddress(walletAddress);
+    } else {
+      provider = walletProvider;
+      signer = provider.getSigner();
+    }
+
+    const permitAbi = [
+      {
+        inputs: [],
+        name: 'name',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+      {
+        inputs: [
+          { internalType: 'address', name: 'owner', type: 'address' },
+          { internalType: 'address', name: 'spender', type: 'address' },
+          { internalType: 'uint256', name: 'value', type: 'uint256' },
+          { internalType: 'uint256', name: 'deadline', type: 'uint256' },
+          { internalType: 'uint8', name: 'v', type: 'uint8' },
+          { internalType: 'bytes32', name: 'r', type: 'bytes32' },
+          { internalType: 'bytes32', name: 's', type: 'bytes32' },
+        ],
+        name: 'permit',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const readOnlyProvider = await getReadOnlyProvider(chain);
+    const readOnlyContract = new ethers.Contract(
+      address,
+      permitAbi,
+      readOnlyProvider,
+    );
+    const contract = new ethers.Contract(address, permitAbi, signer);
+
+    const domainType = [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'verifyingContract', type: 'address' },
+      { name: 'salt', type: 'bytes32' },
+    ];
+
+    const permitType = [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const domainData = {
+      name: await readOnlyContract.name(),
+      version: '1',
+      verifyingContract: address,
+      salt: ethers.utils.hexZeroPad(
+        ethers.BigNumber.from(await getCurrentChainId()).toHexString(),
+        32,
+      ),
+    };
+
+    const nonce = await getAddressNonce(address, walletAddress, chain);
+
+    const message = {
+      owner: walletAddress,
+      spender: spenderAddress,
+      value: maximumUint256Value,
+      nonce: nonce,
+      deadline: maximumUint256Value,
+    };
+
+    const dataToSign = JSON.stringify({
+      types: {
+        EIP712Domain: domainType,
+        Permit: permitType,
+      },
+      domain: domainData,
+      primaryType: 'MetaTransaction',
+      message: message,
+    });
+
+    const signature = await provider.send('eth_signTypedData_v4', [
+      walletAddress,
+      dataToSign,
+    ]);
+    const { r, s, v } = getSignatureParameters(signature);
+    const tx = await contract.permit(
+      message.owner,
+      message.spender,
+      message.value,
+      message.deadline,
+      v,
+      r,
+      s,
+    );
+
+    return { transactionHash: tx.hash };
+  } catch (error) {
+    console.log(error);
+    console.log({
+      address: address,
+      spenderAddress: spenderAddress,
+      walletAddress: walletAddress,
+    });
+    throw processSendError(error);
+  }
+};
+
+export const approve = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  let tx;
+  try {
+    if (chain == EChain.ETHEREUM || !useBiconomy) {
+      const abi = [
+        {
+          inputs: [
+            { internalType: 'address', name: 'spender', type: 'address' },
+            { internalType: 'uint256', name: 'amount', type: 'uint256' },
+          ],
+          name: 'approve',
+          outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+
+      tx = await sendTransaction(
+        abi,
+        tokenAddress,
+        'approve(address,uint256)',
+        [farmAddress, maximumUint256Value],
+        chain,
+      );
+    } else {
+      // if the token can only be approved with permit
+      if (permitOnlyTokenAddresses.includes(tokenAddress)) {
+        tx = await sendPermit(tokenAddress, farmAddress, chain, useBiconomy);
+      } else {
+        const abi = [
+          {
+            inputs: [
+              { internalType: 'address', name: 'spender', type: 'address' },
+              { internalType: 'uint256', name: 'amount', type: 'uint256' },
+            ],
+            name: 'approve',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+        ];
+
+        tx = await sendMetaTransaction(
+          abi,
+          tokenAddress,
+          'approve(address,uint256)',
+          [farmAddress, maximumUint256Value],
+          chain,
+          useBiconomy,
+        );
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+
+  return tx;
+};
 
 export const getReadOnlyProvider = chain => {
   const providerUrl =
@@ -583,95 +794,6 @@ export const getPrice = async (
   }
 };
 
-export const isExpectedPolygonEvent = (type, depositAddress) => {
-  const ibAlluoAddress = getIbAlluoAddress(type);
-  return depositAddress.toLowerCase() === ibAlluoAddress.toLowerCase();
-};
-
-export const getSupportedTokensList = async (
-  type = 'usd',
-  chain = EChain.POLYGON,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [],
-        name: 'getListSupportedTokens',
-        outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
-    const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-    const supportedTokenAddressesList = await callContract(
-      abi,
-      ibAlluoAddress,
-      'getListSupportedTokens()',
-      null,
-      chain,
-    );
-
-    const supportedTokensWithBasicInfo = [];
-
-    const requests = supportedTokenAddressesList.map(async tokenAddress => {
-      const info = await getSupportedTokensBasicInfo(tokenAddress, chain);
-      supportedTokensWithBasicInfo.push(info);
-    });
-
-    await Promise.allSettled(requests);
-
-    supportedTokensWithBasicInfo.sort((a, b) => b.balance - a.balance);
-
-    return supportedTokensWithBasicInfo;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export const getListSupportedTokens = async (
-  type = 'usd',
-  chain = EChain.POLYGON,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [],
-        name: 'getListSupportedTokens',
-        outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
-    const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-    const supportedTokenList = await callContract(
-      abi,
-      ibAlluoAddress,
-      'getListSupportedTokens()',
-      null,
-      chain,
-    );
-
-    const tokensWithInfo = [];
-
-    const requests = supportedTokenList.map(async tokenAddress => {
-      const info = await getStableCoinInfo(tokenAddress, type, chain);
-      tokensWithInfo.push(info);
-    });
-
-    await Promise.allSettled(requests);
-
-    tokensWithInfo.sort((a, b) => b.balance - a.balance);
-
-    return tokensWithInfo;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
   let ibAlluoAddresses;
   switch (chain) {
@@ -699,198 +821,13 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
   return ibAlluoAddresses[type];
 };
 
-export const getSupportedTokensBasicInfo = async (
-  tokenAddress,
-  chain = EChain.POLYGON,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [],
-        name: 'symbol',
-        outputs: [{ internalType: 'string', name: '', type: 'string' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [],
-        name: 'decimals',
-        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
-    const symbol = await callContract(
-      abi,
-      tokenAddress,
-      'symbol()',
-      null,
-      chain,
-    );
-
-    const decimals = await callContract(
-      abi,
-      tokenAddress,
-      'decimals()',
-      null,
-      chain,
-    );
-
-    return {
-      tokenAddress,
-      symbol,
-      decimals,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getSupportedTokensAdvancedInfo = async (
-  farmAddress,
-  supportedToken,
-  chain = EChain.POLYGON,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [
-          { internalType: 'address', name: 'owner', type: 'address' },
-          { internalType: 'address', name: 'spender', type: 'address' },
-        ],
-        name: 'allowance',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
-    const balance = await callContract(
-      abi,
-      supportedToken.tokenAddress,
-      'balanceOf(address)',
-      [walletAddress],
-      chain,
-    );
-
-    const allowance = await callContract(
-      abi,
-      supportedToken.tokenAddress,
-      'allowance(address,address)',
-      [walletAddress, farmAddress],
-      chain,
-    );
-
-    return {
-      balance: fromDecimals(balance, supportedToken.decimals),
-      allowance: allowance,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getStableCoinInfo = async (
-  tokenAddress,
-  type,
-  chain = EChain.POLYGON,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [],
-        name: 'symbol',
-        outputs: [{ internalType: 'string', name: '', type: 'string' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [],
-        name: 'decimals',
-        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-      {
-        inputs: [
-          { internalType: 'address', name: 'owner', type: 'address' },
-          { internalType: 'address', name: 'spender', type: 'address' },
-        ],
-        name: 'allowance',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'view',
-        type: 'function',
-      },
-    ];
-
-    const symbol = await callContract(
-      abi,
-      tokenAddress,
-      'symbol()',
-      null,
-      chain,
-    );
-
-    const decimals = await callContract(
-      abi,
-      tokenAddress,
-      'decimals()',
-      null,
-      chain,
-    );
-
-    const balance = await callContract(
-      abi,
-      tokenAddress,
-      'balanceOf(address)',
-      [walletAddress],
-      chain,
-    );
-
-    const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-    const allowance = await callContract(
-      abi,
-      tokenAddress,
-      'allowance(address,address)',
-      [walletAddress, ibAlluoAddress],
-      chain,
-    );
-
-    return {
-      tokenAddress,
-      symbol,
-      decimals,
-      balance: fromDecimals(balance, decimals),
-      allowance: fromDecimals(allowance, decimals),
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
 /**
  * @description Get meta transaction nonce for on contract.
  * @param {string} metaTxContractAddress - Contract address to which nonce is requested.
  * @param {string} user - Address of user whose nonce is requested.
  * @returns {Promise<number>} User nonce.
  */
-async function getAddressNonce(metaTxContractAddress, user) {
+async function getAddressNonce(metaTxContractAddress, user, chain) {
   // this is merged combination of abi of different contracts - nonces
   // are fetched differently on some contracts.
   const abi = [
@@ -936,15 +873,19 @@ async function getAddressNonce(metaTxContractAddress, user) {
     },
   ];
 
-  const metaTxContract = new web3.eth.Contract(abi, metaTxContractAddress);
+  const metaTxContract = new ethers.Contract(
+    metaTxContractAddress,
+    abi,
+    await getReadOnlyProvider(chain),
+  );
 
   // get user nonce
   let nonce;
   try {
     if (usesNoncesAddresses.includes(metaTxContractAddress)) {
-      nonce = await metaTxContract.methods.nonces(user).call();
+      nonce = await metaTxContract.nonces(user);
     } else {
-      nonce = await metaTxContract.methods.getNonce(user).call();
+      nonce = await metaTxContract.getNonce(user);
     }
   } catch (error) {
     console.log(error);
@@ -954,14 +895,14 @@ async function getAddressNonce(metaTxContractAddress, user) {
 }
 
 const getSignatureParameters = signature => {
-  if (!Web3.utils.isHexStrict(signature)) {
+  if (!ethers.utils.isHexString(signature)) {
     throw new Error(
-      'Given value "'.concat(signature, '" is not a valid hex string.'),
+        'Given value "'.concat(signature, '" is not a valid hex string.')
     );
-  }
+}
   let r = signature.slice(0, 66);
   let s = '0x'.concat(signature.slice(66, 130));
-  let v = Web3.utils.hexToNumber('0x'.concat(signature.slice(130, 132)));
+  let v = ethers.BigNumber.from('0x'.concat(signature.slice(130, 132))).toNumber();
   if (![27, 28].includes(v)) v += 27;
 
   return {
@@ -969,346 +910,6 @@ const getSignatureParameters = signature => {
     s: s,
     v: v,
   };
-};
-
-export const approveStableCoin = async (
-  farmAddress,
-  tokenAddress,
-  chain = EChain.POLYGON,
-  useBiconomy = false,
-) => {
-  if (chain == EChain.ETHEREUM || !useBiconomy) {
-    try {
-      const abi = [
-        {
-          inputs: [
-            { internalType: 'address', name: 'spender', type: 'address' },
-            { internalType: 'uint256', name: 'amount', type: 'uint256' },
-          ],
-          name: 'approve',
-          outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-          stateMutability: 'nonpayable',
-          type: 'function',
-        },
-      ];
-
-      const tx = await sendTransaction(
-        abi,
-        tokenAddress,
-        'approve(address,uint256)',
-        [farmAddress, maximumUint256Value],
-        chain,
-      );
-
-      return tx;
-    } catch (error) {
-      throw error;
-    }
-  } else {
-    const biconomy = await startBiconomy(chain, walletProvider);
-    const biconomyWeb3 = new Web3(biconomy);
-
-    const nonce = await getAddressNonce(tokenAddress, walletAddress);
-
-    let domain;
-    let types;
-    let message;
-    let primaryType;
-    let contract;
-
-    const abiNameMethod = {
-      inputs: [],
-      name: 'name',
-      outputs: [{ internalType: 'string', name: '', type: 'string' }],
-      stateMutability: 'view',
-      type: 'function',
-    };
-
-    const chainId = await web3.eth.getChainId();
-
-    let usePermit = false;
-
-    if (permitOnlyTokenAddresses.includes(tokenAddress)) {
-      usePermit = true;
-      const abi = [
-        {
-          inputs: [
-            { internalType: 'address', name: 'owner', type: 'address' },
-            { internalType: 'address', name: 'spender', type: 'address' },
-            { internalType: 'uint256', name: 'value', type: 'uint256' },
-            { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-            { internalType: 'uint8', name: 'v', type: 'uint8' },
-            { internalType: 'bytes32', name: 'r', type: 'bytes32' },
-            { internalType: 'bytes32', name: 's', type: 'bytes32' },
-          ],
-          name: 'permit',
-          outputs: [],
-          stateMutability: 'nonpayable',
-          type: 'function',
-        },
-        abiNameMethod,
-      ];
-
-      contract = new biconomyWeb3.eth.Contract(abi as any, tokenAddress);
-
-      const name = await contract.methods.name().call();
-
-      domain = {
-        name: name,
-        version: '1',
-        chainId: chainId,
-        verifyingContract: tokenAddress,
-      };
-      primaryType = 'Permit';
-      const EIP712Domain = [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ];
-      const permit = [
-        { name: 'owner', type: 'address' },
-        { name: 'spender', type: 'address' },
-        { name: 'value', type: 'uint256' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'deadline', type: 'uint256' },
-      ];
-      types = { Permit: permit, EIP712Domain: EIP712Domain };
-      message = {
-        owner: walletAddress,
-        spender: farmAddress,
-        value: maximumUint256Value,
-        nonce: nonce,
-        deadline: maximumUint256Value,
-      };
-    } else {
-      const abi = [
-        {
-          inputs: [
-            { internalType: 'address', name: 'userAddress', type: 'address' },
-            { internalType: 'bytes', name: 'functionSignature', type: 'bytes' },
-            { internalType: 'bytes32', name: 'sigR', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'sigS', type: 'bytes32' },
-            { internalType: 'uint8', name: 'sigV', type: 'uint8' },
-          ],
-          name: 'executeMetaTransaction',
-          outputs: [{ internalType: 'bytes', name: '', type: 'bytes' }],
-          stateMutability: 'payable',
-          type: 'function',
-        },
-        abiNameMethod,
-      ];
-      contract = new biconomyWeb3.eth.Contract(abi as any, tokenAddress);
-
-      const name = await contract.methods.name().call();
-      const functionSignature =
-        '0x095ea7b3' +
-        web3.utils.padLeft(farmAddress, 64).replace('0x', '') +
-        'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-      const salt = web3.utils.padLeft(web3.utils.toHex(chainId), 64, '0');
-
-      domain = {
-        name: name,
-        version: '1',
-        verifyingContract: tokenAddress,
-        salt: salt,
-      };
-      primaryType = 'MetaTransaction';
-      const EIP712Domain = [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'verifyingContract', type: 'address' },
-        { name: 'salt', type: 'bytes32' },
-      ];
-      const metaTransaction = [
-        { name: 'nonce', type: 'uint256' },
-        { name: 'from', type: 'address' },
-        { name: 'functionSignature', type: 'bytes' },
-      ];
-      types = { MetaTransaction: metaTransaction, EIP712Domain: EIP712Domain };
-      message = {
-        nonce: nonce,
-        from: walletAddress,
-        functionSignature: functionSignature,
-      };
-    }
-
-    let msgParams = JSON.stringify({
-      domain: domain,
-      message: message,
-      primaryType: primaryType,
-      types: types,
-    });
-
-    let params = [walletAddress, msgParams];
-    let method = 'eth_signTypedData_v4';
-
-    const res = new Promise((resolve, reject) => {
-      web3.currentProvider.sendAsync(
-        {
-          method,
-          params,
-          walletAddress,
-        },
-        async function (err, result) {
-          if (err) {
-            reject(err);
-            return;
-          }
-          if (result.error) {
-            reject(result);
-            return;
-          }
-
-          const { r, s, v } = getSignatureParameters(result.result);
-
-          try {
-            let tx;
-            if (usePermit) {
-              tx = await contract.methods
-                .permit(
-                  message.owner,
-                  message.spender,
-                  message.value,
-                  message.deadline,
-                  v,
-                  r,
-                  s,
-                )
-                .send({
-                  from: walletAddress,
-                });
-            } else {
-              tx = await contract.methods
-                .executeMetaTransaction(
-                  walletAddress,
-                  message.functionSignature,
-                  r,
-                  s,
-                  v,
-                )
-                .send({
-                  from: walletAddress,
-                });
-            }
-            resolve(tx);
-          } catch (err) {
-            console.log('handle errors like signature denied here');
-            console.log(err);
-            reject(err);
-          }
-        },
-      );
-    });
-
-    return await res;
-  }
-};
-
-export const depositStableCoin = async (
-  tokenAddress,
-  amount,
-  decimals,
-  type = 'usd',
-  chain = EChain.POLYGON,
-  useBiconomy,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [
-          { internalType: 'address', name: '_token', type: 'address' },
-          { internalType: 'uint256', name: '_amount', type: 'uint256' },
-        ],
-        name: 'deposit',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-    const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-    const amountInDecimals = toDecimals(amount, decimals);
-
-    const tx = await sendTransaction(
-      abi,
-      ibAlluoAddress,
-      'deposit(address,uint256)',
-      [tokenAddress, amountInDecimals],
-      chain,
-      useBiconomy,
-    );
-
-    return tx;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const depositIntoBoosterFarm = async (
-  farmAddress,
-  tokenAddress,
-  amount,
-  decimals,
-  chain = EChain.POLYGON,
-  useBiconomy = false,
-) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'uint256', name: 'assets', type: 'uint256' },
-        { internalType: 'address', name: 'entryToken', type: 'address' },
-      ],
-      name: 'depositWithoutLP',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const amountInDecimals = toDecimals(amount, decimals);
-
-  const tx = await sendTransaction(
-    abi,
-    farmAddress,
-    'depositWithoutLP(uint256,address)',
-    [amountInDecimals, tokenAddress],
-    chain,
-    useBiconomy,
-  );
-
-  return tx;
-};
-
-export const approve = async (
-  tokenAddress,
-  spender,
-  chain = EChain.ETHEREUM,
-  useBiconomy = false,
-) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: 'spender', type: 'address' },
-        { internalType: 'uint256', name: 'amount', type: 'uint256' },
-      ],
-      name: 'approve',
-      outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-      stateMutability: 'nonpayable',
-      type: 'function',
-    },
-  ];
-
-  const tx = await sendTransaction(
-    abi,
-    tokenAddress,
-    'approve(address,uint256)',
-    [spender, maximumUint256Value],
-    chain,
-    useBiconomy,
-  );
-
-  return tx;
 };
 
 export const getBalanceOf = async (
@@ -1445,7 +1046,7 @@ export const getSymbol = async (tokenAddress, chain = EChain.POLYGON) => {
 };
 
 export const getUserDepositedAmount = async (
-  type = 'usd',
+  address,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1458,8 +1059,6 @@ export const getUserDepositedAmount = async (
     },
   ];
 
-  const address = getIbAlluoAddress(type, chain);
-
   const userDepositedAmount = await callContract(
     abi,
     address,
@@ -1468,7 +1067,7 @@ export const getUserDepositedAmount = async (
     chain,
   );
 
-  return Web3.utils.fromWei(userDepositedAmount);
+  return ethers.utils.formatEther(userDepositedAmount);
 };
 
 export const converToAssetValue = async (
@@ -1500,7 +1099,7 @@ export const converToAssetValue = async (
     chain,
   );
 
-  return Web3.utils.fromWei(userDepositedAmount);
+  return ethers.utils.formatEther(userDepositedAmount);
 };
 
 export const getUserDepositedLPAmount = async (farmAddress, chain) => {
@@ -1522,57 +1121,10 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
     chain,
   );
 
-  return Web3.utils.fromWei(userDepositedLPAmount);
+  return ethers.utils.formatEther(userDepositedLPAmount);
 };
 
-const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
-export const getBoosterFarmInterest = async (
-  farmVaultAddress,
-  apyFarmAddresses,
-  chain,
-) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'adminFee',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const fee =
-    1 -
-    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
-      10000;
-
-  const baseApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
-  ).then(res => res.json());
-  const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
-
-  const boostApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
-  ).then(res => res.json());
-  const boostApyData =
-    boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
-
-  const baseApy = baseApyData.apyBase / 100;
-  const boostApy = boostApyData.apyBase / 100;
-  const baseRewardsAPR = baseApyData.apyReward / 100;
-  const boostRewardsAPR = boostApyData.apyReward / 100;
-
-  return (
-    (baseApy +
-      baseRewardsAPR *
-        fee *
-        (1 + boostApy) *
-        Math.pow(1 + boostRewardsAPR / 52, 52)) *
-    100
-  );
-};
-
-export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
+export const getTotalAssetSupply = async (farmAddress, chain = EChain.POLYGON) => {
   const abi = [
     {
       inputs: [],
@@ -1583,11 +1135,9 @@ export const getTotalAssetSupply = async (type, chain = EChain.POLYGON) => {
     },
   ];
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
   const totalAssetSupply = await callContract(
     abi,
-    ibAlluoAddress,
+    farmAddress,
     'totalAssetSupply()',
     null,
     chain,
@@ -1615,7 +1165,7 @@ export const getTotalAssets = async (farmAddress, chain = EChain.POLYGON) => {
     chain,
   );
 
-  return Web3.utils.fromWei(totalAssetSupply);
+  return ethers.utils.formatEther(totalAssetSupply);
 };
 
 export const getUserDepositedTransferAmount = async (
@@ -1642,10 +1192,10 @@ export const getUserDepositedTransferAmount = async (
     chain,
   );
 
-  return Web3.utils.fromWei(userDepositedAmount);
+  return ethers.utils.formatEther(userDepositedAmount);
 };
 
-export const getInterest = async (type = 'usd', chain = EChain.POLYGON) => {
+export const getInterest = async (tokenAddress, chain = EChain.POLYGON) => {
   const abi = [
     {
       inputs: [],
@@ -1656,238 +1206,15 @@ export const getInterest = async (type = 'usd', chain = EChain.POLYGON) => {
     },
   ];
 
-  const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
   const interest = await callContract(
     abi,
-    ibAlluoAddress,
+    tokenAddress,
     'annualInterest()',
     null,
     chain,
   );
 
   return fromDecimals(interest, 2);
-};
-
-export const withdrawStableCoin = async (
-  coinAddress,
-  amount,
-  type = 'usd',
-  chain = EChain.POLYGON,
-  useBiconomy,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [
-          { internalType: 'address', name: '_targetToken', type: 'address' },
-          { internalType: 'uint256', name: '_amount', type: 'uint256' },
-        ],
-        name: 'withdraw',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-
-    const ibAlluoAddress = getIbAlluoAddress(type, chain);
-
-    const amountInWei = Web3.utils.toWei(amount);
-
-    const tx = await sendTransaction(
-      abi,
-      ibAlluoAddress,
-      'withdraw(address,uint256)',
-      [coinAddress, amountInWei],
-      chain,
-      useBiconomy,
-    );
-
-    return tx;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const claimBoosterFarmLPRewards = async (
-  farmAddress,
-  chain = EChain.POLYGON,
-  useBiconomy = false,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [],
-        name: 'claimRewards',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-
-    const tx = await sendTransaction(
-      abi,
-      farmAddress,
-      'claimRewards()',
-      [],
-      chain,
-      useBiconomy,
-    );
-
-    return tx;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const claimBoosterFarmNonLPRewards = async (
-  farmAddress,
-  tokenAddress,
-  chain = EChain.POLYGON,
-  useBiconomy = false,
-) => {
-  try {
-    const abi = [
-      {
-        inputs: [
-          { internalType: 'address', name: 'exitToken', type: 'address' },
-        ],
-        name: 'claimRewardsInNonLp',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ];
-
-    const tx = await sendTransaction(
-      abi,
-      farmAddress,
-      'claimRewardsInNonLp(address)',
-      [tokenAddress],
-      chain,
-      useBiconomy,
-    );
-
-    return tx;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const listenToHandler = blockNumber => {
-  const handlerInstance = new web3.eth.Contract(
-    polygonHandlerAbi as any,
-    EPolygonAddresses.HANDLER,
-  );
-
-  return handlerInstance.events;
-};
-
-export const getIfUserHasWithdrawalRequest = async (
-  walletAddress,
-  farmAddress,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'address', name: '_ibAlluo', type: 'address' },
-        { internalType: 'address', name: '_user', type: 'address' },
-      ],
-      name: 'isUserWaiting',
-      outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [{ internalType: 'address', name: '', type: 'address' }],
-      name: 'ibAlluoToWithdrawalSystems',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: 'lastWithdrawalRequest',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'lastSatisfiedWithdrawal',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'totalWithdrawalAmount',
-          type: 'uint256',
-        },
-        { internalType: 'bool', name: 'resolverTrigger', type: 'bool' },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        { internalType: 'address', name: '_ibAlluo', type: 'address' },
-        { internalType: 'uint256', name: '_id', type: 'uint256' },
-      ],
-      name: 'getWithdrawal',
-      outputs: [
-        {
-          components: [
-            { internalType: 'address', name: 'user', type: 'address' },
-            { internalType: 'address', name: 'token', type: 'address' },
-            { internalType: 'uint256', name: 'amount', type: 'uint256' },
-            { internalType: 'uint256', name: 'time', type: 'uint256' },
-          ],
-          internalType: 'struct LiquidityHandler.Withdrawal',
-          name: '',
-          type: 'tuple',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const polygonHandlerAddress = EPolygonAddresses.HANDLER;
-
-  const isUserWaiting = await callContract(
-    abi,
-    polygonHandlerAddress,
-    'isUserWaiting(address,address)',
-    [farmAddress, walletAddress],
-    chain,
-  );
-
-  if (!isUserWaiting) return [];
-
-  const ibAlluoToWithdrawalSystems = await callContract(
-    abi,
-    polygonHandlerAddress,
-    'ibAlluoToWithdrawalSystems(address)',
-    [farmAddress],
-    chain,
-  );
-
-  const { lastSatisfiedWithdrawal, lastWithdrawalRequest } =
-    ibAlluoToWithdrawalSystems;
-  const allWithdrawalRequests = [];
-
-  for (let i = +lastSatisfiedWithdrawal + 1; i <= +lastWithdrawalRequest; i++) {
-    const withdrawal = await callContract(
-      abi,
-      polygonHandlerAddress,
-      'getWithdrawal(address,uint256)',
-      [farmAddress, i],
-      chain,
-    );
-    allWithdrawalRequests.push(withdrawal);
-  }
-
-  const allWithdrawals = await Promise.all(allWithdrawalRequests);
-  const usersWithdrawals = allWithdrawals.filter(
-    w => w.user.toLowerCase() === walletAddress.toLowerCase(),
-  );
-
-  return usersWithdrawals;
 };
 
 export const getSuperfluidFramework = async () => {

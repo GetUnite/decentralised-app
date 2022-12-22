@@ -1,6 +1,5 @@
 import {
   getBalanceOf,
-  getBoosterFarmInterest,
   getChainById,
   getCurrentChainId,
   getInterest,
@@ -16,8 +15,10 @@ import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
+import { getBoostFarmInterest } from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
 
 const possibleStableTokens = [
@@ -69,8 +70,13 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  const location = useLocation();
+
   useEffect(() => {
     fetchFarmsInfo();
+    if (walletAccountAtom && location.search.includes('view_type=my_farms')) {
+      setViewType('View my farms only');
+    }
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -99,7 +105,7 @@ export const useMain = () => {
             supportedTokens,
             depositedAmount,
             poolShare,
-          } = availableFarm.isBooster
+          } = availableFarm.isBoost
             ? await fetchBoostFarmInfo(availableFarm)
             : await fetchFarmInfo(availableFarm);
 
@@ -142,7 +148,7 @@ export const useMain = () => {
                   supportedTokenWithBalance.decimals,
                   supportedTokenWithBalance.chain,
                 );
-                if (+toExactFixed(balance, 2) > 0) {
+                if (+balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
                 }
@@ -169,7 +175,7 @@ export const useMain = () => {
     for (let index = 0; index < farmsWithDepositedAmount.length; index++) {
       const farm = farmsWithDepositedAmount[index];
 
-      if (farm.isBooster) {
+      if (farm.isBoost) {
         totalDepositedAmountInUsd =
           totalDepositedAmountInUsd + +farm.depositedAmount;
       } else {
@@ -182,14 +188,14 @@ export const useMain = () => {
   const fetchFarmInfo = async farm => {
     let farmInfo;
     farmInfo = {
-      interest: await getInterest(farm.type, farm.chain),
-      totalAssetSupply: await getTotalAssetSupply(farm.type, farm.chain),
+      interest: await getInterest(farm.farmAddress, farm.chain),
+      totalAssetSupply: await getTotalAssetSupply(farm.farmAddress, farm.chain),
       supportedTokens: farm.supportedTokens,
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
       farmInfo.depositedAmount = await getUserDepositedAmount(
-        farm.type,
+        farm.farmAddress,
         farm.chain,
       );
 
@@ -214,7 +220,7 @@ export const useMain = () => {
     );
 
     farmInfo = {
-      interest: await getBoosterFarmInterest(
+      interest: await getBoostFarmInterest(
         farm.farmAddress,
         farm.apyFarmAddresses,
         farm.chain,
@@ -286,10 +292,10 @@ export const useMain = () => {
     filteredFarms = filteredFarms.filter(farm => {
       let result = false;
       if (typeFilter.includes('Fixed-rate farms')) {
-        result = result || !farm.isBooster;
+        result = result || !farm.isBoost;
       }
       if (typeFilter.includes('Boost farms')) {
-        result = result || farm.isBooster;
+        result = result || farm.isBoost;
       }
       if (typeFilter.includes('Newest farms')) {
         result = result || farm.isNewest;
@@ -347,8 +353,8 @@ export const useMain = () => {
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }
 
-    setFilteredFarms(filteredFarms.filter(farm => !farm.isBooster));
-    setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBooster));
+    setFilteredFarms(filteredFarms.filter(farm => !farm.isBoost));
+    setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBoost));
   };
 
   return {
