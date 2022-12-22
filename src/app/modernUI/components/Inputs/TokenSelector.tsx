@@ -25,19 +25,19 @@ export const TokenSelector = ({
         id="dropdown"
         open={isOpen}
         plain
+        style={{ height: '100%' }}
+        onClick={() => setIsOpen(!isOpen)}
         label={
           <Box align="center">
-            <Button onClick={() => setIsOpen(!isOpen)}>
-              <Box
-                direction="row"
-                gap="10px"
-                align="center"
-                margin={{ right: '16px' }}
-              >
-                <TokenIcon label={selectedToken.label} />
-                <Down size="small" />
-              </Box>
-            </Button>
+            <Box
+              direction="row"
+              gap="10px"
+              align="center"
+              margin={{ right: '16px' }}
+            >
+              <TokenIcon label={selectedToken.label} />
+              <Down size="small" />
+            </Box>
           </Box>
         }
         dropAlign={{ top: 'bottom', right: 'right' }}
@@ -50,6 +50,7 @@ export const TokenSelector = ({
               display: 'block',
               background: backgroundColor,
               color: textColor,
+              right: '3em',
             }}
           >
             <Box fill gap="4px">

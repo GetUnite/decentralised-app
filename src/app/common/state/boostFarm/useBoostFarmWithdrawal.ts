@@ -1,8 +1,8 @@
-import { convertFromUSDC } from 'app/common/functions/boosterFarm';
+import { EChain } from 'app/common/constants/chains';
 import {
-  convertToLP,
-  withdrawFromBoosterFarm
-} from 'app/common/functions/farm';
+  convertFromUSDC, convertToLP,
+  withdrawFromBoostFarm
+} from 'app/common/functions/boostFarm';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -22,9 +22,9 @@ export const useBoostFarmWithdrawal = ({
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false)
-    /*isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
-  );*/
+  const [useBiconomy, setUseBiconomy] = useState(
+    isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+  );
 
   // inputs
   const [withdrawValue, setWithdrawValue] = useState<string>();
@@ -72,7 +72,7 @@ export const useBoostFarmWithdrawal = ({
       setWithdrawValueError('Write a valid number');
     } else if (
       +value >
-      (selectedFarm.isBooster
+      (selectedFarm.isBoost
         ? selectedSupportedToken.boosterDepositedAmount
         : +selectedFarm?.depositedAmount)
     ) {
@@ -90,7 +90,7 @@ export const useBoostFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
-      const tx = await withdrawFromBoosterFarm(
+      const tx = await withdrawFromBoostFarm(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         // The withdraw value is always referent to the selected supported token

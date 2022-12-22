@@ -8,7 +8,42 @@ import {
   sendTransaction
 } from './web3Client';
 
-export const withdrawFromBoosterFarm = async (
+export const depositIntoBoostFarm = async (
+  farmAddress,
+  tokenAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        { internalType: 'address', name: 'entryToken', type: 'address' },
+      ],
+      name: 'depositWithoutLP',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const amountInDecimals = toDecimals(amount, decimals);
+
+  const tx = await sendTransaction(
+    abi,
+    farmAddress,
+    'depositWithoutLP(uint256,address)',
+    [amountInDecimals, tokenAddress],
+    chain,
+    useBiconomy,
+  );
+
+  return tx;
+};
+
+export const withdrawFromBoostFarm = async (
   farmAddress,
   tokenAddress,
   amount,
@@ -54,7 +89,7 @@ export const withdrawFromBoosterFarm = async (
   }
 };
 
-export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
+export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   const abi = [
     {
       inputs: [
@@ -149,7 +184,7 @@ export const getBoosterFarmPendingRewards = async (farmAddress, chain) => {
   );
 };
 
-export const getBoosterFarmRewards = async (
+export const getBoostFarmRewards = async (
   farmAddress,
   valueOf1LPinUSDC,
   chain,
@@ -192,7 +227,7 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
     6,
     decimals,
   );
-  
+
   return valueInUSDC * tokenPrice;
 };
 
@@ -209,4 +244,116 @@ export const convertToLP = async (
     6,
   );
   return (usdcPrice * value) / valueOf1LPinUSDC;
+};
+
+const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
+export const getBoostFarmInterest = async (
+  farmVaultAddress,
+  apyFarmAddresses,
+  chain,
+) => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'adminFee',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const fee =
+    1 -
+    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
+      10000;
+
+  const baseApyJsonResult = await fetch(
+    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+  ).then(res => res.json());
+  const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
+
+  const boostApyJsonResult = await fetch(
+    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+  ).then(res => res.json());
+  const boostApyData =
+    boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
+
+  const baseApy = baseApyData.apyBase / 100;
+  const boostApy = boostApyData.apyBase / 100;
+  const baseRewardsAPR = baseApyData.apyReward / 100;
+  const boostRewardsAPR = boostApyData.apyReward / 100;
+
+  return (
+    (baseApy +
+      baseRewardsAPR *
+        fee *
+        (1 + boostApy) *
+        Math.pow(1 + boostRewardsAPR / 52, 52)) *
+    100
+  );
+};
+
+export const claimBoostFarmLPRewards = async (
+  farmAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'claimRewards',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewards()',
+      [],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const claimBoostFarmNonLPRewards = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          { internalType: 'address', name: 'exitToken', type: 'address' },
+        ],
+        name: 'claimRewardsInNonLp',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewardsInNonLp(address)',
+      [tokenAddress],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
