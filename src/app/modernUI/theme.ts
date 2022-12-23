@@ -63,11 +63,11 @@ export const theme = deepMerge(grommet, {
       error: colors.ERROR,
       errorSoft: 'rgb(250,243,243)',
       darkErrorSoft:
-        'linear-gradient(90.03deg, rgba(57, 2, 13, 0.95) 6.3%, rgba(32, 32, 32, 0.95) 95.91%);',
+        'linear-gradient(90.03deg, rgba(57, 2, 13, 0.95) 6.3%, rgba(32, 32, 32, 0.95) 95.91%)',
       info: colors.BLUE,
       infoSoft: 'rgb(229,237,251)',
       darkInfoSoft:
-        'linear-gradient(90.08deg, rgba(23, 46, 91, 0.95) -1.24%, rgba(32, 32, 32, 0.95) 70.29%);',
+        'linear-gradient(90.08deg, rgba(23, 46, 91, 0.95) -1.24%, rgba(32, 32, 32, 0.95) 70.29%)',
       border: { light: colors.BLACK_20 },
       // brand: { light: 'rgba(255,255,255,.2)', dark: 'red' },
       brand: { light: colors.BLUE, dark: 'white' },
@@ -79,7 +79,7 @@ export const theme = deepMerge(grommet, {
       softText: '#CCCCCC',
       successSoft: 'rgb(238,248,238)',
       darkSuccessSoft:
-        'linear-gradient(90.03deg, rgba(10, 50, 16, 0.9) 6.3%, rgba(32, 33, 32, 0.9) 95.91%);',
+        'linear-gradient(90.03deg, rgba(10, 50, 16, 0.9) 6.3%, rgba(32, 33, 32, 0.9) 95.91%)',
       success: colors.GREEN,
       soul: colors.BLACK_40,
       casper: { light: colors.BLACK_8, dark: colors.WHITE_10 },
@@ -95,8 +95,8 @@ export const theme = deepMerge(grommet, {
       tabSwitch: { light: colors.BLACK_3, dark: colors.BLACK },
       container: {
         light:
-          'linear-gradient(360deg, rgba(250, 252, 255, 0.36) 0%, #FAFAFA 104.31%);',
-        dark: 'linear-gradient(40deg, #0B1D41 0%, #000 30%);',
+          'linear-gradient(360deg, rgba(250, 252, 255, 0.36) 0%, #FAFAFA 104.31%)',
+        dark: 'linear-gradient(40deg, #0B1D41 0%, #000 30%)',
       },
     },
     edgeSize: {

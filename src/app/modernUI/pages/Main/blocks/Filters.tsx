@@ -9,12 +9,12 @@ export const Filters = ({
   walletAccountAtom,
   possibleTypes,
   typeFilter,
-  setTypeFilter,
+  updateTypeFilter,
   possibleNetworks,
   possibleNonStableTokens,
   possibleStableTokens,
-  setTokenFilter,
-  setNetworkFilter,
+  updateTokenFilter,
+  updateNetworkFilter,
   tokenFilter,
   networkFilter,
   possibleViewTypes,
@@ -43,9 +43,9 @@ export const Filters = ({
           options={possibleTypes}
           value={typeFilter}
           onClear={() => {
-            setTypeFilter([]);
-            setTokenFilter([]);
-            setNetworkFilter([]);
+            updateTypeFilter([], false);
+            updateTokenFilter([], false);
+            updateNetworkFilter([], false);
           }}
         >
           <Box
@@ -69,10 +69,11 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTypeFilter(
+                updateTypeFilter(
                   typeFilter.length == possibleTypes.length
                     ? []
                     : possibleTypes,
+                  typeFilter.length == possibleTypes.length ? false : true,
                 )
               }
               checked={possibleTypes.length == typeFilter.length}
@@ -83,7 +84,7 @@ export const Filters = ({
             options={possibleTypes}
             value={typeFilter}
             onChange={event => {
-              setTypeFilter(event.value);
+              updateTypeFilter(event.value);
             }}
             style={
               !walletAccountAtom
@@ -155,11 +156,15 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTokenFilter(
+                updateTokenFilter(
                   tokenFilter.length ==
                     [...possibleNonStableTokens, ...possibleStableTokens].length
                     ? []
                     : [...possibleNonStableTokens, ...possibleStableTokens],
+                  tokenFilter.length ==
+                    [...possibleNonStableTokens, ...possibleStableTokens].length
+                    ? false
+                    : true,
                 )
               }
               checked={
@@ -176,7 +181,7 @@ export const Filters = ({
             options={possibleStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -199,7 +204,7 @@ export const Filters = ({
             options={possibleNonStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
             style={{
               borderBottom: `2px solid ${dividerColor}`,
@@ -238,10 +243,13 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setNetworkFilter(
+                updateNetworkFilter(
                   networkFilter.length == possibleNetworks.length
                     ? []
                     : possibleNetworks,
+                  networkFilter.length == possibleNetworks.length
+                    ? false
+                    : true,
                 )
               }
               checked={possibleNetworks.length == networkFilter.length}
@@ -252,7 +260,7 @@ export const Filters = ({
             options={possibleNetworks}
             value={networkFilter}
             onChange={event => {
-              setNetworkFilter(event.value);
+              updateNetworkFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -269,12 +277,18 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
         <Filter
-          heading="Farms"
-          style={{ width: '80px', padding: 0 }}
-          plain
-          options={possibleTypes}
-          value={typeFilter}
-          onClear={() => setTypeFilter([])}
+          heading={
+            typeFilter.length == 1
+              ? typeFilter[0]
+              : typeFilter.length > 1 &&
+                typeFilter.length < possibleTypes.length
+              ? `${typeFilter[typeFilter.length - 1]} + ${
+                  typeFilter.length - 1
+                }`
+              : 'Farms'
+          }
+          isFiltering={typeFilter.length != possibleTypes.length}
+          onClear={() => updateTypeFilter([], false)}
         >
           <Box
             direction="row"
@@ -297,10 +311,11 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTypeFilter(
+                updateTypeFilter(
                   typeFilter.length == possibleTypes.length
                     ? []
                     : possibleTypes,
+                  typeFilter.length == possibleTypes.length ? false : true,
                 )
               }
               checked={possibleTypes.length == typeFilter.length}
@@ -311,7 +326,7 @@ export const Filters = ({
             options={possibleTypes}
             value={typeFilter}
             onChange={event => {
-              setTypeFilter(event.value);
+              updateTypeFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -356,10 +371,22 @@ export const Filters = ({
           )}
         </Filter>
         <Filter
-          heading="Tokens"
-          style={{ width: '80px', padding: 0 }}
-          plain
-          onClear={() => setTokenFilter([])}
+          heading={
+            tokenFilter.length == 1
+              ? tokenFilter[0]
+              : tokenFilter.length > 1 &&
+                tokenFilter.length <
+                  [...possibleNonStableTokens, ...possibleStableTokens].length
+              ? `${tokenFilter[tokenFilter.length - 1]} + ${
+                  tokenFilter.length - 1
+                }`
+              : 'Tokens'
+          }
+          isFiltering={
+            tokenFilter.length !=
+            [...possibleNonStableTokens, ...possibleStableTokens].length
+          }
+          onClear={() => updateTokenFilter([], false)}
         >
           <Box
             direction="row"
@@ -382,11 +409,15 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTokenFilter(
+                updateTokenFilter(
                   tokenFilter.length ==
                     [...possibleNonStableTokens, ...possibleStableTokens].length
                     ? []
                     : [...possibleNonStableTokens, ...possibleStableTokens],
+                  tokenFilter.length ==
+                    [...possibleNonStableTokens, ...possibleStableTokens].length
+                    ? false
+                    : true,
                 )
               }
               checked={
@@ -403,7 +434,7 @@ export const Filters = ({
             options={possibleStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -426,7 +457,7 @@ export const Filters = ({
             options={possibleNonStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -443,10 +474,18 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
         <Filter
-          heading="Networks"
-          style={{ width: '100px', padding: 0 }}
-          plain
-          onClear={() => setNetworkFilter([])}
+          heading={
+            networkFilter.length == 1
+              ? networkFilter[0]
+              : networkFilter.length > 1 &&
+                networkFilter.length < possibleNetworks.length
+              ? `${networkFilter[networkFilter.length - 1]} + ${
+                  networkFilter.length - 1
+                }`
+              : 'Networks'
+          }
+          onClear={() => updateNetworkFilter([], false)}
+          isFiltering={networkFilter.length != possibleNetworks.length}
         >
           <Box
             direction="row"
@@ -469,10 +508,13 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setNetworkFilter(
+                updateNetworkFilter(
                   networkFilter.length == possibleNetworks.length
                     ? []
                     : possibleNetworks,
+                  networkFilter.length == possibleNetworks.length
+                    ? false
+                    : true,
                 )
               }
               checked={possibleNetworks.length == networkFilter.length}
@@ -483,7 +525,7 @@ export const Filters = ({
             options={possibleNetworks}
             value={networkFilter}
             onChange={event => {
-              setNetworkFilter(event.value);
+              updateNetworkFilter(event.value);
             }}
           >
             {(option, { checked }) => {
