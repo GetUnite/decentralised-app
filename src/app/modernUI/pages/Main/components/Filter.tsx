@@ -1,7 +1,8 @@
 import { useMode } from 'app/common/state';
 import 'app/modernUI/css/Dropdown.css';
+import { colors } from 'app/modernUI/theme';
 import { Box, Button, DropButton, Heading, Text } from 'grommet';
-import { Down } from 'grommet-icons';
+import { Down, FormClose } from 'grommet-icons';
 
 export const Filter = ({
   icon = null,
@@ -9,12 +10,15 @@ export const Filter = ({
   heading,
   onClear,
   buttonStyle = null,
+  isFiltering = false,
   ...rest
 }) => {
   const { isLightMode } = useMode();
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
   const backgroundColor = isLightMode ? '#FFFFFF' : '#1D1D1D';
+  const filteringBackgroundColor = isLightMode ? '#EAF1FF' : '#EAF1FF80';
   const textColor = isLightMode ? 'black' : 'white';
+  const filteringTextColor = isLightMode ? colors.BLUE : 'white';
 
   return (
     <>
@@ -22,20 +26,36 @@ export const Filter = ({
         id="dropdown"
         plain
         label={
-          <Box direction="row" gap={icon ? '4px' : '7px'} pad='5px 9px 5px 13px' align='center'>
+          <Box
+            direction="row"
+            gap={icon ? '4px' : isFiltering ? '4px' : '7px'}
+            pad="5px 9px 5px 13px"
+            align="center"
+          >
             {icon && <img src={icon} />}
             <Text size="14px">{heading}</Text>
-            {!icon && <Down size="small" />}
+            {!icon && (
+              <>
+                {isFiltering ? (
+                  <FormClose size="14px" color={filteringTextColor} />
+                ) : (
+                  <Down size="small" />
+                )}
+              </>
+            )}
           </Box>
         }
         style={
           buttonStyle
             ? buttonStyle
             : {
-              
                 height: '32px',
                 borderRadius: '8px',
-                border: '1px solid #CCCCCC',
+                ...(isFiltering
+                  ? { backgroundColor: filteringBackgroundColor, color: filteringTextColor }
+                  : {
+                      border: '1px solid #CCCCCC',
+                    }),
               }
         }
         dropAlign={{ top: 'bottom', left: 'left' }}

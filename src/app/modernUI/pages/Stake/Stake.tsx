@@ -193,7 +193,7 @@ export const Stake = ({ ...rest }) => {
                     <Button
                       label={
                         seeRewardsAsStable
-                          ? 'Show in ' + rewardsInfo.label + ' LP tokens?'
+                          ? 'Show in ' + rewardsInfo.label + ' LP tokens'
                           : 'Show in ' + rewardsInfo.stableLabel
                       }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
