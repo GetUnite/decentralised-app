@@ -47,6 +47,23 @@ export const Filters = ({
             updateTokenFilter([], false);
             updateNetworkFilter([], false);
           }}
+          onClose={() => {
+            if (typeFilter.length == 0) {
+              updateTypeFilter(possibleTypes);
+            }
+            if (networkFilter.length == 0) {
+              updateNetworkFilter(possibleNetworks);
+            }
+            if (
+              tokenFilter.length ==
+              0
+            ) {
+              updateTokenFilter([
+                ...possibleNonStableTokens,
+                ...possibleStableTokens,
+              ]);
+            }
+          }}
         >
           <Box
             direction="row"
@@ -289,6 +306,11 @@ export const Filters = ({
           }
           isFiltering={typeFilter.length != possibleTypes.length}
           onClear={() => updateTypeFilter([], false)}
+          onClose={() => {
+            if (typeFilter.length == 0) {
+              updateTypeFilter(possibleTypes);
+            }
+          }}
         >
           <Box
             direction="row"
@@ -387,6 +409,17 @@ export const Filters = ({
             [...possibleNonStableTokens, ...possibleStableTokens].length
           }
           onClear={() => updateTokenFilter([], false)}
+          onClose={() => {
+            if (
+              tokenFilter.length ==
+              0
+            ) {
+              updateTokenFilter([
+                ...possibleNonStableTokens,
+                ...possibleStableTokens,
+              ]);
+            }
+          }}
         >
           <Box
             direction="row"
@@ -485,6 +518,11 @@ export const Filters = ({
               : 'Networks'
           }
           onClear={() => updateNetworkFilter([], false)}
+          onClose={() => {
+            if (networkFilter.length == 0) {
+              updateNetworkFilter(possibleNetworks);
+            }
+          }}
           isFiltering={networkFilter.length != possibleNetworks.length}
         >
           <Box
