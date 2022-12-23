@@ -14,7 +14,7 @@ import { boostFarmOptions } from 'app/common/state/boostFarm';
 import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { EChain } from '../constants/chains';
@@ -53,6 +53,7 @@ export const useMain = () => {
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
 
   // filters
+  const shouldFilter = useRef(true);
   const [networkFilter, setNetworkFilter] = useState<any>(possibleNetworks);
   const [tokenFilter, setTokenFilter] = useState<any>([
     ...possibleStableTokens,
@@ -80,16 +81,18 @@ export const useMain = () => {
   }, [walletAccountAtom]);
 
   useEffect(() => {
-    filterFarms();
+    if (shouldFilter.current == true) {
+      filterFarms();
+    }
   }, [
     availableFarms,
     viewType,
     sortField,
     sortDirectionIsAsc,
     isSafeAppAtom,
-    tokenFilter,
     networkFilter,
     typeFilter,
+    tokenFilter,
   ]);
 
   const fetchFarmsInfo = async () => {
@@ -260,6 +263,33 @@ export const useMain = () => {
     setSortDirectionIsAsc(isAsc);
   };
 
+  const updateNetworkFilter = (values, filter: boolean = true) => {
+    if (filter) {
+      shouldFilter.current = true;
+    } else {
+      shouldFilter.current = false;
+    }
+    setNetworkFilter(values);
+  };
+
+  const updateTokenFilter = (values, filter: boolean = true) => {
+    if (filter) {
+      shouldFilter.current = true;
+    } else {
+      shouldFilter.current = false;
+    }
+    setTokenFilter(values);
+  };
+
+  const updateTypeFilter = (values, filter: boolean = true) => {
+    if (filter) {
+      shouldFilter.current = true;
+    } else {
+      shouldFilter.current = false;
+    }
+    setTypeFilter(values);
+  };
+
   const filterFarms = async () => {
     let filteredFarms;
 
@@ -365,14 +395,14 @@ export const useMain = () => {
     assetsInfo,
     viewType,
     tokenFilter,
-    setTokenFilter,
+    updateTokenFilter,
     networkFilter,
-    setNetworkFilter,
+    updateNetworkFilter,
     walletAccountAtom,
     sortBy,
     sortDirectionIsAsc,
     typeFilter,
-    setTypeFilter,
+    updateTypeFilter,
     possibleStableTokens,
     possibleNonStableTokens,
     possibleNetworks,
