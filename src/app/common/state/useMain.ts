@@ -81,9 +81,9 @@ export const useMain = () => {
   }, [walletAccountAtom]);
 
   useEffect(() => {
-    if (shouldFilter.current == true) {
+    //if (shouldFilter.current == true) {
       filterFarms();
-    }
+    //}
   }, [
     availableFarms,
     viewType,
