@@ -14,14 +14,14 @@ export const Main = () => {
     isLoading,
     viewType,
     tokenFilter,
-    setTokenFilter,
+    updateTokenFilter,
     networkFilter,
-    setNetworkFilter,
+    updateNetworkFilter,
     sortBy,
     sortDirectionIsAsc,
     walletAccountAtom,
     typeFilter,
-    setTypeFilter,
+    updateTypeFilter,
     possibleStableTokens,
     possibleNonStableTokens,
     possibleNetworks,
@@ -80,12 +80,12 @@ export const Main = () => {
                       walletAccountAtom={walletAccountAtom}
                       possibleTypes={possibleTypes}
                       typeFilter={typeFilter}
-                      setTypeFilter={setTypeFilter}
+                      updateTypeFilter={updateTypeFilter}
                       possibleNetworks={possibleNetworks}
                       possibleNonStableTokens={possibleNonStableTokens}
                       possibleStableTokens={possibleStableTokens}
-                      setTokenFilter={setTokenFilter}
-                      setNetworkFilter={setNetworkFilter}
+                      updateTokenFilter={updateTokenFilter}
+                      updateNetworkFilter={updateNetworkFilter}
                       tokenFilter={tokenFilter}
                       networkFilter={networkFilter}
                       possibleViewTypes={possibleViewTypes}
