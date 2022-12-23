@@ -9,6 +9,7 @@ export const Filter = ({
   children,
   heading,
   onClear,
+  onClose,
   buttonStyle = null,
   isFiltering = false,
   ...rest
@@ -25,6 +26,7 @@ export const Filter = ({
       <DropButton
         id="dropdown"
         plain
+        onClose={onClose}
         label={
           <Box
             direction="row"
