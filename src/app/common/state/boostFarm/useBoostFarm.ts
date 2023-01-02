@@ -1,15 +1,14 @@
 import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  getBoosterFarmPendingRewards,
-  getBoosterFarmRewards
-} from 'app/common/functions/farm';
+  claimBoostFarmLPRewards,
+  claimBoostFarmNonLPRewards, getBoostFarmInterest,
+  getBoostFarmPendingRewards,
+  getBoostFarmRewards
+} from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  claimBoosterFarmLPRewards,
-  claimBoosterFarmNonLPRewards,
-  getBoosterFarmInterest,
   getTotalAssets,
   getUserDepositedLPAmount,
   getValueOf1LPinUSDC
@@ -44,7 +43,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       'WETH',
       'WBTC',
     ],
-    isBooster: true,
+    isBoost: true,
     rewards: {
       label: 'CVX-ETH',
       icons: ['FRAX', 'USDC'],
@@ -140,7 +139,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       'WBTC',
       'DAI',
     ],
-    isBooster: true,
+    isBoost: true,
     rewards: {
       label: 'CVX-ETH',
       icons: ['CVX', 'ETH'],
@@ -236,7 +235,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       'CRV',
       'CVX',
     ],
-    isBooster: true,
+    isBoost: true,
     rewards: {
       label: 'CVX-ETH',
       icons: ['stETH', 'ETH'],
@@ -362,14 +361,12 @@ export const useBoostFarm = ({ id }) => {
     .subtract(1, 'days')
     .add(1, 'week')
     .day('Monday');
-  const [
-    showBoosterWithdrawalConfirmation,
-    setShowBoosterWithdrawalConfirmation,
-  ] = useState<boolean>(false);
+  const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
+    useState<boolean>(false);
   const [losablePendingRewards, setLosablePendingRewards] = useState<number>();
 
   const showTabs = !showBoostFarmPresentation;
-  //&& !showBoosterWithdrawalConfirmation;
+  //&& !showBoostWithdrawalConfirmation;
 
   useEffect(() => {
     if (walletAccountAtom && selectedFarm) {
@@ -433,7 +430,7 @@ export const useBoostFarm = ({ id }) => {
       );
 
       farmInfo = {
-        interest: await getBoosterFarmInterest(
+        interest: await getBoostFarmInterest(
           farm.farmAddress,
           farm.apyFarmAddresses,
           farm.chain,
@@ -445,17 +442,16 @@ export const useBoostFarm = ({ id }) => {
         valueOf1LPinUSDC: valueOf1LPinUSDC,
       };
       if (walletAccountAtom) {
-        farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
+        const depositedAmountInLP = await getUserDepositedLPAmount(
           farm.farmAddress,
           farm.chain,
         );
+        farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        farmInfo.depositedAmount =
-          +farmInfo.depositedAmountInLP * valueOf1LPinUSDC;
-        farmInfo.depositDividedAmount = depositDivided(
-          farmInfo.depositedAmount,
-        );
+        const depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+        farmInfo.depositedAmount = depositedAmount;
+        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
       return { ...farm, ...farmInfo };
@@ -479,7 +475,7 @@ export const useBoostFarm = ({ id }) => {
       // Rewards
       const updatedRewards = {
         ...selectedFarm.rewards,
-        ...(await getBoosterFarmRewards(
+        ...(await getBoostFarmRewards(
           selectedFarm.farmAddress,
           CVXETHInUSDC,
           selectedFarm.chain,
@@ -491,7 +487,7 @@ export const useBoostFarm = ({ id }) => {
       // Pending Rewards
       const updatedPendingRewards =
         selectedFarm.totalAssetSupply > 0
-          ? await getBoosterFarmPendingRewards(
+          ? await getBoostFarmPendingRewards(
               selectedFarm.farmAddress,
               selectedFarm.chain,
             )
@@ -507,12 +503,12 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(true);
     try {
       const tx = seeRewardsAsStable
-        ? await claimBoosterFarmNonLPRewards(
+        ? await claimBoostFarmNonLPRewards(
             selectedFarm.farmAddress,
             selectedFarm.rewards.stableAddress,
             selectedFarm.chain,
           )
-        : await claimBoosterFarmLPRewards(
+        : await claimBoostFarmLPRewards(
             selectedFarm.farmAddress,
             selectedFarm.chain,
           );
@@ -529,8 +525,8 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startBoosterWithdrawalConfirmation = async withdrawValue => {
-    setShowBoosterWithdrawalConfirmation(true);
+  const startBoostWithdrawalConfirmation = async withdrawValue => {
+    setShowBoostWithdrawalConfirmation(true);
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
       pendingRewardsInfo.pendingValue *
@@ -538,8 +534,8 @@ export const useBoostFarm = ({ id }) => {
     setLosablePendingRewards(projectedLosableRewards);
   };
 
-  const cancelBoosterWithdrawalConfirmation = async () => {
-    setShowBoosterWithdrawalConfirmation(false);
+  const cancelBoostWithdrawalConfirmation = async () => {
+    setShowBoostWithdrawalConfirmation(false);
   };
 
   return {
@@ -558,9 +554,9 @@ export const useBoostFarm = ({ id }) => {
     showBoostFarmPresentation,
     previousHarvestDate,
     nextHarvestDate,
-    showBoosterWithdrawalConfirmation,
-    startBoosterWithdrawalConfirmation,
-    cancelBoosterWithdrawalConfirmation,
+    showBoostWithdrawalConfirmation,
+    startBoostWithdrawalConfirmation,
+    cancelBoostWithdrawalConfirmation,
     rewardsInfo,
     losablePendingRewards,
     pendingRewardsInfo,

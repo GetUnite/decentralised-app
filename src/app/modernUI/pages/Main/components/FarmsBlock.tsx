@@ -89,7 +89,7 @@ export const FarmsBlock = ({
                 viewType != 'View my farms only'
                   ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                   : [
-                      '240px',
+                      '220px',
                       '155px',
                       '155px',
                       '155px',
@@ -168,7 +168,7 @@ export const FarmsBlock = ({
                   icons={farm.icons}
                   isLoading={isLoading}
                   chain={farm.chain as EChain}
-                  isBooster={farm.isBooster}
+                  isBoost={farm.isBoost}
                   viewType={viewType}
                 />
               );

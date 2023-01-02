@@ -39,9 +39,9 @@ export const BoostFarm = () => {
     showTabs,
     previousHarvestDate,
     nextHarvestDate,
-    showBoosterWithdrawalConfirmation,
-    startBoosterWithdrawalConfirmation,
-    cancelBoosterWithdrawalConfirmation,
+    showBoostWithdrawalConfirmation,
+    startBoostWithdrawalConfirmation,
+    cancelBoostWithdrawalConfirmation,
     rewardsInfo,
     losablePendingRewards,
     pendingRewardsInfo,
@@ -54,7 +54,7 @@ export const BoostFarm = () => {
     const farmName = (
       <span>
         {selectedFarm?.name}
-        {selectedFarm?.isBooster && (
+        {selectedFarm?.isBoost && (
           <span style={{ color: '#1C1CFF' }}> BOOST</span>
         )}
       </span>
@@ -95,14 +95,14 @@ export const BoostFarm = () => {
                     selectedSupportedToken={selectedSupportedToken}
                     selectSupportedToken={selectSupportedToken}
                     nextHarvestDate={nextHarvestDate}
-                    showBoosterWithdrawalConfirmation={
-                      showBoosterWithdrawalConfirmation
+                    showBoostWithdrawalConfirmation={
+                      showBoostWithdrawalConfirmation
                     }
-                    startBoosterWithdrawalConfirmation={
-                      startBoosterWithdrawalConfirmation
+                    startBoostWithdrawalConfirmation={
+                      startBoostWithdrawalConfirmation
                     }
-                    cancelBoosterWithdrawalConfirmation={
-                      cancelBoosterWithdrawalConfirmation
+                    cancelBoostWithdrawalConfirmation={
+                      cancelBoostWithdrawalConfirmation
                     }
                     losablePendingRewards={losablePendingRewards}
                   />
@@ -231,7 +231,7 @@ export const BoostFarm = () => {
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
               border={
-                showBoosterWithdrawalConfirmation
+                showBoostWithdrawalConfirmation
                   ? {
                       color: '#F59F31',
                       size: '0.5px',
@@ -239,7 +239,7 @@ export const BoostFarm = () => {
                   : { size: '0px' }
               }
               style={
-                showBoosterWithdrawalConfirmation
+                showBoostWithdrawalConfirmation
                   ? {
                       boxShadow: '0px 0px 10px 0px #FF981133',
                     }

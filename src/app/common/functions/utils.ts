@@ -80,42 +80,25 @@ export const fromDecimals = (
 const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
 const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
+function roundDown(number, decimals) {
+  decimals = decimals || 0;
+  return ( Math.floor( number * Math.pow(10, decimals) ) / Math.pow(10, decimals) );
+}
+
 export const toExactFixed = (
   number: number | string,
   decimals: number,
   withZeroEnds = false,
 ): string => {
-  let nonExponentialNumber = fromExponential(number);
-  if (nonExponentialNumber === '0') {
-    return '0';
-  }
-
-  nonExponentialNumber = (+nonExponentialNumber).toLocaleString();
-
-  const dotIndex = nonExponentialNumber.indexOf(decimalSeparator);
-
-  const partAfterDot =
-    dotIndex > -1 ? nonExponentialNumber.substring(dotIndex + 1) : '';
-
-  if (withZeroEnds && partAfterDot.length < decimals) {
-    const difference = decimals - partAfterDot.length;
-    if (dotIndex === -1) nonExponentialNumber += decimalSeparator;
-    nonExponentialNumber += repeatStringNumTimes('0', difference);
-  }
-
-  const subNonExponentialNumber = nonExponentialNumber.substring(
-    0,
-    dotIndex + +decimals + 1,
-  );
-  
-  const returnValueWithZeroEnds =
-    dotIndex > -1 ? subNonExponentialNumber : nonExponentialNumber;
+  const roundedDownNumber = roundDown(+number, decimals);
 
   return withZeroEnds
-    ? returnValueWithZeroEnds
-    : dotIndex > -1
-    ? returnValueWithZeroEnds
-    : returnValueWithZeroEnds;
+    ? roundedDownNumber.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+      })
+    : roundedDownNumber.toLocaleString(undefined, {
+        maximumFractionDigits: decimals,
+      });
 };
 
 const replaceRecursively = (pattern, oldString, newString) => {
@@ -152,11 +135,10 @@ export const getNextMonday = (date = new Date()) => {
 };
 
 export const depositDivided = depositedAmount => {
-  if (depositedAmount == 0) return { first: '0.0', second: '0' };
-  const depositedAmountString = depositedAmount.toString();
-  const dotIndex = depositedAmountString.indexOf('.');
-  const balanceFirstPart = depositedAmountString.substring(0, dotIndex + 3);
-  const balanceSecondPart = depositedAmountString.substring(
+  depositedAmount = depositedAmount.toString();
+  const dotIndex = depositedAmount.indexOf('.');
+  const balanceFirstPart = depositedAmount.substring(0, dotIndex + 3);
+  const balanceSecondPart = depositedAmount.substring(
     dotIndex + 3,
     dotIndex + 9,
   );
@@ -177,6 +159,8 @@ export const shuffleArray = array => {
 };
 
 export const fromLocaleString = string => {
-  const formattedString = string.replace(thousandsSeparator, '').replace(decimalSeparator, '.');
+  const formattedString = string
+    .replace(thousandsSeparator, '')
+    .replace(decimalSeparator, '.');
   return +formattedString;
 };

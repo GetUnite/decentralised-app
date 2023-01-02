@@ -3,7 +3,6 @@ import { Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 
 export const TopHeader = ({ ibAlluosInfo, isLoading, ...rest }) => {
-  console.log(ibAlluosInfo);
   const alluoTextBalances = ibAlluosInfo
     .filter(token => token.balance > 0)
     .map(token => {
