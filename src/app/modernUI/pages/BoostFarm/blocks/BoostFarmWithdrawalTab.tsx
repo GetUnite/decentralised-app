@@ -2,12 +2,12 @@ import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
-  FeeInfo,
-  Info,
-  NumericInput,
-  ProjectedWeeklyInfo,
-  Spinner,
-  SubmitButton
+    FeeInfo,
+    Info,
+    NumericInput,
+    ProjectedWeeklyInfo,
+    Spinner,
+    SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
@@ -20,9 +20,9 @@ export const BoostFarmWithdrawalTab = ({
   selectSupportedToken,
   selectedSupportedToken,
   nextHarvestDate,
-  showBoosterWithdrawalConfirmation,
-  startBoosterWithdrawalConfirmation,
-  cancelBoosterWithdrawalConfirmation,
+  showBoostWithdrawalConfirmation,
+  startBoostWithdrawalConfirmation,
+  cancelBoostWithdrawalConfirmation,
   losablePendingRewards,
   ...rest
 }) => {
@@ -51,14 +51,14 @@ export const BoostFarmWithdrawalTab = ({
         }}
         justify="center"
       >
-        {showBoosterWithdrawalConfirmation ? (
+        {showBoostWithdrawalConfirmation ? (
           <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
             withdrawTokenLabel={selectedSupportedToken?.label}
             handleWithdraw={handleWithdraw}
-            cancelBoosterWithdrawalConfirmation={
-              cancelBoosterWithdrawalConfirmation
+            cancelBoostWithdrawalConfirmation={
+              cancelBoostWithdrawalConfirmation
             }
             nextHarvestDate={nextHarvestDate}
             losablePendingRewards={losablePendingRewards}
@@ -150,7 +150,7 @@ export const BoostFarmWithdrawalTab = ({
           </>
         )}
       </Box>
-      {!showBoosterWithdrawalConfirmation && (
+      {!showBoostWithdrawalConfirmation && (
         <Box margin={{ top: 'medium' }}>
           <SubmitButton
             primary
@@ -162,7 +162,7 @@ export const BoostFarmWithdrawalTab = ({
               !+withdrawValue ||
               hasErrors
             }
-            onClick={() => startBoosterWithdrawalConfirmation(withdrawValue)}
+            onClick={() => startBoostWithdrawalConfirmation(withdrawValue)}
           />
         </Box>
       )}

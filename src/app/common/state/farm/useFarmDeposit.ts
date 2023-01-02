@@ -1,22 +1,34 @@
+import { EChain } from 'app/common/constants/chains';
+import { deposit } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { isNumeric } from 'app/common/functions/utils';
 import {
-  approveStableCoin,
-  depositStableCoin,
-  getAllowance,
+  approve, getAllowance,
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
+import { TDepositStep } from 'app/common/types/farm';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
+
+const possibleDepositSteps: TDepositStep[] = [
+  { id: 0, label: 'Approve' },
+  { id: 1, label: 'Deposit' },
+];
 
 export const useFarmDeposit = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
 }) => {
+  // react
+  const navigate = useNavigate();
+
+  // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
+
   // other control files
   const { setNotification } = useNotification();
 
@@ -31,16 +43,23 @@ export const useFarmDeposit = ({
       allowance: 0,
     });
 
+  // Deposit steps
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [selectedSupportedTokenSteps, setSelectedSupportedTokenSteps] =
+    useState<TDepositStep[]>();
+
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const [useBiconomy, setUseBiconomy] = useState(true);
 
   useEffect(() => {
     if (selectedFarm) {
-      //setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      setUseBiconomy(
+        isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+      );
     }
   }, [selectedFarm]);
 
@@ -56,29 +75,49 @@ export const useFarmDeposit = ({
     }
   }, [selectedSupportedToken]);
 
+  useEffect(() => {
+    if (selectedFarm && selectedSupportedToken && depositValue != undefined) {
+      // the inputs might not be ok after this
+      handleDepositValueChange(depositValue);
+    }
+  }, [selectedSupportedTokenSteps]);
+
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
+
+    let neededSteps: TDepositStep[] = [];
 
     const allowance = await getAllowance(
       selectedSupportedToken.address,
       selectedFarm.farmAddress,
       selectedFarm.chain,
     );
+    // If the allowance is not higher than 0 ask for approval
+    if (!(+allowance > 0)) {
+      neededSteps.push(possibleDepositSteps[0]);
+    }
+
     const balance = await getBalanceOf(
       selectedSupportedToken.address,
       selectedSupportedToken.decimals,
       selectedFarm.chain,
     );
+
     setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+
+    // Deposit step is always there
+    neededSteps.push(possibleDepositSteps[1]);
+
+    setSelectedSupportedTokenSteps(neededSteps);
 
     setIsFetchingSupportedTokenInfo(false);
   };
-  
+
   const handleApprove = async () => {
     setIsApproving(true);
 
     try {
-      const tx = await approveStableCoin(
+      const tx = await approve(
         selectedFarm.farmAddress,
         selectedSupportedToken.address,
         selectedFarm.chain,
@@ -90,6 +129,8 @@ export const useFarmDeposit = ({
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
+      // Next step
+      setCurrentStep(currentStep + 1);
       setNotification(
         'Approved successfully',
         'success',
@@ -122,11 +163,11 @@ export const useFarmDeposit = ({
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      const tx = await depositStableCoin(
+      const tx = await deposit(
         selectedSupportedToken.address,
+        selectedFarm.farmAddress,
         depositValue,
         selectedSupportedToken.decimals,
-        selectedFarm.type,
         selectedFarm.chain,
         useBiconomy,
       );
@@ -143,7 +184,8 @@ export const useFarmDeposit = ({
         tx.transactionHash,
         selectedFarm.chain,
       );
-      await updateFarmInfo();
+      navigate('/?view_type=my_farms');
+      //await updateFarmInfo();
     } catch (error) {
       resetState();
       setNotification(error, 'error');
@@ -152,19 +194,38 @@ export const useFarmDeposit = ({
     setIsDepositing(false);
   };
 
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    const possibleDepositStep = possibleDepositSteps.find(
+      possibleDepositStep =>
+        possibleDepositStep.id == selectedSupportedTokenSteps[currentStep].id,
+    );
+
+    switch (possibleDepositStep.id) {
+      case 0:
+        await handleApprove();
+        break;
+
+      case 1:
+        await handleDeposit();
+        break;
+    }
+  };
+
   return {
     depositValue,
     handleDepositValueChange,
     selectedSupportedTokenInfo,
     isApproving,
-    handleApprove,
     isDepositing,
-    handleDeposit,
     setUseBiconomy,
     useBiconomy,
     resetState,
     depositValueError,
     hasErrors: depositValueError != '',
     isFetchingSupportedTokenInfo,
+    currentStep,
+    selectedSupportedTokenSteps,
+    handleCurrentStep,
   };
 };

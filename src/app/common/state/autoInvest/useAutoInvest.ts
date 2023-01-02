@@ -291,6 +291,8 @@ export const useAutoInvest = () => {
       ricochetMarketAddressOptions.length
     ) {
       setCanStartStreams(false);
+    }else{
+      setCanStartStreams(true);
     }
     setFundedUntilByStreamOptions(fundedUntilArray);
     setStreams(streamsArray);

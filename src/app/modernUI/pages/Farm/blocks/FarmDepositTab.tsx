@@ -26,13 +26,14 @@ export const FarmDepositTab = ({
     depositValue,
     handleDepositValueChange,
     isApproving,
-    handleApprove,
     isDepositing,
-    handleDeposit,
     setUseBiconomy,
     useBiconomy,
     selectedSupportedTokenInfo,
     isFetchingSupportedTokenInfo,
+    currentStep,
+    selectedSupportedTokenSteps,
+    handleCurrentStep
   } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
@@ -122,17 +123,13 @@ export const FarmDepositTab = ({
             hasErrors
           }
           label={
-            +depositValue > 0
-              ? selectedSupportedTokenInfo?.allowance >= +depositValue
-                ? 'Deposit'
-                : 'Approve'
-              : 'Enter amount'
+            isFetchingSupportedTokenInfo
+              ? 'Loading...'
+              : (selectedSupportedTokenSteps?.length > 1 ? `Step ${currentStep + 1} of ${
+                  selectedSupportedTokenSteps?.length
+                }: ${selectedSupportedTokenSteps[currentStep]?.label}` : `${selectedSupportedTokenSteps[currentStep]?.label}`)
           }
-          onClick={
-            selectedSupportedTokenInfo?.allowance >= +depositValue
-              ? handleDeposit
-              : handleApprove
-          }
+          onClick={handleCurrentStep}
         />
       </Box>
     </Box>

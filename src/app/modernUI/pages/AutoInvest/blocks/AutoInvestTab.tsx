@@ -128,6 +128,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 setUseBiconomy={setUseBiconomy}
                 disableBiconomy={true}
                 showWalletFee={!useBiconomy}
+                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
               />
             </Box>
           </Box>
@@ -140,6 +141,7 @@ export const AutoInvestTab = ({ ...rest }) => {
             isLoading ||
             hasErrors ||
             isUpdatingSelectedStreamOption ||
+            isApproving || isDepositing ||
             !(+streamValue > 0)
           }
           label={

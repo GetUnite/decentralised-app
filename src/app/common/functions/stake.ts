@@ -11,7 +11,7 @@ import {
   EEthereumAddresses,
   EEthereumAddressesMainnet
 } from '../constants/addresses';
-import { toExactFixed } from './utils';
+import { fromDecimals, toExactFixed } from './utils';
 
 export const getAlluoPrice = async () => {
   try {
@@ -456,7 +456,7 @@ export const getStakingPendingRewards = async chain => {
         18,
         6,
       );
-      return +ethers.utils.formatUnits(prbt.amount.toString(), 18) * tokenPrice;
+      return +fromDecimals(prbt.amount.toString(), 18) * tokenPrice;
     }),
   );
 

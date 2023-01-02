@@ -63,7 +63,7 @@ export const Stake = ({ ...rest }) => {
                       <>
                         <Text size="18px" weight="bold">
                           Your unlocked balance is{' '}
-                          {toExactFixed(alluoInfo.unlocked, 2)}
+                          {toExactFixed(alluoInfo?.unlocked, 2)}
                         </Text>
                         <Button
                           primary
@@ -82,7 +82,7 @@ export const Stake = ({ ...rest }) => {
                       date={+alluoInfo?.depositUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
                       label={`${toExactFixed(
-                        alluoInfo.locked,
+                        alluoInfo?.locked,
                         2,
                       )} TOKENS LOCKED UNTIL`}
                       showReunlockConfirmation={showReunlockConfirmation}
@@ -93,10 +93,10 @@ export const Stake = ({ ...rest }) => {
                 {!timerIsFinished(+alluoInfo?.withdrawUnlockTime) && (
                   <>
                     <UnlockCountdown
-                      date={+alluoInfo.withdrawUnlockTime * 1000}
+                      date={+alluoInfo?.withdrawUnlockTime * 1000}
                       onComplete={updateAlluoInfo}
                       label={`UNLOCKING ${toExactFixed(
-                        alluoInfo.unlocked,
+                        alluoInfo?.unlocked,
                         2,
                       )} TOKENS IN`}
                       showReunlockConfirmation={showReunlockConfirmation}
@@ -193,7 +193,7 @@ export const Stake = ({ ...rest }) => {
                     <Button
                       label={
                         seeRewardsAsStable
-                          ? 'Show in ' + rewardsInfo.label + ' LP tokens?'
+                          ? 'Show in ' + rewardsInfo.label + ' LP tokens'
                           : 'Show in ' + rewardsInfo.stableLabel
                       }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}

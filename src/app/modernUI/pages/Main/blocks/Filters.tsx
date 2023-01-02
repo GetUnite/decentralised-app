@@ -9,12 +9,12 @@ export const Filters = ({
   walletAccountAtom,
   possibleTypes,
   typeFilter,
-  setTypeFilter,
+  updateTypeFilter,
   possibleNetworks,
   possibleNonStableTokens,
   possibleStableTokens,
-  setTokenFilter,
-  setNetworkFilter,
+  updateTokenFilter,
+  updateNetworkFilter,
   tokenFilter,
   networkFilter,
   possibleViewTypes,
@@ -27,7 +27,7 @@ export const Filters = ({
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
   return (
-    <Box direction="row" margin={{ bottom: '13px' }}>
+    <Box direction="row" margin={{ bottom: '13px' }} justify="between">
       <Box
         direction="row"
         justify="start"
@@ -43,9 +43,26 @@ export const Filters = ({
           options={possibleTypes}
           value={typeFilter}
           onClear={() => {
-            setTypeFilter([]);
-            setTokenFilter([]);
-            setNetworkFilter([]);
+            updateTypeFilter([], false);
+            updateTokenFilter([], false);
+            updateNetworkFilter([], false);
+          }}
+          onClose={() => {
+            if (typeFilter.length == 0) {
+              updateTypeFilter(possibleTypes);
+            }
+            if (networkFilter.length == 0) {
+              updateNetworkFilter(possibleNetworks);
+            }
+            if (
+              tokenFilter.length ==
+              0
+            ) {
+              updateTokenFilter([
+                ...possibleNonStableTokens,
+                ...possibleStableTokens,
+              ]);
+            }
           }}
         >
           <Box
@@ -69,10 +86,11 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTypeFilter(
+                updateTypeFilter(
                   typeFilter.length == possibleTypes.length
                     ? []
                     : possibleTypes,
+                  typeFilter.length == possibleTypes.length ? false : true,
                 )
               }
               checked={possibleTypes.length == typeFilter.length}
@@ -83,7 +101,7 @@ export const Filters = ({
             options={possibleTypes}
             value={typeFilter}
             onChange={event => {
-              setTypeFilter(event.value);
+              updateTypeFilter(event.value);
             }}
             style={
               !walletAccountAtom
@@ -147,7 +165,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -155,11 +173,15 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTokenFilter(
+                updateTokenFilter(
                   tokenFilter.length ==
                     [...possibleNonStableTokens, ...possibleStableTokens].length
                     ? []
                     : [...possibleNonStableTokens, ...possibleStableTokens],
+                  tokenFilter.length ==
+                    [...possibleNonStableTokens, ...possibleStableTokens].length
+                    ? false
+                    : true,
                 )
               }
               checked={
@@ -176,7 +198,7 @@ export const Filters = ({
             options={possibleStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -199,7 +221,7 @@ export const Filters = ({
             options={possibleNonStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
             style={{
               borderBottom: `2px solid ${dividerColor}`,
@@ -230,7 +252,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -238,10 +260,13 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setNetworkFilter(
+                updateNetworkFilter(
                   networkFilter.length == possibleNetworks.length
                     ? []
                     : possibleNetworks,
+                  networkFilter.length == possibleNetworks.length
+                    ? false
+                    : true,
                 )
               }
               checked={possibleNetworks.length == networkFilter.length}
@@ -252,7 +277,7 @@ export const Filters = ({
             options={possibleNetworks}
             value={networkFilter}
             onChange={event => {
-              setNetworkFilter(event.value);
+              updateNetworkFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -269,12 +294,23 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
         <Filter
-          heading="Farms"
-          style={{ width: '80px', padding: 0 }}
-          plain
-          options={possibleTypes}
-          value={typeFilter}
-          onClear={() => setTypeFilter([])}
+          heading={
+            typeFilter.length == 1
+              ? typeFilter[0]
+              : typeFilter.length > 1 &&
+                typeFilter.length < possibleTypes.length
+              ? `${typeFilter[typeFilter.length - 1]} + ${
+                  typeFilter.length - 1
+                }`
+              : 'Farms'
+          }
+          isFiltering={typeFilter.length != possibleTypes.length}
+          onClear={() => updateTypeFilter([], false)}
+          onClose={() => {
+            if (typeFilter.length == 0) {
+              updateTypeFilter(possibleTypes);
+            }
+          }}
         >
           <Box
             direction="row"
@@ -289,7 +325,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -297,10 +333,11 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTypeFilter(
+                updateTypeFilter(
                   typeFilter.length == possibleTypes.length
                     ? []
                     : possibleTypes,
+                  typeFilter.length == possibleTypes.length ? false : true,
                 )
               }
               checked={possibleTypes.length == typeFilter.length}
@@ -311,7 +348,7 @@ export const Filters = ({
             options={possibleTypes}
             value={typeFilter}
             onChange={event => {
-              setTypeFilter(event.value);
+              updateTypeFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -356,10 +393,33 @@ export const Filters = ({
           )}
         </Filter>
         <Filter
-          heading="Tokens"
-          style={{ width: '80px', padding: 0 }}
-          plain
-          onClear={() => setTokenFilter([])}
+          heading={
+            tokenFilter.length == 1
+              ? tokenFilter[0]
+              : tokenFilter.length > 1 &&
+                tokenFilter.length <
+                  [...possibleNonStableTokens, ...possibleStableTokens].length
+              ? `${tokenFilter[tokenFilter.length - 1]} + ${
+                  tokenFilter.length - 1
+                }`
+              : 'Tokens'
+          }
+          isFiltering={
+            tokenFilter.length !=
+            [...possibleNonStableTokens, ...possibleStableTokens].length
+          }
+          onClear={() => updateTokenFilter([], false)}
+          onClose={() => {
+            if (
+              tokenFilter.length ==
+              0
+            ) {
+              updateTokenFilter([
+                ...possibleNonStableTokens,
+                ...possibleStableTokens,
+              ]);
+            }
+          }}
         >
           <Box
             direction="row"
@@ -374,7 +434,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -382,11 +442,15 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setTokenFilter(
+                updateTokenFilter(
                   tokenFilter.length ==
                     [...possibleNonStableTokens, ...possibleStableTokens].length
                     ? []
                     : [...possibleNonStableTokens, ...possibleStableTokens],
+                  tokenFilter.length ==
+                    [...possibleNonStableTokens, ...possibleStableTokens].length
+                    ? false
+                    : true,
                 )
               }
               checked={
@@ -403,7 +467,7 @@ export const Filters = ({
             options={possibleStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -426,7 +490,7 @@ export const Filters = ({
             options={possibleNonStableTokens}
             value={tokenFilter}
             onChange={event => {
-              setTokenFilter(event.value);
+              updateTokenFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -443,10 +507,23 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
         <Filter
-          heading="Networks"
-          style={{ width: '100px', padding: 0 }}
-          plain
-          onClear={() => setNetworkFilter([])}
+          heading={
+            networkFilter.length == 1
+              ? networkFilter[0]
+              : networkFilter.length > 1 &&
+                networkFilter.length < possibleNetworks.length
+              ? `${networkFilter[networkFilter.length - 1]} + ${
+                  networkFilter.length - 1
+                }`
+              : 'Networks'
+          }
+          onClear={() => updateNetworkFilter([], false)}
+          onClose={() => {
+            if (networkFilter.length == 0) {
+              updateNetworkFilter(possibleNetworks);
+            }
+          }}
+          isFiltering={networkFilter.length != possibleNetworks.length}
         >
           <Box
             direction="row"
@@ -461,7 +538,7 @@ export const Filters = ({
               onColor="#AAC7FF"
               onHandleColor="#2A73FF"
               offHandleColor="#FAFAFA"
-              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12);"
+              activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
               offColor="#CCCCCC"
               handleDiameter={20}
               height={14}
@@ -469,10 +546,13 @@ export const Filters = ({
               checkedIcon={false}
               uncheckedIcon={false}
               onChange={() =>
-                setNetworkFilter(
+                updateNetworkFilter(
                   networkFilter.length == possibleNetworks.length
                     ? []
                     : possibleNetworks,
+                  networkFilter.length == possibleNetworks.length
+                    ? false
+                    : true,
                 )
               }
               checked={possibleNetworks.length == networkFilter.length}
@@ -483,7 +563,7 @@ export const Filters = ({
             options={possibleNetworks}
             value={networkFilter}
             onChange={event => {
-              setNetworkFilter(event.value);
+              updateNetworkFilter(event.value);
             }}
           >
             {(option, { checked }) => {
@@ -500,6 +580,32 @@ export const Filters = ({
           </CheckBoxGroup>
         </Filter>
       </Box>
+
+      {walletAccountAtom && (
+        <Box direction="row" gap="9px" align="center">
+          <Text size="14px">View my farms only</Text>
+          <Switch
+            onColor="#AAC7FF"
+            onHandleColor="#2A73FF"
+            offHandleColor="#FAFAFA"
+            activeBoxShadow="0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 1px 3px rgba(0, 0, 0, 0.12)"
+            offColor="#CCCCCC"
+            handleDiameter={20}
+            height={14}
+            width={34}
+            checkedIcon={false}
+            uncheckedIcon={false}
+            onChange={() => {
+              if (viewType == 'View my farms only') {
+                setViewType('View all farms');
+              } else {
+                setViewType('View my farms only');
+              }
+            }}
+            checked={viewType == 'View my farms only'}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
