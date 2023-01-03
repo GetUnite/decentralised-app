@@ -156,11 +156,11 @@ export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
         prbt => prbt.token == pendingRewards.token,
       );
       if (rewardByToken) {
-        rewardByToken.amount += pendingRewards.amount;
+        rewardByToken.amount += +pendingRewards.amount;
       } else {
         pendingRewardsByToken.push({
           token: pendingRewards.token,
-          amount: pendingRewards.amount,
+          amount: +pendingRewards.amount,
         });
       }
     }
