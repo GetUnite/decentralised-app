@@ -249,7 +249,8 @@ export const useMain = () => {
         );
       }
 
-      farmInfo.depositedAmountInUSD = +farmInfo.depositedAmount * valueOfAssetInUSDC;
+      farmInfo.depositedAmountInUSD =
+        +farmInfo.depositedAmount * valueOfAssetInUSDC;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -281,19 +282,17 @@ export const useMain = () => {
         +(await getTotalAssets(farm.farmAddress, farm.chain)) *
         valueOf1LPinUSDC,
       supportedTokens: farm.supportedTokens,
-      depositedAmount: 0,
+      valueOf1LPinUSDC: valueOf1LPinUSDC,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmountInLP = await getUserDepositedLPAmount(
+      const depositedAmountInLP = await getUserDepositedLPAmount(
         farm.farmAddress,
         farm.chain,
       );
+      farmInfo.depositedAmountInLP = depositedAmountInLP;
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount = toExactFixed(
-        farmInfo.depositedAmountInLP * valueOf1LPinUSDC,
-        2,
-      );
+      farmInfo.depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
