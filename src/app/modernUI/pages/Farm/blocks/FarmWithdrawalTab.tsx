@@ -65,12 +65,12 @@ export const FarmWithdrawalTab = ({
                         ? selectedSupportedToken?.label
                         : ''
                     }`}
-                    available={selectedFarm.depositedAmount}
+                    available={selectedFarm.depositedAssetValue}
                     tokenSign={selectedFarm.sign}
                     onValueChange={handleWithdrawalFieldChange}
                     value={withdrawValue}
                     maxButton={true}
-                    maxValue={selectedFarm.depositedAmount}
+                    maxValue={selectedFarm.depositedAssetValue}
                     tokenOptions={selectedFarm.supportedTokens || []}
                     selectedToken={selectedSupportedToken}
                     setSelectedToken={selectSupportedToken}

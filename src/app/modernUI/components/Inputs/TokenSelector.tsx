@@ -36,7 +36,7 @@ export const TokenSelector = ({
               margin={{ right: '16px' }}
             >
               <TokenIcon label={selectedToken.label} />
-              <Down size="small" />
+              <Down size="small" color={textColor}/>
             </Box>
           </Box>
         }

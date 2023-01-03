@@ -101,7 +101,7 @@ export const NumericInput = ({
                   setFormattedValue(toExactFixed(maxValue, 6));
                 }}
               >
-                Max
+                MAX
               </MaxButton>
             )}
             {tokenOptions && !disabled && (
