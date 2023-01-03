@@ -1064,6 +1064,7 @@ export const getUserDepositedAmount = async (
 export const converToAssetValue = async (
   contractAddress,
   amount,
+  decimals,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1082,11 +1083,13 @@ export const converToAssetValue = async (
     },
   ];
 
+  const amountInDecimals = toDecimals(amount, decimals);
+
   const userDepositedAmount = await callContract(
     abi,
     contractAddress,
     'convertToAssetValue(uint256)',
-    [amount],
+    [amountInDecimals],
     chain,
   );
 
