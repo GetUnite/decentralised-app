@@ -5,6 +5,7 @@ import { useMode, useNotification } from 'app/common/state';
 import { walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
+import swap from 'app/modernUI/images/swap.svg';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
@@ -39,6 +40,7 @@ interface IFarmCard {
   isBoost: boolean;
   viewType: string;
   balance?: string;
+  balanceInUSD?: string;
   poolShare?: number;
 }
 
@@ -49,6 +51,7 @@ export const FarmCard = ({
   totalAssetSupply,
   interest,
   balance,
+  balanceInUSD,
   isLoading,
   sign,
   icons,
@@ -75,12 +78,17 @@ export const FarmCard = ({
   const hoverColor = isLightMode ? '#F4F8FF' : '#4C4C4C40';
   const dividerColor = isLightMode ? '#EBEBEB' : '#999999';
 
+  // for showing supported tokens icons
   const [seeAllSupportedTokens, setSeeAllSupportedTokens] =
     useState<boolean>(false);
   const [shuffledIcons] = useState(
     Array.isArray(icons) ? shuffleArray(icons.slice(2, icons.length)) : [],
   );
   const [randomIcon] = useState(shuffledIcons.pop());
+
+  // for showing value in usd for non-usd farms
+  const allowSwap = sign != '$';
+  const [seeBalanceInUSD, setSeeBalanceInUSD] = useState<boolean>(false);
 
   return (
     <ResponsiveContext.Consumer>
@@ -249,9 +257,7 @@ export const FarmCard = ({
                                   size={24}
                                   style={{ marginLeft: '-0.4rem' }}
                                 />
-                                <Text size="18px">
-                                  ...
-                                </Text>
+                                <Text size="18px">...</Text>
                               </Box>
                             </Button>
                           )}
@@ -295,7 +301,24 @@ export const FarmCard = ({
                         <ChainBadge chain={chain} />
                         <span>{poolShare}%</span>
                         <span>{tvl}</span>
-                        <span>{sign + toExactFixed(balance, 4)}</span>
+                        <Box direction="row" gap="4px">
+                          {seeBalanceInUSD
+                            ? `$${toExactFixed(balanceInUSD, 4)}`
+                            : `${sign}${toExactFixed(balance, 4)}`}
+                          {allowSwap && (
+                            <>
+                              <Button
+                                onClick={() =>
+                                  setSeeBalanceInUSD(!seeBalanceInUSD)
+                                }
+                              >
+                                <Box justify="center" fill>
+                                  <img src={swap} />
+                                </Box>
+                              </Button>
+                            </>
+                          )}
+                        </Box>
                         <span>{toExactFixed(interest, 2)}%</span>
                         <Box justify="end" fill>
                           <Link

@@ -1,8 +1,10 @@
 import {
+  converToAssetValue,
   getBalanceOf,
   getChainById,
   getCurrentChainId,
   getInterest,
+  getPrice,
   getTotalAssets,
   getTotalAssetSupply,
   getUserDepositedAmount,
@@ -17,6 +19,7 @@ import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { getBoostFarmInterest } from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
@@ -51,6 +54,8 @@ export const useMain = () => {
     ...farmOptions,
   ]);
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
+  const [totalDepositedAmountInUsd, setTotalDepositedAmountInUsd] =
+    useState<string>();
 
   // filters
   const shouldFilter = useRef(true);
@@ -82,7 +87,7 @@ export const useMain = () => {
 
   useEffect(() => {
     //if (shouldFilter.current == true) {
-      filterFarms();
+    filterFarms();
     //}
   }, [
     availableFarms,
@@ -107,6 +112,7 @@ export const useMain = () => {
             totalAssetSupply,
             supportedTokens,
             depositedAmount,
+            depositedAmountInUSD,
             poolShare,
           } = availableFarm.isBoost
             ? await fetchBoostFarmInfo(availableFarm)
@@ -125,6 +131,7 @@ export const useMain = () => {
           availableFarm.totalAssetSupply = totalAssetSupply;
           availableFarm.supportedTokens = supportedTokens;
           availableFarm.depositedAmount = depositedAmount;
+          availableFarm.depositedAmountInUSD = depositedAmountInUSD;
           availableFarm.poolShare = poolShare;
 
           return availableFarm;
@@ -171,7 +178,7 @@ export const useMain = () => {
     }
     setIsLoading(false);
     // We can probably get away with calculating total value invested in usd after showing the first screen
-    let totalDepositedAmountInUsd = 0;
+    let tdaiu = 0;
     const farmsWithDepositedAmount = availableFarms.filter(
       farm => +farm.depositedAmount > 0,
     );
@@ -179,13 +186,12 @@ export const useMain = () => {
       const farm = farmsWithDepositedAmount[index];
 
       if (farm.isBoost) {
-        totalDepositedAmountInUsd =
-          totalDepositedAmountInUsd + +farm.depositedAmount;
+        tdaiu = tdaiu + +farm.depositedAmount;
       } else {
-        //const assetValue = await converToAssetValue(farm.farmAddress, farm.depositedAmount, farm.chain);
-        //const valueOfAssetInUSDC = getPrice(farm.underlyingTokenAddress, farm.chain == EChain.ETHEREUM ? EEthereumAddresses.USDC : EPolygonAddresses. USDC)
+        tdaiu = tdaiu + +farm.depositedAmountInUSD;
       }
     }
+    setTotalDepositedAmountInUsd(toExactFixed(tdaiu, 2));
   };
 
   const fetchFarmInfo = async farm => {
@@ -197,10 +203,53 @@ export const useMain = () => {
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = await getUserDepositedAmount(
+      const depositedAmount = await getUserDepositedAmount(
         farm.farmAddress,
         farm.chain,
       );
+      farmInfo.depositedAmount = await converToAssetValue(
+        farm.farmAddress,
+        depositedAmount,
+        18,
+        farm.chain,
+      );
+
+      let valueOfAssetInUSDC;
+      // if the underlying is usdc no need for price
+      if (
+        farm.underlyingTokenAddress == EPolygonAddresses.USDC ||
+        farm.underlyingTokenAddress == EEthereumAddresses.USDC
+      ) {
+        valueOfAssetInUSDC = 1;
+      } else {
+        let tokenPriceAddress;
+        let tokenDecimals = 18;
+        // for polygon underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
+        switch (farm.underlyingTokenAddress) {
+          case EPolygonAddresses.WBTC:
+            tokenPriceAddress = EEthereumAddresses.WBTC;
+            break;
+          case EPolygonAddresses.WETH:
+            tokenPriceAddress = EEthereumAddresses.WETH;
+            break;
+          case EPolygonAddresses.EURT:
+          case EEthereumAddresses.EURT:
+            tokenPriceAddress = EEthereumAddresses.EURT;
+            tokenDecimals = 6;
+            break;
+          default:
+            tokenPriceAddress = farm.underlyingTokenAddress;
+            break;
+        }
+        valueOfAssetInUSDC = await getPrice(
+          tokenPriceAddress,
+          EEthereumAddresses.USDC,
+          tokenDecimals,
+          6,
+        );
+      }
+
+      farmInfo.depositedAmountInUSD = +farmInfo.depositedAmount * valueOfAssetInUSDC;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -409,5 +458,6 @@ export const useMain = () => {
     possibleTypes,
     possibleViewTypes,
     setViewType,
+    totalDepositedAmountInUsd,
   };
 };

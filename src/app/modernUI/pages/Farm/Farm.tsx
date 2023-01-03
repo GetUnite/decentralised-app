@@ -52,6 +52,9 @@ export const Farm = () => {
                 <a
                   target="_blank"
                   href="https://docsend.com/view/26j9j8se4vrfu2wh"
+                  style={{
+                    textDecoration: 'none',
+                  }}
                 >
                   here
                 </a>

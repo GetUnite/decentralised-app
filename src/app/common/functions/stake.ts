@@ -438,11 +438,11 @@ export const getStakingPendingRewards = async chain => {
         prbt => prbt.token == pendingRewards.token,
       );
       if (rewardByToken) {
-        rewardByToken.amount = rewardByToken.amount.add(pendingRewards.amount);
+        rewardByToken.amount += +pendingRewards.amount;
       } else {
         pendingRewardsByToken.push({
           token: pendingRewards.token,
-          amount: pendingRewards.amount,
+          amount: +pendingRewards.amount,
         });
       }
     }
