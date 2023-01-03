@@ -29,7 +29,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
-    name: 'FRAX/USDC',
+    name: 'Frax/USDC',
     sign: '$',
     icons: [
       'FRAX',
