@@ -115,6 +115,9 @@ export const BoostFarm = () => {
                 <a
                   target="_blank"
                   href="https://docsend.com/view/np9ypdn38jajb9zj"
+                  style={{
+                    textDecoration: 'none',
+                  }}
                 >
                   here
                 </a>

@@ -162,6 +162,7 @@ export const FarmsBlock = ({
                   totalAssetSupply={farm.totalAssetSupply}
                   poolShare={farm.poolShare}
                   balance={farm.depositedAmount}
+                  balanceInUSD={farm.depositedAmountInUSD}
                   interest={farm.interest}
                   disabled={false}
                   sign={farm.sign}
