@@ -258,13 +258,17 @@ export const getAlluoStakingAllowance = async () => {
 };
 
 export const approveAlluoStaking = async () => {
-  const tx = await approve(
-    EEthereumAddresses.ALLUO,
-    EEthereumAddresses.VLALLUO,
-    EChain.ETHEREUM,
-  );
+  try {
+    const tx = await approve(
+      EEthereumAddresses.VLALLUO,
+      EEthereumAddresses.ALLUO,
+      EChain.ETHEREUM,
+    );
 
-  return tx;
+    return tx;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const lockAlluo = async alluoAmount => {

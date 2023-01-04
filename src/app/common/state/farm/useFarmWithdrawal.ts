@@ -32,7 +32,9 @@ export const useFarmWithdrawal = ({
 
   useEffect(() => {
     if (selectedFarm) {
-      setUseBiconomy(isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true)
+      setUseBiconomy(
+        isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+      );
     }
   }, [selectedFarm]);
 
@@ -40,12 +42,7 @@ export const useFarmWithdrawal = ({
     resetState();
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
-    } else if (
-      +value >
-      (selectedFarm.isBoost
-        ? selectedSupportedToken.boosterDepositedAmount
-        : +selectedFarm?.depositedAmount)
-    ) {
+    } else if (+value > +selectedFarm?.depositedAssetValue) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
@@ -60,10 +57,15 @@ export const useFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
+      // TODO: the withdraw value is in asset value so convert it to iballuo value
+      const percentageToWithdraw =
+        +withdrawValue / selectedFarm.depositedAssetValue;
+      const valueToWithdraw =
+        selectedFarm.depositedAmount * +percentageToWithdraw;
       const tx = await withdraw(
         selectedSupportedToken.address,
         selectedFarm.farmAddress,
-        withdrawValue,
+        valueToWithdraw,
         selectedFarm.chain,
         useBiconomy,
       );
