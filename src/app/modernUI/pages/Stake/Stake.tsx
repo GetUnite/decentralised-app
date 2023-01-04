@@ -1,5 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import { timerIsFinished, toExactFixed } from 'app/common/functions/utils';
+import { useMode } from 'app/common/state';
 import { useStake } from 'app/common/state/stake';
 import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
@@ -10,6 +11,8 @@ import { UnlockTab } from './blocks/UnlockTab';
 import { UnlockCountdown } from './components/UnlockCountdown';
 
 export const Stake = ({ ...rest }) => {
+  const { isLightMode } = useMode();
+
   const {
     isLoading,
     updateAlluoInfo,
@@ -142,6 +145,7 @@ export const Stake = ({ ...rest }) => {
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
+              border={isLightMode ? { color: '#EBEBEB', size: '1px' } : {size: "0px"}}
             >
               {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
@@ -220,10 +224,11 @@ export const Stake = ({ ...rest }) => {
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
+              border={isLightMode ? { color: '#EBEBEB', size: '1px' } : {size:"0px"}}
             >
               <Box fill gap="12px">
                 {isLoading || isLoadingPendingRewards ? (
-                  <Skeleton height="16px"/>
+                  <Skeleton height="16px" />
                 ) : (
                   <Text size="16px" weight="bold">
                     Pending rewards

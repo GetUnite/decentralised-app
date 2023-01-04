@@ -1,3 +1,4 @@
+import { useMode } from 'app/common/state';
 import { Box, Text } from 'grommet';
 import Countdown, {
   CountdownTimeDelta,
@@ -10,6 +11,8 @@ export const UnlockCountdown = (
   onComplete,
   showReunlockConfirmation,}
 ) => {
+  const { isLightMode } = useMode();
+
   const renderer = ({ completed, days, ...timeDelta }) => {
     const { hours, minutes, seconds } = formatTimeDelta(
       timeDelta as CountdownTimeDelta,
@@ -37,7 +40,7 @@ export const UnlockCountdown = (
                   color: '#F59F31',
                   size: '0.5px',
                 }
-              : {size: '0px'}
+              : isLightMode ? {color: "#EBEBEB", size: "1px"} : {size:"0px"}
           }
           style={
             showReunlockConfirmation

@@ -15,7 +15,6 @@ import { TopHeader } from '../components';
 export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarm,
-  updateFarmInfo,
   selectSupportedToken,
   selectedSupportedToken,
   ...rest
@@ -26,14 +25,15 @@ export const BoostFarmDepositTab = ({
     depositValue,
     handleDepositValueChange,
     isApproving,
-    handleApprove,
     isDepositing,
-    handleDeposit,
     setUseBiconomy,
     useBiconomy,
     isFetchingSupportedTokenInfo,
-    selectedSupportedTokenInfo
-  } = useBoostFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+    selectedSupportedTokenInfo,
+    currentStep,
+    selectedSupportedTokenSteps,
+    handleCurrentStep
+  } = useBoostFarmDeposit({ selectedFarm, selectedSupportedToken });
 
   return (
     <Box fill>
@@ -114,17 +114,13 @@ export const BoostFarmDepositTab = ({
             hasErrors
           }
           label={
-            +depositValue > 0
-              ? +selectedSupportedTokenInfo?.allowance >= +depositValue
-                ? 'Deposit'
-                : 'Approve'
-              : 'Enter amount'
+            isFetchingSupportedTokenInfo
+              ? 'Loading...'
+              : (selectedSupportedTokenSteps?.length > 1 ? `Step ${currentStep + 1} of ${
+                  selectedSupportedTokenSteps?.length
+                }: ${selectedSupportedTokenSteps[currentStep]?.label}` : `${selectedSupportedTokenSteps[currentStep]?.label}`)
           }
-          onClick={
-            +selectedSupportedTokenInfo?.allowance >= +depositValue
-              ? handleDeposit
-              : handleApprove
-          }
+          onClick={handleCurrentStep}
         />
       </Box>
     </Box>

@@ -1,4 +1,5 @@
 import { toExactFixed } from 'app/common/functions/utils';
+import { useMode } from 'app/common/state';
 import { walletAccount } from 'app/common/state/atoms';
 import { useBoostFarm } from 'app/common/state/boostFarm';
 import {
@@ -23,6 +24,7 @@ import {
 export const BoostFarm = () => {
   const { id } = useParams();
 
+  const { isLightMode } = useMode();
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const {
     selectedFarm,
@@ -82,7 +84,6 @@ export const BoostFarm = () => {
                   <BoostFarmDepositTab
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
-                    updateFarmInfo={updateFarmInfo}
                     selectedSupportedToken={selectedSupportedToken}
                     selectSupportedToken={selectSupportedToken}
                   />
@@ -138,6 +139,7 @@ export const BoostFarm = () => {
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
+              border={isLightMode ? {color: "#EBEBEB", size:"1px"} : {size: "0px"}}
             >
               {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
@@ -239,7 +241,7 @@ export const BoostFarm = () => {
                       color: '#F59F31',
                       size: '0.5px',
                     }
-                  : { size: '0px' }
+                  : isLightMode ? {color: "#EBEBEB", size: "1px"} : {size: "0px"}
               }
               style={
                 showBoostWithdrawalConfirmation
