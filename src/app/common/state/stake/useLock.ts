@@ -47,9 +47,8 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
         EChain.ETHEREUM,
       );
       await updateAlluoInfo();
-    } catch (err) {
-      console.error('Error', err.message);
-      setNotification(err.message, 'error');
+    } catch (error) {
+      setNotification(error, 'error');
     }
 
     setIsApproving(false);

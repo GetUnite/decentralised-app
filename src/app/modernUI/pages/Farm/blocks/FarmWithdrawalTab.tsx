@@ -121,12 +121,12 @@ export const FarmWithdrawalTab = ({
       <Box margin={{ top: 'medium' }}>
         <SubmitButton
           primary
-          label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
+          label={withdrawValue != '' ? 'Withdraw' : 'Enter amount'}
           disabled={
             isLoading ||
             isWithdrawing ||
             isWithdrawalRequestsLoading ||
-            !+withdrawValue ||
+            withdrawValue == '' ||
             hasErrors
           }
           onClick={handleWithdraw}
