@@ -117,7 +117,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 width="xlarge"
                 pad={{ horizontal: 'medium', vertical: 'medium' }}
                 style={{
-                  marginTop: '12px',
+                  marginTop: notificationAtom.message != '' ? "57px" : "105px",
                   marginBottom: '123px',
                   minHeight: '510px',
                 }}

@@ -31,7 +31,6 @@ export const Farm = () => {
                 <FarmDepositTab
                   selectedFarm={selectedFarm}
                   isLoading={isLoading}
-                  updateFarmInfo={updateFarmInfo}
                   selectedSupportedToken={selectedSupportedToken}
                   selectSupportedToken={selectSupportedToken}
                 />

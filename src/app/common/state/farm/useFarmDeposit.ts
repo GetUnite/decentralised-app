@@ -21,7 +21,6 @@ const possibleDepositSteps: TDepositStep[] = [
 export const useFarmDeposit = ({
   selectedFarm,
   selectedSupportedToken,
-  updateFarmInfo,
 }) => {
   // react
   const navigate = useNavigate();
@@ -33,7 +32,7 @@ export const useFarmDeposit = ({
   const { setNotification } = useNotification();
 
   // inputs
-  const [depositValue, setDepositValue] = useState<string>();
+  const [depositValue, setDepositValue] = useState<string>('');
   const [depositValueError, setDepositValueError] = useState<string>('');
 
   // data
@@ -172,7 +171,7 @@ export const useFarmDeposit = ({
         useBiconomy,
       );
       resetState();
-      setDepositValue(null);
+      setDepositValue('');
       heapTrack('depositTransactionMined', {
         pool: 'Ib',
         currency: selectedSupportedToken.label,
@@ -189,9 +188,8 @@ export const useFarmDeposit = ({
     } catch (error) {
       resetState();
       setNotification(error, 'error');
+      setIsDepositing(false);
     }
-
-    setIsDepositing(false);
   };
 
   // executes the handle for the current step

@@ -1,6 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  convertFromUSDC, convertToLP,
+  convertFromUSDC,
+  convertToLP,
   withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
 import { isNumeric } from 'app/common/functions/utils';
@@ -42,40 +43,35 @@ export const useBoostFarmWithdrawal = ({
     useState(true);
 
   useEffect(() => {
-    const updateAvailable = async () => {
-      setIsFetchingSupportedTokenInfo(true);
-
-      // For booster farm withdrawals
-      // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
-      // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
-      const boostDepositedAmount = await convertFromUSDC(
-        selectedSupportedToken.address,
-        selectedSupportedToken.decimals,
-        // here the deposited amount is in USDC
-        selectedFarm.depositedAmount,
-      );
-      setSelectedSupportedTokenInfo({
-        boostDepositedAmount: boostDepositedAmount,
-      });
-
-      setIsFetchingSupportedTokenInfo(false);
-    };
-
     if (selectedFarm && selectedSupportedToken) {
       updateAvailable();
     }
   }, [selectedSupportedToken]);
 
+  const updateAvailable = async () => {
+    setIsFetchingSupportedTokenInfo(true);
+
+    // For booster farm withdrawals
+    // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
+    // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
+    const boostDepositedAmount = await convertFromUSDC(
+      selectedSupportedToken.address,
+      selectedSupportedToken.decimals,
+      // here the deposited amount is in USDC
+      selectedFarm.depositedAmount,
+    );
+    setSelectedSupportedTokenInfo({
+      boostDepositedAmount: boostDepositedAmount,
+    });
+
+    setIsFetchingSupportedTokenInfo(false);
+  };
+  
   const handleWithdrawalFieldChange = value => {
-    resetState();
+    setWithdrawValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
-    } else if (
-      +value >
-      (selectedFarm.isBoost
-        ? selectedSupportedToken.boosterDepositedAmount
-        : +selectedFarm?.depositedAmount)
-    ) {
+    } else if (+value > selectedSupportedTokenInfo.boostDepositedAmount) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
