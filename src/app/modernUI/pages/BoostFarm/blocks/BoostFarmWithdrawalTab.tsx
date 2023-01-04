@@ -2,12 +2,12 @@ import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
-    FeeInfo,
-    Info,
-    NumericInput,
-    ProjectedWeeklyInfo,
-    Spinner,
-    SubmitButton
+  FeeInfo,
+  Info,
+  NumericInput,
+  ProjectedWeeklyInfo,
+  Spinner,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';

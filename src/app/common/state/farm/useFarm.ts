@@ -297,7 +297,6 @@ export const useFarm = ({ id }) => {
           farm.chain,
         );
         farmInfo.depositedAmount = depositedAmount;
-        // TODO: the deposited amount should be the asset value but we need to store the deposited amount to handle withdraw
         farmInfo.depositedAssetValue = await converToAssetValue(
           farm.farmAddress,
           depositedAmount,

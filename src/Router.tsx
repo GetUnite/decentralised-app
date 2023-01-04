@@ -1,12 +1,21 @@
 import { useWallet } from 'app/common/state';
 import { mode } from 'app/common/state/atoms';
-import { AutoInvestRoutes, BoostFarm, Buy, Farm, Main, Stake, Transfer } from 'app/modernUI/pages';
+import {
+  AutoInvestRoutes,
+  BoostFarm,
+  Buy,
+  Farm,
+  Main,
+  Stake,
+  Transfer
+} from 'app/modernUI/pages';
 import { theme as modernUITheme } from 'app/modernUI/theme';
 import { Grommet } from 'grommet';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import ScrollToTop from 'scroll-to-top';
 import './reset.css';
 
 export const Router = () => {
@@ -15,6 +24,7 @@ export const Router = () => {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Grommet theme={modernUITheme} themeMode={modeAtom}>
         <SkeletonTheme
           baseColor={modeAtom === 'dark' ? '#202020' : '#ebebeb'}

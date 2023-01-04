@@ -1,5 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
-import { withdraw } from 'app/common/functions/farm';
+import { getIfUserHasWithdrawalRequest, withdraw } from 'app/common/functions/farm';
 import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -22,7 +22,7 @@ export const useFarmWithdrawal = ({
   const [useBiconomy, setUseBiconomy] = useState(true);
 
   // inputs
-  const [withdrawValue, setWithdrawValue] = useState<string>();
+  const [withdrawValue, setWithdrawValue] = useState<string>('');
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
 
   // loading control
@@ -38,8 +38,37 @@ export const useFarmWithdrawal = ({
     }
   }, [selectedFarm]);
 
+  const fetchIfUserHasWithdrawalRequest = async () => {
+    setIsWithdrawalRequestsLoading(true);
+    try {
+      const userRequests = await getIfUserHasWithdrawalRequest(
+        selectedFarm.farmAddress,
+        selectedFarm.chain,
+      );
+      const userRequestslength = userRequests.length;
+      if (userRequestslength > 0) {
+        const FULL_DAY_IN_HOURS = 86400;
+        const lastRequest = userRequests[userRequestslength - 1];
+        const remainingSeconds =
+          Math.trunc(new Date().getTime() / 1000) - +lastRequest.time;
+        const remainingTime = new Date(
+          (FULL_DAY_IN_HOURS - remainingSeconds) * 1000,
+        )
+          .toISOString()
+          .substr(11, 8);
+        const message = `You have ${userRequestslength} ${
+          userRequestslength === 1 ? 'request' : 'requests'
+        } accepted, will be processed within ${remainingTime}`;
+        // TODO: this message needs to be shown somewhere or input needs to be blocked if the value didnt update
+      }
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+    setIsWithdrawalRequestsLoading(false);
+  };
+
   const handleWithdrawalFieldChange = value => {
-    resetState();
+    setWithdrawValueError('');
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setWithdrawValueError('Write a valid number');
     } else if (+value > +selectedFarm?.depositedAssetValue) {
@@ -48,16 +77,10 @@ export const useFarmWithdrawal = ({
     setWithdrawValue(value);
   };
 
-  const resetState = () => {
-    setWithdrawValueError('');
-    setIsWithdrawing(false);
-  };
-
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
 
     try {
-      // TODO: the withdraw value is in asset value so convert it to iballuo value
       const percentageToWithdraw =
         +withdrawValue / selectedFarm.depositedAssetValue;
       const valueToWithdraw =
@@ -69,7 +92,6 @@ export const useFarmWithdrawal = ({
         selectedFarm.chain,
         useBiconomy,
       );
-      resetState();
       setNotification(
         'Successfully withdrew',
         'success',
@@ -78,7 +100,6 @@ export const useFarmWithdrawal = ({
       );
       await updateFarmInfo();
     } catch (error) {
-      resetState();
       setNotification(error, 'error');
     }
 
@@ -92,7 +113,6 @@ export const useFarmWithdrawal = ({
     isWithdrawalRequestsLoading,
     isWithdrawing,
     handleWithdraw,
-    resetState,
     setUseBiconomy,
     useBiconomy,
     hasErrors: withdrawValueError != '',
