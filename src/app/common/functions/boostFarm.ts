@@ -237,12 +237,16 @@ export const convertToLP = async (
   decimals,
   valueOf1LPinUSDC,
 ) => {
-  const usdcPrice = await getPrice(
-    tokenAddress,
-    EEthereumAddresses.USDC,
-    decimals,
-    6,
-  );
+  let usdcPrice = 1;
+  // the value already comes as usdc
+  if (tokenAddress != EEthereumAddresses.USDC) {
+    usdcPrice = await getPrice(
+      tokenAddress,
+      EEthereumAddresses.USDC,
+      decimals,
+      6,
+    );
+  }
   return (usdcPrice * value) / valueOf1LPinUSDC;
 };
 
