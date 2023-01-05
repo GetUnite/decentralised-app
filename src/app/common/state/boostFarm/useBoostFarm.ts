@@ -2,7 +2,8 @@ import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
-  claimBoostFarmNonLPRewards, getBoostFarmInterest,
+  claimBoostFarmNonLPRewards,
+  getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards
 } from 'app/common/functions/boostFarm';
@@ -529,7 +530,7 @@ export const useBoostFarm = ({ id }) => {
     setShowBoostWithdrawalConfirmation(true);
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
-      pendingRewardsInfo.pendingValue *
+      pendingRewardsInfo *
       (+withdrawValue / +selectedSupportedToken.boostDepositedAmount);
     setLosablePendingRewards(projectedLosableRewards);
   };
