@@ -150,8 +150,19 @@ export const BoostFarmWithdrawalTab = ({
           <SubmitButton
             primary
             label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
-
-            onClick={() => startBoostWithdrawalConfirmation(withdrawValue, selectedSupportedTokenInfo.boostDepositedAmount)}
+            disabled={
+              isLoading ||
+              isWithdrawing ||
+              isFetchingSupportedTokenInfo ||
+              !+withdrawValue ||
+              hasErrors
+            }
+            onClick={() =>
+              startBoostWithdrawalConfirmation(
+                withdrawValue,
+                selectedSupportedTokenInfo.boostDepositedAmount,
+              )
+            }
           />
         </Box>
       )}
