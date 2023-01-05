@@ -49,9 +49,8 @@ export const BoostFarmWithdrawalTab = ({
         style={{
           minHeight: '504px',
         }}
-        justify="center"
       >
-        {showBoostWithdrawalConfirmation ? (
+        {showBoostWithdrawalConfirmation && !isWithdrawing ? (
           <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
@@ -81,35 +80,31 @@ export const BoostFarmWithdrawalTab = ({
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                   />
-                  <Box margin={{ top: 'medium' }}>
-                    <NumericInput
-                      label={`Withdraw ${
-                        selectedSupportedToken
-                          ? selectedSupportedToken?.label
-                          : ''
-                      }`}
-                      available={
-                        selectedSupportedTokenInfo?.boostDepositedAmount
-                      }
-                      tokenSign={selectedSupportedToken?.sign}
-                      onValueChange={handleWithdrawalFieldChange}
-                      value={withdrawValue}
-                      maxValue={
-                        selectedSupportedTokenInfo?.boostDepositedAmount
-                      }
-                      tokenOptions={selectedFarm?.supportedTokens || []}
-                      selectedToken={selectedSupportedToken}
-                      setSelectedToken={selectSupportedToken}
-                      error={withdrawValueError}
-                      slippageWarning={true}
-                      lowSlippageTokenLabels={
-                        selectedFarm?.lowSlippageTokenLabels
-                      }
-                      disabled={isLoading}
-                    />
-                  </Box>
                 </Box>
-
+                <Box margin={{ top: 'medium' }}>
+                  <NumericInput
+                    label={`Withdraw ${
+                      selectedSupportedToken
+                        ? selectedSupportedToken?.label
+                        : ''
+                    }`}
+                    available={selectedSupportedTokenInfo?.boostDepositedAmount}
+                    tokenSign={selectedSupportedToken?.sign}
+                    onValueChange={handleWithdrawalFieldChange}
+                    value={withdrawValue}
+                    maxButton={true}
+                    maxValue={selectedSupportedTokenInfo?.boostDepositedAmount}
+                    tokenOptions={selectedFarm?.supportedTokens || []}
+                    selectedToken={selectedSupportedToken}
+                    setSelectedToken={selectSupportedToken}
+                    error={withdrawValueError}
+                    slippageWarning={true}
+                    lowSlippageTokenLabels={
+                      selectedFarm?.lowSlippageTokenLabels
+                    }
+                    disabled={isLoading}
+                  />
+                </Box>
                 <Box margin={{ top: 'medium' }}>
                   <ProjectedWeeklyInfo
                     depositedAmount={selectedFarm?.depositedAmount}
@@ -155,14 +150,8 @@ export const BoostFarmWithdrawalTab = ({
           <SubmitButton
             primary
             label={+withdrawValue > 0 ? 'Withdraw' : 'Enter amount'}
-            disabled={
-              isLoading ||
-              isWithdrawing ||
-              isFetchingSupportedTokenInfo ||
-              !+withdrawValue ||
-              hasErrors
-            }
-            onClick={() => startBoostWithdrawalConfirmation(withdrawValue)}
+
+            onClick={() => startBoostWithdrawalConfirmation(withdrawValue, selectedSupportedTokenInfo.boostDepositedAmount)}
           />
         </Box>
       )}
