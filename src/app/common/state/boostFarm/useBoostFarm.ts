@@ -526,12 +526,14 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startBoostWithdrawalConfirmation = async withdrawValue => {
+  const startBoostWithdrawalConfirmation = async (
+    withdrawValue,
+    boostDepositedAmount,
+  ) => {
     setShowBoostWithdrawalConfirmation(true);
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
-      pendingRewardsInfo *
-      (+withdrawValue / +selectedSupportedToken.boostDepositedAmount);
+      +pendingRewardsInfo * (+withdrawValue / +boostDepositedAmount);
     setLosablePendingRewards(projectedLosableRewards);
   };
 
