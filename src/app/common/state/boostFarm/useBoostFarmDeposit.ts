@@ -92,6 +92,9 @@ export const useBoostFarmDeposit = ({
     setSelectedSupportedTokenSteps(neededSteps);
 
     setIsFetchingSupportedTokenInfo(false);
+
+    // retrigger input validation
+    handleDepositValueChange(depositValue);
   };
 
   const handleApprove = async () => {
