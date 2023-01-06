@@ -58,7 +58,7 @@ export const TransferTab = ({ ...rest }) => {
                 disabled={isLoading}
               />
             </Box>
-            <Box margin={{ top: 'medium' }}>
+            <Box margin={{ top: '11px' }}>
               <Box direction="row" justify="between">
               <Text size="13px" color="soul">
                    {recipientAddressValue === '' ? 'Recipient' : `Recipient: ${recipientAddressValue}`}

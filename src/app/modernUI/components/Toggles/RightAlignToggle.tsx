@@ -11,7 +11,6 @@ export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=fals
         direction="row"
         align="center"
         justify="end"
-        margin={{ top: '9px' }}
       >
         <Text
           size="12px"
