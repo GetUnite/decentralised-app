@@ -40,13 +40,6 @@ export const useFarmWithdrawal = ({
     }
   }, [selectedFarm]);
 
-  useEffect(() => {
-    if (selectedFarm && selectedSupportedToken) {
-      // retrigger input validation
-      handleWithdrawalFieldChange(withdrawValue);
-    }
-  }, [selectedSupportedToken]);
-
   const fetchIfUserHasWithdrawalRequest = async () => {
     setIsWithdrawalRequestsLoading(true);
     try {

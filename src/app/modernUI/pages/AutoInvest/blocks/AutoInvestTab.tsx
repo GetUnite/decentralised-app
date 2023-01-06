@@ -180,7 +180,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 }: ${selectedStreamOptionSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
-          glowing={currentStep > 0 && !isDepositing}
+          glowing={currentStep > 0 && !isDepositing && !isApproving && !isLoading}
         />
       </Box>
     </Box>

@@ -1,6 +1,5 @@
 import { depositIntoBoostFarm } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
-import { isNumeric } from 'app/common/functions/utils';
 import {
   approve,
   getAllowance,
@@ -63,6 +62,13 @@ export const useBoostFarmDeposit = ({
     }
   }, [selectedSupportedToken]);
 
+  useEffect(() => {
+    if (selectedFarm && selectedSupportedTokenInfo) {
+      // retrigger input validation
+      handleDepositValueChange(depositValue);
+    }
+  }, [selectedSupportedTokenInfo]);
+
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
@@ -92,9 +98,6 @@ export const useBoostFarmDeposit = ({
     setSelectedSupportedTokenSteps(neededSteps);
 
     setIsFetchingSupportedTokenInfo(false);
-
-    // retrigger input validation
-    handleDepositValueChange(depositValue);
   };
 
   const handleApprove = async () => {
@@ -126,10 +129,9 @@ export const useBoostFarmDeposit = ({
   };
 
   const handleDepositValueChange = value => {
-    resetState();
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setDepositValueError('Write a valid number');
-    } else if (+value > +selectedSupportedTokenInfo.balance) {
+    setDepositValueError('');
+    console.log(value, selectedSupportedTokenInfo.balance)
+    if (+value > +selectedSupportedTokenInfo.balance) {
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);

@@ -1,8 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  convertFromUSDC,
-  convertToLP,
-  withdrawFromBoostFarm
+  convertFromUSDC
 } from 'app/common/functions/boostFarm';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
@@ -13,6 +11,7 @@ export const useBoostFarmWithdrawal = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
+  cancelBoostWithdrawalConfirmation
 }) => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -47,6 +46,13 @@ export const useBoostFarmWithdrawal = ({
     }
   }, [selectedSupportedToken]);
 
+  useEffect(() => {
+    if (selectedFarm && selectedSupportedTokenInfo) {
+      // retrigger input validation
+      handleWithdrawalFieldChange(withdrawValue);
+    }
+  }, [selectedSupportedTokenInfo]);
+
   const updateAvailable = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
@@ -64,9 +70,6 @@ export const useBoostFarmWithdrawal = ({
     });
 
     setIsFetchingSupportedTokenInfo(false);
-
-    // retrigger input validation
-    handleWithdrawalFieldChange(withdrawValue);
   };
 
   const handleWithdrawalFieldChange = value => {
@@ -84,7 +87,7 @@ export const useBoostFarmWithdrawal = ({
 
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
-
+    cancelBoostWithdrawalConfirmation();
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarm.farmAddress,
@@ -104,6 +107,7 @@ export const useBoostFarmWithdrawal = ({
       );
       resetState();
       await updateFarmInfo();
+      
       setNotification(
         'Withdrew successfully',
         'success',
