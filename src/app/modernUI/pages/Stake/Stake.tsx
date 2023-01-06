@@ -171,7 +171,9 @@ export const Stake = ({ ...rest }) => {
                   >
                     <Box direction="row" justify="between" fill>
                       {isLoading || isLoadingRewards ? (
-                        <Skeleton height="18px" />
+                        <Box fill>
+                          <Skeleton height="18px" />
+                        </Box>
                       ) : (
                         <>
                           <Text size="18px">Rewards</Text>

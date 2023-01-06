@@ -181,6 +181,9 @@ export const FarmCard = ({
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
+                    {viewType == 'View my farms only' && (
+                      <Skeleton count={1} height="14px" width="76px" />
+                    )}
                     <Box direction="row" justify="end" fill align="center">
                       <Skeleton count={1} height="14px" width="76px" />
                     </Box>
