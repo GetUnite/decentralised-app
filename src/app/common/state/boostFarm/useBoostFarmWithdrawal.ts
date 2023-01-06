@@ -4,7 +4,6 @@ import {
   convertToLP,
   withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
-import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -65,13 +64,14 @@ export const useBoostFarmWithdrawal = ({
     });
 
     setIsFetchingSupportedTokenInfo(false);
+
+    // retrigger input validation
+    handleWithdrawalFieldChange(withdrawValue);
   };
-  
+
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setWithdrawValueError('Write a valid number');
-    } else if (+value > selectedSupportedTokenInfo.boostDepositedAmount) {
+    if (+value > selectedSupportedTokenInfo.boostDepositedAmount) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);

@@ -52,8 +52,6 @@ export const Main = () => {
               align="center"
               justify="start"
               gap="none"
-              pad="xsmall"
-              margin={{ top: 'small' }}
               direction="column"
               fill="horizontal"
             >

@@ -2,7 +2,14 @@ import { EChain } from 'app/common/constants/chains';
 import { timerIsFinished, toExactFixed } from 'app/common/functions/utils';
 import { useMode } from 'app/common/state';
 import { useStake } from 'app/common/state/stake';
-import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
+import {
+  Layout,
+  Modal,
+  Spinner,
+  Tab,
+  Tabs,
+  TokenIcon
+} from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, Heading, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
@@ -133,19 +140,22 @@ export const Stake = ({ ...rest }) => {
           </Tabs>
         </Modal>
         {walletAccountAtom && (
-          <Box gap="22px">
+          <Box gap="12px">
             <Box
               round={'medium'}
               overflow="hidden"
               width="245px"
               align="start"
-              height="224px"
               justify="between"
               gap="small"
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
-              border={isLightMode ? { color: '#EBEBEB', size: '1px' } : {size: "0px"}}
+              border={
+                isLightMode
+                  ? { color: '#EBEBEB', size: '1px' }
+                  : { size: '0px' }
+              }
             >
               {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
@@ -156,17 +166,29 @@ export const Stake = ({ ...rest }) => {
                   <Heading
                     size="small"
                     level={3}
-                    margin={{ bottom: '16px', top: '0px' }}
+                    margin={{ bottom: '12px', top: '0px' }}
                     fill
                   >
-                    {isLoading || isLoadingRewards ? (
-                      <Skeleton height="18px" />
-                    ) : (
-                      <Text size="18px">Rewards</Text>
-                    )}
+                    <Box direction="row" justify="between" fill>
+                      {isLoading || isLoadingRewards ? (
+                        <Skeleton height="18px" />
+                      ) : (
+                        <>
+                          <Text size="18px">Rewards</Text>
+                          <Box direction="row">
+                            <TokenIcon key={0} label={'CVX'} />
+                            <TokenIcon
+                              key={0}
+                              label={'ETH'}
+                              style={{ marginLeft: '-0.6rem' }}
+                            />
+                          </Box>
+                        </>
+                      )}
+                    </Box>
                   </Heading>
 
-                  <Box margin={{ bottom: '28px' }}>
+                  <Box margin={{ bottom: '16px' }}>
                     {isLoading || isLoadingRewards ? (
                       <Skeleton height="16px" />
                     ) : (
@@ -190,25 +212,27 @@ export const Stake = ({ ...rest }) => {
                     <Button
                       primary
                       label={'Withdraw ' + rewardsInfo.label}
-                      style={{ borderRadius: '58px', width: '197px' }}
+                      style={{
+                        borderRadius: '58px',
+                        width: '197px',
+                        padding: '6px 16px',
+                      }}
                       onClick={claimRewards}
                       disabled={isLoading || isLoadingRewards}
                     />
                     <Button
-                      label={
-                        seeRewardsAsStable
-                          ? 'Show in ' + rewardsInfo.label + ' LP tokens'
-                          : 'Show in ' + rewardsInfo.stableLabel
-                      }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
                       plain
-                      style={{
-                        textAlign: 'center',
-                        color: '#2A73FF',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                      }}
-                    />
+                      disabled={isLoading || isLoadingRewards}
+                    >
+                      <Box direction="row" justify="center">
+                        <Text size="12px" weight={500} color="#2A73FF">
+                          {seeRewardsAsStable
+                            ? 'Show in ' + rewardsInfo.label + ' LP tokens'
+                            : 'Show in ' + rewardsInfo.stableLabel}
+                        </Text>
+                      </Box>
+                    </Button>
                   </Box>
                 </Box>
               )}
@@ -224,7 +248,11 @@ export const Stake = ({ ...rest }) => {
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
-              border={isLightMode ? { color: '#EBEBEB', size: '1px' } : {size:"0px"}}
+              border={
+                isLightMode
+                  ? { color: '#EBEBEB', size: '1px' }
+                  : { size: '0px' }
+              }
             >
               <Box fill gap="12px">
                 {isLoading || isLoadingPendingRewards ? (

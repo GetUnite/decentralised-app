@@ -19,7 +19,7 @@ export const useNotification = () => {
     type,
     txHash = null,
     chain = EChain.POLYGON,
-    stick = true,
+    stick = false,
   ) => {
     setNotificationAtom({
       id: null,

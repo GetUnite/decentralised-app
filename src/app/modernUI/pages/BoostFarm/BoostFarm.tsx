@@ -110,24 +110,26 @@ export const BoostFarm = () => {
                 </Tab>
               </Tabs>
             )}
-            <Box margin={{ top: '26px' }} justify="center" direction="row">
-              <Text size="12px">
-                Find out where these funds are being invested{' '}
-                <a
-                  target="_blank"
-                  href="https://docsend.com/view/np9ypdn38jajb9zj"
-                  style={{
-                    textDecoration: 'none',
-                  }}
-                >
-                  here
-                </a>
-              </Text>
-            </Box>
+            {!showBoostWithdrawalConfirmation && (
+              <Box margin={{ top: '26px' }} justify="center" direction="row">
+                <Text size="12px">
+                  Find out where these funds are being invested{' '}
+                  <a
+                    target="_blank"
+                    href="https://docsend.com/view/np9ypdn38jajb9zj"
+                    style={{
+                      textDecoration: 'none',
+                    }}
+                  >
+                    here
+                  </a>
+                </Text>
+              </Box>
+            )}
           </>
         </Modal>
         {walletAccountAtom && !showBoostFarmPresentation && (
-          <Box gap="22px">
+          <Box gap="12px">
             <Box
               round={'medium'}
               overflow="hidden"
@@ -139,7 +141,11 @@ export const BoostFarm = () => {
               direction="column"
               background="modal"
               pad={{ vertical: 'medium', horizontal: 'medium' }}
-              border={isLightMode ? {color: "#EBEBEB", size:"1px"} : {size: "0px"}}
+              border={
+                isLightMode
+                  ? { color: '#EBEBEB', size: '1px' }
+                  : { size: '0px' }
+              }
             >
               {isClamingRewards ? (
                 <Box align="center" justify="center" fill>
@@ -150,14 +156,12 @@ export const BoostFarm = () => {
                   <Heading
                     size="small"
                     level={3}
-                    margin={{ bottom: '16px', top: '0px' }}
+                    margin={{ bottom: '12px', top: '0px' }}
                     fill
                   >
                     <Box direction="row" justify="between" fill>
                       {isLoading || isLoadingRewards ? (
-                        <Box fill>
-                          <Skeleton height="18px" />
-                        </Box>
+                        <Skeleton height="18px" />
                       ) : (
                         <>
                           <Text size="18px">Rewards</Text>
@@ -174,7 +178,7 @@ export const BoostFarm = () => {
                       )}
                     </Box>
                   </Heading>
-                  <Box margin={{ bottom: '28px' }}>
+                  <Box margin={{ bottom: '26px' }}>
                     {isLoading || isLoadingRewards ? (
                       <Skeleton height="16px" />
                     ) : (
@@ -201,25 +205,27 @@ export const BoostFarm = () => {
                           ? rewardsInfo.stableLabel
                           : rewardsInfo.label)
                       }
-                      style={{ borderRadius: '58px', width: '197px' }}
+                      style={{
+                        borderRadius: '58px',
+                        width: '197px',
+                        padding: '6px 16px',
+                      }}
                       onClick={claimRewards}
                       disabled={isLoading || isLoadingRewards}
                     />
                     <Button
-                      label={
-                        seeRewardsAsStable
-                          ? 'Prefer ' + rewardsInfo.label + ' LP tokens?'
-                          : 'Prefer ' + rewardsInfo.stableLabel
-                      }
                       onClick={() => setSeeRewardsAsStable(!seeRewardsAsStable)}
                       plain
-                      style={{
-                        textAlign: 'center',
-                        color: '#2A73FF',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                      }}
-                    />
+                      disabled={isLoading || isLoadingRewards}
+                    >
+                      <Box direction="row" justify="center">
+                        <Text size="12px" weight={500} color="#2A73FF">
+                          {seeRewardsAsStable
+                            ? 'Show in ' + rewardsInfo.label + ' LP tokens'
+                            : 'Show in ' + rewardsInfo.stableLabel}
+                        </Text>
+                      </Box>
+                    </Button>
                   </Box>
                 </Box>
               )}
@@ -241,7 +247,9 @@ export const BoostFarm = () => {
                       color: '#F59F31',
                       size: '0.5px',
                     }
-                  : isLightMode ? {color: "#EBEBEB", size: "1px"} : {size: "0px"}
+                  : isLightMode
+                  ? { color: '#EBEBEB', size: '1px' }
+                  : { size: '0px' }
               }
               style={
                 showBoostWithdrawalConfirmation
@@ -260,7 +268,7 @@ export const BoostFarm = () => {
                   </Text>
                 )}
                 {isLoading || isLoadingPendingRewards ? (
-                  <Skeleton height="16px"/>
+                  <Skeleton height="16px" />
                 ) : (
                   <Box direction="row" justify="between">
                     <Text weight="bold" size="16px">
@@ -272,12 +280,13 @@ export const BoostFarm = () => {
                   </Box>
                 )}
                 {isLoading || isLoadingPendingRewards ? (
-                  <Skeleton height="8px"/>
+                  <Skeleton height="8px" />
                 ) : (
-                <Text size="8px" weight={400}>
-                  Available {nextHarvestDate.format('DD MMM')} · Last harvested{' '}
-                  {previousHarvestDate.format('DD MMM')}
-                </Text>)}
+                  <Text size="8px" weight={400}>
+                    Available {nextHarvestDate.format('DD MMM')} · Last
+                    harvested {previousHarvestDate.format('DD MMM')}
+                  </Text>
+                )}
               </Box>
             </Box>
           </Box>

@@ -54,10 +54,7 @@ export const Filters = ({
             if (networkFilter.length == 0) {
               updateNetworkFilter(possibleNetworks);
             }
-            if (
-              tokenFilter.length ==
-              0
-            ) {
+            if (tokenFilter.length == 0) {
               updateTokenFilter([
                 ...possibleNonStableTokens,
                 ...possibleStableTokens,
@@ -306,6 +303,9 @@ export const Filters = ({
           }
           isFiltering={typeFilter.length != possibleTypes.length}
           onClear={() => updateTypeFilter([], false)}
+          onReset={() => {
+            updateTypeFilter(possibleTypes);
+          }}
           onClose={() => {
             if (typeFilter.length == 0) {
               updateTypeFilter(possibleTypes);
@@ -408,12 +408,15 @@ export const Filters = ({
             tokenFilter.length !=
             [...possibleNonStableTokens, ...possibleStableTokens].length
           }
+          onReset={() =>
+            updateTokenFilter([
+              ...possibleNonStableTokens,
+              ...possibleStableTokens,
+            ])
+          }
           onClear={() => updateTokenFilter([], false)}
           onClose={() => {
-            if (
-              tokenFilter.length ==
-              0
-            ) {
+            if (tokenFilter.length == 0) {
               updateTokenFilter([
                 ...possibleNonStableTokens,
                 ...possibleStableTokens,
@@ -517,6 +520,9 @@ export const Filters = ({
                 }`
               : 'Networks'
           }
+          onReset={() => {
+            updateNetworkFilter(possibleNetworks);
+          }}
           onClear={() => updateNetworkFilter([], false)}
           onClose={() => {
             if (networkFilter.length == 0) {

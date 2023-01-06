@@ -35,7 +35,6 @@ export const UnlockTab = ({
         style={{
           minHeight: '454px',
         }}
-        justify="center"
       >
         {isUnlocking ? (
           <Box
@@ -59,48 +58,47 @@ export const UnlockTab = ({
                   {isLoading ? (
                     <Skeleton />
                   ) : (
-                    <Text textAlign="center" weight="bold">
+                    <Text textAlign="center" weight="bold" size="18px">
                       You have {toExactFixed(alluoInfo?.locked, 2)} $ALLUO
                       staked
                     </Text>
                   )}
+                </Box>
+                <Box margin={{ top: 'medium' }}>
+                  <RangeInput
+                    label="Unlock percentage"
+                    value={unlockValue}
+                    onValueChange={handleUnlockValueChange}
+                    error={unlockValueError}
+                  />
+                </Box>
 
-                  <Box margin={{ top: 'medium' }}>
-                    <RangeInput
-                      label="Unlock percentage"
-                      value={unlockValue}
-                      onValueChange={handleUnlockValueChange}
-                      error={unlockValueError}
-                    />
-                  </Box>
-
-                  <Box margin={{ top: 'medium' }}>
-                    <Info
-                      label="$ALLUO being unlocked"
-                      value={projectedUnlockValue}
-                      isLoading={isLoading}
-                    />
-                    <Info
-                      label="$ALLUO APR"
-                      value={alluoInfo?.apr + '%'}
-                      isLoading={isLoading}
-                    />
-                    <Info
-                      label="$ALLUO earned"
-                      value={alluoInfo?.earned}
-                      isLoading={isLoading}
-                    />
-                    <Info
-                      label="$ALLUO unlocked"
-                      value={toExactFixed(alluoInfo?.unlocked, 2)}
-                      isLoading={isLoading}
-                    />
-                    <Info
-                      label="Total $ALLUO staked"
-                      value={alluoInfo?.totalLocked}
-                      isLoading={isLoading}
-                    />
-                  </Box>
+                <Box margin={{ top: 'medium' }}>
+                  <Info
+                    label="$ALLUO being unlocked"
+                    value={projectedUnlockValue}
+                    isLoading={isLoading}
+                  />
+                  <Info
+                    label="$ALLUO APR"
+                    value={alluoInfo?.apr + '%'}
+                    isLoading={isLoading}
+                  />
+                  <Info
+                    label="$ALLUO earned"
+                    value={alluoInfo?.earned}
+                    isLoading={isLoading}
+                  />
+                  <Info
+                    label="$ALLUO unlocked"
+                    value={toExactFixed(alluoInfo?.unlocked, 2)}
+                    isLoading={isLoading}
+                  />
+                  <Info
+                    label="Total $ALLUO staked"
+                    value={alluoInfo?.totalLocked}
+                    isLoading={isLoading}
+                  />
                 </Box>
               </>
             )}
