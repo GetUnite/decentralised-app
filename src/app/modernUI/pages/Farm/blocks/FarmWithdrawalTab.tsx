@@ -42,6 +42,7 @@ export const FarmWithdrawalTab = ({
         style={{
           minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
         }}
+        justify="center"
       >
         <>
           {isWithdrawing || isWithdrawalRequestsLoading ? (

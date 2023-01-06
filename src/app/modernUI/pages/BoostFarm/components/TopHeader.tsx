@@ -18,7 +18,7 @@ export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
           {toExactFixed(selectedFarm.interest, 2).toLocaleString()}% APY is{' '}
           {selectedFarm.sign}
           {integerPart + floatPart}
-          <Text color="softText" margin={{ left: 'hair' }}>
+          <Text color="softText" size="18px">
             {second}
           </Text>
         </Text>
