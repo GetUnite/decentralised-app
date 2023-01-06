@@ -80,11 +80,6 @@ export const useBoostFarmWithdrawal = ({
     setWithdrawValue(value);
   };
 
-  const resetState = () => {
-    setWithdrawValueError('');
-    setIsWithdrawing(false);
-  };
-
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
     cancelBoostWithdrawalConfirmation();
@@ -105,17 +100,17 @@ export const useBoostFarmWithdrawal = ({
         selectedFarm.chain,
         useBiconomy,
       );
-      resetState();
-      await updateFarmInfo();
-      
+
       setNotification(
         'Withdrew successfully',
         'success',
         tx.transactionHash,
         selectedFarm.chain,
       );
+      await updateFarmInfo();
+      
+
     } catch (error) {
-      resetState();
       setNotification(error, 'error');
     }
 
@@ -128,7 +123,6 @@ export const useBoostFarmWithdrawal = ({
     handleWithdrawalFieldChange,
     isWithdrawing,
     handleWithdraw,
-    resetState,
     setUseBiconomy,
     useBiconomy,
     hasErrors: withdrawValueError != '',
