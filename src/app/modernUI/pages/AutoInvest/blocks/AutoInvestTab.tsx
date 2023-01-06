@@ -74,13 +74,23 @@ export const AutoInvestTab = ({ ...rest }) => {
                 selectedToToken={selectedSupportedToToken}
                 setSelectedToToken={selectSupportedToToken}
                 error={streamValueError}
-                disabled={disableInputs || isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                disabled={
+                  disableInputs ||
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
               <RightAlignToggle
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
-                disabled={disableInputs || isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                disabled={
+                  disableInputs ||
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
               {useEndDate && (
                 <>
@@ -108,12 +118,20 @@ export const AutoInvestTab = ({ ...rest }) => {
                 inputValue={streamValueError}
                 interest={targetFarmInfo?.interest}
                 sign={targetFarmInfo?.sign}
-                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                isLoading={
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
               <Info
                 label="APY"
                 value={targetFarmInfo?.interest + '%'}
-                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                isLoading={
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
               <Info
                 label="Pool liquidity"
@@ -121,14 +139,22 @@ export const AutoInvestTab = ({ ...rest }) => {
                   targetFarmInfo?.sign +
                   (+targetFarmInfo?.totalAssetSupply).toLocaleString()
                 }
-                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                isLoading={
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
               <FeeInfo
                 useBiconomy={useBiconomy}
                 setUseBiconomy={setUseBiconomy}
                 disableBiconomy={true}
                 showWalletFee={!useBiconomy}
-                isLoading={isLoading || isFetchingFarmInfo || isUpdatingSelectedStreamOption}
+                isLoading={
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
               />
             </Box>
           </Box>
@@ -141,7 +167,8 @@ export const AutoInvestTab = ({ ...rest }) => {
             isLoading ||
             hasErrors ||
             isUpdatingSelectedStreamOption ||
-            isApproving || isDepositing ||
+            isApproving ||
+            isDepositing ||
             !(+streamValue > 0)
           }
           label={
@@ -152,7 +179,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 }: ${selectedStreamOptionSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
-          glowing={currentStep > 0}
+          glowing={currentStep > 0 && !isDepositing}
         />
       </Box>
     </Box>

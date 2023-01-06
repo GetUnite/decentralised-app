@@ -1,5 +1,5 @@
 import { useMode } from 'app/common/state';
-import 'app/modernUI/css/Dropdown.css';
+import 'app/modernUI/css/Filter.css';
 import { colors } from 'app/modernUI/theme';
 import { Box, Button, DropButton, Heading, Text } from 'grommet';
 import { Down, FormClose } from 'grommet-icons';
@@ -10,6 +10,7 @@ export const Filter = ({
   heading,
   onClear,
   onClose,
+  onReset = null,
   buttonStyle = null,
   isFiltering = false,
   ...rest
@@ -22,43 +23,42 @@ export const Filter = ({
   const filteringTextColor = isLightMode ? colors.BLUE : 'white';
 
   return (
-    <>
+    <Box
+      direction="row"
+      gap={icon ? '4px' : isFiltering ? '4px' : '7px'}
+      pad="5px 9px 5px 13px"
+      align="center"
+      style={
+        buttonStyle
+          ? buttonStyle
+          : {
+              height: '32px',
+              borderRadius: '8px',
+              ...(isFiltering
+                ? {
+                    backgroundColor: filteringBackgroundColor,
+                    color: filteringTextColor,
+                  }
+                : {
+                    border: '1px solid #CCCCCC',
+                  }),
+            }
+      }
+    >
       <DropButton
-        id="dropdown"
+        id="filter"
         plain
         onClose={onClose}
         label={
           <Box
             direction="row"
             gap={icon ? '4px' : isFiltering ? '4px' : '7px'}
-            pad="5px 9px 5px 13px"
             align="center"
           >
             {icon && <img src={icon} />}
             <Text size="14px">{heading}</Text>
-            {!icon && (
-              <>
-                {isFiltering ? (
-                  <FormClose size="14px" color={filteringTextColor} />
-                ) : (
-                  <Down size="small" />
-                )}
-              </>
-            )}
+            {!icon && !isFiltering && <Down size="small" />}
           </Box>
-        }
-        style={
-          buttonStyle
-            ? buttonStyle
-            : {
-                height: '32px',
-                borderRadius: '8px',
-                ...(isFiltering
-                  ? { backgroundColor: filteringBackgroundColor, color: filteringTextColor }
-                  : {
-                      border: '1px solid #CCCCCC',
-                    }),
-              }
         }
         dropAlign={{ top: 'bottom', left: 'left' }}
         dropContent={
@@ -94,6 +94,17 @@ export const Filter = ({
           </Box>
         }
       />
-    </>
+      {!icon && isFiltering && (
+        <Button>
+          <Box justify="center">
+            <FormClose
+              size="14px"
+              color={filteringTextColor}
+              onClick={onReset}
+            />
+          </Box>
+        </Button>
+      )}
+    </Box>
   );
 };

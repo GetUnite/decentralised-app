@@ -110,6 +110,9 @@ export const useFarmDeposit = ({
     setSelectedSupportedTokenSteps(neededSteps);
 
     setIsFetchingSupportedTokenInfo(false);
+
+    // retrigger input validation
+    handleDepositValueChange(depositValue);
   };
 
   const handleApprove = async () => {
