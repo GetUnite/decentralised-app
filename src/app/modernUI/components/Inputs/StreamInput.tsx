@@ -121,11 +121,14 @@ export const StreamInput = ({
             </ThemeContext.Extend>
           </AbsoluteBox>
         </RelativeBox>
+        <Box
+          height="13px"
+        >
         {error && (
           <Text color="error" size="small" margin={{ top: 'small' }}>
             {error}
           </Text>
-        )}
+        )}</Box>
       </Box>
     </>
   );
