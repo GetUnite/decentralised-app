@@ -41,6 +41,7 @@ export const FarmDepositTab = ({
         style={{
           minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
         }}
+        justify="center"
       >
         {isApproving || isDepositing ? (
           <Box
