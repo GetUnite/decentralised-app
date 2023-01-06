@@ -130,7 +130,6 @@ export const useBoostFarmDeposit = ({
 
   const handleDepositValueChange = value => {
     setDepositValueError('');
-    console.log(value, selectedSupportedTokenInfo.balance)
     if (+value > +selectedSupportedTokenInfo.balance) {
       setDepositValueError('Insufficient balance');
     }
