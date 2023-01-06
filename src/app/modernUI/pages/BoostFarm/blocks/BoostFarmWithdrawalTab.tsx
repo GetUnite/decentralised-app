@@ -41,6 +41,7 @@ export const BoostFarmWithdrawalTab = ({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,
+    cancelBoostWithdrawalConfirmation
   });
 
   return (
