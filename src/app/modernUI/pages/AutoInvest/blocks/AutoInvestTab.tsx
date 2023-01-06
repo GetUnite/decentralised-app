@@ -161,6 +161,7 @@ export const AutoInvestTab = ({ ...rest }) => {
         )}
       </Box>
       <Box margin={{ top: 'large' }}>
+        {console.log(streamValue)}
         <SubmitButton
           primary
           disabled={
@@ -169,7 +170,7 @@ export const AutoInvestTab = ({ ...rest }) => {
             isUpdatingSelectedStreamOption ||
             isApproving ||
             isDepositing ||
-            !(+streamValue > 0)
+            streamValue == ''
           }
           label={
             isLoading || isUpdatingSelectedStreamOption
