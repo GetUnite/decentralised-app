@@ -32,7 +32,7 @@ export const BoostFarmDepositTab = ({
     selectedSupportedTokenInfo,
     currentStep,
     selectedSupportedTokenSteps,
-    handleCurrentStep
+    handleCurrentStep,
   } = useBoostFarmDeposit({ selectedFarm, selectedSupportedToken });
 
   return (
@@ -54,23 +54,25 @@ export const BoostFarmDepositTab = ({
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading}/>
-              <Box margin={{ top: 'medium' }}>
-                <NumericInput
-                  label={`Deposit ${selectedSupportedToken ? selectedSupportedToken?.label : ''}`}
-                  tokenSign={selectedFarm?.sign}
-                  onValueChange={handleDepositValueChange}
-                  value={depositValue}
-                  isLoadingMaxValue={isFetchingSupportedTokenInfo}
-                  maxButton={true}
-                  maxValue={selectedSupportedTokenInfo?.balance}
-                  tokenOptions={selectedFarm?.supportedTokens || []}
-                  selectedToken={selectedSupportedToken}
-                  setSelectedToken={selectSupportedToken}
-                  error={depositValueError}
-                  disabled={isLoading}
-                />
-              </Box>
+              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
+            </Box>
+            <Box margin={{ top: 'medium' }}>
+              <NumericInput
+                label={`Deposit ${
+                  selectedSupportedToken ? selectedSupportedToken?.label : ''
+                }`}
+                tokenSign={selectedFarm?.sign}
+                onValueChange={handleDepositValueChange}
+                value={depositValue}
+                isLoadingMaxValue={isFetchingSupportedTokenInfo}
+                maxButton={true}
+                maxValue={selectedSupportedTokenInfo?.balance}
+                tokenOptions={selectedFarm?.supportedTokens || []}
+                selectedToken={selectedSupportedToken}
+                setSelectedToken={selectSupportedToken}
+                error={depositValueError}
+                disabled={isLoading}
+              />
             </Box>
             <Box margin={{ top: 'medium' }}>
               <ProjectedWeeklyInfo
@@ -80,7 +82,13 @@ export const BoostFarmDepositTab = ({
                 sign={selectedFarm?.sign}
                 isLoading={isLoading}
               />
-              <Info label="APY" value={toExactFixed(selectedFarm?.interest,2).toLocaleString() + '%'} isLoading={isLoading}/>
+              <Info
+                label="APY"
+                value={
+                  toExactFixed(selectedFarm?.interest, 2).toLocaleString() + '%'
+                }
+                isLoading={isLoading}
+              />
               <Info
                 label="Pool liquidity"
                 value={
@@ -116,9 +124,11 @@ export const BoostFarmDepositTab = ({
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
-              : (selectedSupportedTokenSteps?.length > 1 ? `Step ${currentStep + 1} of ${
+              : selectedSupportedTokenSteps?.length > 1
+              ? `Step ${currentStep + 1} of ${
                   selectedSupportedTokenSteps?.length
-                }: ${selectedSupportedTokenSteps[currentStep]?.label}` : `${selectedSupportedTokenSteps[currentStep]?.label}`)
+                }: ${selectedSupportedTokenSteps[currentStep]?.label}`
+              : `${selectedSupportedTokenSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
         />

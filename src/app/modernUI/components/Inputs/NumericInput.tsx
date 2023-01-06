@@ -93,7 +93,7 @@ export const NumericInput = ({
               setFormattedValue(formattedValue);
             }}
           />
-          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "15px"} : {right: "0"}}>
+          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "8px"} : {right: "0"}}>
             {maxButton && maxValue != undefined && (
               <MaxButton
                 primary

@@ -1,11 +1,10 @@
 import { toExactFixed } from 'app/common/functions/utils';
 import { TSupportedToken } from 'app/common/types/global';
-import { Box, Select, Text, TextInput, ThemeContext } from 'grommet';
-import { Down } from 'grommet-icons';
+import { Box, Text, TextInput, ThemeContext } from 'grommet';
 import { useState } from 'react';
 import NumberFormat from 'react-number-format';
 import styled from 'styled-components';
-import { TokenIcon } from '../Icons';
+import { TokenSelector } from './TokenSelector';
 
 const AbsoluteBox = styled(Box)`
   position: absolute;
@@ -78,7 +77,7 @@ export const StreamInput = ({
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
             value={formattedValue}
-            placeholder={disabled ? value : "0.00".toLocaleString()}
+            placeholder={disabled ? value : '0.00'.toLocaleString()}
             customInput={TextInput}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
@@ -102,37 +101,19 @@ export const StreamInput = ({
               }}
             >
               {fromTokenOptions && (
-                <Select
-                  width="10px"
-                  plain
-                  icon={<Down size="small" />}
-                  dropAlign={{ right: 'right', top: 'bottom' }}
-                  options={fromTokenOptions}
-                  value={selectedFromToken?.label}
-                  valueLabel={option => {
-                    return <TokenIcon label={option} />;
-                  }}
-                  onChange={({ option }) => setSelectedFromToken(option)}
-                  labelKey="label"
-                  valueKey="address"
+                <TokenSelector
+                  selectedToken={selectedFromToken}
+                  tokenOptions={fromTokenOptions}
+                  setSelectedToken={setSelectedFromToken}
                   disabled={disabled}
                 />
               )}
               <Text margin={{ right: '10px' }}> to </Text>
               {toTokenOptions && (
-                <Select
-                  width="10px"
-                  plain
-                  icon={<Down size="small" />}
-                  dropAlign={{ right: 'right', top: 'bottom' }}
-                  options={toTokenOptions}
-                  value={selectedToToken?.label}
-                  valueLabel={option => {
-                    return <TokenIcon label={option} />;
-                  }}
-                  onChange={({ option }) => setSelectedToToken(option)}
-                  labelKey="label"
-                  valueKey="address"
+                <TokenSelector
+                  selectedToken={selectedToToken}
+                  tokenOptions={toTokenOptions}
+                  setSelectedToken={setSelectedToToken}
                   disabled={disabled}
                 />
               )}

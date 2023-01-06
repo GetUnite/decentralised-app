@@ -1,6 +1,8 @@
 import { EChain } from 'app/common/constants/chains';
-import { getIfUserHasWithdrawalRequest, withdraw } from 'app/common/functions/farm';
-import { isNumeric } from 'app/common/functions/utils';
+import {
+  getIfUserHasWithdrawalRequest,
+  withdraw
+} from 'app/common/functions/farm';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -38,6 +40,13 @@ export const useFarmWithdrawal = ({
     }
   }, [selectedFarm]);
 
+  useEffect(() => {
+    if (selectedFarm && selectedSupportedToken) {
+      // retrigger input validation
+      handleWithdrawalFieldChange(withdrawValue);
+    }
+  }, [selectedSupportedToken]);
+
   const fetchIfUserHasWithdrawalRequest = async () => {
     setIsWithdrawalRequestsLoading(true);
     try {
@@ -69,9 +78,7 @@ export const useFarmWithdrawal = ({
 
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setWithdrawValueError('Write a valid number');
-    } else if (+value > +selectedFarm?.depositedAssetValue) {
+    if (+value > +selectedFarm?.depositedAssetValue) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);

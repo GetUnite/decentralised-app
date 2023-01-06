@@ -1,15 +1,13 @@
-import { useState } from 'react';
-import styled from 'styled-components';
-import {
-  Box,
-  Button,
-  Text,
-  ButtonExtendedProps,
-} from 'grommet';
-import { normalizeColor } from 'grommet/utils';
-import { useRecoilState } from 'recoil';
 import { mode } from "app/common/state/atoms";
 import { colors } from 'app/modernUI/theme';
+import {
+  Box,
+  Button, ButtonExtendedProps, Text
+} from 'grommet';
+import { normalizeColor } from 'grommet/utils';
+import { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
 
 const StyledButton = styled(Button)<ButtonExtendedProps | any>`
   background-color: ${props =>
