@@ -105,7 +105,7 @@ export const BoostFarmWithdrawalTab = ({
                     disabled={isLoading}
                   />
                 </Box>
-                <Box margin={{ top: 'medium' }}>
+                <Box margin={{ top: '11px' }}>
                   <ProjectedWeeklyInfo
                     depositedAmount={selectedFarm?.depositedAmount}
                     inputValue={-1 * +withdrawValue}

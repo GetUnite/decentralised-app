@@ -74,7 +74,7 @@ export const FarmDepositTab = ({
                 />
               </Box>
             </Box>
-            <Box margin={{ top: 'medium' }}>
+            <Box margin={{ top: '11px' }}>
               <ProjectedWeeklyInfo
                 depositedAmount={selectedFarm?.depositedAssetValue}
                 inputValue={depositValue}
