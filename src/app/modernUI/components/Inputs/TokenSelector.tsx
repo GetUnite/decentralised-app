@@ -10,6 +10,7 @@ export const TokenSelector = ({
   tokenOptions,
   selectedToken,
   setSelectedToken,
+  disabled = false,
   ...rest
 }) => {
   const { isLightMode } = useMode();
@@ -35,11 +36,12 @@ export const TokenSelector = ({
               align="center"
               margin={{ right: '16px' }}
             >
-              <TokenIcon label={selectedToken.label} />
-              <Down size="small" />
+              <TokenIcon label={selectedToken?.label} />
+              <Down size="small" color={textColor}/>
             </Box>
           </Box>
         }
+        disabled={disabled}
         dropAlign={{ top: 'bottom', right: 'right' }}
         dropContent={
           <Box

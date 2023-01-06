@@ -93,7 +93,7 @@ export const NumericInput = ({
               setFormattedValue(formattedValue);
             }}
           />
-          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "15px"} : {right: "0"}}>
+          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "8px"} : {right: "0"}}>
             {maxButton && maxValue != undefined && (
               <MaxButton
                 primary
@@ -101,7 +101,7 @@ export const NumericInput = ({
                   setFormattedValue(toExactFixed(maxValue, 6));
                 }}
               >
-                Max
+                MAX
               </MaxButton>
             )}
             {tokenOptions && !disabled && (
@@ -115,14 +115,14 @@ export const NumericInput = ({
         </RelativeBox>
         <Box
           margin={{ top: 'small' }}
-          height={slippageWarning ? '60px' : 'auto'}
+          height={slippageWarning ? '60px' : '13px'}
         >
           {error ? (
             <Text color="error" size="small">
               {error}
             </Text>
           ) : (
-            <>
+            <Box fill>
               {slippageWarning && (
                 <>
                   <Text size="small" color="soul">
@@ -133,7 +133,7 @@ export const NumericInput = ({
                   </Text>
                 </>
               )}
-            </>
+            </Box>
           )}
         </Box>
       </Box>

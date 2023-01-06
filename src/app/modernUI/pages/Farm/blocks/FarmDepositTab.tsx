@@ -15,7 +15,6 @@ import { TopHeader } from '../components';
 export const FarmDepositTab = ({
   isLoading,
   selectedFarm,
-  updateFarmInfo,
   selectSupportedToken,
   selectedSupportedToken,
   ...rest
@@ -33,8 +32,8 @@ export const FarmDepositTab = ({
     isFetchingSupportedTokenInfo,
     currentStep,
     selectedSupportedTokenSteps,
-    handleCurrentStep
-  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+    handleCurrentStep,
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken });
 
   return (
     <Box fill>
@@ -56,10 +55,12 @@ export const FarmDepositTab = ({
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading}/>
+              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
               <Box margin={{ top: 'medium' }}>
                 <NumericInput
-                  label={`Deposit ${selectedSupportedToken ? selectedSupportedToken?.label : ''}`}
+                  label={`Deposit ${
+                    selectedSupportedToken ? selectedSupportedToken?.label : ''
+                  }`}
                   tokenSign={selectedFarm?.sign}
                   onValueChange={handleDepositValueChange}
                   value={depositValue}
@@ -74,9 +75,9 @@ export const FarmDepositTab = ({
                 />
               </Box>
             </Box>
-            <Box margin={{ top: 'medium' }}>
+            <Box margin={{ top: '11px' }}>
               <ProjectedWeeklyInfo
-                depositedAmount={selectedFarm?.depositedAmount}
+                depositedAmount={selectedFarm?.depositedAssetValue}
                 inputValue={depositValue}
                 interest={selectedFarm?.interest}
                 sign={selectedFarm?.sign}
@@ -125,9 +126,11 @@ export const FarmDepositTab = ({
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
-              : (selectedSupportedTokenSteps?.length > 1 ? `Step ${currentStep + 1} of ${
+              : selectedSupportedTokenSteps?.length > 1
+              ? `Step ${currentStep + 1} of ${
                   selectedSupportedTokenSteps?.length
-                }: ${selectedSupportedTokenSteps[currentStep]?.label}` : `${selectedSupportedTokenSteps[currentStep]?.label}`)
+                }: ${selectedSupportedTokenSteps[currentStep]?.label}`
+              : `${selectedSupportedTokenSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
         />

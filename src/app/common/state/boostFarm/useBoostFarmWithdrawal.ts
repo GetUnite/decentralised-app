@@ -1,9 +1,7 @@
 import { EChain } from 'app/common/constants/chains';
 import {
-  convertFromUSDC, convertToLP,
-  withdrawFromBoostFarm
+  convertFromUSDC, convertToLP, withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
-import { isNumeric } from 'app/common/functions/utils';
 import { useNotification } from 'app/common/state';
 import { isSafeApp, walletAccount } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
@@ -13,6 +11,7 @@ export const useBoostFarmWithdrawal = ({
   selectedFarm,
   selectedSupportedToken,
   updateFarmInfo,
+  cancelBoostWithdrawalConfirmation
 }) => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -42,53 +41,48 @@ export const useBoostFarmWithdrawal = ({
     useState(true);
 
   useEffect(() => {
-    const updateAvailable = async () => {
-      setIsFetchingSupportedTokenInfo(true);
-
-      // For booster farm withdrawals
-      // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
-      // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
-      const boostDepositedAmount = await convertFromUSDC(
-        selectedSupportedToken.address,
-        selectedSupportedToken.decimals,
-        // here the deposited amount is in USDC
-        selectedFarm.depositedAmount,
-      );
-      setSelectedSupportedTokenInfo({
-        boostDepositedAmount: boostDepositedAmount,
-      });
-
-      setIsFetchingSupportedTokenInfo(false);
-    };
-
     if (selectedFarm && selectedSupportedToken) {
       updateAvailable();
     }
   }, [selectedSupportedToken]);
 
+  useEffect(() => {
+    if (selectedFarm && selectedSupportedTokenInfo) {
+      // retrigger input validation
+      handleWithdrawalFieldChange(withdrawValue);
+    }
+  }, [selectedSupportedTokenInfo]);
+
+  const updateAvailable = async () => {
+    setIsFetchingSupportedTokenInfo(true);
+
+    // For booster farm withdrawals
+    // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
+    // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
+    const boostDepositedAmount = await convertFromUSDC(
+      selectedSupportedToken.address,
+      selectedSupportedToken.decimals,
+      // here the deposited amount is in USDC
+      selectedFarm.depositedAmount,
+    );
+    setSelectedSupportedTokenInfo({
+      boostDepositedAmount: boostDepositedAmount,
+    });
+
+    setIsFetchingSupportedTokenInfo(false);
+  };
+
   const handleWithdrawalFieldChange = value => {
-    resetState();
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setWithdrawValueError('Write a valid number');
-    } else if (
-      +value >
-      (selectedFarm.isBoost
-        ? selectedSupportedToken.boosterDepositedAmount
-        : +selectedFarm?.depositedAmount)
-    ) {
+    setWithdrawValueError('');
+    if (+value > selectedSupportedTokenInfo.boostDepositedAmount) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
   };
 
-  const resetState = () => {
-    setWithdrawValueError('');
-    setIsWithdrawing(false);
-  };
-
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
-
+    cancelBoostWithdrawalConfirmation();
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarm.farmAddress,
@@ -106,16 +100,17 @@ export const useBoostFarmWithdrawal = ({
         selectedFarm.chain,
         useBiconomy,
       );
-      resetState();
-      await updateFarmInfo();
+
       setNotification(
         'Withdrew successfully',
         'success',
         tx.transactionHash,
         selectedFarm.chain,
       );
+      await updateFarmInfo();
+      
+
     } catch (error) {
-      resetState();
       setNotification(error, 'error');
     }
 
@@ -128,7 +123,6 @@ export const useBoostFarmWithdrawal = ({
     handleWithdrawalFieldChange,
     isWithdrawing,
     handleWithdraw,
-    resetState,
     setUseBiconomy,
     useBiconomy,
     hasErrors: withdrawValueError != '',

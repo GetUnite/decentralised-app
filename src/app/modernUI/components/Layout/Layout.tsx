@@ -43,22 +43,10 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
       {size => (
         <>
           <Box
-            fill="horizontal"
-            style={{
-              position: 'fixed',
-              top: 'top',
-              bottom: 'bottom',
-              left: 'left',
-              right: 'right',
-              height: '100vh',
-              zIndex: '-1',
-            }}
-          />
-          <Box
             align="center"
-            justify="center"
+            justify="start"
             fill="horizontal"
-            height={notificationAtom.message != '' ? "148px" : "100px"}
+            height={notificationAtom.message != '' ? '148px' : '100px'}
             style={{ position: 'sticky', top: '0px', zIndex: 2 }}
           >
             <Nav
@@ -117,7 +105,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 width="xlarge"
                 pad={{ horizontal: 'medium', vertical: 'medium' }}
                 style={{
-                  marginTop: '12px',
+                  marginTop: notificationAtom.message != '' ? '12px' : '60px',
                   marginBottom: '123px',
                   minHeight: '510px',
                 }}

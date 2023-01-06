@@ -2,7 +2,8 @@ import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
-  claimBoostFarmNonLPRewards, getBoostFarmInterest,
+  claimBoostFarmNonLPRewards,
+  getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards
 } from 'app/common/functions/boostFarm';
@@ -29,7 +30,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
-    name: 'FRAX/USDC',
+    name: 'Frax/USDC',
     sign: '$',
     icons: [
       'FRAX',
@@ -525,12 +526,14 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startBoostWithdrawalConfirmation = async withdrawValue => {
+  const startBoostWithdrawalConfirmation = async (
+    withdrawValue,
+    boostDepositedAmount,
+  ) => {
     setShowBoostWithdrawalConfirmation(true);
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
-      pendingRewardsInfo.pendingValue *
-      (+withdrawValue / +selectedSupportedToken.boostDepositedAmount);
+      +pendingRewardsInfo * (+withdrawValue / +boostDepositedAmount);
     setLosablePendingRewards(projectedLosableRewards);
   };
 

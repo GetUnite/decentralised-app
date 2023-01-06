@@ -888,12 +888,14 @@ async function getAddressNonce(metaTxContractAddress, user, chain) {
 const getSignatureParameters = signature => {
   if (!ethers.utils.isHexString(signature)) {
     throw new Error(
-        'Given value "'.concat(signature, '" is not a valid hex string.')
+      'Given value "'.concat(signature, '" is not a valid hex string.'),
     );
-}
+  }
   let r = signature.slice(0, 66);
   let s = '0x'.concat(signature.slice(66, 130));
-  let v = ethers.BigNumber.from('0x'.concat(signature.slice(130, 132))).toNumber();
+  let v = ethers.BigNumber.from(
+    '0x'.concat(signature.slice(130, 132)),
+  ).toNumber();
   if (![27, 28].includes(v)) v += 27;
 
   return {
@@ -1064,6 +1066,7 @@ export const getUserDepositedAmount = async (
 export const converToAssetValue = async (
   contractAddress,
   amount,
+  decimals,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1082,11 +1085,13 @@ export const converToAssetValue = async (
     },
   ];
 
+  const amountInDecimals = toDecimals(amount, decimals);
+
   const userDepositedAmount = await callContract(
     abi,
     contractAddress,
     'convertToAssetValue(uint256)',
-    [amount],
+    [amountInDecimals],
     chain,
   );
 
@@ -1115,7 +1120,10 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
   return ethers.utils.formatEther(userDepositedLPAmount);
 };
 
-export const getTotalAssetSupply = async (farmAddress, chain = EChain.POLYGON) => {
+export const getTotalAssetSupply = async (
+  farmAddress,
+  chain = EChain.POLYGON,
+) => {
   const abi = [
     {
       inputs: [],
