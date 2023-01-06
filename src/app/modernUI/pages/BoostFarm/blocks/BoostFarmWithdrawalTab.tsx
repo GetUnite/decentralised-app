@@ -2,12 +2,12 @@ import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
 import { useBoostFarmWithdrawal } from 'app/common/state/boostFarm/useBoostFarmWithdrawal';
 import {
-    FeeInfo,
-    Info,
-    NumericInput,
-    ProjectedWeeklyInfo,
-    Spinner,
-    SubmitButton
+  FeeInfo,
+  Info,
+  NumericInput,
+  ProjectedWeeklyInfo,
+  Spinner,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
@@ -41,6 +41,7 @@ export const BoostFarmWithdrawalTab = ({
     selectedFarm,
     selectedSupportedToken,
     updateFarmInfo,
+    cancelBoostWithdrawalConfirmation
   });
 
   return (
@@ -49,9 +50,8 @@ export const BoostFarmWithdrawalTab = ({
         style={{
           minHeight: '504px',
         }}
-        justify="center"
       >
-        {showBoostWithdrawalConfirmation ? (
+        {showBoostWithdrawalConfirmation && !isWithdrawing ? (
           <BoostFarmWithdrawalConfirmation
             selectedFarm={selectedFarm}
             withdrawValue={withdrawValue}
@@ -81,36 +81,32 @@ export const BoostFarmWithdrawalTab = ({
                     selectedFarm={selectedFarm}
                     isLoading={isLoading}
                   />
-                  <Box margin={{ top: 'medium' }}>
-                    <NumericInput
-                      label={`Withdraw ${
-                        selectedSupportedToken
-                          ? selectedSupportedToken?.label
-                          : ''
-                      }`}
-                      available={
-                        selectedSupportedTokenInfo?.boostDepositedAmount
-                      }
-                      tokenSign={selectedSupportedToken?.sign}
-                      onValueChange={handleWithdrawalFieldChange}
-                      value={withdrawValue}
-                      maxValue={
-                        selectedSupportedTokenInfo?.boostDepositedAmount
-                      }
-                      tokenOptions={selectedFarm?.supportedTokens || []}
-                      selectedToken={selectedSupportedToken}
-                      setSelectedToken={selectSupportedToken}
-                      error={withdrawValueError}
-                      slippageWarning={true}
-                      lowSlippageTokenLabels={
-                        selectedFarm?.lowSlippageTokenLabels
-                      }
-                      disabled={isLoading}
-                    />
-                  </Box>
                 </Box>
-
                 <Box margin={{ top: 'medium' }}>
+                  <NumericInput
+                    label={`Withdraw ${
+                      selectedSupportedToken
+                        ? selectedSupportedToken?.label
+                        : ''
+                    }`}
+                    available={selectedSupportedTokenInfo?.boostDepositedAmount}
+                    tokenSign={selectedSupportedToken?.sign}
+                    onValueChange={handleWithdrawalFieldChange}
+                    value={withdrawValue}
+                    maxButton={true}
+                    maxValue={selectedSupportedTokenInfo?.boostDepositedAmount}
+                    tokenOptions={selectedFarm?.supportedTokens || []}
+                    selectedToken={selectedSupportedToken}
+                    setSelectedToken={selectSupportedToken}
+                    error={withdrawValueError}
+                    slippageWarning={true}
+                    lowSlippageTokenLabels={
+                      selectedFarm?.lowSlippageTokenLabels
+                    }
+                    disabled={isLoading}
+                  />
+                </Box>
+                <Box margin={{ top: '11px' }}>
                   <ProjectedWeeklyInfo
                     depositedAmount={selectedFarm?.depositedAmount}
                     inputValue={-1 * +withdrawValue}
@@ -162,7 +158,12 @@ export const BoostFarmWithdrawalTab = ({
               !+withdrawValue ||
               hasErrors
             }
-            onClick={() => startBoostWithdrawalConfirmation(withdrawValue)}
+            onClick={() =>
+              startBoostWithdrawalConfirmation(
+                withdrawValue,
+                selectedSupportedTokenInfo.boostDepositedAmount,
+              )
+            }
           />
         </Box>
       )}

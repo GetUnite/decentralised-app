@@ -1,6 +1,6 @@
 import { useMain } from 'app/common/state';
 import { Layout } from 'app/modernUI/components';
-import { Box, ResponsiveContext } from 'grommet';
+import { Box, ResponsiveContext, Text } from 'grommet';
 import moment from 'moment';
 import { useState } from 'react';
 import { Filters } from './blocks/Filters';
@@ -28,6 +28,7 @@ export const Main = () => {
     possibleTypes,
     possibleViewTypes,
     setViewType,
+    totalDepositedAmountInUsd,
   } = useMain();
 
   const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] =
@@ -51,8 +52,6 @@ export const Main = () => {
               align="center"
               justify="start"
               gap="none"
-              pad="xsmall"
-              margin={{ top: 'small' }}
               direction="column"
               fill="horizontal"
             >
@@ -141,6 +140,13 @@ export const Main = () => {
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />
+                      {viewType == 'View my farms only' && (
+                        <Box fill="horizontal" justify="end" align="end">
+                          <Text size="18px" weight="bold">
+                            Total balance in farms: ${totalDepositedAmountInUsd}
+                          </Text>
+                        </Box>
+                      )}
                     </Box>
                   </Box>
                 </Box>

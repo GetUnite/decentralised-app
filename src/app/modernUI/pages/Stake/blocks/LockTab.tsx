@@ -27,7 +27,6 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
         style={{
           minHeight: '415px',
         }}
-        justify="center"
       >
         {isApproving || isLocking ? (
           <Box
@@ -44,24 +43,24 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
               {isLoading ? (
                 <Skeleton />
               ) : (
-                <Text textAlign="center" weight="bold">
+                <Text textAlign="center" weight="bold" size="18px">
                   You have {toExactFixed(alluoInfo?.locked, 2)} $ALLUO staked
                 </Text>
               )}
-              <Box margin={{ top: 'medium' }}>
-                <NumericInput
-                  label="Lock"
-                  tokenSign="$"
-                  onValueChange={handleLockValueChange}
-                  value={lockValue}
-                  maxButton={true}
-                  maxValue={alluoInfo?.balance}
-                  error={lockValueError}
-                  disabled={isLoading}
-                />
-              </Box>
             </Box>
             <Box margin={{ top: 'medium' }}>
+              <NumericInput
+                label="Lock"
+                tokenSign="$"
+                onValueChange={handleLockValueChange}
+                value={lockValue}
+                maxButton={true}
+                maxValue={alluoInfo?.balance}
+                error={lockValueError}
+                disabled={isLoading}
+              />
+            </Box>
+            <Box margin={{ top: '11px' }}>
               <Info
                 label="Unstaked $ALLUO balance"
                 value={toExactFixed(alluoInfo?.balance, 2)}
@@ -94,7 +93,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
             isApproving ||
             isLocking ||
             hasErrors ||
-            !(+lockValue > 0)
+            lockValue == ''
           }
           label={
             +lockValue > 0

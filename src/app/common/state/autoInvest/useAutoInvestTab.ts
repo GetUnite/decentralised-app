@@ -2,16 +2,18 @@ import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   approveSuperfluidSubscriptions,
-  depositIntoAlluo, getStreamFlow,
+  depositIntoAlluo,
+  getStreamFlow,
   getUnapprovedSuperfluidSubscriptions,
   startStream
 } from 'app/common/functions/autoInvest';
 import { heapTrack } from 'app/common/functions/heapClient';
-import { isNumeric } from 'app/common/functions/utils';
 import {
   approve,
   getAllowance,
-  getBalance, getBalanceOf, getInterest,
+  getBalance,
+  getBalanceOf,
+  getInterest,
   getTotalAssetSupply
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -339,7 +341,7 @@ export const useAutoInvestTab = () => {
   const { setNotification } = useNotification();
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false);//useState(isSafeAppAtom ? false : true);
+  const [useBiconomy, setUseBiconomy] = useState(false); //useState(isSafeAppAtom ? false : true);
 
   // stream
   const [possibleStreamOptions, setPossibleStreamOptions] = useState<
@@ -362,7 +364,7 @@ export const useAutoInvestTab = () => {
   const [targetFarmInfo, setTargetFarmInfo] = useState<TFarm>();
 
   // inputs
-  const [streamValue, setStreamValue] = useState<string>();
+  const [streamValue, setStreamValue] = useState<string>('');
   const [streamValueError, setStreamValueError] = useState<string>('');
   const [useEndDate, setUseEndDate] = useState<boolean>(false);
   const [endDate, setEndDate] = useState<string>();
@@ -408,15 +410,22 @@ export const useAutoInvestTab = () => {
           // if there is no value streaming add a combination of every "from" to this "to"
           if (+streamFlow.flowPerSecond > 0) {
             // save the ricochet market addresses that already have a stream running
-            ricochetMarketAddressesWithStreams.push(streamOption.ricochetMarketAddress);
+            ricochetMarketAddressesWithStreams.push(
+              streamOption.ricochetMarketAddress,
+            );
           }
         }
 
         // the possible streams are all the options that don't have already one stream running
-        const possibleStreamOptionsArray = streamOptions.filter(streamOption => !ricochetMarketAddressesWithStreams.find(rmaws => rmaws == streamOption.ricochetMarketAddress));
+        const possibleStreamOptionsArray = streamOptions.filter(
+          streamOption =>
+            !ricochetMarketAddressesWithStreams.find(
+              rmaws => rmaws == streamOption.ricochetMarketAddress,
+            ),
+        );
 
         // If there aren't any possible stream options, redirect to auto invest
-        if(possibleStreamOptionsArray.length == 0){
+        if (possibleStreamOptionsArray.length == 0) {
           navigate('/autoinvest');
           setNotification('No available stream options', 'info');
           return;
@@ -554,13 +563,11 @@ export const useAutoInvestTab = () => {
       setStreamValueError('');
       setEndDateError('');
       if (value) {
-        if (!(isNumeric(value) || value === '' || value === '.')) {
-          setStreamValueError('Write a valid number');
-        } else if (+value > +selectedSupportedFromToken?.balance) {
+        if (+value > +selectedSupportedFromToken?.balance) {
           setStreamValueError('Insufficient balance');
         }
-        setStreamValue(value);
       }
+      setStreamValue(value);
       if (useEndDate) {
         if (new Date().getTime() > new Date(endDate).getTime()) {
           setEndDateError(`The end date of the stream can't be in the past`);
@@ -578,10 +585,7 @@ export const useAutoInvestTab = () => {
       sign: selectedToToken.sign,
     };
     if (walletAccountAtom) {
-      farmInfo.depositedAmount = await getBalance(
-        selectedToToken.address,
-        18
-      );
+      farmInfo.depositedAmount = await getBalance(selectedToToken.address, 18);
     }
 
     return farmInfo;
@@ -592,7 +596,7 @@ export const useAutoInvestTab = () => {
     supportedFromToken: TSupportedStreamToken,
   ) => {
     setSelectedSupportedFromToken(supportedFromToken);
-    heapTrack('autoInvestTokenSelected', {token: supportedFromToken.label})
+    heapTrack('autoInvestTokenSelected', { token: supportedFromToken.label });
     // updates the list of possible "to" tokens
     setSupportedToTokens(supportedFromToken.canStreamTo);
     // changes the "to" token to the first one on the list
@@ -621,7 +625,12 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotification('Approved successfully', 'success', tx.transactionHash, EChain.POLYGON);
+      setNotification(
+        'Approved successfully',
+        'success',
+        tx.transactionHash,
+        EChain.POLYGON,
+      );
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -634,7 +643,10 @@ export const useAutoInvestTab = () => {
     setIsApproving(true);
 
     try {
-      heapTrack('approvedTransactionMined',  {currency: selectedStreamOption.fromIbAlluoAddress, amount: streamValue})
+      heapTrack('approvedTransactionMined', {
+        currency: selectedStreamOption.fromIbAlluoAddress,
+        amount: streamValue,
+      });
       // TODO: currently biconomy doesn't work here
       const tx = await approveSuperfluidSubscriptions(
         unapprovedSuperfluidSubscriptions,
@@ -642,7 +654,12 @@ export const useAutoInvestTab = () => {
       );
       // Next step
       setCurrentStep(currentStep + 1);
-      setNotification('Approved successfully', 'success', tx.transactionHash, EChain.POLYGON);
+      setNotification(
+        'Approved successfully',
+        'success',
+        tx.transactionHash,
+        EChain.POLYGON,
+      );
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -655,7 +672,10 @@ export const useAutoInvestTab = () => {
     setIsDepositing(true);
 
     try {
-      heapTrack('startedAutoinvestDeposit', { token: selectedSupportedFromToken.label, amount: streamValue });
+      heapTrack('startedAutoinvestDeposit', {
+        token: selectedSupportedFromToken.label,
+        amount: streamValue,
+      });
       const tx = await depositIntoAlluo(
         selectedSupportedFromToken.address,
         selectedStreamOption.fromIbAlluoAddress,
@@ -673,8 +693,16 @@ export const useAutoInvestTab = () => {
         ...selectedSupportedFromToken,
         balance: balance,
       });
-      heapTrack('depositTransactionMined', { currency: selectedSupportedFromToken.label, amount: streamValue });
-      setNotification('Deposit successful', 'success', tx.transactionHash, EChain.POLYGON);
+      heapTrack('depositTransactionMined', {
+        currency: selectedSupportedFromToken.label,
+        amount: streamValue,
+      });
+      setNotification(
+        'Deposit successful',
+        'success',
+        tx.transactionHash,
+        EChain.POLYGON,
+      );
     } catch (err) {
       setNotification(err, 'error');
     }
@@ -688,7 +716,8 @@ export const useAutoInvestTab = () => {
 
     try {
       const timeToStreamInSeconds = Math.floor(
-        (new Date(endDate).getTime() - new Date().getTime()) / 1000);
+        (new Date(endDate).getTime() - new Date().getTime()) / 1000,
+      );
       // data from the selected output
       const tx = await startStream(
         selectedStreamOption.fromIbAlluoAddress,
@@ -699,7 +728,12 @@ export const useAutoInvestTab = () => {
         useEndDate ? timeToStreamInSeconds : null,
         useBiconomy,
       );
-      setNotification('Stream started successfully', 'success',tx.transactionHash, EChain.POLYGON);
+      setNotification(
+        'Stream started successfully',
+        'success',
+        tx.transactionHash,
+        EChain.POLYGON,
+      );
       navigate('/autoinvest');
     } catch (error) {
       setNotification(error, 'error');
@@ -740,8 +774,8 @@ export const useAutoInvestTab = () => {
   return {
     // loading control
     isLoading: isUpdating,
-    isStartingStream ,
-    isApproving ,
+    isStartingStream,
+    isApproving,
     isDepositing,
     isFetchingFarmInfo,
     isUpdatingSelectedStreamOption,

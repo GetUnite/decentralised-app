@@ -44,7 +44,7 @@ export const RangeInput = ({
               onValueChange(100);
             }}
           >
-            Max
+            MAX
           </MaxButton>
         </RelativeBox>
         {error && (
