@@ -175,6 +175,7 @@ export const FarmsBlock = ({
                 chain={farm.chain as EChain}
                 isBoost={farm.isBoost}
                 viewType={viewType}
+                isLocked={farm.isLocked}
               />
             );
           })

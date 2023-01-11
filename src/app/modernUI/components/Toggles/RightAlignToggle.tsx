@@ -24,16 +24,16 @@ export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=fals
             width="46px"
             height="20px"
             round="10px"
-            pad="0px 7px 0px 7px"
+            pad="0px 3px 0px 3px"
             background={buttonColor}
             direction={buttonDirection}
-            justify="between"
+   
             align="center"
           >
             <span
               style={{
-                width: '13px',
-                height: '13px',
+                width: '16px',
+                height: '16px',
                 textAlign: 'center',
                 backgroundColor: 'white',
                 borderRadius: '50px',

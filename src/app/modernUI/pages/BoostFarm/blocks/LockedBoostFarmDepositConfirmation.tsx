@@ -1,15 +1,11 @@
-import { toExactFixed } from 'app/common/functions/utils';
 import exclamation from 'app/modernUI/images/blackExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
-export const BoostFarmWithdrawalConfirmation = ({
+export const BoostFarmDepositConfirmation = ({
   selectedFarmInfo,
-  withdrawValue,
-  withdrawTokenLabel,
-  handleWithdraw,
-  cancelBoostWithdrawalConfirmation,
+  handleDeposit,
+  cancelBoostDepositConfirmation,
   nextHarvestDate,
-  losablePendingRewards,
   ...rest
 }) => {
   return (
@@ -18,8 +14,8 @@ export const BoostFarmWithdrawalConfirmation = ({
         <img src={exclamation} alt="exclamation" />
         <Box gap="35px" margin={{ top: '45px' }}>
           <Text textAlign="center" weight="bold" size="24px">
-            If you withdraw {withdrawValue} {withdrawTokenLabel} now, about
-            ${toExactFixed(losablePendingRewards, 6)} in pending rewards won't be realised.
+            Don't forget, funds deposited today will only be available of
+            withdrawal next {'here'}
           </Text>
           <Text textAlign="center" weight={400} size="16px">
             Any unrealised rewards will be redistributed amongst the pool. Wait
@@ -31,8 +27,8 @@ export const BoostFarmWithdrawalConfirmation = ({
         <Box gap="30px" margin={{ top: '48px' }}>
           <Button
             primary
-            label="I still want to withdraw now"
-            onClick={handleWithdraw}
+            label="Continue with deposit"
+            onClick={handleDeposit}
             style={{ width: '360px' }}
           />
           <Button
@@ -40,7 +36,7 @@ export const BoostFarmWithdrawalConfirmation = ({
             label={`Cancel withdraw and comeback on ${nextHarvestDate.format(
               'DD MMMM',
             )}`}
-            onClick={cancelBoostWithdrawalConfirmation}
+            onClick={cancelBoostDepositConfirmation}
             style={{
               textAlign: 'center',
               color: '#2A73FF',
@@ -48,6 +44,20 @@ export const BoostFarmWithdrawalConfirmation = ({
               fontWeight: 600,
             }}
           />
+        </Box>
+        <Box margin={{ top: '26px' }} justify="center" direction="row">
+          <Text size="12px">
+           Don't want to lock your funds?{' '}
+            <a
+              target="_blank"
+              href="https://docsend.com/view/np9ypdn38jajb9zj"
+              style={{
+                textDecoration: 'none',
+              }}
+            >
+              View other BOOST pools
+            </a>
+          </Text>
         </Box>
       </Box>
     </>

@@ -14,34 +14,43 @@ import { TopHeader } from '../components';
 
 export const BoostFarmDepositTab = ({
   isLoading,
-  selectedFarm,
+  selectedFarmInfo,
   selectSupportedToken,
   selectedSupportedToken,
-  ...rest
+  // deposit
+  depositValue,
+  setDepositValue,
+  startBoostDepositConfirmation,
+  handleDeposit,
+  isDepositing,
+  // biconomy
+  useBiconomy,
+  setUseBiconomy,
 }) => {
   const {
     hasErrors,
     depositValueError,
-    depositValue,
     handleDepositValueChange,
     isApproving,
-    isDepositing,
-    setUseBiconomy,
-    useBiconomy,
     isFetchingSupportedTokenInfo,
     selectedSupportedTokenInfo,
     currentStep,
     selectedSupportedTokenSteps,
     handleCurrentStep,
-  } = useBoostFarmDeposit({ selectedFarm, selectedSupportedToken });
+  } = useBoostFarmDeposit({
+    selectedFarmInfo,
+    selectedSupportedToken,
+    depositValue,
+    setDepositValue,
+    startBoostDepositConfirmation,
+    handleDeposit
+  });
 
   return (
     <Box fill>
-      <Box
-        style={{
-          minHeight: selectedFarm?.chain == EChain.POLYGON ? '462px' : '433px',
-        }}
-      >
+      <Box style={{
+          minHeight: selectedFarmInfo.current?.chain == EChain.POLYGON ? '462px' : '433px',
+        }}>
         {isApproving || isDepositing ? (
           <Box
             align="center"
@@ -54,20 +63,20 @@ export const BoostFarmDepositTab = ({
         ) : (
           <>
             <Box margin={{ top: 'large' }}>
-              <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
+              <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
             </Box>
             <Box margin={{ top: 'medium' }}>
               <NumericInput
                 label={`Deposit ${
                   selectedSupportedToken ? selectedSupportedToken?.label : ''
                 }`}
-                tokenSign={selectedFarm?.sign}
+                tokenSign={selectedFarmInfo.current?.sign}
                 onValueChange={handleDepositValueChange}
                 value={depositValue}
                 isLoadingMaxValue={isFetchingSupportedTokenInfo}
                 maxButton={true}
-                maxValue={selectedSupportedTokenInfo?.balance}
-                tokenOptions={selectedFarm?.supportedTokens || []}
+                maxValue={selectedSupportedTokenInfo.current?.balance}
+                tokenOptions={selectedFarmInfo.current?.supportedTokens || []}
                 selectedToken={selectedSupportedToken}
                 setSelectedToken={selectSupportedToken}
                 error={depositValueError}
@@ -76,33 +85,33 @@ export const BoostFarmDepositTab = ({
             </Box>
             <Box margin={{ top: '11px' }}>
               <ProjectedWeeklyInfo
-                depositedAmount={selectedFarm?.depositedAmount}
+                depositedAmount={selectedFarmInfo.current?.depositedAmount}
                 inputValue={depositValue}
-                interest={selectedFarm?.interest}
-                sign={selectedFarm?.sign}
+                interest={selectedFarmInfo.current?.interest}
+                sign={selectedFarmInfo.current?.sign}
                 isLoading={isLoading}
               />
               <Info
                 label="APY"
                 value={
-                  toExactFixed(selectedFarm?.interest, 2).toLocaleString() + '%'
+                  toExactFixed(selectedFarmInfo.current?.interest, 2).toLocaleString() + '%'
                 }
                 isLoading={isLoading}
               />
               <Info
                 label="Pool liquidity"
                 value={
-                  selectedFarm?.sign +
-                  (+selectedFarm?.totalAssetSupply).toLocaleString()
+                  selectedFarmInfo.current?.sign +
+                  (+selectedFarmInfo.current?.totalAssetSupply).toLocaleString()
                 }
                 isLoading={isLoading}
               />
               <FeeInfo
-                biconomyToggle={selectedFarm?.chain == EChain.POLYGON}
-                useBiconomy={useBiconomy}
+                biconomyToggle={selectedFarmInfo.current?.chain == EChain.POLYGON}
+                useBiconomy={false}
                 setUseBiconomy={setUseBiconomy}
                 showWalletFee={
-                  !useBiconomy || selectedFarm?.chain != EChain.POLYGON
+                  !useBiconomy || selectedFarmInfo.current?.chain != EChain.POLYGON
                 }
                 isLoading={isLoading}
               />
@@ -124,11 +133,11 @@ export const BoostFarmDepositTab = ({
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
-              : selectedSupportedTokenSteps?.length > 1
+              : selectedSupportedTokenSteps.current?.length > 1
               ? `Step ${currentStep + 1} of ${
-                  selectedSupportedTokenSteps?.length
-                }: ${selectedSupportedTokenSteps[currentStep]?.label}`
-              : `${selectedSupportedTokenSteps[currentStep]?.label}`
+                  selectedSupportedTokenSteps.current?.length
+                }: ${selectedSupportedTokenSteps.current[currentStep]?.label}`
+              : `${selectedSupportedTokenSteps.current[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
         />

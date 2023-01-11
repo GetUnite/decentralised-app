@@ -42,6 +42,7 @@ interface IFarmCard {
   balance?: string;
   balanceInUSD?: string;
   poolShare?: number;
+  isLocked: boolean;
 }
 
 export const FarmCard = ({
@@ -60,6 +61,7 @@ export const FarmCard = ({
   isBoost = false,
   viewType,
   poolShare,
+  isLocked = false,
   ...rest
 }: IFarmCard) => {
   const { isLightMode } = useMode();
@@ -193,6 +195,7 @@ export const FarmCard = ({
                     {viewType != 'View my farms only' ? (
                       <>
                         <span style={{ fontWeight: 'bold' }}>
+                          {isLocked && <span>🔒</span>}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
@@ -296,6 +299,7 @@ export const FarmCard = ({
                     ) : (
                       <>
                         <span style={{ fontWeight: 'bold' }}>
+                          {isLocked && <span>🔒</span>}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>

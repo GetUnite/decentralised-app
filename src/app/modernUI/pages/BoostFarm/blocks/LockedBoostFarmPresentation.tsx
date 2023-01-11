@@ -5,13 +5,13 @@ import { toExactFixed } from 'app/common/functions/utils';
 import booster from 'app/modernUI/images/booster.svg';
 import Skeleton from 'react-loading-skeleton';
 
-export const BoostFarmPresentation = ({
+export const LockedBoostFarmPresentation = ({
   selectedFarmInfo,
   farmName,
   isLoading,
   ...rest
 }) => {
-  const [, setCookies] = useCookies(['has_seen_boost_farms']);
+  const [, setCookies] = useCookies(['has_seen_locked_boost_farms']);
 
   const rewardsLabel =
     selectedFarmInfo.current?.rewards.label + ' or ' + selectedFarmInfo.current?.rewards.stableLabel;
@@ -37,7 +37,7 @@ export const BoostFarmPresentation = ({
         <Button
           primary
           label="Deposit to get started"
-          onClick={() => setCookies('has_seen_boost_farms', true)}
+          onClick={() => setCookies('has_seen_locked_boost_farms', true)}
           style={{ width: 310 }}
         />
       </Box>

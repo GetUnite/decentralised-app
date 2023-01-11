@@ -39,7 +39,7 @@ export type TFarm = {
 };
 
 export type TBoostFarm = TFarm & {
-  // For booster farms
+  // For boost farms
   rewards?: TBoostFarmRewards;
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
@@ -47,6 +47,8 @@ export type TBoostFarm = TFarm & {
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
+  // For locked boost farms
+  isLocked?: boolean;
 }
 
 export type TDepositStep = {

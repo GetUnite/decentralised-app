@@ -3,9 +3,12 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
+  convertToLP,
+  depositIntoBoostFarm,
   getBoostFarmInterest,
   getBoostFarmPendingRewards,
-  getBoostFarmRewards
+  getBoostFarmRewards,
+  withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
@@ -14,11 +17,11 @@ import {
   getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
-import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
@@ -30,7 +33,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
-    name: 'Frax/USDC',
+    name: 'FRAX/USDC',
     sign: '$',
     icons: [
       'FRAX',
@@ -327,101 +330,131 @@ const defaultRewards = {
 export const useBoostFarm = ({ id }) => {
   // react
   const navigate = useNavigate();
-  const [cookies] = useCookies(['has_seen_boost_farms']);
+  const [cookies] = useCookies([
+    'has_seen_boost_farms',
+    'has_seen_locked_boost_farms',
+  ]);
 
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
+  const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
   // other state control files
   const { setNotification } = useNotification();
 
   // selected farm control
-  const [availableFarms] = useState<TBoostFarm[]>(boostFarmOptions);
-  const [selectedFarm, setSelectedFarm] = useState<TBoostFarm>();
-  const [selectedSupportedToken, setSelectedsupportedToken] =
+  const selectedFarm = useRef<TBoostFarm>(
+    boostFarmOptions.find(availableFarm => availableFarm.id == id),
+  );
+  const selectedFarmInfo = useRef<TBoostFarm>();
+  const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
 
   // booster farm rewards control
-  const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
-  const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
+  const rewardsInfo = useRef<any>(defaultRewards);
+  const pendingRewardsInfo = useRef<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
+  const [losablePendingRewards, setLosablePendingRewards] = useState<number>();
+
+  // deposit and withdraw values needs to be here to show the confirmation screen
+  const [depositValue, setDepositValue] = useState<string>('');
+  const [withdrawValue, setWithdrawValue] = useState<string>('');
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [isDepositing, setIsDepositing] = useState<boolean>(false);
+
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
 
-  // information/confirmation control
-  const showBoostFarmPresentation = !cookies.has_seen_boost_farms;
+  // biconomy
+  const [useBiconomy, setUseBiconomy] = useState(
+    isSafeAppAtom || EChain.POLYGON != selectedFarmInfo.current?.chain
+      ? false
+      : true,
+  );
 
+  // information/confirmation control
+  const showBoostFarmPresentation =
+    !cookies.has_seen_boost_farms && !selectedFarm.current?.isLocked;
+  const showLockedBoostFarmPresentation =
+    !cookies.has_seen_locked_boost_farms && selectedFarm.current?.isLocked;
+  const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
+    useState<boolean>(true);
+  const [showBoostDepositConfirmation, setShowBoostDepositConfirmation] =
+    useState<boolean>(false);
+  const showHeading =
+    !showBoostFarmPresentation && !showLockedBoostFarmPresentation;
+  const showTabs =
+    !showBoostFarmPresentation &&
+    !showLockedBoostFarmPresentation &&
+    !showBoostWithdrawalConfirmation &&
+    !showBoostDepositConfirmation;
+
+  // harvest dates for the farms
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
   const nextHarvestDate = moment()
     .subtract(1, 'days')
     .add(1, 'week')
     .day('Monday');
-  const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
-    useState<boolean>(false);
-  const [losablePendingRewards, setLosablePendingRewards] = useState<number>();
 
-  const showTabs = !showBoostFarmPresentation;
-  //&& !showBoostWithdrawalConfirmation;
-
+  // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
   useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      setWantedChainAtom(selectedFarm.chain);
+    if (walletAccountAtom) {
+      setWantedChainAtom(EChain.ETHEREUM);
     }
-  }, [walletAccountAtom, selectedFarm]);
+  }, [walletAccountAtom]);
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      updateRewardsInfo();
+    if (!selectedFarm) {
+      navigate('/');
+      return;
     }
-  }, [selectedFarm]);
-
-  useEffect(() => {
-    const selectFarm = async id => {
+    const loadFarmInfo = async () => {
       try {
-        let farm = availableFarms.find(availableFarm => availableFarm.id == id);
-        if (!farm) {
-          navigate('/');
-          return;
-        }
+        heapTrack('farm', {
+          pool: 'boost',
+          currency: selectedFarm.current.name,
+        });
 
-        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+        selectedFarmInfo.current = {
+          ...selectedFarm.current,
+          ...(await getUpdatedFarmInfo(selectedFarm.current)),
+        };
+        setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
 
-        heapTrack('farm', { pool: 'boost', currency: farm.name });
-        setSelectedFarm(farm);
-        setSelectedsupportedToken(farm.supportedTokens[0]);
         setIsLoading(false);
+        await updateRewardsInfo();
       } catch (error) {
         console.log(error);
       }
     };
     if (walletAccountAtom) {
-      selectFarm(id);
+      loadFarmInfo();
     }
   }, [walletAccountAtom]);
 
+  // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
-    setIsLoading(true);
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarm);
-      setSelectedsupportedToken(
+      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
+      selectedFarmInfo.current = farm;
+      setSelectedSupportedToken(
         farm.supportedTokens?.find(
           st => st?.address == selectedSupportedToken?.address,
         ),
       );
-      setSelectedFarm(farm);
     } catch (error) {
       console.log(error);
     }
-    setIsLoading(false);
   };
 
-  const getUpdatedFarmInfo = async (farm = selectedFarm) => {
+  const getUpdatedFarmInfo = async farm => {
     try {
       let farmInfo;
 
@@ -462,7 +495,7 @@ export const useBoostFarm = ({ id }) => {
   };
 
   const selectSupportedToken = supportedToken => {
-    setSelectedsupportedToken(supportedToken);
+    setSelectedSupportedToken(supportedToken);
   };
 
   const updateRewardsInfo = async () => {
@@ -471,29 +504,29 @@ export const useBoostFarm = ({ id }) => {
     try {
       const CVXETHInUSDC = await getValueOf1LPinUSDC(
         EEthereumAddresses.CVXETH,
-        selectedFarm.chain,
+        selectedFarmInfo.current.chain,
       );
       // Rewards
       const updatedRewards = {
-        ...selectedFarm.rewards,
+        ...selectedFarmInfo.current.rewards,
         ...(await getBoostFarmRewards(
-          selectedFarm.farmAddress,
+          selectedFarmInfo.current.farmAddress,
           CVXETHInUSDC,
-          selectedFarm.chain,
+          selectedFarmInfo.current.chain,
         )),
       };
-      setRewardsInfo(updatedRewards);
+      rewardsInfo.current = updatedRewards;
       setIsLoadingRewards(false);
 
       // Pending Rewards
       const updatedPendingRewards =
-        selectedFarm.totalAssetSupply > 0
+        selectedFarmInfo.current.totalAssetSupply > 0
           ? await getBoostFarmPendingRewards(
-              selectedFarm.farmAddress,
-              selectedFarm.chain,
+              selectedFarmInfo.current.farmAddress,
+              selectedFarmInfo.current.chain,
             )
           : 0;
-      setPendingRewardsInfo(updatedPendingRewards);
+      pendingRewardsInfo.current = updatedPendingRewards;
       setIsLoadingPendingRewards(false);
     } catch (error) {
       console.log(error);
@@ -505,20 +538,20 @@ export const useBoostFarm = ({ id }) => {
     try {
       const tx = seeRewardsAsStable
         ? await claimBoostFarmNonLPRewards(
-            selectedFarm.farmAddress,
-            selectedFarm.rewards.stableAddress,
-            selectedFarm.chain,
+            selectedFarmInfo.current.farmAddress,
+            selectedFarmInfo.current.rewards.stableAddress,
+            selectedFarmInfo.current.chain,
           )
         : await claimBoostFarmLPRewards(
-            selectedFarm.farmAddress,
-            selectedFarm.chain,
+            selectedFarmInfo.current.farmAddress,
+            selectedFarmInfo.current.chain,
           );
       await updateRewardsInfo();
       setNotification(
         'Rewards claimed successfully',
         'success',
         tx.transactionHash,
-        selectedFarm.chain,
+        selectedFarmInfo.current.chain,
       );
     } catch (error) {
       setNotification(error, 'error');
@@ -526,43 +559,142 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startBoostWithdrawalConfirmation = async (
-    withdrawValue,
-    boostDepositedAmount,
-  ) => {
-    setShowBoostWithdrawalConfirmation(true);
+  const startBoostDepositConfirmation = async () => {
+    setShowBoostDepositConfirmation(true);
+  };
+
+  const cancelBoostDepositConfirmation = async () => {
+    setShowBoostDepositConfirmation(false);
+  };
+
+  const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
     // Losable rewards will be the pending value * % of shares to withdraw
     const projectedLosableRewards =
       +pendingRewardsInfo * (+withdrawValue / +boostDepositedAmount);
     setLosablePendingRewards(projectedLosableRewards);
+    setShowBoostWithdrawalConfirmation(true);
   };
 
   const cancelBoostWithdrawalConfirmation = async () => {
     setShowBoostWithdrawalConfirmation(false);
   };
 
+  // withdraw method
+  const handleWithdraw = async () => {
+    setIsWithdrawing(true);
+    setShowBoostWithdrawalConfirmation(false);
+    try {
+      const tx = await withdrawFromBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        selectedSupportedToken.address,
+        // The withdraw value is always referent to the selected supported token
+        // But the contract for booster farm withdrawal expects the value as LP/Shares
+        // Thus, convert the value into LP
+        await convertToLP(
+          withdrawValue,
+          selectedSupportedToken.address,
+          selectedSupportedToken.decimals,
+          selectedFarmInfo.current.valueOf1LPinUSDC,
+        ),
+        selectedSupportedToken.decimals,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
+
+      setNotification(
+        'Withdrew successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarmInfo.current.chain,
+      );
+      await updateFarmInfo();
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+
+    setIsWithdrawing(false);
+  };
+
+  // deposit method
+  const handleDeposit = async () => {
+    setIsDepositing(true);
+    setShowBoostDepositConfirmation(false);
+    try {
+      heapTrack('startedDepositing', {
+        pool: 'boost',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      const tx = await depositIntoBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        selectedSupportedToken.address,
+        depositValue,
+        selectedSupportedToken.decimals,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
+      setDepositValue('');
+      heapTrack('depositTransactionMined', {
+        pool: 'boost',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      setNotification(
+        'Deposit successful',
+        'success',
+        tx.transactionHash,
+        selectedFarmInfo.current.chain,
+      );
+      await updateFarmInfo();
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+
+    setIsDepositing(false);
+  };
+
   return {
+    // presentation
+    showTabs,
+    showHeading,
+    showBoostFarmPresentation,
+    showLockedBoostFarmPresentation,
+    // farm
     isLoading,
-    availableFarms,
-    selectedFarm,
-    updateFarmInfo,
-    selectedSupportedToken,
+    selectedFarmInfo,
     selectSupportedToken,
+    selectedSupportedToken,
+    // rewards
+    isLoadingRewards,
+    rewardsInfo,
     seeRewardsAsStable,
     setSeeRewardsAsStable,
     claimRewards,
     isClamingRewards,
-    isLoadingRewards,
-    showTabs,
-    showBoostFarmPresentation,
+    // pending rewards
+    isLoadingPendingRewards,
+    pendingRewardsInfo,
     previousHarvestDate,
     nextHarvestDate,
+    losablePendingRewards,
+    // biconomy
+    useBiconomy,
+    setUseBiconomy,
+    // deposit
+    depositValue,
+    setDepositValue,
+    handleDeposit,
+    isDepositing,
+    showBoostDepositConfirmation,
+    startBoostDepositConfirmation,
+    cancelBoostDepositConfirmation,
+    //withdraw
+    withdrawValue,
+    setWithdrawValue,
+    handleWithdraw,
+    isWithdrawing,
     showBoostWithdrawalConfirmation,
     startBoostWithdrawalConfirmation,
     cancelBoostWithdrawalConfirmation,
-    rewardsInfo,
-    losablePendingRewards,
-    pendingRewardsInfo,
-    isLoadingPendingRewards,
   };
 };
