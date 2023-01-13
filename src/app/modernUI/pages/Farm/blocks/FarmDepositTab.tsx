@@ -17,6 +17,7 @@ export const FarmDepositTab = ({
   selectedFarm,
   selectSupportedToken,
   selectedSupportedToken,
+  updateFarmInfo,
   ...rest
 }) => {
   const {
@@ -33,7 +34,7 @@ export const FarmDepositTab = ({
     currentStep,
     selectedSupportedTokenSteps,
     handleCurrentStep,
-  } = useFarmDeposit({ selectedFarm, selectedSupportedToken });
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
 
   return (
     <Box fill>

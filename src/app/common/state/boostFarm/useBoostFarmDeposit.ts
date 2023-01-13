@@ -1,4 +1,3 @@
-import { depositIntoBoostFarm } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
   approve,
@@ -7,8 +6,7 @@ import {
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { TDepositStep } from 'app/common/types/farm';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 
 const possibleDepositSteps: TDepositStep[] = [
   { id: 0, label: 'Approve' },
@@ -16,58 +14,39 @@ const possibleDepositSteps: TDepositStep[] = [
 ];
 
 export const useBoostFarmDeposit = ({
-  selectedFarm,
+  selectedFarmInfo,
   selectedSupportedToken,
+  depositValue,
+  setDepositValue,
+  startBoostDepositConfirmation,
+  handleDeposit,
 }) => {
-  // react
-  const navigate = useNavigate();
-
   // other state control files
   const { setNotification } = useNotification();
 
   // inputs
-  const [depositValue, setDepositValue] = useState<string>('');
   const [depositValueError, setDepositValueError] = useState<string>('');
 
   // data
-  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
-    useState<any>({
-      balance: 0,
-      allowance: 0,
-    });
+  const selectedSupportedTokenInfo = useRef<any>({
+    balance: 0,
+    allowance: 0,
+  });
 
   // Deposit steps
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [selectedSupportedTokenSteps, setSelectedSupportedTokenSteps] =
-    useState<TDepositStep[]>();
-
-  // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const selectedSupportedTokenSteps = useRef<TDepositStep[]>();
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
-
-  const resetState = () => {
-    setDepositValueError('');
-    setIsApproving(false);
-    setIsDepositing(false);
-  };
 
   useEffect(() => {
-    if (selectedFarm && selectedSupportedToken) {
+    if (selectedFarmInfo && selectedSupportedToken) {
       updateBalanceAndAllowance();
     }
   }, [selectedSupportedToken]);
-
-  useEffect(() => {
-    if (selectedFarm && selectedSupportedTokenInfo) {
-      // retrigger input validation
-      handleDepositValueChange(depositValue);
-    }
-  }, [selectedSupportedTokenInfo]);
 
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
@@ -75,9 +54,9 @@ export const useBoostFarmDeposit = ({
     let neededSteps: TDepositStep[] = [];
 
     const allowance = await getAllowance(
-      selectedSupportedToken.address,
-      selectedFarm.farmAddress,
-      selectedFarm.chain,
+      selectedSupportedToken?.address,
+      selectedFarmInfo.current?.farmAddress,
+      selectedFarmInfo.current?.chain,
     );
     // If the allowance is not higher than 0 ask for approval
     if (!(+allowance > 0)) {
@@ -85,17 +64,22 @@ export const useBoostFarmDeposit = ({
     }
 
     const balance = await getBalanceOf(
-      selectedSupportedToken.address,
-      selectedSupportedToken.decimals,
-      selectedFarm.chain,
+      selectedSupportedToken?.address,
+      selectedSupportedToken?.decimals,
+      selectedFarmInfo.current?.chain,
     );
 
-    setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+    selectedSupportedTokenInfo.current = {
+      balance: balance,
+      allowance: allowance,
+    };
 
     // Deposit step is always there
     neededSteps.push(possibleDepositSteps[1]);
 
-    setSelectedSupportedTokenSteps(neededSteps);
+    selectedSupportedTokenSteps.current = neededSteps;
+
+    await handleDepositValueChange(depositValue);
 
     setIsFetchingSupportedTokenInfo(false);
   };
@@ -105,21 +89,22 @@ export const useBoostFarmDeposit = ({
 
     try {
       const tx = await approve(
-        selectedFarm.farmAddress,
-        selectedSupportedToken.address,
-        selectedFarm.chain,
+        selectedFarmInfo.current?.farmAddress,
+        selectedSupportedToken?.address,
+        selectedFarmInfo.current?.chain,
       );
-      await updateBalanceAndAllowance();
       heapTrack('approvedTransactionMined', {
         pool: 'boost',
-        currency: selectedSupportedToken.label,
+        currency: selectedSupportedToken?.label,
         amount: depositValue,
       });
+      // Next step
+      setCurrentStep(currentStep + 1);
       setNotification(
         'Approved successfully',
         'success',
         tx.transactionHash,
-        selectedFarm.chain,
+        selectedFarmInfo.current?.chain,
       );
     } catch (err) {
       setNotification(err, 'error');
@@ -130,50 +115,10 @@ export const useBoostFarmDeposit = ({
 
   const handleDepositValueChange = value => {
     setDepositValueError('');
-    if (+value > +selectedSupportedTokenInfo.balance) {
+    if (+value > +selectedSupportedTokenInfo.current?.balance) {
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
-  };
-
-  const handleDeposit = async () => {
-    setIsDepositing(true);
-
-    try {
-      heapTrack('startedDepositing', {
-        pool: 'boost',
-        currency: selectedSupportedToken.label,
-        amount: depositValue,
-      });
-      const tx = await depositIntoBoostFarm(
-        selectedFarm.farmAddress,
-        selectedSupportedToken.address,
-        depositValue,
-        selectedSupportedToken.decimals,
-        selectedFarm.chain,
-        useBiconomy,
-      );
-      resetState();
-      setDepositValue('');
-      heapTrack('depositTransactionMined', {
-        pool: 'boost',
-        currency: selectedSupportedToken.label,
-        amount: depositValue,
-      });
-      setNotification(
-        'Deposit successful',
-        'success',
-        tx.transactionHash,
-        selectedFarm.chain,
-      );
-      navigate('/?view_type=my_farms');
-      //await updateFarmInfo();
-    } catch (error) {
-      resetState();
-      setNotification(error, 'error');
-    }
-
-    setIsDepositing(false);
   };
 
   // executes the handle for the current step
@@ -189,7 +134,9 @@ export const useBoostFarmDeposit = ({
         break;
 
       case 1:
-        await handleDeposit();
+        (await selectedFarmInfo.currenct?.isLocked)
+          ? startBoostDepositConfirmation()
+          : handleDeposit();
         break;
     }
   };
@@ -198,10 +145,6 @@ export const useBoostFarmDeposit = ({
     depositValue,
     handleDepositValueChange,
     isApproving,
-    isDepositing,
-    setUseBiconomy,
-    useBiconomy,
-    resetState,
     depositValueError,
     hasErrors: depositValueError != '',
     isFetchingSupportedTokenInfo,

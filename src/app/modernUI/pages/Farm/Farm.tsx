@@ -33,6 +33,7 @@ export const Farm = () => {
                   isLoading={isLoading}
                   selectedSupportedToken={selectedSupportedToken}
                   selectSupportedToken={selectSupportedToken}
+                  updateFarmInfo={updateFarmInfo}
                 />
               </Tab>
               <Tab title="Withdraw">

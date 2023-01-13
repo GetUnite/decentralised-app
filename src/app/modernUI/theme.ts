@@ -41,7 +41,7 @@ export const isSmall = size =>
 
 export const theme = deepMerge(grommet, {
   global: {
-    focus: { outline: { color: 'primary' } },
+    focus: { outline: { color: { dark: colors.WHITE, light: colors.BLACK } } },
 
     breakpoints: {
       xsmall: {

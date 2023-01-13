@@ -83,8 +83,10 @@ export const useFarmWithdrawal = ({
     try {
       const percentageToWithdraw =
         +withdrawValue / selectedFarm.depositedAssetValue;
+
       const valueToWithdraw =
         selectedFarm.depositedAmount * +percentageToWithdraw;
+
       const tx = await withdraw(
         selectedSupportedToken.address,
         selectedFarm.farmAddress,

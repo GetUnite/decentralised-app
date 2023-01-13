@@ -1,14 +1,15 @@
 import { isSafeApp } from 'app/common/state/atoms';
-import { Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import { useRecoilState } from 'recoil';
-import { BiconomyToggle } from '../Toggles';
+import { RightAlignToggle } from '../Toggles';
+import { Tooltip } from '../Tooltips';
 import { Info } from './Info';
 
 export const FeeInfo = ({
   showWalletFee,
   biconomyToggle = true,
-  useBiconomy,
-  setUseBiconomy,
+  useBiconomy = false,
+  setUseBiconomy = null,
   disableBiconomy = false,
   isLoading = false,
   ...rest
@@ -22,18 +23,37 @@ export const FeeInfo = ({
           <Text size="14px">View fee in your wallet</Text>
         ) : (
           <>
-            <span>No fees 🎉 - Paid for by Alluo via </span>
-            <a href="https://twitter.com/biconomy" target="_blank">
-              Biconomy
-            </a>
+            <Text size="14px">
+              No fees 🎉 - Paid for by Alluo via{' '}
+              <a href="https://twitter.com/biconomy" target="_blank">
+                Biconomy
+              </a>
+            </Text>
           </>
         )}
         {!isSafeAppAtom && biconomyToggle && (
-          <BiconomyToggle
-            useBiconomy={useBiconomy}
-            setUseBiconomy={setUseBiconomy}
-            disabled={disableBiconomy}
-          />
+          <Box margin={{ top: '9px' }}>
+            <RightAlignToggle
+              label={
+                <>
+                  Turn {useBiconomy ? 'off' : 'on'}
+                  <Tooltip
+                    text="Turning off Biconomy means Alluo will no longer pay your
+                    transaction fee."
+                  >
+                    <span
+                      style={{ textDecoration: 'underline', marginLeft: '5px' }}
+                    >
+                      Biconomy
+                    </span>
+                  </Tooltip>
+                </>
+              }
+              isToggled={useBiconomy}
+              setIsToggled={setUseBiconomy}
+              disabled={disableBiconomy}
+            />
+          </Box>
         )}
       </div>
     </Info>

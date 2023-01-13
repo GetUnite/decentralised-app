@@ -132,18 +132,20 @@ export const getStreamEndDate = async (
     EChain.POLYGON,
   );
 
-  const eventLogs = await QueryFilter(
-    abi,
-    ibAlluoAddress,
-    'CreateFlowWithTimestamp(address,address,int96,uint256)',
-    [getCurrentWalletAddress(), ricochetMarketAddress],
-    blockNumber,
-    chain,
-  );
+  if (blockNumber) {
+    const eventLogs = await QueryFilter(
+      abi,
+      ibAlluoAddress,
+      'CreateFlowWithTimestamp(address,address,int96,uint256)',
+      [getCurrentWalletAddress(), ricochetMarketAddress],
+      blockNumber,
+      chain,
+    );
 
-  if (eventLogs[0]) {
-    const endTimestamp = eventLogs[0].args.endTimestamp;
-    return Number(endTimestamp);
+    if (eventLogs[0]) {
+      const endTimestamp = eventLogs[0].args.endTimestamp;
+      return Number(endTimestamp);
+    }
   }
 
   return null;
@@ -221,81 +223,86 @@ export const getUnapprovedSuperfluidSubscriptions = async (
   superfluidOutputAddress,
   ricochetMarketAddress,
 ) => {
-  const provider = getReadOnlyProvider(EChain.POLYGON);
-  const walletAddress = getCurrentWalletAddress();
+  try {
+    const provider = getReadOnlyProvider(EChain.POLYGON);
+    const walletAddress = getCurrentWalletAddress();
 
-  const superfluidFramework = await getSuperfluidFramework();
+    const superfluidFramework = await getSuperfluidFramework();
 
-  const subsidyAddress = EPolygonAddresses.RICOCHETSUBSIDY;
-  const { subsidyIndex, inputIndex, outputIndex } = getRicochetStreamIndexes(
-    superfluidInputAddress,
-    superfluidOutputAddress,
-  );
-  const userData = '0x';
+    const subsidyAddress = EPolygonAddresses.RICOCHETSUBSIDY;
+    const { subsidyIndex, inputIndex, outputIndex } = getRicochetStreamIndexes(
+      superfluidInputAddress,
+      superfluidOutputAddress,
+    );
+    const userData = '0x';
 
-  let subscriptionOperations = [];
+    let subscriptionOperations = [];
 
-  const outputAddressSubscription =
-    await superfluidFramework.idaV1.getSubscription({
-      superToken: superfluidOutputAddress,
-      publisher: ricochetMarketAddress,
-      indexId: outputIndex.toString(),
-      subscriber: walletAddress,
-      providerOrSigner: provider,
-    });
-
-  if (!outputAddressSubscription.approved) {
-    subscriptionOperations.push(
-      superfluidFramework.idaV1.approveSubscription({
+    const outputAddressSubscription =
+      await superfluidFramework.idaV1.getSubscription({
         superToken: superfluidOutputAddress,
+        publisher: ricochetMarketAddress,
         indexId: outputIndex.toString(),
-        publisher: ricochetMarketAddress,
-        userData,
-      }),
-    );
-  }
+        subscriber: walletAddress,
+        providerOrSigner: provider,
+      });
 
-  const subsidyAddressSubscription =
-    await superfluidFramework.idaV1.getSubscription({
-      superToken: subsidyAddress,
-      publisher: ricochetMarketAddress,
-      indexId: subsidyIndex.toString(),
-      subscriber: walletAddress,
-      providerOrSigner: provider,
-    });
+    if (!outputAddressSubscription.approved) {
+      subscriptionOperations.push(
+        superfluidFramework.idaV1.approveSubscription({
+          superToken: superfluidOutputAddress,
+          indexId: outputIndex.toString(),
+          publisher: ricochetMarketAddress,
+          userData,
+        }),
+      );
+    }
 
-  if (!subsidyAddressSubscription.approved) {
-    subscriptionOperations.push(
-      superfluidFramework.idaV1.approveSubscription({
+    const subsidyAddressSubscription =
+      await superfluidFramework.idaV1.getSubscription({
         superToken: subsidyAddress,
-        indexId: subsidyIndex.toString(),
         publisher: ricochetMarketAddress,
-        userData,
-      }),
-    );
-  }
+        indexId: subsidyIndex.toString(),
+        subscriber: walletAddress,
+        providerOrSigner: provider,
+      });
 
-  const flowOperatorData = await superfluidFramework.cfaV1.getFlowOperatorData({
-    superToken: superfluidInputAddress,
-    flowOperator: ibAlluoInputAddress,
-    sender: walletAddress,
-    providerOrSigner: provider,
-  });
+    if (!subsidyAddressSubscription.approved) {
+      subscriptionOperations.push(
+        superfluidFramework.idaV1.approveSubscription({
+          superToken: subsidyAddress,
+          indexId: subsidyIndex.toString(),
+          publisher: ricochetMarketAddress,
+          userData,
+        }),
+      );
+    }
 
-  if (
-    +flowOperatorData.permissions != 7 ||
-    !(+flowOperatorData.flowRateAllowance > 0)
-  ) {
-    subscriptionOperations.push(
-      superfluidFramework.cfaV1.authorizeFlowOperatorWithFullControl({
+    const flowOperatorData =
+      await superfluidFramework.cfaV1.getFlowOperatorData({
         superToken: superfluidInputAddress,
         flowOperator: ibAlluoInputAddress,
-        userData: userData,
-      }),
-    );
-  }
+        sender: walletAddress,
+        providerOrSigner: provider,
+      });
 
-  return subscriptionOperations;
+    if (
+      +flowOperatorData.permissions != 7 ||
+      !(+flowOperatorData.flowRateAllowance > 0)
+    ) {
+      subscriptionOperations.push(
+        superfluidFramework.cfaV1.authorizeFlowOperatorWithFullControl({
+          superToken: superfluidInputAddress,
+          flowOperator: ibAlluoInputAddress,
+          userData: userData,
+        }),
+      );
+    }
+
+    return subscriptionOperations;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const approveSuperfluidSubscriptions = async (
