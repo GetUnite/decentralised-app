@@ -682,7 +682,7 @@ export const callContract = async (
 
     return txResult;
   } catch (error) {
-    console.log(abi, address, functionSignature, params);
+    console.log({abi: abi, address:address, functionSignature:functionSignature, params:params});
     // here do all error handling to readable stuff
     console.log(error);
   }
