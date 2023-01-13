@@ -133,7 +133,7 @@ export const FarmCard = ({
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
                     <Text>APY</Text>
                     <Text size="xlarge" weight="bold">
-                      {interest}%
+                      {toExactFixed(interest,2)}%
                     </Text>
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
