@@ -316,7 +316,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
   },
-  /*{
+  {
     id: 3,
     farmAddress: EEthereumAddresses.CRVYCRVVAULT,
     type: 'booster',
@@ -440,7 +440,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
+    lPTokenAddress: EEthereumAddresses.DOLAFRAXBP,
     supportedTokens: [
       {
         label: 'agEUR',
@@ -511,7 +511,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
     isNewest: true,
-  },*/
+  },
 ];
 
 const defaultRewards = {
