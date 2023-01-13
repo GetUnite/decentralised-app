@@ -1,6 +1,6 @@
 import { useMode } from 'app/common/state';
 import { TokenIcon } from 'app/modernUI/components';
-import { Box, Grid, ResponsiveContext } from 'grommet';
+import { Box, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
@@ -87,7 +87,7 @@ export const StreamCard = ({
                   </span>
                 </Box>
                 <span>{startDate}</span>
-                <span>{endDate || '∞'}</span>
+                <Text size='16px'>{endDate || '∞'}</Text>
                 <Box direction="row" justify="between" align="center">
                   <span>{fundedUntilDate}</span>
                   <StopStreamConfirmation

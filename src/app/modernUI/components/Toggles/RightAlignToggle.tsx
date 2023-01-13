@@ -1,6 +1,6 @@
 import { Box, Button, Text } from 'grommet';
 
-export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=false }) {
+export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=false, weight=500 }) {
   const buttonColor = !isToggled ? '#CCCCCC' : '#2A73FF';
   const buttonDirection = !isToggled ? 'row' : 'row-reverse';
 
@@ -15,7 +15,7 @@ export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=fals
         <Text
           size="12px"
           margin={{ right: '8px' }}
-          weight={500}
+          weight={weight}
         >
           {label}
         </Text>

@@ -29,7 +29,7 @@ import { useNotification } from '../useNotification';
 
 export const boostFarmOptions: Array<TBoostFarm> = [
   {
-    id: 8,
+    id: 0,
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
@@ -50,7 +50,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     isBoost: true,
     rewards: {
       label: 'CVX-ETH',
-      icons: ['FRAX', 'USDC'],
+      icons: ['CVX', 'ETH'],
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
@@ -122,10 +122,9 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
-    isNewest: true,
   },
   {
-    id: 9,
+    id: 1,
     farmAddress: EEthereumAddresses.CVXETHVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
@@ -218,10 +217,9 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
-    isNewest: true,
   },
   {
-    id: 10,
+    id: 2,
     farmAddress: EEthereumAddresses.STETHETHVAULT,
     type: 'booster',
     chain: EChain.ETHEREUM,
@@ -242,7 +240,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     isBoost: true,
     rewards: {
       label: 'CVX-ETH',
-      icons: ['stETH', 'ETH'],
+      icons: ['CVX', 'ETH'],
       stableLabel: 'USDC',
       stableAddress: EEthereumAddresses.USDC,
     },
@@ -317,8 +315,203 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
+  },
+  /*{
+    id: 3,
+    farmAddress: EEthereumAddresses.CRVYCRVVAULT,
+    type: 'booster',
+    chain: EChain.ETHEREUM,
+    name: 'CRV/yCRV',
+    sign: '$',
+    icons: [
+      'WETH',
+      'USDC',
+      'DAI',
+      'EURS',
+      'EURT',
+      'FRAX',
+      'WBTC',
+      'agEUR',
+      'CRV',
+      'CVX',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.CRVYCRV,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: [
+      'wETH',
+    ],
+    apyFarmAddresses: {
+      baseApyAddress: '5fcf4418-be5e-4d48-8da7-5c4c615971e0',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
     isNewest: true,
   },
+  {
+    id: 4,
+    farmAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
+    type: 'booster',
+    chain: EChain.ETHEREUM,
+    name: 'DOLA/FRAXBP',
+    sign: '$',
+    icons: [
+      'WETH',
+      'USDC',
+      'DAI',
+      'EURS',
+      'EURT',
+      'FRAX',
+      'WBTC',
+      'agEUR',
+      'CRV',
+      'CVX',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: [
+      'wETH',
+    ],
+    apyFarmAddresses: {
+      baseApyAddress: '3a745337-3f04-409d-9627-8391e3c7494d',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
+    isNewest: true,
+  },*/
 ];
 
 const defaultRewards = {
@@ -385,7 +578,7 @@ export const useBoostFarm = ({ id }) => {
   const showLockedBoostFarmPresentation =
     !cookies.has_seen_locked_boost_farms && selectedFarm.current?.isLocked;
   const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
-    useState<boolean>(true);
+    useState<boolean>(false);
   const [showBoostDepositConfirmation, setShowBoostDepositConfirmation] =
     useState<boolean>(false);
   const showHeading =

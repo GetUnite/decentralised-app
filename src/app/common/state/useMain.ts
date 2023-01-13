@@ -453,5 +453,6 @@ export const useMain = () => {
     possibleViewTypes,
     setViewType,
     totalDepositedAmountInUsd,
+    isFarming: availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0
   };
 };

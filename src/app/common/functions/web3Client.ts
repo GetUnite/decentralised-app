@@ -721,27 +721,31 @@ export const binarySearchForBlock = async (
   let highestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlockNumber,
   );
+  console.log(startTimestamp);
+  console.log("highestEstimatedBlock",highestEstimatedBlock);
   let lowestEstimatedBlock = await provider.getBlock(
-    highestEstimatedBlock.number -
-      Math.floor(highestEstimatedBlock.timestamp - startTimestamp),
+    highestEstimatedBlock?.number -
+      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
+  console.log("lowestEstimatedBlock",highestEstimatedBlock);
   let closestBlock;
 
-  while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
+  while (lowestEstimatedBlock?.number != undefined && highestEstimatedBlock?.number != undefined && lowestEstimatedBlock?.number <= highestEstimatedBlock?.number) {
     closestBlock = await provider.getBlock(
       Math.floor(
-        (highestEstimatedBlock.number + lowestEstimatedBlock.number) / 2,
+        (highestEstimatedBlock?.number + lowestEstimatedBlock?.number) / 2,
       ),
     );
-    if (closestBlock.timestamp == startTimestamp) {
-      return closestBlock.number;
-    } else if (closestBlock.timestamp > startTimestamp) {
+    console.log("closestBlock",closestBlock);
+    if (closestBlock?.timestamp == startTimestamp) {
+      return closestBlock?.number;
+    } else if (closestBlock?.timestamp > startTimestamp) {
       highestEstimatedBlock = closestBlock;
     } else {
       lowestEstimatedBlock = closestBlock;
     }
   }
-  return 0;
+  return null;
 };
 
 const marketApiURl =
