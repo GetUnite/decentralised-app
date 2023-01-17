@@ -7,8 +7,9 @@ import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import swap from 'app/modernUI/images/swap.svg';
 import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Card, Grid, ResponsiveContext, Skeleton, Text } from 'grommet';
+import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
@@ -132,7 +133,7 @@ export const FarmCard = ({
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
                     <Text>APY</Text>
                     <Text size="xlarge" weight="bold">
-                      {toExactFixed(interest,2)}%
+                      {toExactFixed(interest, 2)}%
                     </Text>
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
@@ -177,16 +178,24 @@ export const FarmCard = ({
               >
                 {isLoading ? (
                   <>
-                    <Skeleton count={1} height="14px" width="76px" round="20px"/>
-                    <Skeleton count={1} height="14px" width="76px" />
-                    <Skeleton count={1} height="14px" width="76px" />
-                    <Skeleton count={1} height="14px" width="76px" />
-                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
                     {viewType == 'View my farms only' && (
-                      <Skeleton count={1} height="14px" width="76px" />
+                      <Skeleton
+                        height="14px"
+                        width="76px"
+                        borderRadius="20px"
+                      />
                     )}
                     <Box direction="row" justify="end" fill align="center">
-                      <Skeleton count={1} height="14px" width="76px" />
+                      <Skeleton
+                        height="14px"
+                        width="76px"
+                        borderRadius="20px"
+                      />
                     </Box>
                   </>
                 ) : (
