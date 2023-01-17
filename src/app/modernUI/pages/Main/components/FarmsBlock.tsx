@@ -28,11 +28,7 @@ export const FarmsBlock = ({
       background="card"
       round="8px"
       pad={{ bottom: '20px' }}
-<<<<<<< HEAD
-      style={{ boxShadow: '0px -1px 4px #CCCCCC' }}
-=======
       style={isLightMode ? { border: '1px solid #EBEBEB' } : {}}
->>>>>>> staging
     >
       <Box
         pad={{
@@ -164,11 +160,7 @@ export const FarmsBlock = ({
             return (
               <FarmCard
                 id={farm.id}
-<<<<<<< HEAD
-                key={farm.id}
-=======
                 key={farm.type + farm.id}
->>>>>>> staging
                 type={farm.type}
                 name={farm.name}
                 totalAssetSupply={farm.totalAssetSupply}
@@ -183,10 +175,7 @@ export const FarmsBlock = ({
                 chain={farm.chain as EChain}
                 isBoost={farm.isBoost}
                 viewType={viewType}
-<<<<<<< HEAD
-=======
                 isLocked={farm.isLocked}
->>>>>>> staging
               />
             );
           })

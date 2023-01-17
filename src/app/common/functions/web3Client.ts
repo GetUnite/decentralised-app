@@ -176,11 +176,8 @@ export const connectToWallet = async (connectOptions?) => {
 };
 
 export const getCurrentWalletAddress = () => {
-<<<<<<< HEAD
-=======
   // Use this line to force "get" methods for a specific wallet address
   //return '0x781c9e6f0eEEdFE16329880731e25Fd57fE27e13'
->>>>>>> staging
   return walletAddress;
 };
 
@@ -273,11 +270,7 @@ export const getProvider = chain => {
 
 export const processSendError = error => {
   if (error.code == 4001) {
-<<<<<<< HEAD
-    throw 'User denied message signature';
-=======
     throw 'Transaction rejected in wallet';
->>>>>>> staging
   }
 
   if (error.code == 417) {
@@ -287,11 +280,7 @@ export const processSendError = error => {
   const errorString = error.toString();
 
   if (errorString.includes('user rejected signing')) {
-<<<<<<< HEAD
-    throw 'User denied message signature';
-=======
     throw 'Transaction rejected in wallet';
->>>>>>> staging
   }
 
   if (errorString.includes('reverted by the EVM')) {
@@ -695,11 +684,7 @@ export const callContract = async (
 
     return txResult;
   } catch (error) {
-<<<<<<< HEAD
-    console.log(abi, address, functionSignature, params);
-=======
     console.log({abi: abi, address:address, functionSignature:functionSignature, params:params});
->>>>>>> staging
     // here do all error handling to readable stuff
     console.log(error);
   }
@@ -739,22 +724,6 @@ export const binarySearchForBlock = async (
     highestEstimatedBlockNumber,
   );
   let lowestEstimatedBlock = await provider.getBlock(
-<<<<<<< HEAD
-    highestEstimatedBlock.number -
-      Math.floor(highestEstimatedBlock.timestamp - startTimestamp),
-  );
-  let closestBlock;
-
-  while (lowestEstimatedBlock.number <= highestEstimatedBlock.number) {
-    closestBlock = await provider.getBlock(
-      Math.floor(
-        (highestEstimatedBlock.number + lowestEstimatedBlock.number) / 2,
-      ),
-    );
-    if (closestBlock.timestamp == startTimestamp) {
-      return closestBlock.number;
-    } else if (closestBlock.timestamp > startTimestamp) {
-=======
     highestEstimatedBlock?.number -
       Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
@@ -769,17 +738,12 @@ export const binarySearchForBlock = async (
     if (closestBlock?.timestamp == startTimestamp) {
       return closestBlock?.number;
     } else if (closestBlock?.timestamp > startTimestamp) {
->>>>>>> staging
       highestEstimatedBlock = closestBlock;
     } else {
       lowestEstimatedBlock = closestBlock;
     }
   }
-<<<<<<< HEAD
-  return 0;
-=======
   return null;
->>>>>>> staging
 };
 
 const marketApiURl =
@@ -795,13 +759,8 @@ export const getPrice = async (
 ) => {
   const url = marketApiURl + `/v1/quote`;
 
-<<<<<<< HEAD
-  // quote returns the value accounting with fee so using 10000 to prevent the fee being higher than the actual value
-  const value = toDecimals(10000, sellDecimals);
-=======
   // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
   const value = toDecimals(1000, sellDecimals);
->>>>>>> staging
 
   try {
     const priceResponse = await fetch(url, {
@@ -822,11 +781,7 @@ export const getPrice = async (
     const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
 
     // We multiplied the value by 1000 so now divide it
-<<<<<<< HEAD
-    return price / 10000;
-=======
     return price / 1000;
->>>>>>> staging
   } catch (error) {
     throw 'Something went wrong while fetching data. Please try again later';
   }
@@ -1103,46 +1058,7 @@ export const getUserDepositedAmount = async (
     abi,
     address,
     'getBalance(address)',
-<<<<<<< HEAD
-    [walletAddress],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedAmount);
-};
-
-export const converToAssetValue = async (
-  contractAddress,
-  amount,
-  decimals,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [
-        {
-          internalType: 'uint256',
-          name: '_amountInTokenValue',
-          type: 'uint256',
-        },
-      ],
-      name: 'convertToAssetValue',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const amountInDecimals = toDecimals(amount, decimals);
-
-  const userDepositedAmount = await callContract(
-    abi,
-    contractAddress,
-    'convertToAssetValue(uint256)',
-    [amountInDecimals],
-=======
     [getCurrentWalletAddress()],
->>>>>>> staging
     chain,
   );
 
@@ -1164,11 +1080,7 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
     abi,
     farmAddress,
     'balanceOf(address)',
-<<<<<<< HEAD
-    [walletAddress],
-=======
     [getCurrentWalletAddress()],
->>>>>>> staging
     chain,
   );
 
@@ -1242,11 +1154,7 @@ export const getUserDepositedTransferAmount = async (
     abi,
     ibAlluoAddress,
     'getBalanceForTransfer(address)',
-<<<<<<< HEAD
-    [walletAddress],
-=======
     [getCurrentWalletAddress()],
->>>>>>> staging
     chain,
   );
 

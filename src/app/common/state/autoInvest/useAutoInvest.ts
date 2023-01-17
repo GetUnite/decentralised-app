@@ -222,84 +222,6 @@ export const useAutoInvest = () => {
     const fundedUntilArray = [];
     const streamsArray = [];
 
-<<<<<<< HEAD
-    for (let index = 0; index < streamOptions.length; index++) {
-      const element = streamOptions[index];
-      const streamFlow = await getStreamFlow(
-        element.fromStIbAlluoAddress,
-        element.ricochetMarketAddress,
-      );
-      if (+streamFlow.flowPerSecond > 0) {
-        ricochetMarketAddressesWithStreams.push(element.ricochetMarketAddress);
-
-        const ibAlluoBalance = await getBalance(
-          element.fromIbAlluoAddress,
-          18,
-          EChain.POLYGON,
-        );
-        const flowPerSecond = +streamFlow.flowPerSecond;
-        const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
-        const tvs = (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond;
-
-        const endDateTimestamp = await getStreamEndDate(
-          element.fromIbAlluoAddress,
-          element.ricochetMarketAddress,
-          streamFlow.timestamp,
-        );
-        const endDate = new Date(0);
-        endDate.setSeconds(endDateTimestamp);
-        streamsArray.push({
-          from: element.fromLabel,
-          fromAddress: element.fromIbAlluoAddress,
-          to: element.toLabel,
-          toAddress: element.ricochetMarketAddress,
-          flowPerSecond: flowPerSecond,
-          flowPerMonth: toExactFixed(flowPerMonth, 6),
-          startDate: new Date(streamFlow.timestamp * 1000).toLocaleDateString(),
-          endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
-          tvs: toExactFixed(tvs, 6),
-          sign: element.fromSign,
-        });
-
-        let fundedUntil = fundedUntilArray.find(
-          fundedUntil => fundedUntil.from == element.fromLabel,
-        );
-
-        if (fundedUntil) {
-          fundedUntil.flowPerSecond = fundedUntil.flowPerSecond + flowPerSecond;
-          const remainingFundedMiliseconds =
-            (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
-          fundedUntil.fundedUntilDate = new Date(
-            currentTime + remainingFundedMiliseconds,
-          ).toLocaleDateString();
-        } else {
-          const remainingFundedMiliseconds =
-            (+ibAlluoBalance / flowPerSecond) * 1000;
-
-          fundedUntilArray.push({
-            from: element.fromLabel,
-            flowPerSecond: flowPerSecond,
-            fundedUntilDate: new Date(
-              currentTime + remainingFundedMiliseconds,
-            ).toLocaleDateString(),
-          });
-        }
-      }
-    }
-
-    if (
-      ricochetMarketAddressesWithStreams.length >=
-      ricochetMarketAddressOptions.length
-    ) {
-      setCanStartStreams(false);
-    }else{
-      setCanStartStreams(true);
-    }
-    setFundedUntilByStreamOptions(fundedUntilArray);
-    setStreams(streamsArray);
-
-    return ricochetMarketAddressesWithStreams.length;
-=======
     try {
       for (let index = 0; index < streamOptions.length; index++) {
         const element = streamOptions[index];
@@ -390,7 +312,6 @@ export const useAutoInvest = () => {
         'error',
       );
     }
->>>>>>> staging
   };
 
   const handleStopStream = async (fromAddress, toAddress) => {

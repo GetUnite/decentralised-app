@@ -1,24 +1,11 @@
-<<<<<<< HEAD
-import { useMode } from 'app/common/state';
-=======
 import { modernUiPaths } from 'app/common/hooks';
 import { useMode } from 'app/common/state';
 import { notification } from 'app/common/state/atoms';
 import { Menu, Notification } from 'app/modernUI/components';
->>>>>>> staging
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Footer, Image, Nav, ResponsiveContext, Text } from 'grommet';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-<<<<<<< HEAD
-import { MenuItem } from '../Menu/blocks';
-
-import { Menu, Notification } from 'app/modernUI/components';
-
-import { modernUiPaths } from 'app/common/hooks';
-import { notification } from 'app/common/state/atoms';
-=======
->>>>>>> staging
 import { useRecoilState } from 'recoil';
 import appStore from '../../images/appStore.svg';
 import discordDark from '../../images/discord-dark.svg';
@@ -36,10 +23,7 @@ import telegramDark from '../../images/telegram-dark.svg';
 import telegram from '../../images/telegram.svg';
 import twitterDark from '../../images/twitter-dark.svg';
 import twitter from '../../images/twitter.svg';
-<<<<<<< HEAD
-=======
 import { MenuItem } from '../Menu/blocks';
->>>>>>> staging
 
 export const Layout = ({ children, notificationId = null, ...rest }) => {
   const { isLightMode } = useMode();
@@ -145,20 +129,14 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://apps.apple.com/us/app/alluo/id1604572992"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                     >
                       <img src={appStore} width="170px" />
                     </a>
                     <a
                       href="https://play.google.com/store/apps/details?id=com.alluo"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                     >
                       <img src={googlePlay} width="183px" />
                     </a>
@@ -172,10 +150,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://alluo.com/about"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -187,10 +162,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://blog.alluo.com"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -200,25 +172,16 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       Blog
                     </a>
                     <a
-<<<<<<< HEAD
-                      href="https://docs.alluo.com/"
-                      target="_blank"
-=======
                       href="https://vote.alluo.com/#/"
                       target="_blank"
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
                         fontSize: '14px',
                       }}
                     >
-<<<<<<< HEAD
-                      Understanding Alluo
-=======
                       The vote
->>>>>>> staging
                     </a>
                   </Box>
                   <Box>
@@ -228,10 +191,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://discord.gg/alluo"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -243,10 +203,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://www.linkedin.com/company/alluo/?"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -258,10 +215,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://twitter.com/AlluoApp"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -273,10 +227,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <a
                       href="https://t.me/alluoApp"
                       target="_blank"
-<<<<<<< HEAD
-=======
                       rel="noreferrer"
->>>>>>> staging
                       style={{
                         color: isLightMode ? 'black' : 'white',
                         textDecoration: 'none',
@@ -315,10 +266,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   <a
                     target="_blank"
                     href="https://alluo-terms-of-service.s3.eu-west-2.amazonaws.com/Alluo+-+Terms+of+Service.pdf"
-<<<<<<< HEAD
-=======
                     rel="noreferrer"
->>>>>>> staging
                     style={{
                       color: isLightMode ? 'black' : 'white',
                       textDecoration: 'none',
@@ -330,10 +278,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   <a
                     target="_blank"
                     href="https://www.privacypolicies.com/live/dc166d48-be35-4e1f-9d02-2c3a786e705c"
-<<<<<<< HEAD
-=======
                     rel="noreferrer"
->>>>>>> staging
                     style={{
                       color: isLightMode ? 'black' : 'white',
                       textDecoration: 'none',
@@ -347,18 +292,6 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   <a
                     target="_blank"
                     href="https://discord.com/invite/RgprRgdRTD"
-<<<<<<< HEAD
-                  >
-                    <Image src={isLightMode ? discord : discordDark} />
-                  </a>
-                  <a href="https://blog.alluo.io/" target="_blank">
-                    <Image src={isLightMode ? medium : mediumDark} />
-                  </a>
-                  <a href="https://twitter.com/AlluoApp" target="_blank">
-                    <Image src={isLightMode ? twitter : twitterDark} />
-                  </a>
-                  <a href="https://t.me/+Ir2-mWe8fQhhNzQ0" target="_blank">
-=======
                     rel="noreferrer"
                   >
                     <Image src={isLightMode ? discord : discordDark} />
@@ -370,7 +303,6 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     <Image src={isLightMode ? twitter : twitterDark} />
                   </a>
                   <a href="https://t.me/+Ir2-mWe8fQhhNzQ0" target="_blank" rel="noreferrer">
->>>>>>> staging
                     <Image src={isLightMode ? telegram : telegramDark} />
                   </a>
                 </Box>

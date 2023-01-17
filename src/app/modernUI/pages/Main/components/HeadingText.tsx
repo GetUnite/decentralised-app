@@ -7,11 +7,7 @@ export const HeadingText = ({
   isLoading,
   numberOfAssets,
   numberOfChainsWithAssets,
-<<<<<<< HEAD
-  ...rest
-=======
   isFarming,
->>>>>>> staging
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
@@ -22,15 +18,11 @@ export const HeadingText = ({
   ) : (
     <>
       {numberOfAssets == 0 ? (
-<<<<<<< HEAD
-        'You don’t have any available assets to farm in your wallet.'
-=======
         <>
           {walletAccountAtom && isFarming
             ? 'Add more assets to your wallet to farm more.'
             : 'You don’t have any available assets to farm in your wallet.'}{' '}
         </>
->>>>>>> staging
       ) : (
         <span>
           You have {numberOfAssets} {numberOfAssets > 1 ? 'assets' : 'asset'}{' '}

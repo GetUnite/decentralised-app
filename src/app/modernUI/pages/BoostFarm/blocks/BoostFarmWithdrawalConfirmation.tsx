@@ -3,11 +3,7 @@ import exclamation from 'app/modernUI/images/blackExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
 export const BoostFarmWithdrawalConfirmation = ({
-<<<<<<< HEAD
-  selectedFarm,
-=======
   selectedFarmInfo,
->>>>>>> staging
   withdrawValue,
   withdrawTokenLabel,
   handleWithdraw,

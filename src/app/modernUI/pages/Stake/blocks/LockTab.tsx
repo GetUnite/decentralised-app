@@ -60,11 +60,7 @@ export const LockTab = ({ isLoading, alluoInfo, updateAlluoInfo, ...rest }) => {
                 disabled={isLoading}
               />
             </Box>
-<<<<<<< HEAD
-            <Box margin={{ top: '11px' }}>
-=======
             <Box>
->>>>>>> staging
               <Info
                 label="Unstaked $ALLUO balance"
                 value={toExactFixed(alluoInfo?.balance, 2)}

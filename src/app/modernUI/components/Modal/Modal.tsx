@@ -2,11 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import { useMode, useNotification } from 'app/common/state';
 import { ENotificationId, walletAccount } from 'app/common/state/atoms';
 import { ChainBadge, ConnectionButton, Spinner } from 'app/modernUI/components';
-<<<<<<< HEAD
-import { Box, Button, Heading, Text } from 'grommet';
-=======
 import { Box, Button, Text } from 'grommet';
->>>>>>> staging
 import { FormClose } from 'grommet-icons';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
@@ -17,11 +13,7 @@ interface IModal {
   isLoading?: boolean;
   showChainBadge?: boolean;
   notificationId?: ENotificationId;
-<<<<<<< HEAD
-  children: React.ReactNode;
-=======
   children?: React.ReactNode;
->>>>>>> staging
   noHeading?: boolean;
   closeAction?: Function;
 }
@@ -31,11 +23,7 @@ export const Modal = ({
   heading,
   isLoading = false,
   showChainBadge = true,
-<<<<<<< HEAD
-  children,
-=======
   children = null,
->>>>>>> staging
   noHeading = false,
   closeAction,
 }: IModal) => {
@@ -50,11 +38,7 @@ export const Modal = ({
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
   return (
-<<<<<<< HEAD
-    <Box fill justify="center" align="center">
-=======
     <Box justify="center" align="center">
->>>>>>> staging
       <Box
         round={'medium'}
         overflow="auto"
@@ -64,17 +48,12 @@ export const Modal = ({
         gap="small"
         direction="column"
         background="modal"
-<<<<<<< HEAD
-        pad={walletAccountAtom ? { top: 'medium', horizontal: 'medium' } : { vertical: 'medium', horizontal: 'medium' }}
-        style={isLightMode ? {border: "1px solid #EBEBEB"} : {}}
-=======
         pad={
           walletAccountAtom
             ? { top: 'medium', horizontal: 'medium' }
             : { vertical: 'medium', horizontal: 'medium' }
         }
         style={isLightMode ? { border: '1px solid #EBEBEB' } : {}}
->>>>>>> staging
       >
         <Box fill flex="grow" height="100vh">
           <Box
@@ -85,14 +64,6 @@ export const Modal = ({
             gap="small"
           >
             {!noHeading && (
-<<<<<<< HEAD
-              <Box direction="row" fill="horizontal" justify="between">
-                <Heading size="small" level={3} margin="none">
-                  <Box alignContent="between" direction="row" fill="horizontal">
-                    {heading}
-                  </Box>
-                </Heading>
-=======
               <Box
                 direction="row"
                 fill="horizontal"
@@ -100,7 +71,6 @@ export const Modal = ({
                 align="center"
               >
                 <Text size="24px" weight={600}>{heading}</Text>
->>>>>>> staging
                 <Box direction="row" gap="small" align="end">
                   {showChainBadge && <ChainBadge chain={chain} />}
                 </Box>
@@ -127,19 +97,12 @@ export const Modal = ({
           </Box>
           <Box direction="column" fill="vertical" gap="small">
             {!walletAccountAtom ? (
-<<<<<<< HEAD
-              <Box margin={{ vertical: 'large' }}>
-                <Text textAlign="center" weight="bold">
-                  <ConnectionButton />
-                </Text>
-=======
               <Box
                 margin={{ vertical: 'large' }}
                 direction="row"
                 justify="center"
               >
                 <ConnectionButton />
->>>>>>> staging
               </Box>
             ) : (
               <Box

@@ -1,10 +1,6 @@
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
-<<<<<<< HEAD
-import { isNumeric } from 'app/common/functions/utils';
-=======
->>>>>>> staging
 import { useNotification } from 'app/common/state';
 import { useState } from 'react';
 
@@ -28,15 +24,8 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
   };
 
   const handleLockValueChange = value => {
-<<<<<<< HEAD
-    resetState();
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setLockValueError('Write a valid number');
-    } else if (+value > +alluoInfo?.balance) {
-=======
     setLockValueError('');
     if (+value > +alluoInfo?.balance) {
->>>>>>> staging
       setLockValueError('Insufficient balance');
     }
     setLockValue(value);

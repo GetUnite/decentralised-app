@@ -36,11 +36,7 @@ export const Tabs = ({ children = [], ...rest }) => {
         style={{boxShadow:`inset 0px 0px 0px 1px ${modeAtom === 'light' ? colors.BLACK_8 : colors.BLUE_80}`}}
         background="tabSwitch"
         direction="row"
-<<<<<<< HEAD
-        height="36px"
-=======
         height="38px"
->>>>>>> staging
         round="xsmall"
         justify="stretch"
         pad="hair"

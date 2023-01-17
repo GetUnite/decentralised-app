@@ -6,10 +6,6 @@ import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-<<<<<<< HEAD
-  converToAssetValue,
-=======
->>>>>>> staging
   getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount
@@ -300,17 +296,7 @@ export const useFarm = ({ id }) => {
           farm.chain,
         );
         farmInfo.depositedAmount = depositedAmount;
-<<<<<<< HEAD
-        farmInfo.depositedAssetValue = await converToAssetValue(
-          farm.farmAddress,
-          depositedAmount,
-          18,
-          farm.chain,
-        );
-        farmInfo.depositDividedAmount = depositDivided(farmInfo.depositedAssetValue);
-=======
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
->>>>>>> staging
       }
 
       return { ...farm, ...farmInfo };

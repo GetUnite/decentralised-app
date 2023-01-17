@@ -1,24 +1,14 @@
 import { EChain } from 'app/common/constants/chains';
 import { deposit } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
-<<<<<<< HEAD
-import { isNumeric } from 'app/common/functions/utils';
-import {
-  approve, getAllowance,
-=======
 import {
   approve,
   getAllowance,
->>>>>>> staging
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import { TDepositStep } from 'app/common/types/farm';
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
-import { useNavigate } from 'react-router-dom';
-=======
->>>>>>> staging
 import { useRecoilState } from 'recoil';
 import { isSafeApp } from '../atoms';
 
@@ -30,15 +20,8 @@ const possibleDepositSteps: TDepositStep[] = [
 export const useFarmDeposit = ({
   selectedFarm,
   selectedSupportedToken,
-<<<<<<< HEAD
-}) => {
-  // react
-  const navigate = useNavigate();
-
-=======
   updateFarmInfo,
 }) => {
->>>>>>> staging
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
@@ -105,10 +88,7 @@ export const useFarmDeposit = ({
       selectedFarm.farmAddress,
       selectedFarm.chain,
     );
-<<<<<<< HEAD
-=======
 
->>>>>>> staging
     // If the allowance is not higher than 0 ask for approval
     if (!(+allowance > 0)) {
       neededSteps.push(possibleDepositSteps[0]);
@@ -140,10 +120,6 @@ export const useFarmDeposit = ({
         selectedFarm.chain,
         useBiconomy,
       );
-<<<<<<< HEAD
-      await updateBalanceAndAllowance();
-=======
->>>>>>> staging
       heapTrack('approvedTransactionMined', {
         pool: 'Ib',
         currency: selectedSupportedToken.label,
@@ -165,15 +141,8 @@ export const useFarmDeposit = ({
   };
 
   const handleDepositValueChange = value => {
-<<<<<<< HEAD
-    resetState();
-    if (!(isNumeric(value) || value === '' || value === '.')) {
-      setDepositValueError('Write a valid number');
-    } else if (+value > +selectedSupportedTokenInfo.balance) {
-=======
     setDepositValueError('');
     if (+value > +selectedSupportedTokenInfo.balance) {
->>>>>>> staging
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
@@ -196,10 +165,6 @@ export const useFarmDeposit = ({
         selectedFarm.chain,
         useBiconomy,
       );
-<<<<<<< HEAD
-      resetState();
-=======
->>>>>>> staging
       setDepositValue('');
       heapTrack('depositTransactionMined', {
         pool: 'Ib',
@@ -212,12 +177,7 @@ export const useFarmDeposit = ({
         tx.transactionHash,
         selectedFarm.chain,
       );
-<<<<<<< HEAD
-      navigate('/?view_type=my_farms');
-      //await updateFarmInfo();
-=======
       await updateFarmInfo();
->>>>>>> staging
     } catch (error) {
       resetState();
       setNotification(error, 'error');
