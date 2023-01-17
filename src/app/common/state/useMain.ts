@@ -1,5 +1,4 @@
 import {
-  converToAssetValue,
   getBalanceOf,
   getChainById,
   getCurrentChainId,
@@ -202,12 +201,7 @@ export const useMain = () => {
         farm.farmAddress,
         farm.chain,
       );
-      farmInfo.depositedAmount = await converToAssetValue(
-        farm.farmAddress,
-        depositedAmount,
-        18,
-        farm.chain,
-      );
+      farmInfo.depositedAmount = depositedAmount;
 
       let valueOfAssetInUSDC;
       // if the underlying is usdc no need for price
@@ -223,6 +217,7 @@ export const useMain = () => {
         switch (farm.underlyingTokenAddress) {
           case EPolygonAddresses.WBTC:
             tokenPriceAddress = EEthereumAddresses.WBTC;
+            tokenDecimals= 8;
             break;
           case EPolygonAddresses.WETH:
             tokenPriceAddress = EEthereumAddresses.WETH;

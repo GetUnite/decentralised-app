@@ -409,7 +409,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       'wETH',
     ],
     apyFarmAddresses: {
-      baseApyAddress: '5fcf4418-be5e-4d48-8da7-5c4c615971e0',
+      baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
     isNewest: true,

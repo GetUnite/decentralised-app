@@ -176,6 +176,8 @@ export const connectToWallet = async (connectOptions?) => {
 };
 
 export const getCurrentWalletAddress = () => {
+  // Use this line to force "get" methods for a specific wallet address
+  //return '0x781c9e6f0eEEdFE16329880731e25Fd57fE27e13'
   return walletAddress;
 };
 
@@ -721,13 +723,10 @@ export const binarySearchForBlock = async (
   let highestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlockNumber,
   );
-  console.log(startTimestamp);
-  console.log("highestEstimatedBlock",highestEstimatedBlock);
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
       Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
-  console.log("lowestEstimatedBlock",highestEstimatedBlock);
   let closestBlock;
 
   while (lowestEstimatedBlock?.number != undefined && highestEstimatedBlock?.number != undefined && lowestEstimatedBlock?.number <= highestEstimatedBlock?.number) {
@@ -736,7 +735,6 @@ export const binarySearchForBlock = async (
         (highestEstimatedBlock?.number + lowestEstimatedBlock?.number) / 2,
       ),
     );
-    console.log("closestBlock",closestBlock);
     if (closestBlock?.timestamp == startTimestamp) {
       return closestBlock?.number;
     } else if (closestBlock?.timestamp > startTimestamp) {
@@ -761,8 +759,8 @@ export const getPrice = async (
 ) => {
   const url = marketApiURl + `/v1/quote`;
 
-  // quote returns the value accounting with fee so using 10000 to prevent the fee being higher than the actual value
-  const value = toDecimals(10000, sellDecimals);
+  // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
+  const value = toDecimals(1000, sellDecimals);
 
   try {
     const priceResponse = await fetch(url, {
@@ -783,7 +781,7 @@ export const getPrice = async (
     const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
 
     // We multiplied the value by 1000 so now divide it
-    return price / 10000;
+    return price / 1000;
   } catch (error) {
     throw 'Something went wrong while fetching data. Please try again later';
   }
@@ -1060,42 +1058,7 @@ export const getUserDepositedAmount = async (
     abi,
     address,
     'getBalance(address)',
-    [walletAddress],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedAmount);
-};
-
-export const converToAssetValue = async (
-  contractAddress,
-  amount,
-  decimals,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [
-        {
-          internalType: 'uint256',
-          name: '_amountInTokenValue',
-          type: 'uint256',
-        },
-      ],
-      name: 'convertToAssetValue',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const amountInDecimals = toDecimals(amount, decimals);
-
-  const userDepositedAmount = await callContract(
-    abi,
-    contractAddress,
-    'convertToAssetValue(uint256)',
-    [amountInDecimals],
+    [getCurrentWalletAddress()],
     chain,
   );
 
@@ -1117,7 +1080,7 @@ export const getUserDepositedLPAmount = async (farmAddress, chain) => {
     abi,
     farmAddress,
     'balanceOf(address)',
-    [walletAddress],
+    [getCurrentWalletAddress()],
     chain,
   );
 
@@ -1191,7 +1154,7 @@ export const getUserDepositedTransferAmount = async (
     abi,
     ibAlluoAddress,
     'getBalanceForTransfer(address)',
-    [walletAddress],
+    [getCurrentWalletAddress()],
     chain,
   );
 

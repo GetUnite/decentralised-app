@@ -11,6 +11,8 @@ import {
   getStakingPendingRewards,
   getTotalAlluoLocked,
   getUnlockedAlluo,
+  unlockAllAlluo,
+  unlockAlluo,
   withdrawAlluo
 } from 'app/common/functions/stake';
 import { toExactFixed } from 'app/common/functions/utils';
@@ -52,6 +54,9 @@ export const useStake = () => {
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
+  // inputs
+  const [unlockValue, setUnlockValue] = useState<number>(0);
+
   //rewards control
   const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
@@ -64,6 +69,7 @@ export const useStake = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
@@ -120,6 +126,26 @@ export const useStake = () => {
       console.log(error);
     }
     setIsLoading(false);
+  };
+
+  const handleUnlock = async () => {
+    resetState();
+    setIsUnlocking(true);
+    let tx;
+    try {
+      heapTrack('stakeUnlockAmount', { amount: unlockValue });
+      heapTrack('stakeUnlockButtonClicked');
+      if (+unlockValue === 100) {
+        tx = await unlockAllAlluo();
+      } else {
+        tx = await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
+      }
+      setNotification('Successfully unlocked', 'success', tx.transactionHash, EChain.ETHEREUM);
+      await updateAlluoInfo();
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+    setIsUnlocking(false);
   };
 
   const handleWithdraw = async () => {
@@ -209,5 +235,10 @@ export const useStake = () => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    // unlock 
+    unlockValue,
+    setUnlockValue,
+    handleUnlock,
+    isUnlocking
   };
 };

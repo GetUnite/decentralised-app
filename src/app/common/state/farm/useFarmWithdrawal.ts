@@ -71,7 +71,7 @@ export const useFarmWithdrawal = ({
 
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
-    if (+value > +selectedFarm?.depositedAssetValue) {
+    if (+value > +selectedFarm?.depositedAmount) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
@@ -81,16 +81,10 @@ export const useFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
-      const percentageToWithdraw =
-        +withdrawValue / selectedFarm.depositedAssetValue;
-
-      const valueToWithdraw =
-        selectedFarm.depositedAmount * +percentageToWithdraw;
-
       const tx = await withdraw(
         selectedSupportedToken.address,
         selectedFarm.farmAddress,
-        valueToWithdraw,
+        +withdrawValue,
         selectedFarm.chain,
         useBiconomy,
       );
