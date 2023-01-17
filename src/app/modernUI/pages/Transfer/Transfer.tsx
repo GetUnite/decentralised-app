@@ -9,7 +9,7 @@ export const Transfer = ({ ...rest }) => {
       {_ => (
         <Layout>
           <Modal chain={EChain.POLYGON} heading={'Transfer Asset'}>
-            <Tab title="Send">
+            <Tab title="Transfer">
               <TransferTab />
             </Tab>
           </Modal>

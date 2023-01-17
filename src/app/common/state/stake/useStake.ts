@@ -154,7 +154,7 @@ export const useStake = () => {
     try {
       await withdrawAlluo();
       await updateAlluoInfo();
-      setNotification('Successfully withdrew', 'success');
+      setNotification('Transaction confirmed. $ALLUO tokens withdrawn to wallet.', 'success');
     } catch (error) {
       console.error('Error', error);
       setNotification(error, 'error');

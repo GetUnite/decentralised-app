@@ -67,7 +67,7 @@ export const TransferTab = ({ ...rest }) => {
               <TextInput
                 value={recipientAddress}
                 onChange={handleRecipientAddressChange}
-                placeholder="Address or domain"
+                placeholder="Address or Unstoppable domain"
                 disabled={isLoading}
               />
               <Text color="error" size="small" margin={{ top: 'small' }}>
