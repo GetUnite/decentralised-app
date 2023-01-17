@@ -112,7 +112,7 @@ export const BoostFarmWithdrawalTab = ({
                 isLoading={isLoading}
               />
               <FeeInfo
-                biconomyToggle={true}
+                biconomyToggle={selectedFarmInfo.current?.chain == EChain.POLYGON}
                 useBiconomy={useBiconomy}
                 setUseBiconomy={setUseBiconomy}
                 showWalletFee={
