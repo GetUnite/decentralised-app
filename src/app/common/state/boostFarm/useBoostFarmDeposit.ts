@@ -125,7 +125,7 @@ export const useBoostFarmDeposit = ({
   const handleCurrentStep = async () => {
     const possibleDepositStep = possibleDepositSteps.find(
       possibleDepositStep =>
-        possibleDepositStep.id == selectedSupportedTokenSteps[currentStep].id,
+        possibleDepositStep.id == selectedSupportedTokenSteps.current[currentStep].id,
     );
 
     switch (possibleDepositStep.id) {
