@@ -14,6 +14,7 @@ import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { LockTab } from './blocks/LockTab';
+import { ReunlockConfirmation } from './blocks/ReunlockConfirmation';
 import { UnlockTab } from './blocks/UnlockTab';
 import { UnlockCountdown } from './components/UnlockCountdown';
 
@@ -40,6 +41,11 @@ export const Stake = ({ ...rest }) => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    // unlock
+    unlockValue,
+    setUnlockValue,
+    isUnlocking,
+    handleUnlock,
   } = useStake();
 
   const allTimersAreFinished =
@@ -52,8 +58,7 @@ export const Stake = ({ ...rest }) => {
         <Layout>
           {/*Kindy hacky but for some reason if the modal is inside the flex box when no wallet is connected a ghost margin appears that shifts things slighly up*/}
           {!walletAccountAtom ? (
-            <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-            </Modal>
+            <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}></Modal>
           ) : (
             <Box direction={!isSmall(size) ? 'row' : 'column'} gap="small">
               <Box direction="row" justify="end" flex>
@@ -125,26 +130,36 @@ export const Stake = ({ ...rest }) => {
                 </Box>
               </Box>
               <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-                <Tabs>
-                  <Tab title="Lock">
-                    <LockTab
-                      isLoading={isLoading}
-                      alluoInfo={alluoInfo}
-                      updateAlluoInfo={updateAlluoInfo}
-                    />
-                  </Tab>
-                  <Tab title="Unlock">
-                    <UnlockTab
-                      isLoading={isLoading}
-                      alluoInfo={alluoInfo}
-                      updateAlluoInfo={updateAlluoInfo}
-                      startReunlockConfirmation={startReunlockConfirmation}
-                      showReunlockConfirmation={showReunlockConfirmation}
-                      cancelReunlockConfirmation={cancelReunlockConfirmation}
-                      allTimersAreFinished={allTimersAreFinished}
-                    />
-                  </Tab>
-                </Tabs>
+                {showReunlockConfirmation ? (
+                  <ReunlockConfirmation
+                    handleUnlock={handleUnlock}
+                    cancelReunlockConfirmation={cancelReunlockConfirmation}
+                  />
+                ) : (
+                  <Tabs>
+                    <Tab title="Lock">
+                      <LockTab
+                        isLoading={isLoading}
+                        alluoInfo={alluoInfo}
+                        updateAlluoInfo={updateAlluoInfo}
+                      />
+                    </Tab>
+                    <Tab title="Unlock">
+                      <UnlockTab
+                        isLoading={isLoading}
+                        alluoInfo={alluoInfo}
+                        startReunlockConfirmation={startReunlockConfirmation}
+                        showReunlockConfirmation={showReunlockConfirmation}
+                        cancelReunlockConfirmation={cancelReunlockConfirmation}
+                        allTimersAreFinished={allTimersAreFinished}
+                        unlockValue={unlockValue}
+                        setUnlockValue={setUnlockValue}
+                        isUnlocking={isUnlocking}
+                        handleUnlock={handleUnlock}
+                      />
+                    </Tab>
+                  </Tabs>
+                )}
               </Modal>
               <Box flex>
                 {walletAccountAtom && (

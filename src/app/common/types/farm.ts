@@ -28,7 +28,6 @@ export type TFarm = {
   interest?: string;
   totalAssetSupply?: string | number;
   depositedAmount?: string;
-  depositedAssetValue?: string;
   depositedAmountInUSD?: string;
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;

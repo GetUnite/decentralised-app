@@ -13,7 +13,7 @@ interface IModal {
   isLoading?: boolean;
   showChainBadge?: boolean;
   notificationId?: ENotificationId;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   noHeading?: boolean;
   closeAction?: Function;
 }
@@ -23,7 +23,7 @@ export const Modal = ({
   heading,
   isLoading = false,
   showChainBadge = true,
-  children,
+  children = null,
   noHeading = false,
   closeAction,
 }: IModal) => {
