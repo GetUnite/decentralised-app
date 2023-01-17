@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { unlockAllAlluo, unlockAlluo } from 'app/common/functions/stake';
@@ -11,11 +12,19 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
 
   // inputs
   const [unlockValue, setUnlockValue] = useState<number>(0);
+=======
+import { isNumeric, toExactFixed } from 'app/common/functions/utils';
+import { useState } from 'react';
+
+export const useUnlock = ({ alluoInfo, setUnlockValue }) => {
+  // inputs
+>>>>>>> staging
   const [unlockValueError, setUnlockValueError] = useState<string>();
 
   // calculated data
   const [projectedUnlockValue, setProjectedUnlockValue] = useState<string>('0');
 
+<<<<<<< HEAD
   // loading control
   const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
 
@@ -27,6 +36,10 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
 
   const handleUnlockValueChange = value => {
     resetState();
+=======
+  const handleUnlockValueChange = value => {
+    setUnlockValueError('');
+>>>>>>> staging
     if (!(isNumeric(value) || value === '' || value === '.')) {
       setUnlockValueError('Write a valid number');
     }
@@ -36,6 +49,7 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     );
   };
 
+<<<<<<< HEAD
   const handleUnlock = async () => {
     resetState();
     setIsUnlocking(true);
@@ -64,5 +78,12 @@ export const useUnlock = ({ alluoInfo, updateAlluoInfo }) => {
     isUnlocking,
     handleUnlockValueChange,
     handleUnlock,
+=======
+  return {
+    unlockValueError,
+    projectedUnlockValue,
+    hasErrors: unlockValueError != '',
+    handleUnlockValueChange,
+>>>>>>> staging
   };
 };

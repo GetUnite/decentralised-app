@@ -6,7 +6,11 @@ import booster from 'app/modernUI/images/booster.svg';
 import Skeleton from 'react-loading-skeleton';
 
 export const BoostFarmPresentation = ({
+<<<<<<< HEAD
   selectedFarm,
+=======
+  selectedFarmInfo,
+>>>>>>> staging
   farmName,
   isLoading,
   ...rest
@@ -14,7 +18,13 @@ export const BoostFarmPresentation = ({
   const [, setCookies] = useCookies(['has_seen_boost_farms']);
 
   const rewardsLabel =
+<<<<<<< HEAD
     selectedFarm?.rewards.label + ' or ' + selectedFarm?.rewards.stableLabel;
+=======
+    selectedFarmInfo.current?.rewards.label +
+    ' or ' +
+    selectedFarmInfo.current?.rewards.stableLabel;
+>>>>>>> staging
 
   return (
     <>
@@ -28,8 +38,13 @@ export const BoostFarmPresentation = ({
           </Box>
         ) : (
           <Text textAlign="center" weight="bold" size="28px">
+<<<<<<< HEAD
             Earn {toExactFixed(selectedFarm.interest, 2)}% as {rewardsLabel}{' '}
             tokens
+=======
+            Earn {toExactFixed(selectedFarmInfo.current?.interest, 2)}% as{' '}
+            {rewardsLabel} tokens
+>>>>>>> staging
             <br />
           </Text>
         )}
@@ -41,6 +56,23 @@ export const BoostFarmPresentation = ({
           style={{ width: 310 }}
         />
       </Box>
+<<<<<<< HEAD
+=======
+      <Box margin={{ top: '26px' }} justify="center" direction="row">
+        <Text size="12px">
+          Find out where these funds are being invested{' '}
+          <a
+            target="_blank"
+            href="https://docsend.com/view/np9ypdn38jajb9zj"
+            style={{
+              textDecoration: 'none',
+            }}
+          >
+            here
+          </a>
+        </Text>
+      </Box>
+>>>>>>> staging
     </>
   );
 };

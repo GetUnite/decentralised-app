@@ -28,7 +28,10 @@ export type TFarm = {
   interest?: string;
   totalAssetSupply?: string | number;
   depositedAmount?: string;
+<<<<<<< HEAD
   depositedAssetValue?: string;
+=======
+>>>>>>> staging
   depositedAmountInUSD?: string;
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;
@@ -39,7 +42,11 @@ export type TFarm = {
 };
 
 export type TBoostFarm = TFarm & {
+<<<<<<< HEAD
   // For booster farms
+=======
+  // For boost farms
+>>>>>>> staging
   rewards?: TBoostFarmRewards;
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
@@ -47,6 +54,11 @@ export type TBoostFarm = TFarm & {
   // To store boost farm deposited amount to improve ui and functionality
   depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
+<<<<<<< HEAD
+=======
+  // For locked boost farms
+  isLocked?: boolean;
+>>>>>>> staging
 }
 
 export type TDepositStep = {

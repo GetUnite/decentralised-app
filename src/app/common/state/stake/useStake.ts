@@ -11,6 +11,11 @@ import {
   getStakingPendingRewards,
   getTotalAlluoLocked,
   getUnlockedAlluo,
+<<<<<<< HEAD
+=======
+  unlockAllAlluo,
+  unlockAlluo,
+>>>>>>> staging
   withdrawAlluo
 } from 'app/common/functions/stake';
 import { toExactFixed } from 'app/common/functions/utils';
@@ -52,6 +57,12 @@ export const useStake = () => {
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
+<<<<<<< HEAD
+=======
+  // inputs
+  const [unlockValue, setUnlockValue] = useState<number>(0);
+
+>>>>>>> staging
   //rewards control
   const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
@@ -64,6 +75,10 @@ export const useStake = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+<<<<<<< HEAD
+=======
+  const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
+>>>>>>> staging
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
@@ -122,13 +137,40 @@ export const useStake = () => {
     setIsLoading(false);
   };
 
+<<<<<<< HEAD
+=======
+  const handleUnlock = async () => {
+    resetState();
+    setIsUnlocking(true);
+    let tx;
+    try {
+      heapTrack('stakeUnlockAmount', { amount: unlockValue });
+      heapTrack('stakeUnlockButtonClicked');
+      if (+unlockValue === 100) {
+        tx = await unlockAllAlluo();
+      } else {
+        tx = await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
+      }
+      setNotification('Successfully unlocked', 'success', tx.transactionHash, EChain.ETHEREUM);
+      await updateAlluoInfo();
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+    setIsUnlocking(false);
+  };
+
+>>>>>>> staging
   const handleWithdraw = async () => {
     resetState();
     setIsWithdrawing(true);
     try {
       await withdrawAlluo();
       await updateAlluoInfo();
+<<<<<<< HEAD
       setNotification('Successfully withdrew', 'success');
+=======
+      setNotification('Transaction confirmed. $ALLUO tokens withdrawn to wallet.', 'success');
+>>>>>>> staging
     } catch (error) {
       console.error('Error', error);
       setNotification(error, 'error');
@@ -209,5 +251,13 @@ export const useStake = () => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+<<<<<<< HEAD
+=======
+    // unlock 
+    unlockValue,
+    setUnlockValue,
+    handleUnlock,
+    isUnlocking
+>>>>>>> staging
   };
 };

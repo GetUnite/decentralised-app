@@ -71,7 +71,11 @@ export const useFarmWithdrawal = ({
 
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
+<<<<<<< HEAD
     if (+value > +selectedFarm?.depositedAssetValue) {
+=======
+    if (+value > +selectedFarm?.depositedAmount) {
+>>>>>>> staging
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
@@ -81,6 +85,7 @@ export const useFarmWithdrawal = ({
     setIsWithdrawing(true);
 
     try {
+<<<<<<< HEAD
       const percentageToWithdraw =
         +withdrawValue / selectedFarm.depositedAssetValue;
       const valueToWithdraw =
@@ -89,6 +94,12 @@ export const useFarmWithdrawal = ({
         selectedSupportedToken.address,
         selectedFarm.farmAddress,
         valueToWithdraw,
+=======
+      const tx = await withdraw(
+        selectedSupportedToken.address,
+        selectedFarm.farmAddress,
+        +withdrawValue,
+>>>>>>> staging
         selectedFarm.chain,
         useBiconomy,
       );

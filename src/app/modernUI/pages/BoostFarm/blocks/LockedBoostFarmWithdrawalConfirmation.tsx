@@ -2,12 +2,8 @@ import { toExactFixed } from 'app/common/functions/utils';
 import exclamation from 'app/modernUI/images/blackExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
-export const BoostFarmWithdrawalConfirmation = ({
-<<<<<<< HEAD
+export const LockedBoostFarmWithdrawalConfirmation = ({
   selectedFarm,
-=======
-  selectedFarmInfo,
->>>>>>> staging
   withdrawValue,
   withdrawTokenLabel,
   handleWithdraw,
@@ -22,8 +18,9 @@ export const BoostFarmWithdrawalConfirmation = ({
         <img src={exclamation} alt="exclamation" />
         <Box gap="35px" margin={{ top: '45px' }}>
           <Text textAlign="center" weight="bold" size="24px">
-            If you withdraw {withdrawValue} {withdrawTokenLabel} now, about
-            ${toExactFixed(losablePendingRewards, 6)} in pending rewards won't be realised.
+            If you withdraw {withdrawValue} {withdrawTokenLabel} now, about $
+            {toExactFixed(losablePendingRewards, 6)} in pending rewards won't be
+            realised.
           </Text>
           <Text textAlign="center" weight={400} size="16px">
             Any unrealised rewards will be redistributed amongst the pool. Wait

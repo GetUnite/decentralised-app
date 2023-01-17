@@ -6,10 +6,19 @@ import {
   ProjectedWeeklyInfo,
   Spinner,
   StreamInput,
+<<<<<<< HEAD
   SubmitButton
 } from 'app/modernUI/components';
 import { RightAlignToggle } from 'app/modernUI/components/Toggles';
 import { Box, Text } from 'grommet';
+=======
+  SubmitButton,
+  Tooltip
+} from 'app/modernUI/components';
+import { RightAlignToggle } from 'app/modernUI/components/Toggles';
+import { Box, Text } from 'grommet';
+import { CircleInformation } from 'grommet-icons';
+>>>>>>> staging
 
 export const AutoInvestTab = ({ ...rest }) => {
   const {
@@ -48,7 +57,14 @@ export const AutoInvestTab = ({ ...rest }) => {
 
   return (
     <Box fill>
+<<<<<<< HEAD
       <Box style={{ minHeight: '410px' }} justify="center">
+=======
+      <Box
+        style={{ minHeight: useEndDate ? '535px' : '448px' }}
+        justify="center"
+      >
+>>>>>>> staging
         {isStartingStream || isApproving || isDepositing ? (
           <Box
             align="center"
@@ -85,6 +101,10 @@ export const AutoInvestTab = ({ ...rest }) => {
                 isToggled={useEndDate}
                 setIsToggled={setUseEndDate}
                 label="Set end date for stream"
+<<<<<<< HEAD
+=======
+                weight={400}
+>>>>>>> staging
                 disabled={
                   disableInputs ||
                   isLoading ||
@@ -145,6 +165,38 @@ export const AutoInvestTab = ({ ...rest }) => {
                   isUpdatingSelectedStreamOption
                 }
               />
+<<<<<<< HEAD
+=======
+              <Info
+                label={
+                  <Box
+                    justify="center"
+                    direction="row"
+                    gap="4px"
+                    align="center"
+                    fill
+                  >
+                    <span>Monthly transaction fee</span>
+                    <Tooltip text="AutoInvest incurs a transaction fee of 0.5% of your monthly stream rate to cover Ricochet’s DCA fees. ">
+                      <CircleInformation
+                        color="soul"
+                        size="18px"
+                        style={{ marginTop: '-2px' }}
+                      />
+                    </Tooltip>
+                  </Box>
+                }
+                value={
+                  selectedSupportedFromToken?.sign +
+                  (+streamValue * 0.5 / 100).toLocaleString()
+                }
+                isLoading={
+                  isLoading ||
+                  isFetchingFarmInfo ||
+                  isUpdatingSelectedStreamOption
+                }
+              />
+>>>>>>> staging
               <FeeInfo
                 useBiconomy={useBiconomy}
                 setUseBiconomy={setUseBiconomy}
@@ -161,7 +213,10 @@ export const AutoInvestTab = ({ ...rest }) => {
         )}
       </Box>
       <Box margin={{ top: 'large' }}>
+<<<<<<< HEAD
         {console.log(streamValue)}
+=======
+>>>>>>> staging
         <SubmitButton
           primary
           disabled={
@@ -180,7 +235,13 @@ export const AutoInvestTab = ({ ...rest }) => {
                 }: ${selectedStreamOptionSteps[currentStep]?.label}`
           }
           onClick={handleCurrentStep}
+<<<<<<< HEAD
           glowing={currentStep > 0 && !isDepositing && !isApproving && !isLoading}
+=======
+          glowing={
+            currentStep > 0 && !isDepositing && !isApproving && !isLoading
+          }
+>>>>>>> staging
         />
       </Box>
     </Box>

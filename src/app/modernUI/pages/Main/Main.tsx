@@ -29,6 +29,10 @@ export const Main = () => {
     possibleViewTypes,
     setViewType,
     totalDepositedAmountInUsd,
+<<<<<<< HEAD
+=======
+    isFarming
+>>>>>>> staging
   } = useMain();
 
   const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] =
@@ -62,6 +66,10 @@ export const Main = () => {
                   numberOfChainsWithAssets={
                     assetsInfo?.numberOfChainsWithAssets
                   }
+<<<<<<< HEAD
+=======
+                  isFarming={isFarming}
+>>>>>>> staging
                 />
                 <Box
                   align="center"

@@ -493,6 +493,7 @@ export const useAutoInvestTab = () => {
 
   // updates the selectes stream option when either the "from" or "to" tokens change
   useEffect(() => {
+<<<<<<< HEAD
     if (
       walletAccountAtom &&
       selectedSupportedFromToken &&
@@ -551,6 +552,74 @@ export const useAutoInvestTab = () => {
       if (!(currentStep > 0)) {
         updateSelectedStreamCombination();
       }
+=======
+    try {
+      if (
+        walletAccountAtom &&
+        selectedSupportedFromToken &&
+        selectedSupportedToToken
+      ) {
+        const updateSelectedStreamCombination = async () => {
+          setIsUpdatingSelectedStreamOption(true);
+
+          const newSelectedStreamOption = possibleStreamOptions.find(
+            pstc =>
+              pstc.fromAddress == selectedSupportedFromToken.address &&
+              pstc.toIbAlluoAddress == selectedSupportedToToken.address,
+          );
+          if (newSelectedStreamOption) {
+            setSelectedStreamOption(newSelectedStreamOption);
+
+            let neededSteps: TStreamCreationStep[] = [];
+            // First step is always approve when there is a need for deposit
+            if (!selectedSupportedFromToken.isStreamable) {
+              const allowance = await getAllowance(
+                selectedSupportedFromToken.address,
+                newSelectedStreamOption.fromIbAlluoAddress,
+              );
+              if (!(+allowance > 0)) {
+                neededSteps.push(possibleStreamCreationSteps[0]);
+              }
+            }
+            // Deposit step if its not one of the iballuo
+            if (!selectedSupportedFromToken.isStreamable) {
+              neededSteps.push(possibleStreamCreationSteps[1]);
+            }
+            // subscriptions to superfluid contracts
+            const subscriptionOperations =
+              await getUnapprovedSuperfluidSubscriptions(
+                newSelectedStreamOption.fromIbAlluoAddress,
+                newSelectedStreamOption.fromStIbAlluoAddress,
+                newSelectedStreamOption.toStIbAlluoAddress,
+                newSelectedStreamOption.ricochetMarketAddress,
+              );
+            if (subscriptionOperations.length > 0) {
+              setUnapprovedSuperfluidSubscriptions(subscriptionOperations);
+              neededSteps.push(possibleStreamCreationSteps[2]);
+            }
+            // start stream finishs the steps
+            neededSteps.push(possibleStreamCreationSteps[3]);
+
+            setSelectedStreamOptionSteps(neededSteps);
+          }
+          setIsUpdatingSelectedStreamOption(false);
+        };
+        // Check the stream value against the new "from" token
+        if (+streamValue > 0) {
+          validateInputs(streamValue);
+        }
+        // Only update if we didn't take the first step yet, after that info is updated on a need basis
+        if (!(currentStep > 0)) {
+          updateSelectedStreamCombination();
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setNotification(
+        'We were unable to load your data. Please try again. If the error persists contact the team',
+        'error',
+      );
+>>>>>>> staging
     }
   }, [selectedSupportedFromToken, selectedSupportedToToken]);
 

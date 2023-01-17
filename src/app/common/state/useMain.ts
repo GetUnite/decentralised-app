@@ -1,5 +1,8 @@
 import {
+<<<<<<< HEAD
   converToAssetValue,
+=======
+>>>>>>> staging
   getBalanceOf,
   getChainById,
   getCurrentChainId,
@@ -17,7 +20,10 @@ import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useLocation } from 'react-router-dom';
+=======
+>>>>>>> staging
 import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
@@ -76,6 +82,7 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+<<<<<<< HEAD
   const location = useLocation();
 
   useEffect(() => {
@@ -83,6 +90,11 @@ export const useMain = () => {
     if (walletAccountAtom && location.search.includes('view_type=my_farms')) {
       setViewType('View my farms only');
     }
+=======
+  
+  useEffect(() => {
+    fetchFarmsInfo();
+>>>>>>> staging
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -207,12 +219,16 @@ export const useMain = () => {
         farm.farmAddress,
         farm.chain,
       );
+<<<<<<< HEAD
       farmInfo.depositedAmount = await converToAssetValue(
         farm.farmAddress,
         depositedAmount,
         18,
         farm.chain,
       );
+=======
+      farmInfo.depositedAmount = depositedAmount;
+>>>>>>> staging
 
       let valueOfAssetInUSDC;
       // if the underlying is usdc no need for price
@@ -228,6 +244,10 @@ export const useMain = () => {
         switch (farm.underlyingTokenAddress) {
           case EPolygonAddresses.WBTC:
             tokenPriceAddress = EEthereumAddresses.WBTC;
+<<<<<<< HEAD
+=======
+            tokenDecimals= 8;
+>>>>>>> staging
             break;
           case EPolygonAddresses.WETH:
             tokenPriceAddress = EEthereumAddresses.WETH;
@@ -458,5 +478,9 @@ export const useMain = () => {
     possibleViewTypes,
     setViewType,
     totalDepositedAmountInUsd,
+<<<<<<< HEAD
+=======
+    isFarming: availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0
+>>>>>>> staging
   };
 };

@@ -213,7 +213,11 @@ export const getBoostFarmRewards = async (
 
   return {
     value: toExactFixed(valueAmountInDecimals, 8),
+<<<<<<< HEAD
     stableValue: stableValue,
+=======
+    stableValue: toExactFixed(stableValue,2)
+>>>>>>> staging
   };
 };
 

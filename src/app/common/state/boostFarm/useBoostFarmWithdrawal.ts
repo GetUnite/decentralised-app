@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { EChain } from 'app/common/constants/chains';
 import {
   convertFromUSDC, convertToLP, withdrawFromBoostFarm
@@ -32,10 +33,30 @@ export const useBoostFarmWithdrawal = ({
   // data
   const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
     useState<any>({
+=======
+import {
+  convertFromUSDC
+} from 'app/common/functions/boostFarm';
+import { useEffect, useRef, useState } from 'react';
+
+export const useBoostFarmWithdrawal = ({
+  selectedFarmInfo,
+  selectedSupportedToken,
+  withdrawValue,
+  setWithdrawValue,
+}) => {
+  // inputs validation
+  const [withdrawValueError, setWithdrawValueError] = useState<string>('');
+
+  // data
+  const selectedSupportedTokenInfo =
+    useRef<any>({
+>>>>>>> staging
       boostDepositedAmount: 0,
     });
 
   // loading control
+<<<<<<< HEAD
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
@@ -54,6 +75,20 @@ export const useBoostFarmWithdrawal = ({
   }, [selectedSupportedTokenInfo]);
 
   const updateAvailable = async () => {
+=======
+  const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
+    useState(true);
+
+  // when the selected token changes, trigger balance update
+  useEffect(() => {
+    if (selectedFarmInfo && selectedSupportedToken) {
+      updateSelectedTokenBalance();
+    }
+  }, [selectedSupportedToken]);
+
+  // function that updates the balance of the selected token on change
+  const updateSelectedTokenBalance = async () => {
+>>>>>>> staging
     setIsFetchingSupportedTokenInfo(true);
 
     // For booster farm withdrawals
@@ -63,23 +98,41 @@ export const useBoostFarmWithdrawal = ({
       selectedSupportedToken.address,
       selectedSupportedToken.decimals,
       // here the deposited amount is in USDC
+<<<<<<< HEAD
       selectedFarm.depositedAmount,
     );
     setSelectedSupportedTokenInfo({
       boostDepositedAmount: boostDepositedAmount,
     });
+=======
+      selectedFarmInfo.current?.depositedAmount,
+    );
+    selectedSupportedTokenInfo.current = {
+      boostDepositedAmount: boostDepositedAmount,
+    };
+
+    await handleWithdrawalFieldChange(withdrawValue);
+>>>>>>> staging
 
     setIsFetchingSupportedTokenInfo(false);
   };
 
+<<<<<<< HEAD
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
     if (+value > selectedSupportedTokenInfo.boostDepositedAmount) {
+=======
+  // handles withdraw input change
+  const handleWithdrawalFieldChange = value => {
+    setWithdrawValueError('');
+    if (+value > selectedSupportedTokenInfo.current?.boostDepositedAmount) {
+>>>>>>> staging
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);
   };
 
+<<<<<<< HEAD
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
     cancelBoostWithdrawalConfirmation();
@@ -117,14 +170,19 @@ export const useBoostFarmWithdrawal = ({
     setIsWithdrawing(false);
   };
 
+=======
+>>>>>>> staging
   return {
     withdrawValueError,
     withdrawValue,
     handleWithdrawalFieldChange,
+<<<<<<< HEAD
     isWithdrawing,
     handleWithdraw,
     setUseBiconomy,
     useBiconomy,
+=======
+>>>>>>> staging
     hasErrors: withdrawValueError != '',
     isFetchingSupportedTokenInfo,
     selectedSupportedTokenInfo,

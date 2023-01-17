@@ -42,6 +42,10 @@ interface IFarmCard {
   balance?: string;
   balanceInUSD?: string;
   poolShare?: number;
+<<<<<<< HEAD
+=======
+  isLocked: boolean;
+>>>>>>> staging
 }
 
 export const FarmCard = ({
@@ -60,6 +64,10 @@ export const FarmCard = ({
   isBoost = false,
   viewType,
   poolShare,
+<<<<<<< HEAD
+=======
+  isLocked = false,
+>>>>>>> staging
   ...rest
 }: IFarmCard) => {
   const { isLightMode } = useMode();
@@ -131,7 +139,11 @@ export const FarmCard = ({
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
                     <Text>APY</Text>
                     <Text size="xlarge" weight="bold">
+<<<<<<< HEAD
                       {interest}%
+=======
+                      {toExactFixed(interest, 2)}%
+>>>>>>> staging
                     </Text>
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
@@ -176,6 +188,7 @@ export const FarmCard = ({
               >
                 {isLoading ? (
                   <>
+<<<<<<< HEAD
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
@@ -186,6 +199,26 @@ export const FarmCard = ({
                     )}
                     <Box direction="row" justify="end" fill align="center">
                       <Skeleton count={1} height="14px" width="76px" />
+=======
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    {viewType == 'View my farms only' && (
+                      <Skeleton
+                        height="14px"
+                        width="76px"
+                        borderRadius="20px"
+                      />
+                    )}
+                    <Box direction="row" justify="end" fill align="center">
+                      <Skeleton
+                        height="14px"
+                        width="76px"
+                        borderRadius="20px"
+                      />
+>>>>>>> staging
                     </Box>
                   </>
                 ) : (
@@ -193,6 +226,10 @@ export const FarmCard = ({
                     {viewType != 'View my farms only' ? (
                       <>
                         <span style={{ fontWeight: 'bold' }}>
+<<<<<<< HEAD
+=======
+                          {isLocked && <span>🔒</span>}
+>>>>>>> staging
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
@@ -296,6 +333,10 @@ export const FarmCard = ({
                     ) : (
                       <>
                         <span style={{ fontWeight: 'bold' }}>
+<<<<<<< HEAD
+=======
+                          {isLocked && <span>🔒</span>}
+>>>>>>> staging
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>

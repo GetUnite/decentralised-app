@@ -17,6 +17,10 @@ export const FarmDepositTab = ({
   selectedFarm,
   selectSupportedToken,
   selectedSupportedToken,
+<<<<<<< HEAD
+=======
+  updateFarmInfo,
+>>>>>>> staging
   ...rest
 }) => {
   const {
@@ -33,7 +37,11 @@ export const FarmDepositTab = ({
     currentStep,
     selectedSupportedTokenSteps,
     handleCurrentStep,
+<<<<<<< HEAD
   } = useFarmDeposit({ selectedFarm, selectedSupportedToken });
+=======
+  } = useFarmDeposit({ selectedFarm, selectedSupportedToken, updateFarmInfo });
+>>>>>>> staging
 
   return (
     <Box fill>
@@ -77,7 +85,11 @@ export const FarmDepositTab = ({
             </Box>
             <Box margin={{ top: '11px' }}>
               <ProjectedWeeklyInfo
+<<<<<<< HEAD
                 depositedAmount={selectedFarm?.depositedAssetValue}
+=======
+                depositedAmount={selectedFarm?.depositedAmount}
+>>>>>>> staging
                 inputValue={depositValue}
                 interest={selectedFarm?.interest}
                 sign={selectedFarm?.sign}
