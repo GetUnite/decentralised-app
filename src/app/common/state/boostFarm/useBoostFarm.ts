@@ -3,9 +3,7 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
-  convertToLP,
-  depositIntoBoostFarm,
-  getBoostFarmInterest,
+  convertToLP, depositIntoBoostFarm, getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
   withdrawFromBoostFarm
@@ -635,7 +633,7 @@ export const useBoostFarm = ({ id }) => {
   // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
+      const farm = await getUpdatedFarmInfo(selectedFarm.current);
       selectedFarmInfo.current = farm;
       setSelectedSupportedToken(
         farm.supportedTokens?.find(
