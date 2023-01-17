@@ -26,7 +26,7 @@ export const FarmsBlock = ({
     <Box
       gap="18px"
       background="card"
-      round="8px"
+      round="16px"
       pad={{ bottom: '20px' }}
       style={isLightMode ? { border: '1px solid #EBEBEB' } : {}}
     >

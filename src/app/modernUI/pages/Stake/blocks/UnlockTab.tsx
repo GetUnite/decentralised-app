@@ -45,7 +45,7 @@ export const UnlockTab = ({
           <>
             <Box margin={{ top: 'large' }}>
               {isLoading ? (
-                <Skeleton />
+                <Skeleton borderRadius="20px"/>
               ) : (
                 <Text textAlign="center" weight="bold" size="18px">
                   You have {toExactFixed(alluoInfo?.locked, 2)} $ALLUO staked
