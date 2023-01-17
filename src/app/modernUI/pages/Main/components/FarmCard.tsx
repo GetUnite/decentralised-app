@@ -7,9 +7,8 @@ import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import swap from 'app/modernUI/images/swap.svg';
 import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
+import { Box, Button, Card, Grid, ResponsiveContext, Skeleton, Text } from 'grommet';
 import { useState } from 'react';
-import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
@@ -178,7 +177,7 @@ export const FarmCard = ({
               >
                 {isLoading ? (
                   <>
-                    <Skeleton count={1} height="14px" width="76px" />
+                    <Skeleton count={1} height="14px" width="76px" round="20px"/>
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />
                     <Skeleton count={1} height="14px" width="76px" />

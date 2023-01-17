@@ -309,7 +309,8 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     ],
     lowSlippageTokenLabels: [
       //'stETH',
-      'wETH',
+      'FRAX',
+      'USDC'
     ],
     apyFarmAddresses: {
       baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
@@ -406,7 +407,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       },
     ],
     lowSlippageTokenLabels: [
-      'wETH',
+      'CRV',
     ],
     apyFarmAddresses: {
       baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',

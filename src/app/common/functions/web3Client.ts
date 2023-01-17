@@ -270,7 +270,7 @@ export const getProvider = chain => {
 
 export const processSendError = error => {
   if (error.code == 4001) {
-    throw 'User denied message signature';
+    throw 'Transaction rejected in wallet';
   }
 
   if (error.code == 417) {
@@ -280,7 +280,7 @@ export const processSendError = error => {
   const errorString = error.toString();
 
   if (errorString.includes('user rejected signing')) {
-    throw 'User denied message signature';
+    throw 'Transaction rejected in wallet';
   }
 
   if (errorString.includes('reverted by the EVM')) {
