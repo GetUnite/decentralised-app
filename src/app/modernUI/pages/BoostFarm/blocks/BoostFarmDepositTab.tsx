@@ -70,7 +70,7 @@ export const BoostFarmDepositTab = ({
                 label={`Deposit ${
                   selectedSupportedToken ? selectedSupportedToken?.label : ''
                 }`}
-                tokenSign={selectedFarmInfo.current?.sign}
+                tokenSign={selectedSupportedToken?.sign}
                 onValueChange={handleDepositValueChange}
                 value={depositValue}
                 isLoadingMaxValue={isFetchingSupportedTokenInfo}
