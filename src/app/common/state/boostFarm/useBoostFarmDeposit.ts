@@ -134,7 +134,7 @@ export const useBoostFarmDeposit = ({
         break;
 
       case 1:
-        (await selectedFarmInfo.currenct?.isLocked)
+        (await selectedFarmInfo.current?.isLocked)
           ? startBoostDepositConfirmation()
           : handleDeposit();
         break;
