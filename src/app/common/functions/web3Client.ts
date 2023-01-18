@@ -1251,12 +1251,15 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
 
   const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
 
-  // The fiatId for USDC is 1
+  // fiatIds:
+  // USD: 0
+  // EUR: 1
+  // ETH: 2
   const priceInUSDC = await callContract(
     abi,
     priceFeedRouter,
     'getPrice(address,uint256)',
-    [lPTokenAddress, 1],
+    [lPTokenAddress, 0],
     chain,
   );
 
