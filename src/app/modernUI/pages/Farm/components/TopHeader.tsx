@@ -10,7 +10,7 @@ export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
   return (
     <>
       {isLoading ? (
-        <Skeleton count={2} height="18px" />
+        <Skeleton count={2} height="22px" borderRadius="20px"/>
       ) : (
         <Text textAlign="center" weight="bold" size="18px">
           Your balance currently earning <br />

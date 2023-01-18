@@ -12,7 +12,7 @@ export const Info = ({ label, value, border = true, isLoading, ...rest }) => {
       >
         {isLoading ? (
           <Box fill>
-            <Skeleton height="14px" />
+            <Skeleton height="14px" borderRadius="20px"/>
           </Box>
         ) : (
           <>

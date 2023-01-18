@@ -67,7 +67,7 @@ export const Stake = ({ ...rest }) => {
                     <Box gap="16px">
                       {+alluoInfo?.unlocked > 0 && allTimersAreFinished && (
                         <Box
-                          round={'medium'}
+                          round="16px"
                           width="245px"
                           align="start"
                           justify="between"
@@ -165,7 +165,7 @@ export const Stake = ({ ...rest }) => {
                 {walletAccountAtom && (
                   <Box gap="12px">
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -195,7 +195,7 @@ export const Stake = ({ ...rest }) => {
                             <Box direction="row" justify="between" fill>
                               {isLoading || isLoadingRewards ? (
                                 <Box fill>
-                                  <Skeleton height="18px" />
+                                  <Skeleton height="18px" borderRadius="20px" />
                                 </Box>
                               ) : (
                                 <>
@@ -215,7 +215,7 @@ export const Stake = ({ ...rest }) => {
 
                           <Box margin={{ bottom: '16px' }}>
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <Box direction="row" justify="between">
                                 <Text weight="bold" size="16px">
@@ -267,7 +267,7 @@ export const Stake = ({ ...rest }) => {
                       )}
                     </Box>
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -285,18 +285,18 @@ export const Stake = ({ ...rest }) => {
                     >
                       <Box fill gap="12px">
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="16px" />
+                          <Skeleton height="16px" borderRadius="20px" />
                         ) : (
                           <Text size="16px" weight="bold">
                             Pending rewards
                           </Text>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton />
+                          <Skeleton borderRadius="20px" />
                         ) : (
                           <Box direction="row" justify="between">
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <>
                                 <Text weight="bold" size="16px">
@@ -311,7 +311,7 @@ export const Stake = ({ ...rest }) => {
                           </Box>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="8px" />
+                          <Skeleton height="8px" borderRadius="20px" />
                         ) : (
                           <Text size="8px" weight={400}>
                             Available {nextHarvestDate.format('DD MMM')} · Last

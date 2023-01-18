@@ -42,7 +42,6 @@ export const isSmall = size =>
 export const theme = deepMerge(grommet, {
   global: {
     focus: { outline: { color: { dark: colors.WHITE, light: colors.BLACK } } },
-
     breakpoints: {
       xsmall: {
         value: 500,
@@ -340,6 +339,11 @@ export const theme = deepMerge(grommet, {
       };`,
   },
   rangeInput: {
+    track:{
+      height: '1px',
+      color: { dark: colors.WHITE, light: colors.BLACK },
+      opacity: 1,
+    },
     extend: ({ theme }) => `
         margin: 0.7em 1em ;
       `,

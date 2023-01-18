@@ -1,5 +1,5 @@
 import { walletAccount } from 'app/common/state/atoms';
-import { Box, Paragraph, Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { useRecoilState } from 'recoil';
 
@@ -12,11 +12,7 @@ export const HeadingText = ({
 }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
-  const headingText = isLoading ? (
-    <Box fill>
-      <Skeleton count={1} height="36px" />
-    </Box>
-  ) : (
+  const headingText = (
     <>
       {!canStartStreams ? (
         <span>
@@ -46,23 +42,27 @@ export const HeadingText = ({
 
   return (
     <>
-      <Text size="36px" weight="bold">
-        {!walletAccountAtom
-          ? 'Connect your wallet to see your available assets to stream.'
-          : headingText}
-      </Text>
+      {isLoading ? (
+        <Skeleton count={1} height="50px" borderRadius="20px" />
+      ) : (
+        <Text size="36px" weight="bold">
+          {!walletAccountAtom
+            ? 'Connect your wallet to see your available assets to stream.'
+            : headingText}
+        </Text>
+      )}
       <Box margin={{ top: '35px' }}>
         {isLoading && walletAccountAtom ? (
           <Box fill>
-            <Skeleton count={2} height="18px" />
+            <Skeleton count={2} height="22px" borderRadius="20px" />
           </Box>
         ) : (
-          <Paragraph fill>
+          <Text size="18px">
             AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC
             and ETH and BTC to dollar-pegged stablecoins (one way at a time)
             whilst earning yield on all assets you stream.
-          </Paragraph>
-        )}{' '}
+          </Text>
+        )}
       </Box>
     </>
   );

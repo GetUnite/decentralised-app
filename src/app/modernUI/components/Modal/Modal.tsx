@@ -40,7 +40,7 @@ export const Modal = ({
   return (
     <Box justify="center" align="center">
       <Box
-        round={'medium'}
+        round={'16px'}
         overflow="auto"
         width="medium"
         align="start"
