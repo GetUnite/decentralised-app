@@ -49,8 +49,3 @@ export type TBoostFarm = TFarm & {
   // For locked boost farms
   isLocked?: boolean;
 }
-
-export type TDepositStep = {
-  id: number;
-  label: string;
-};

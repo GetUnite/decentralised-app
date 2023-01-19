@@ -21,7 +21,7 @@ export function RightAlignToggle({ label, isToggled, setIsToggled, disabled=fals
         </Text>
         <Button onClick={() => setIsToggled(!isToggled)} disabled={disabled}>
           <Box
-            width="46px"
+            width="38px"
             height="20px"
             round="10px"
             pad="0px 3px 0px 3px"

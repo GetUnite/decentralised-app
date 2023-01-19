@@ -7,7 +7,7 @@ import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import swap from 'app/modernUI/images/swap.svg';
 import { isSmall } from 'app/modernUI/theme';
-import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
+import { Box, Button, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
@@ -97,14 +97,16 @@ export const FarmCard = ({
       {size => (
         <>
           {isSmall(size) ? (
-            <Card
+            <Box
               onClick={() => {
                 if (!disabled && !!walletAccountAtom) navigate('/farm/' + id);
                 else setNotification('Connect your wallet', 'error');
               }}
-              style={{ position: 'relative' }}
-              pad={{ horizontal: 'medium', vertical: 'medium' }}
-              margin={{ top: 'small' }}
+              style={{
+                position: 'relative',
+                borderTop: `0.5px solid ${dividerColor}`,
+              }}
+              pad="large"
               height="fit"
               background="card"
               align="center"
@@ -133,17 +135,34 @@ export const FarmCard = ({
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
                     <Text>APY</Text>
                     <Text size="xlarge" weight="bold">
-                      {toExactFixed(interest, 2)}%
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="76px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <>{toExactFixed(interest, 2)}%</>
+                      )}
                     </Text>
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }} align="end">
                     <Text margin="none">TVL</Text>
-                    <Text margin={{ top: '-5px' }}>{tvl}</Text>
+                    <Text margin={{ top: '-5px' }}>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="76px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <>{tvl}</>
+                      )}
+                    </Text>
                   </Box>
                 </Box>
               </Box>
-              <Box fill="horizontal" margin={{ top: 'medium' }} />
-            </Card>
+            </Box>
           ) : (
             <Box
               pad={{ horizontal: '34px', vertical: 'none' }}

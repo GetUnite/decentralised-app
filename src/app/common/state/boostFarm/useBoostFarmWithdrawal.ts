@@ -1,6 +1,4 @@
-import {
-  convertFromUSDC
-} from 'app/common/functions/boostFarm';
+import { getMaximumWithdrawAmount } from 'app/common/functions/boostFarm';
 import { useEffect, useRef, useState } from 'react';
 
 export const useBoostFarmWithdrawal = ({
@@ -13,10 +11,9 @@ export const useBoostFarmWithdrawal = ({
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
 
   // data
-  const selectedSupportedTokenInfo =
-    useRef<any>({
-      boostDepositedAmount: 0,
-    });
+  const selectedSupportedTokenInfo = useRef<any>({
+    boostDepositedAmount: 0,
+  });
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
@@ -33,15 +30,14 @@ export const useBoostFarmWithdrawal = ({
   const updateSelectedTokenBalance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    // For booster farm withdrawals
-    // The balance of the farm is returned in LP which is converted into USDC and needs to be converted to each supported token for withdrawal
-    // ex: wETH is selected => depositedAmount = 1500 USDC = 1 wETH => Max withdraw value is 1
-    const boostDepositedAmount = await convertFromUSDC(
-      selectedSupportedToken.address,
-      selectedSupportedToken.decimals,
-      // here the deposited amount is in USDC
-      selectedFarmInfo.current?.depositedAmount,
-    );
+    const boostDepositedAmount =
+      selectedFarmInfo.current?.depositedAmountInLP > 0
+        ? await getMaximumWithdrawAmount(
+            selectedFarmInfo.current.farmAddress,
+            selectedSupportedToken.address,
+            selectedFarmInfo.current?.depositedAmountInLP,
+          )
+        : 0;
     selectedSupportedTokenInfo.current = {
       boostDepositedAmount: boostDepositedAmount,
     };

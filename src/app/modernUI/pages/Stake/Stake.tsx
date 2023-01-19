@@ -41,6 +41,13 @@ export const Stake = ({ ...rest }) => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    // lock
+    lockValue,
+    setLockValue,
+    isApproving,
+    isLocking,
+    handleApprove,
+    handleLock,
     // unlock
     unlockValue,
     setUnlockValue,
@@ -130,35 +137,53 @@ export const Stake = ({ ...rest }) => {
                 </Box>
               </Box>
               <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-                {showReunlockConfirmation ? (
-                  <ReunlockConfirmation
-                    handleUnlock={handleUnlock}
-                    cancelReunlockConfirmation={cancelReunlockConfirmation}
-                  />
+                {isLocking || isApproving || isWithdrawing ? (
+                  <Box
+                    align="center"
+                    justify="center"
+                    fill="vertical"
+                    margin={{ top: 'large', bottom: 'medium' }}
+                    style={{
+                      minHeight: '536px',
+                    }}
+                  >
+                    <Spinner pad="large" />
+                  </Box>
                 ) : (
-                  <Tabs>
-                    <Tab title="Lock">
-                      <LockTab
-                        isLoading={isLoading}
-                        alluoInfo={alluoInfo}
-                        updateAlluoInfo={updateAlluoInfo}
-                      />
-                    </Tab>
-                    <Tab title="Unlock">
-                      <UnlockTab
-                        isLoading={isLoading}
-                        alluoInfo={alluoInfo}
-                        startReunlockConfirmation={startReunlockConfirmation}
-                        showReunlockConfirmation={showReunlockConfirmation}
-                        cancelReunlockConfirmation={cancelReunlockConfirmation}
-                        allTimersAreFinished={allTimersAreFinished}
-                        unlockValue={unlockValue}
-                        setUnlockValue={setUnlockValue}
-                        isUnlocking={isUnlocking}
+                  <>
+                    {showReunlockConfirmation ? (
+                      <ReunlockConfirmation
                         handleUnlock={handleUnlock}
+                        cancelReunlockConfirmation={cancelReunlockConfirmation}
                       />
-                    </Tab>
-                  </Tabs>
+                    ) : (
+                      <Tabs>
+                        <Tab title="Lock">
+                          <LockTab
+                            isLoading={isLoading}
+                            alluoInfo={alluoInfo}
+                            lockValue={lockValue}
+                            setLockValue={setLockValue}
+                            handleApprove={handleApprove}
+                            handleLock={handleLock}
+                          />
+                        </Tab>
+                        <Tab title="Unlock">
+                          <UnlockTab
+                            isLoading={isLoading}
+                            alluoInfo={alluoInfo}
+                            startReunlockConfirmation={
+                              startReunlockConfirmation
+                            }
+                            allTimersAreFinished={allTimersAreFinished}
+                            unlockValue={unlockValue}
+                            setUnlockValue={setUnlockValue}
+                            handleUnlock={handleUnlock}
+                          />
+                        </Tab>
+                      </Tabs>
+                    )}
+                  </>
                 )}
               </Modal>
               <Box flex>
@@ -203,7 +228,7 @@ export const Stake = ({ ...rest }) => {
                                   <Box direction="row">
                                     <TokenIcon key={0} label={'CVX'} />
                                     <TokenIcon
-                                      key={0}
+                                      key={1}
                                       label={'ETH'}
                                       style={{ marginLeft: '-0.6rem' }}
                                     />

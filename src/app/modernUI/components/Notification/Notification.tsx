@@ -11,16 +11,22 @@ export const Notification = ({ ...rest }) => {
   const [notificationAtom] = useRecoilState(notification);
   const { resetNotification } = useNotification();
 
-  const textColors = { success: colors.GREEN, error: colors.ERROR, info: colors.BLUE };
-  const bgColors = isLightMode ? {
-    success: 'successSoft',
-    error: 'errorSoft',
-    info: 'infoSoft',
-  } : {
-    success: 'darkSuccessSoft',
-    error: 'darkErrorSoft',
-    info: 'darkInfoSoft',
+  const textColors = {
+    success: colors.GREEN,
+    error: colors.ERROR,
+    info: colors.BLUE,
   };
+  const bgColors = isLightMode
+    ? {
+        success: 'successSoft',
+        error: 'errorSoft',
+        info: 'infoSoft',
+      }
+    : {
+        success: 'darkSuccessSoft',
+        error: 'darkErrorSoft',
+        info: 'darkInfoSoft',
+      };
   const backgroundColor = bgColors[notificationAtom.type];
   const color = textColors[notificationAtom.type];
 
@@ -62,6 +68,7 @@ export const Notification = ({ ...rest }) => {
           style={{
             position: 'absolute',
             right: '20px',
+            height: '16px',
           }}
         >
           <Box

@@ -1,6 +1,6 @@
 import { Mobile } from 'app/modernUI/pages';
-import { useEffect } from 'react';
-import { BrowserView, MobileView } from 'react-device-detect';
+import { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 import { IntercomProvider } from 'react-use-intercom';
 import { RecoilRoot } from 'recoil';
 import { Router } from './Router';
@@ -12,15 +12,12 @@ function App() {
     };
   }, []);
 
+  const [useWebApp, setUseWebApp] = useState<boolean>(false);
+  
   return (
     <RecoilRoot>
       <IntercomProvider appId={process.env.REACT_APP_INTERCOM_APP_ID} autoBoot>
-        <BrowserView>
-          <Router />
-        </BrowserView>
-        <MobileView>
-          <Mobile />
-        </MobileView>
+        {isMobile && !useWebApp ? <Mobile setUseWebApp={setUseWebApp}/> : <Router />}
       </IntercomProvider>
     </RecoilRoot>
   );

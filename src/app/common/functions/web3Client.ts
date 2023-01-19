@@ -372,6 +372,39 @@ export const sendTransaction = async (
   }
 };
 
+export const callStatic = async (
+  abi,
+  address,
+  functionSignature,
+  params = []
+) => {
+  try {
+    const provider = walletProvider;
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(address, abi, signer);
+
+    const method = contract.callStatic[functionSignature].apply(
+      null,
+      params,
+    );
+
+    const tx = await method;
+
+    console.log("tx on webclint", tx);
+    return tx;
+  } catch (error) {
+    console.log(error);
+    console.log({
+      abi: abi,
+      address: address,
+      functionSignature: functionSignature,
+      params: params,
+      walletAddress: walletAddress,
+    });
+    return processSendError(error);
+  }
+};
+
 export const sendMetaTransaction = async (
   abi,
   address,
