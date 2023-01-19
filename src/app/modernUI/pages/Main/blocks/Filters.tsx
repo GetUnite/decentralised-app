@@ -37,16 +37,16 @@ export const Filters = ({
       {size => (
         <Box direction="row" margin={{ bottom: '13px' }} justify="between">
           <Box
-            direction="row"
+            direction={isSmall(size) ? 'column' : 'row'}
             justify="start"
-            gap="13px"
             style={{ fontSize: '16px' }}
+            gap="13px"
           >
             <Filter
               heading="All filters"
               style={{ width: '80px', padding: 0 }}
               icon={filter}
-              buttonStyle={{ color: colors.BLUE, fontSize: '14px' }}
+              buttonStyle={{ color: colors.BLUE, fontSize: '14px', paddingLeft: '0px' }}
               plain
               options={possibleTypes}
               value={typeFilter}
@@ -300,6 +300,7 @@ export const Filters = ({
                 }}
               </CheckBoxGroup>
             </Filter>
+            <Box direction='row' gap="13px">
             <Filter
               heading={
                 typeFilter.length == 1
@@ -598,6 +599,7 @@ export const Filters = ({
                 }}
               </CheckBoxGroup>
             </Filter>
+            </Box>
           </Box>
           {walletAccountAtom && !isSmall(size) && (
             <Box direction="row" gap="9px" align="center">
