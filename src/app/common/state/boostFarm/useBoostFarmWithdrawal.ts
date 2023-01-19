@@ -1,19 +1,15 @@
-import { getMaximumWithdrawAmount } from 'app/common/functions/boostFarm';
-import { useEffect, useRef, useState } from 'react';
+import { getMaximumLPValueAsToken } from 'app/common/functions/boostFarm';
+import { useEffect, useState } from 'react';
 
 export const useBoostFarmWithdrawal = ({
   selectedFarmInfo,
   selectedSupportedToken,
+  selectedSupportedTokenInfo,
   withdrawValue,
   setWithdrawValue,
 }) => {
   // inputs validation
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
-
-  // data
-  const selectedSupportedTokenInfo = useRef<any>({
-    boostDepositedAmount: 0,
-  });
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
@@ -32,7 +28,7 @@ export const useBoostFarmWithdrawal = ({
 
     const boostDepositedAmount =
       selectedFarmInfo.current?.depositedAmountInLP > 0
-        ? await getMaximumWithdrawAmount(
+        ? await getMaximumLPValueAsToken(
             selectedFarmInfo.current.farmAddress,
             selectedSupportedToken.address,
             selectedSupportedToken.decimals,

@@ -19,7 +19,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
-import { getBoostFarmInterest } from '../functions/boostFarm';
+import {
+  getBoostFarmInterest,
+  getMaximumLPValueAsToken
+} from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
 
 const possibleStableTokens = [
@@ -74,7 +77,6 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  
   useEffect(() => {
     fetchFarmsInfo();
   }, [walletAccountAtom]);
@@ -217,7 +219,7 @@ export const useMain = () => {
         switch (farm.underlyingTokenAddress) {
           case EPolygonAddresses.WBTC:
             tokenPriceAddress = EEthereumAddresses.WBTC;
-            tokenDecimals= 8;
+            tokenDecimals = 8;
             break;
           case EPolygonAddresses.WETH:
             tokenPriceAddress = EEthereumAddresses.WETH;
@@ -281,8 +283,16 @@ export const useMain = () => {
       );
       farmInfo.depositedAmountInLP = depositedAmountInLP;
       // Let's use the depositedAmount to store the deposited amount in USD(C)
-      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+      // callStatic withdraw from pool with the maximum amount of LP tokens to get the equivalent on the request token
+      farmInfo.depositedAmount =
+        +depositedAmountInLP > 0
+          ? await getMaximumLPValueAsToken(
+              farm.farmAddress,
+              EEthereumAddresses.USDC,
+              6,
+              depositedAmountInLP,
+            )
+          : 0;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -448,6 +458,7 @@ export const useMain = () => {
     possibleViewTypes,
     setViewType,
     totalDepositedAmountInUsd,
-    isFarming: availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0
+    isFarming:
+      availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0,
   };
 };
