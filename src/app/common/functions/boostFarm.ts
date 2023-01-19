@@ -232,7 +232,7 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
   return valueInUSDC * tokenPrice;
 };
 
-export const getMaximumWithdrawAmount = async (
+export const getMaximumLPValueAsToken = async (
   farmAddress,
   tokenAddress,
   tokenDecimals,

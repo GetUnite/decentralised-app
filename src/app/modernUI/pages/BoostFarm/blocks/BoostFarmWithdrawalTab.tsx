@@ -21,6 +21,7 @@ export const BoostFarmWithdrawalTab = ({
   // withdraw
   withdrawValue,
   setWithdrawValue,
+  selectedSupportedTokenInfo,
   startBoostWithdrawalConfirmation,
   isWithdrawing,
   // biconomy
@@ -32,10 +33,10 @@ export const BoostFarmWithdrawalTab = ({
     withdrawValueError,
     handleWithdrawalFieldChange,
     isFetchingSupportedTokenInfo,
-    selectedSupportedTokenInfo,
   } = useBoostFarmWithdrawal({
     selectedFarmInfo,
     selectedSupportedToken,
+    selectedSupportedTokenInfo,
     withdrawValue,
     setWithdrawValue,
   });

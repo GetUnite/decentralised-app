@@ -3,9 +3,11 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
-  convertToLP, depositIntoBoostFarm, getBoostFarmInterest,
+  depositIntoBoostFarm,
+  getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getMaximumLPValueAsToken,
   withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
@@ -305,9 +307,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'wETH',
-    ],
+    lowSlippageTokenLabels: ['wETH'],
     apyFarmAddresses: {
       baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -402,9 +402,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'CRV',
-    ],
+    lowSlippageTokenLabels: ['CRV'],
     apyFarmAddresses: {
       baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -500,10 +498,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'FRAX',
-      'USDC'
-    ],
+    lowSlippageTokenLabels: ['FRAX', 'USDC'],
     apyFarmAddresses: {
       baseApyAddress: 'd05cb04d-f1e5-451d-95a2-6a3a9da001ad',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -541,6 +536,10 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
+  // withdraw selected supportedTokenInfo
+  const selectedSupportedTokenInfo = useRef<any>({
+    boostDepositedAmount: 0,
+  });
 
   // booster farm rewards control
   const rewardsInfo = useRef<any>(defaultRewards);
@@ -674,7 +673,15 @@ export const useBoostFarm = ({ id }) => {
         farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        const depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+        const depositedAmount =
+          +depositedAmountInLP > 0
+            ? await getMaximumLPValueAsToken(
+                farm.farmAddress,
+                EEthereumAddresses.USDC,
+                6,
+                depositedAmountInLP,
+              )
+            : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
@@ -774,19 +781,19 @@ export const useBoostFarm = ({ id }) => {
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
     setShowBoostWithdrawalConfirmation(false);
+
+    // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
+    const withdrawPercentage = Math.round(
+      +withdrawValue / +selectedSupportedTokenInfo.current,
+    );
+    const valueToWithdraw =
+      selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
+
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarmInfo.current.farmAddress,
         selectedSupportedToken.address,
-        // The withdraw value is always referent to the selected supported token
-        // But the contract for booster farm withdrawal expects the value as LP/Shares
-        // Thus, convert the value into LP
-        await convertToLP(
-          withdrawValue,
-          selectedSupportedToken.address,
-          selectedSupportedToken.decimals,
-          selectedFarmInfo.current.valueOf1LPinUSDC,
-        ),
+        valueToWithdraw,
         selectedSupportedToken.decimals,
         selectedFarmInfo.current.chain,
         useBiconomy,
@@ -882,6 +889,7 @@ export const useBoostFarm = ({ id }) => {
     //withdraw
     withdrawValue,
     setWithdrawValue,
+    selectedSupportedTokenInfo,
     handleWithdraw,
     isWithdrawing,
     showBoostWithdrawalConfirmation,

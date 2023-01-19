@@ -68,6 +68,7 @@ export const BoostFarm = () => {
     //withdraw
     withdrawValue,
     setWithdrawValue,
+    selectedSupportedTokenInfo,
     handleWithdraw,
     isWithdrawing,
     showBoostWithdrawalConfirmation,
@@ -186,6 +187,7 @@ export const BoostFarm = () => {
                           // withdraw
                           withdrawValue={withdrawValue}
                           setWithdrawValue={setWithdrawValue}
+                          selectedSupportedTokenInfo={selectedSupportedTokenInfo}
                           startBoostWithdrawalConfirmation={
                             startBoostWithdrawalConfirmation
                           }
