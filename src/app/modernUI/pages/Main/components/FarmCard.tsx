@@ -116,10 +116,19 @@ export const FarmCard = ({
               {disabled && <Disabled />}
               <Box fill direction="row" justify="between">
                 <Box>
-                  <Box direction="row" gap="small">
-                    {icons.map((icon, i) => (
-                      <TokenIcon key={i} label={icon} />
-                    ))}
+                  <Box direction="column" gap="small">
+                    <Box direction='row' gap="small">
+                      {icons.slice(0, 6).map((icon, i) => (
+                        <TokenIcon key={i} label={icon} />
+                      ))}
+                    </Box>
+                    {icons.length > 6 && (
+                      <Box direction='row' gap="small">
+                        {icons.slice(6, icons.length - 1).map((icon, i) => (
+                          <TokenIcon key={i} label={icon} />
+                        ))}
+                      </Box>
+                    )}
                   </Box>
                   <Box pad="none" margin={{ top: 'medium' }}>
                     <Text>Asset</Text>
