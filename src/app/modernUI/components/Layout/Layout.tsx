@@ -44,7 +44,15 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="start"
             fill="horizontal"
-            height={notificationAtom.message != '' ? '148px' : '100px'}
+            height={
+              isSmall(size)
+                ? notificationAtom.message != ''
+                  ? '108px'
+                  : '60px'
+                : notificationAtom.message != ''
+                ? '148px'
+                : '100px'
+            }
             style={{ position: 'sticky', top: '0px', zIndex: 2 }}
           >
             <Nav
@@ -55,7 +63,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               pad={{ horizontal: 'medium', vertical: 'small' }}
               gap="none"
               fill="horizontal"
-              height="100px"
+              height={isSmall(size) ? '60px' : '100px'}
             >
               <Box direction="row" align="center" style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -76,7 +84,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   </Link>
                 </div>
               </Box>
-              {isSmall(size) || (
+              {!isSmall(size) && (
                 <MenuItem
                   direction="row"
                   gap="large"
@@ -121,11 +129,19 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               <Box
                 direction={isSmall(size) ? 'column' : 'row'}
                 justify={isSmall(size) ? 'center' : 'between'}
+                pad={{ horizontal: isSmall(size) ? '20px' : '' }}
                 fill
               >
-                <Box>
+                <Box
+                  direction={isSmall(size) ? 'row' : 'column'}
+                  justify={isSmall(size) ? 'between' : 'start'}
+                >
                   <img width="137px" src={isLightMode ? logo : logoDark} />
-                  <Box direction="row" gap="24px" margin={{ top: '60px' }}>
+                  <Box
+                    direction="row"
+                    gap="24px"
+                    margin={{ top: isSmall(size) ? '' : '60px' }}
+                  >
                     <a
                       href="https://apps.apple.com/us/app/alluo/id1604572992"
                       target="_blank"
@@ -142,8 +158,8 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                     </a>
                   </Box>
                 </Box>
-                <Box direction="row" gap="64px">
-                  <Box>
+                <Box direction="row" gap="64px" justify={isSmall(size) ? 'center' : 'end'} margin={{top: isSmall(size) ? '20px' : ''}}>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       About us
                     </Text>
@@ -184,7 +200,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       The vote
                     </a>
                   </Box>
-                  <Box>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       Social
                     </Text>
@@ -237,7 +253,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       Telegram
                     </a>
                   </Box>
-                  <Box>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       Support
                     </Text>
@@ -259,7 +275,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 direction="row"
                 justify="between"
                 fill
-                pad={{ top: '50px' }}
+                pad={{ top: '50px', horizontal: isSmall(size) ? '20px' : ''}}
                 style={{ borderTop: `2px solid ${dividerColor}` }}
               >
                 <Box direction="row" gap="medium">
@@ -296,13 +312,25 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   >
                     <Image src={isLightMode ? discord : discordDark} />
                   </a>
-                  <a href="https://blog.alluo.io/" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://blog.alluo.io/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? medium : mediumDark} />
                   </a>
-                  <a href="https://twitter.com/AlluoApp" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://twitter.com/AlluoApp"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? twitter : twitterDark} />
                   </a>
-                  <a href="https://t.me/+Ir2-mWe8fQhhNzQ0" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://t.me/+Ir2-mWe8fQhhNzQ0"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? telegram : telegramDark} />
                   </a>
                 </Box>

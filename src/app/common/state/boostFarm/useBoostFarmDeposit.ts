@@ -5,10 +5,10 @@ import {
   getBalanceOf
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
-import { TDepositStep } from 'app/common/types/farm';
+import { TPossibleStep } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 
-const possibleDepositSteps: TDepositStep[] = [
+const possibleDepositSteps: TPossibleStep[] = [
   { id: 0, label: 'Approve' },
   { id: 1, label: 'Deposit' },
 ];
@@ -35,7 +35,7 @@ export const useBoostFarmDeposit = ({
 
   // Deposit steps
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const selectedSupportedTokenSteps = useRef<TDepositStep[]>();
+  const selectedSupportedTokenSteps = useRef<TPossibleStep[]>();
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
@@ -51,7 +51,7 @@ export const useBoostFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    let neededSteps: TDepositStep[] = [];
+    let neededSteps: TPossibleStep[] = [];
 
     const allowance = await getAllowance(
       selectedSupportedToken?.address,

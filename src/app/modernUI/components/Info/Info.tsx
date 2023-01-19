@@ -11,7 +11,7 @@ export const Info = ({ label, value, border = true, isLoading, ...rest }) => {
         style={border ? { borderBottom: '1px solid #EDEDED' } : {}}
       >
         {isLoading ? (
-          <Box fill>
+          <Box height="21px" fill="horizontal">
             <Skeleton height="14px" borderRadius="20px"/>
           </Box>
         ) : (

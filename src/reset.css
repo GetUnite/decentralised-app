@@ -9,6 +9,7 @@ body,
   margin: 0;
 }
 #root {
+  height: calc(100% - 18px);
   padding-right: calc(100vw - 100%);
 }
 

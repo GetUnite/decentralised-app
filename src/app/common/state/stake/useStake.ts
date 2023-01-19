@@ -2,6 +2,7 @@ import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
+  approveAlluoStaking,
   claimStakingRewards,
   getAlluoBalance,
   getAlluoStakingAllowance,
@@ -11,6 +12,7 @@ import {
   getStakingPendingRewards,
   getTotalAlluoLocked,
   getUnlockedAlluo,
+  lockAlluo,
   unlockAllAlluo,
   unlockAlluo,
   withdrawAlluo
@@ -49,12 +51,13 @@ export const useStake = () => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // other state control files
-  const { setNotification, resetNotification } = useNotification();
+  const { setNotification } = useNotification();
 
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
 
   // inputs
+  const [lockValue, setLockValue] = useState<string>('');
   const [unlockValue, setUnlockValue] = useState<number>(0);
 
   //rewards control
@@ -69,6 +72,8 @@ export const useStake = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isLocking, setIsLocking] = useState<boolean>(false);
   const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
@@ -87,12 +92,6 @@ export const useStake = () => {
       updateAlluoInfo();
     }
   }, [walletAccountAtom]);
-
-  const resetState = () => {
-    resetNotification();
-    setShowReunlockConfirmation(false);
-    setIsWithdrawing(false);
-  };
 
   useEffect(() => {
     if (walletAccountAtom && alluoInfo) {
@@ -127,9 +126,48 @@ export const useStake = () => {
     }
     setIsLoading(false);
   };
+  const handleApprove = async () => {
+    setIsApproving(true);
+
+    try {
+      const tx = await approveAlluoStaking();
+      setNotification(
+        'Successfully approved',
+        'success',
+        tx.transactionHash,
+        EChain.ETHEREUM,
+      );
+      await updateAlluoInfo();
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+
+    setIsApproving(false);
+  };
+
+  const handleLock = async () => {
+    setIsLocking(true);
+
+    try {
+      heapTrack('stakeLockAmount', { amount: lockValue });
+      heapTrack('stakeLockButtonClicked');
+      const tx = await lockAlluo(lockValue);
+      setNotification(
+        'Successfully locked',
+        'success',
+        tx.transactionHash,
+        EChain.ETHEREUM,
+      );
+      await updateAlluoInfo();
+      setLockValue(null);
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+
+    setIsLocking(false);
+  };
 
   const handleUnlock = async () => {
-    resetState();
     setIsUnlocking(true);
     let tx;
     try {
@@ -149,7 +187,6 @@ export const useStake = () => {
   };
 
   const handleWithdraw = async () => {
-    resetState();
     setIsWithdrawing(true);
     try {
       await withdrawAlluo();
@@ -235,6 +272,13 @@ export const useStake = () => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    // lock
+    lockValue,
+    setLockValue,
+    isApproving,
+    isLocking,
+    handleApprove,
+    handleLock,
     // unlock 
     unlockValue,
     setUnlockValue,

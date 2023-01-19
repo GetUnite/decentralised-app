@@ -1,26 +1,47 @@
-import { EChain } from 'app/common/constants/chains';
-import { heapTrack } from 'app/common/functions/heapClient';
-import { approveAlluoStaking, lockAlluo } from 'app/common/functions/stake';
-import { useNotification } from 'app/common/state';
-import { useState } from 'react';
+import { TPossibleStep } from 'app/common/types/global';
+import { useEffect, useState } from 'react';
 
-export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
-  // other state control files
-  const { setNotification, resetNotification } = useNotification();
+const possibleLockSteps: TPossibleStep[] = [
+  { id: 0, label: 'Approve' },
+  { id: 1, label: 'Lock' },
+];
 
+export const useLock = ({
+  alluoInfo,
+  setLockValue,
+  handleApprove,
+  handleLock,
+}) => {
   // inputs
-  const [lockValue, setLockValue] = useState<string>();
   const [lockValueError, setLockValueError] = useState<string>();
 
-  // loading control
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isLocking, setIsLocking] = useState<boolean>(false);
+  // lock steps
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [lockSteps, setLockSteps] = useState<TPossibleStep[]>();
 
-  const resetState = () => {
-    resetNotification();
-    setLockValueError('');
-    setIsApproving(false);
-    setIsLocking(false);
+  // loading control
+  const [isLoadingRequiredSteps, setIsLoadingRequiredSteps] = useState(true);
+
+  useEffect(() => {
+    if (alluoInfo?.allowance != undefined) {
+      loadRequiredSteps();
+    }
+  }, [alluoInfo]);
+
+  const loadRequiredSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // If the allowance is not higher than 0 ask for approval
+    if (!(+alluoInfo?.allowance > 0)) {
+      neededSteps.push(possibleLockSteps[0]);
+    }
+
+    // Lock step is always there
+    neededSteps.push(possibleLockSteps[1]);
+
+    setLockSteps(neededSteps);
+
+    setIsLoadingRequiredSteps(false);
   };
 
   const handleLockValueChange = value => {
@@ -31,57 +52,33 @@ export const useLock = ({ alluoInfo, updateAlluoInfo }) => {
     setLockValue(value);
   };
 
-  const handleApprove = async () => {
-    resetState();
-    setIsApproving(true);
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    const possibleDepositStep = possibleLockSteps.find(
+      possibleDepositStep =>
+        possibleDepositStep.id == lockSteps[currentStep].id,
+    );
 
-    try {
-      const tx = await approveAlluoStaking();
-      setNotification(
-        'Successfully approved',
-        'success',
-        tx.transactionHash,
-        EChain.ETHEREUM,
-      );
-      await updateAlluoInfo();
-    } catch (error) {
-      setNotification(error, 'error');
+    switch (possibleDepositStep.id) {
+      case 0:
+        await handleApprove();
+        // Next step
+        setCurrentStep(currentStep + 1);
+        break;
+
+      case 1:
+        await handleLock();
+        break;
     }
-
-    setIsApproving(false);
-  };
-
-  const handleLock = async () => {
-    resetState();
-    setIsLocking(true);
-
-    try {
-      heapTrack('stakeLockAmount', { amount: lockValue });
-      heapTrack('stakeLockButtonClicked');
-      const tx = await lockAlluo(lockValue);
-      setNotification(
-        'Successfully locked',
-        'success',
-        tx.transactionHash,
-        EChain.ETHEREUM,
-      );
-      await updateAlluoInfo();
-      setLockValue(null);
-    } catch (error) {
-      setNotification(error, 'error');
-    }
-
-    setIsLocking(false);
   };
 
   return {
-    lockValue,
-    isApproving,
-    isLocking,
+    currentStep,
+    lockSteps,
+    handleCurrentStep,
     handleLockValueChange,
-    handleApprove,
-    handleLock,
     lockValueError,
     hasErrors: lockValueError != '',
+    isLoadingRequiredSteps,
   };
 };

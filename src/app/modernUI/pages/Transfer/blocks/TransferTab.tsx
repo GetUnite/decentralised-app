@@ -58,10 +58,12 @@ export const TransferTab = ({ ...rest }) => {
                 disabled={isLoading}
               />
             </Box>
-            <Box margin={{ top: '11px' }}>
+            <Box margin={{ top: '6px' }}>
               <Box direction="row" justify="between">
-              <Text size="13px" color="soul">
-                   {recipientAddressValue === '' ? 'Recipient' : `Recipient: ${recipientAddressValue}`}
+                <Text size="13px" color="soul">
+                  {recipientAddressValue === ''
+                    ? 'Recipient'
+                    : `Recipient: ${recipientAddressValue}`}
                 </Text>
               </Box>
               <TextInput
@@ -70,9 +72,11 @@ export const TransferTab = ({ ...rest }) => {
                 placeholder="Address or Unstoppable domain"
                 disabled={isLoading}
               />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {recipientAddressError}
-              </Text>
+              <Box height="13px" margin={{ top: 'small' }}>
+                <Text color="error" size="small">
+                  {recipientAddressError}
+                </Text>
+              </Box>
             </Box>
             <FeeInfo
               useBiconomy={useBiconomy}

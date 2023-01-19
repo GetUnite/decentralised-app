@@ -15,3 +15,9 @@ export type TAllowance = {
   toTokenAddress: string;
   allowance: string;
 };
+
+// type for steps for modal ex step 1: Approve, step2: Deposit
+export type TPossibleStep = {
+  id: number;
+  label: string;
+};

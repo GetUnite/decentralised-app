@@ -10,28 +10,34 @@ import { MenuItem } from './blocks';
 import moonIcon from '../../images/moonIcon.svg';
 import sunIcon from '../../images/sunIcon.svg';
 
-const Drop = () => {
+const Drop = ({ toggleModal }) => {
   return (
     <Layer
       background="transparent"
       margin={{ top: 'large' }}
       full
+      animate={false}
       responsive={true}
-      // onEsc={toggleForm}
-      // onClickOutside={toggleForm}
+      onEsc={toggleModal}
+      onClickOutside={toggleModal}
     >
       <Box
-        fill
+        fill="horizontal"
         round="none"
         overflow="auto"
-        align="start"
-        justify="start"
+        justify="center"
         gap="small"
-        direction="column"
+        direction="row"
         background="modal"
         pad={{ vertical: 'medium', horizontal: 'medium' }}
       >
-        <MenuItem />
+        <MenuItem
+          pad={{ vertical: '20px' }}
+          fill="horizontal"
+          justify="center"
+          align="center"
+          gap="20px"
+        />
       </Box>
     </Layer>
   );
@@ -62,39 +68,27 @@ export const Menu = ({ ...rest }) => {
                   color: isLightMode ? 'black' : 'white',
                   textDecoration: 'none',
                   fontSize: '14px',
-                  marginRight: '34px'
+                  marginRight: '34px',
                 }}
               >
                 About Alluo
               </a>
             )}
-            {!isSmall(size) && <ConnectionButton />}
-            {isSmall(size) && isModalOpen && (
-              <Button
-                plain
-                onClick={() => {
-                  toggleModal();
-                }}
-              >
-                <ConnectionButton />
-              </Button>
-            )}
-            {((isSmall(size) && !isModalOpen) || !isSmall(size)) && (
-              <Button
-                plain
-                onClick={() => {
-                  toggleMode();
-                }}
-              >
-                <Avatar
-                  align="center"
-                  margin="none"
-                  src={isLightMode ? sunIcon : moonIcon}
-                  size="small"
-                  justify="center"
-                />
-              </Button>
-            )}
+            <ConnectionButton />
+            <Button
+              plain
+              onClick={() => {
+                toggleMode();
+              }}
+            >
+              <Avatar
+                align="center"
+                margin="none"
+                src={isLightMode ? sunIcon : moonIcon}
+                size="small"
+                justify="center"
+              />
+            </Button>
             {isSmall(size) && (
               <Button plain alignSelf="center" onClick={toggleModal} {...rest}>
                 <Box align="center">
@@ -107,7 +101,7 @@ export const Menu = ({ ...rest }) => {
               </Button>
             )}
           </Box>
-          {isModalOpen && <Drop />}
+          {isModalOpen && <Drop toggleModal={toggleModal} />}
         </>
       )}
     </ResponsiveContext.Consumer>
