@@ -214,7 +214,7 @@ export const getBoostFarmRewards = async (
 
   return {
     value: toExactFixed(valueAmountInDecimals, 8),
-    stableValue: toExactFixed(stableValue,2)
+    stableValue: toExactFixed(stableValue, 2),
   };
 };
 
@@ -232,7 +232,12 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
   return valueInUSDC * tokenPrice;
 };
 
-export const getMaximumWithdrawAmount = async (farmAddress, tokenAddress, amount) => {
+export const getMaximumWithdrawAmount = async (
+  farmAddress,
+  tokenAddress,
+  tokenDecimals,
+  amount,
+) => {
   const abi = [
     {
       inputs: [
@@ -248,9 +253,9 @@ export const getMaximumWithdrawAmount = async (farmAddress, tokenAddress, amount
     },
   ];
 
-  const amountInDecimals = toDecimals(amount,18);
+  const amountInDecimals = toDecimals(amount, 18);
 
-  const tx = await callStatic(
+  const valueInDecimals = await callStatic(
     abi,
     farmAddress,
     'withdrawToNonLp(uint256,address,address,address)',
@@ -262,9 +267,9 @@ export const getMaximumWithdrawAmount = async (farmAddress, tokenAddress, amount
     ],
   );
 
-  console.log("tx on boostFarm file", tx);
+  const value = fromDecimals(valueInDecimals, tokenDecimals);
 
-  return tx.blockNumber;
+  return value;
 };
 
 export const convertToLP = async (

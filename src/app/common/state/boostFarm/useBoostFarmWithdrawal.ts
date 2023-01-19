@@ -35,6 +35,7 @@ export const useBoostFarmWithdrawal = ({
         ? await getMaximumWithdrawAmount(
             selectedFarmInfo.current.farmAddress,
             selectedSupportedToken.address,
+            selectedSupportedToken.decimals,
             selectedFarmInfo.current?.depositedAmountInLP,
           )
         : 0;

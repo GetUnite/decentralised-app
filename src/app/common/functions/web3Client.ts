@@ -388,10 +388,13 @@ export const callStatic = async (
       params,
     );
 
-    const tx = await method;
+    let txResult = await method;
 
-    console.log("tx on webclint", tx);
-    return tx;
+    if (ethers.BigNumber.isBigNumber(txResult)) {
+      return txResult.toString();
+    }
+    
+    return txResult;
   } catch (error) {
     console.log(error);
     console.log({
