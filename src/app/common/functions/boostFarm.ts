@@ -3,6 +3,7 @@ import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
 import {
   callContract,
+  callStatic,
   getCurrentWalletAddress,
   getPrice,
   sendTransaction
@@ -83,7 +84,7 @@ export const withdrawFromBoostFarm = async (
       useBiconomy,
     );
 
-    return tx.blockNumber;
+    return tx;
   } catch (error) {
     throw error;
   }
@@ -213,7 +214,7 @@ export const getBoostFarmRewards = async (
 
   return {
     value: toExactFixed(valueAmountInDecimals, 8),
-    stableValue: toExactFixed(stableValue,2)
+    stableValue: toExactFixed(stableValue, 2),
   };
 };
 
@@ -229,6 +230,46 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
   );
 
   return valueInUSDC * tokenPrice;
+};
+
+export const getMaximumLPValueAsToken = async (
+  farmAddress,
+  tokenAddress,
+  tokenDecimals,
+  amount,
+) => {
+  const abi = [
+    {
+      inputs: [
+        { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        { internalType: 'address', name: 'receiver', type: 'address' },
+        { internalType: 'address', name: 'owner', type: 'address' },
+        { internalType: 'address', name: 'exitToken', type: 'address' },
+      ],
+      name: 'withdrawToNonLp',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
+  ];
+
+  const amountInDecimals = toDecimals(amount, 18);
+
+  const valueInDecimals = await callStatic(
+    abi,
+    farmAddress,
+    'withdrawToNonLp(uint256,address,address,address)',
+    [
+      amountInDecimals,
+      getCurrentWalletAddress(),
+      getCurrentWalletAddress(),
+      tokenAddress,
+    ],
+  );
+
+  const value = fromDecimals(valueInDecimals, tokenDecimals);
+
+  return value;
 };
 
 export const convertToLP = async (

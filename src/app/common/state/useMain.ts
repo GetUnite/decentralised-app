@@ -19,7 +19,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
-import { getBoostFarmInterest } from '../functions/boostFarm';
+import {
+  getBoostFarmInterest
+} from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
 
 const possibleStableTokens = [
@@ -74,7 +76,6 @@ export const useMain = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  
   useEffect(() => {
     fetchFarmsInfo();
   }, [walletAccountAtom]);
@@ -217,7 +218,7 @@ export const useMain = () => {
         switch (farm.underlyingTokenAddress) {
           case EPolygonAddresses.WBTC:
             tokenPriceAddress = EEthereumAddresses.WBTC;
-            tokenDecimals= 8;
+            tokenDecimals = 8;
             break;
           case EPolygonAddresses.WETH:
             tokenPriceAddress = EEthereumAddresses.WETH;
@@ -448,6 +449,7 @@ export const useMain = () => {
     possibleViewTypes,
     setViewType,
     totalDepositedAmountInUsd,
-    isFarming: availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0
+    isFarming:
+      availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0,
   };
 };

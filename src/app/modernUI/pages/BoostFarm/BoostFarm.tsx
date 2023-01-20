@@ -1,6 +1,5 @@
 import { toExactFixed } from 'app/common/functions/utils';
 import { useMode } from 'app/common/state';
-import { walletAccount } from 'app/common/state/atoms';
 import { useBoostFarm } from 'app/common/state/boostFarm';
 import {
   Layout,
@@ -12,16 +11,14 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useParams } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
 import {
-  BoostFarmDepositConfirmation,
   BoostFarmDepositTab,
   BoostFarmPresentation,
   BoostFarmWithdrawalConfirmation,
-  BoostFarmWithdrawalTab,
-  LockedBoostFarmPresentation
+  BoostFarmWithdrawalTab, LockedBoostFarmDepositConfirmation, LockedBoostFarmPresentation
 } from './blocks';
 import { } from './blocks/BoostFarmWithdrawalConfirmation';
 
@@ -29,8 +26,10 @@ export const BoostFarm = () => {
   const { id } = useParams();
 
   const { isLightMode } = useMode();
-  const [walletAccountAtom] = useRecoilState(walletAccount);
+
   const {
+    walletAccountAtom,
+    isCorrectNetworkAtom,
     // presentation
     showTabs,
     showHeading,
@@ -60,14 +59,17 @@ export const BoostFarm = () => {
     // deposit
     depositValue,
     setDepositValue,
+    handleApprove,
+    isApproving,
     handleDeposit,
     isDepositing,
-    showBoostDepositConfirmation,
-    startBoostDepositConfirmation,
-    cancelBoostDepositConfirmation,
+    showLockedBoostDepositConfirmation,
+    startLockedBoostDepositConfirmation,
+    cancelLockedBoostDepositConfirmation,
     //withdraw
     withdrawValue,
     setWithdrawValue,
+    selectedSupportedTokenInfo,
     handleWithdraw,
     isWithdrawing,
     showBoostWithdrawalConfirmation,
@@ -76,6 +78,8 @@ export const BoostFarm = () => {
   } = useBoostFarm({
     id,
   });
+
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const farmName = (
     <span>
@@ -100,131 +104,154 @@ export const BoostFarm = () => {
               showChainBadge={!isLoading}
               noHeading={!showHeading}
             >
-              <>
-                {showBoostFarmPresentation && (
-                  <BoostFarmPresentation
-                    selectedFarmInfo={selectedFarmInfo}
-                    farmName={farmName}
-                    isLoading={isLoading}
-                  />
-                )}
-                {showLockedBoostFarmPresentation && (
-                  <LockedBoostFarmPresentation
-                    selectedFarmInfo={selectedFarmInfo}
-                    farmName={farmName}
-                    isLoading={isLoading}
-                  />
-                )}
-                {showBoostDepositConfirmation && (
-                  <BoostFarmDepositConfirmation
-                    selectedFarmInfo={selectedFarmInfo}
-                    handleDeposit={handleDeposit}
-                    cancelBoostDepositConfirmation={
-                      cancelBoostDepositConfirmation
-                    }
-                    nextHarvestDate={nextHarvestDate}
-                  />
-                )}
-                {showBoostWithdrawalConfirmation && (
-                  <>
-                    {selectedFarmInfo.current?.isLocked ? (
-                      <BoostFarmWithdrawalConfirmation
-                        selectedFarmInfo={selectedFarmInfo}
-                        withdrawValue={withdrawValue}
-                        withdrawTokenLabel={selectedSupportedToken?.label}
-                        handleWithdraw={handleWithdraw}
-                        cancelBoostWithdrawalConfirmation={
-                          cancelBoostWithdrawalConfirmation
-                        }
-                        nextHarvestDate={nextHarvestDate}
-                        losablePendingRewards={losablePendingRewards}
-                      />
-                    ) : (
-                      <BoostFarmWithdrawalConfirmation
-                        selectedFarmInfo={selectedFarmInfo}
-                        withdrawValue={withdrawValue}
-                        withdrawTokenLabel={selectedSupportedToken?.label}
-                        handleWithdraw={handleWithdraw}
-                        cancelBoostWithdrawalConfirmation={
-                          cancelBoostWithdrawalConfirmation
-                        }
-                        nextHarvestDate={nextHarvestDate}
-                        losablePendingRewards={losablePendingRewards}
-                      />
-                    )}
-                  </>
-                )}
-                {showTabs && (
-                  <>
-                    <Tabs>
-                      <Tab title="Deposit">
-                        <BoostFarmDepositTab
+              {isApproving || isDepositing || isWithdrawing ? (
+                <Box
+                  align="center"
+                  justify="center"
+                  fill="vertical"
+                  style={{
+                    minHeight: selectedTab == 0 ? '595px' : '642px',
+                  }}
+                >
+                  <Spinner pad="large" />
+                </Box>
+              ) : (
+                <>
+                  {showBoostFarmPresentation && (
+                    <BoostFarmPresentation
+                      selectedFarmInfo={selectedFarmInfo}
+                      farmName={farmName}
+                      isLoading={isLoading}
+                    />
+                  )}
+                  {showLockedBoostFarmPresentation && (
+                    <LockedBoostFarmPresentation
+                      selectedFarmInfo={selectedFarmInfo}
+                      farmName={farmName}
+                      isLoading={isLoading}
+                    />
+                  )}
+                  {showLockedBoostDepositConfirmation && (
+                    <LockedBoostFarmDepositConfirmation
+                      selectedFarmInfo={selectedFarmInfo}
+                      handleDeposit={handleDeposit}
+                      cancelLockedBoostDepositConfirmation={
+                        cancelLockedBoostDepositConfirmation
+                      }
+                      nextHarvestDate={nextHarvestDate}
+                    />
+                  )}
+                  {showBoostWithdrawalConfirmation && (
+                    <>
+                      {selectedFarmInfo.current?.isLocked ? (
+                        <BoostFarmWithdrawalConfirmation
                           selectedFarmInfo={selectedFarmInfo}
-                          isLoading={isLoading}
-                          selectedSupportedToken={selectedSupportedToken}
-                          selectSupportedToken={selectSupportedToken}
-                          // deposit
-                          depositValue={depositValue}
-                          setDepositValue={setDepositValue}
-                          startBoostDepositConfirmation={
-                            startBoostDepositConfirmation
-                          }
-                          handleDeposit={handleDeposit}
-                          isDepositing={isDepositing}
-                          // biconomy
-                          useBiconomy={useBiconomy}
-                          setUseBiconomy={setUseBiconomy}
-                        />
-                      </Tab>
-                      <Tab title="Withdraw">
-                        <BoostFarmWithdrawalTab
-                          // farm
-                          isLoading={isLoading}
-                          selectedFarmInfo={selectedFarmInfo}
-                          selectedSupportedToken={selectedSupportedToken}
-                          selectSupportedToken={selectSupportedToken}
-                          // withdraw
                           withdrawValue={withdrawValue}
-                          setWithdrawValue={setWithdrawValue}
-                          startBoostWithdrawalConfirmation={
-                            startBoostWithdrawalConfirmation
+                          withdrawTokenLabel={selectedSupportedToken?.label}
+                          handleWithdraw={handleWithdraw}
+                          cancelBoostWithdrawalConfirmation={
+                            cancelBoostWithdrawalConfirmation
                           }
-                          isWithdrawing={isWithdrawing}
-                          // biconomy
-                          useBiconomy={useBiconomy}
-                          setUseBiconomy={setUseBiconomy}
+                          nextHarvestDate={nextHarvestDate}
+                          losablePendingRewards={losablePendingRewards}
                         />
-                      </Tab>
-                    </Tabs>
-                    <Box
-                      margin={{ top: '26px' }}
-                      justify="center"
-                      direction="row"
-                    >
-                      <Text size="12px">
-                        Find out where these funds are being invested{' '}
-                        <a
-                          target="_blank"
-                          href="https://docsend.com/view/np9ypdn38jajb9zj"
-                          style={{
-                            textDecoration: 'none',
-                          }}
-                        >
-                          here
-                        </a>
-                      </Text>
-                    </Box>
-                  </>
-                )}
-              </>
+                      ) : (
+                        <BoostFarmWithdrawalConfirmation
+                          selectedFarmInfo={selectedFarmInfo}
+                          withdrawValue={withdrawValue}
+                          withdrawTokenLabel={selectedSupportedToken?.label}
+                          handleWithdraw={handleWithdraw}
+                          cancelBoostWithdrawalConfirmation={
+                            cancelBoostWithdrawalConfirmation
+                          }
+                          nextHarvestDate={nextHarvestDate}
+                          losablePendingRewards={losablePendingRewards}
+                        />
+                      )}
+                    </>
+                  )}
+                  {showTabs && (
+                    <>
+                      <Tabs
+                        selectedTab={selectedTab}
+                        setSelectedTab={setSelectedTab}
+                      >
+                        <Tab title="Deposit">
+                          <BoostFarmDepositTab
+                            selectedFarmInfo={selectedFarmInfo}
+                            isLoading={isLoading}
+                            selectedSupportedToken={selectedSupportedToken}
+                            selectedSupportedTokenInfo={
+                              selectedSupportedTokenInfo
+                            }
+                            selectSupportedToken={selectSupportedToken}
+                            isCorrectNetworkAtom={isCorrectNetworkAtom}
+                            // deposit
+                            handleApprove={handleApprove}
+                            depositValue={depositValue}
+                            setDepositValue={setDepositValue}
+                            startLockedBoostDepositConfirmation={
+                              startLockedBoostDepositConfirmation
+                            }
+                            handleDeposit={handleDeposit}
+                            // biconomy
+                            useBiconomy={useBiconomy}
+                            setUseBiconomy={setUseBiconomy}
+                          />
+                        </Tab>
+                        <Tab title="Withdraw">
+                          <BoostFarmWithdrawalTab
+                            // farm
+                            isLoading={isLoading}
+                            selectedFarmInfo={selectedFarmInfo}
+                            selectedSupportedToken={selectedSupportedToken}
+                            selectedSupportedTokenInfo={
+                              selectedSupportedTokenInfo
+                            }
+                            selectSupportedToken={selectSupportedToken}
+                            isCorrectNetworkAtom={isCorrectNetworkAtom}
+                            // withdraw
+                            withdrawValue={withdrawValue}
+                            setWithdrawValue={setWithdrawValue}
+                            startBoostWithdrawalConfirmation={
+                              startBoostWithdrawalConfirmation
+                            }
+                            // biconomy
+                            useBiconomy={useBiconomy}
+                            setUseBiconomy={setUseBiconomy}
+                          />
+                        </Tab>
+                      </Tabs>
+                      <Box
+                        margin={{ top: '26px' }}
+                        justify="center"
+                        direction="row"
+                      >
+                        <Text size="12px">
+                          Find out where these funds are being invested{' '}
+                          <a
+                            target="_blank"
+                            href="https://docsend.com/view/np9ypdn38jajb9zj"
+                            style={{
+                              textDecoration: 'none',
+                            }}
+                          >
+                            here
+                          </a>
+                        </Text>
+                      </Box>
+                    </>
+                  )}
+                </>
+              )}
             </Modal>
             <Box flex>
               {walletAccountAtom &&
                 !showBoostFarmPresentation &&
-                !showBoostWithdrawalConfirmation && (
+                !showLockedBoostFarmPresentation && (
                   <Box gap="12px">
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -254,7 +281,7 @@ export const BoostFarm = () => {
                             <Box direction="row" justify="between" fill>
                               {isLoading || isLoadingRewards ? (
                                 <Box fill>
-                                  <Skeleton height="18px" />
+                                  <Skeleton height="18px" borderRadius="20px" />
                                 </Box>
                               ) : (
                                 <>
@@ -281,7 +308,7 @@ export const BoostFarm = () => {
 
                           <Box margin={{ bottom: '16px' }}>
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <Box direction="row" justify="between">
                                 <Text weight="bold" size="16px">
@@ -334,7 +361,7 @@ export const BoostFarm = () => {
                       )}
                     </Box>
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -345,25 +372,37 @@ export const BoostFarm = () => {
                       background="modal"
                       pad={{ vertical: 'medium', horizontal: 'medium' }}
                       border={
-                        isLightMode
+                        showBoostWithdrawalConfirmation
+                          ? {
+                              color: '#F59F31',
+                              size: '0.5px',
+                            }
+                          : isLightMode
                           ? { color: '#EBEBEB', size: '1px' }
                           : { size: '0px' }
+                      }
+                      style={
+                        showBoostWithdrawalConfirmation
+                          ? {
+                              boxShadow: '0px 0px 20px 0px rgba(255, 152, 17, 0.2)',
+                            }
+                          : {}
                       }
                     >
                       <Box fill gap="12px">
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="16px" />
+                          <Skeleton height="16px" borderRadius="20px" />
                         ) : (
                           <Text size="16px" weight="bold">
                             Pending rewards
                           </Text>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton />
+                          <Skeleton borderRadius="20px" />
                         ) : (
                           <Box direction="row" justify="between">
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <>
                                 <Text weight="bold" size="16px">
@@ -379,7 +418,7 @@ export const BoostFarm = () => {
                           </Box>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="8px" />
+                          <Skeleton height="8px" borderRadius="20px" />
                         ) : (
                           <Text size="8px" weight={400}>
                             Available {nextHarvestDate.format('DD MMM')} · Last

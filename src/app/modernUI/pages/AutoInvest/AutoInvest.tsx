@@ -51,7 +51,7 @@ export const AutoInvest = () => {
               <Box margin={{ top: '72px' }}>
                 <>
                   {walletAccountAtom && isLoading ? (
-                    <Skeleton count={1} height="36px" />
+                    <Skeleton count={1} height="45px" borderRadius="20px"/>
                   ) : (
                     <Box direction="row" justify="between" align="center">
                       <Text size="24px" weight={700}>
@@ -71,7 +71,7 @@ export const AutoInvest = () => {
                     margin={{ top: '36px' }}
                     pad={{bottom: "20px"}}
                     background="card"
-                    round="8px"
+                    round="16px"
                     style={{ boxShadow: '0px -1px 4px #CCCCCC' }}
                   >
                     {!isSmall(size) && (

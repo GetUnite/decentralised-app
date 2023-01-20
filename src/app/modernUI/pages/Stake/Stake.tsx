@@ -12,6 +12,7 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { LockTab } from './blocks/LockTab';
 import { ReunlockConfirmation } from './blocks/ReunlockConfirmation';
@@ -41,6 +42,13 @@ export const Stake = ({ ...rest }) => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    // lock
+    lockValue,
+    setLockValue,
+    isApproving,
+    isLocking,
+    handleApprove,
+    handleLock,
     // unlock
     unlockValue,
     setUnlockValue,
@@ -51,6 +59,8 @@ export const Stake = ({ ...rest }) => {
   const allTimersAreFinished =
     timerIsFinished(alluoInfo?.depositUnlockTime) &&
     timerIsFinished(alluoInfo?.withdrawUnlockTime);
+
+  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <ResponsiveContext.Consumer>
@@ -67,7 +77,7 @@ export const Stake = ({ ...rest }) => {
                     <Box gap="16px">
                       {+alluoInfo?.unlocked > 0 && allTimersAreFinished && (
                         <Box
-                          round={'medium'}
+                          round="16px"
                           width="245px"
                           align="start"
                           justify="between"
@@ -130,42 +140,62 @@ export const Stake = ({ ...rest }) => {
                 </Box>
               </Box>
               <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-                {showReunlockConfirmation ? (
-                  <ReunlockConfirmation
-                    handleUnlock={handleUnlock}
-                    cancelReunlockConfirmation={cancelReunlockConfirmation}
-                  />
+                {isLocking || isApproving || isUnlocking ? (
+                  <Box
+                    align="center"
+                    justify="center"
+                    fill="vertical"
+                    style={{
+                      minHeight: selectedTab == 0 ? '538px': '579px',
+                    }}
+                  >
+                    <Spinner pad="large" />
+                  </Box>
                 ) : (
-                  <Tabs>
-                    <Tab title="Lock">
-                      <LockTab
-                        isLoading={isLoading}
-                        alluoInfo={alluoInfo}
-                        updateAlluoInfo={updateAlluoInfo}
-                      />
-                    </Tab>
-                    <Tab title="Unlock">
-                      <UnlockTab
-                        isLoading={isLoading}
-                        alluoInfo={alluoInfo}
-                        startReunlockConfirmation={startReunlockConfirmation}
-                        showReunlockConfirmation={showReunlockConfirmation}
-                        cancelReunlockConfirmation={cancelReunlockConfirmation}
-                        allTimersAreFinished={allTimersAreFinished}
-                        unlockValue={unlockValue}
-                        setUnlockValue={setUnlockValue}
-                        isUnlocking={isUnlocking}
+                  <>
+                    {showReunlockConfirmation ? (
+                      <ReunlockConfirmation
                         handleUnlock={handleUnlock}
+                        cancelReunlockConfirmation={cancelReunlockConfirmation}
                       />
-                    </Tab>
-                  </Tabs>
+                    ) : (
+                      <Tabs
+                        selectedTab={selectedTab}
+                        setSelectedTab={setSelectedTab}
+                      >
+                        <Tab title="Lock">
+                          <LockTab
+                            isLoading={isLoading}
+                            alluoInfo={alluoInfo}
+                            lockValue={lockValue}
+                            setLockValue={setLockValue}
+                            handleApprove={handleApprove}
+                            handleLock={handleLock}
+                          />
+                        </Tab>
+                        <Tab title="Unlock">
+                          <UnlockTab
+                            isLoading={isLoading}
+                            alluoInfo={alluoInfo}
+                            startReunlockConfirmation={
+                              startReunlockConfirmation
+                            }
+                            allTimersAreFinished={allTimersAreFinished}
+                            unlockValue={unlockValue}
+                            setUnlockValue={setUnlockValue}
+                            handleUnlock={handleUnlock}
+                          />
+                        </Tab>
+                      </Tabs>
+                    )}
+                  </>
                 )}
               </Modal>
               <Box flex>
                 {walletAccountAtom && (
                   <Box gap="12px">
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -195,7 +225,7 @@ export const Stake = ({ ...rest }) => {
                             <Box direction="row" justify="between" fill>
                               {isLoading || isLoadingRewards ? (
                                 <Box fill>
-                                  <Skeleton height="18px" />
+                                  <Skeleton height="18px" borderRadius="20px" />
                                 </Box>
                               ) : (
                                 <>
@@ -203,7 +233,7 @@ export const Stake = ({ ...rest }) => {
                                   <Box direction="row">
                                     <TokenIcon key={0} label={'CVX'} />
                                     <TokenIcon
-                                      key={0}
+                                      key={1}
                                       label={'ETH'}
                                       style={{ marginLeft: '-0.6rem' }}
                                     />
@@ -215,7 +245,7 @@ export const Stake = ({ ...rest }) => {
 
                           <Box margin={{ bottom: '16px' }}>
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <Box direction="row" justify="between">
                                 <Text weight="bold" size="16px">
@@ -267,7 +297,7 @@ export const Stake = ({ ...rest }) => {
                       )}
                     </Box>
                     <Box
-                      round={'medium'}
+                      round="16px"
                       overflow="hidden"
                       width="245px"
                       align="start"
@@ -285,18 +315,18 @@ export const Stake = ({ ...rest }) => {
                     >
                       <Box fill gap="12px">
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="16px" />
+                          <Skeleton height="16px" borderRadius="20px" />
                         ) : (
                           <Text size="16px" weight="bold">
                             Pending rewards
                           </Text>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton />
+                          <Skeleton borderRadius="20px" />
                         ) : (
                           <Box direction="row" justify="between">
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" />
+                              <Skeleton height="16px" borderRadius="20px" />
                             ) : (
                               <>
                                 <Text weight="bold" size="16px">
@@ -311,7 +341,7 @@ export const Stake = ({ ...rest }) => {
                           </Box>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
-                          <Skeleton height="8px" />
+                          <Skeleton height="8px" borderRadius="20px" />
                         ) : (
                           <Text size="8px" weight={400}>
                             Available {nextHarvestDate.format('DD MMM')} · Last

@@ -31,7 +31,7 @@ export const useTransfer = () => {
 
   // inputs
   const [selectedIbAlluo, setSelectedIbAlluo] = useState<string>('IbAlluoUSD');
-  const [transferValue, setTransferValue] = useState<string>();
+  const [transferValue, setTransferValue] = useState<string>('');
   const [transferValueError, setTransferValueError] = useState<string>('');
   const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [recipientAddressError, setRecipientAddressError] =
@@ -122,6 +122,7 @@ export const useTransfer = () => {
     setRecipientAddressError('');
     setRecipientAddressValue('');
 
+    if(value != '')
     if (/\.(?=[^\.]+$)/.test(value)) {
       const inputTld = value.split(/\.(?=[^\.]+$)/);
       const found = udTlds.find(

@@ -37,7 +37,7 @@ export const BoostFarmWithdrawalConfirmation = ({
           />
           <Button
             plain
-            label={`Cancel withdraw and comeback on ${nextHarvestDate.format(
+            label={`Cancel withdraw and come back on ${nextHarvestDate.format(
               'DD MMMM',
             )}`}
             onClick={cancelBoostWithdrawalConfirmation}

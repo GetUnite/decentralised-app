@@ -1,5 +1,9 @@
 import {
-  changeNetwork, getChainNameById, getCurrentChainId, onWalletUpdated, trySafeAppConnection
+  changeNetwork,
+  getChainNameById,
+  getCurrentChainId,
+  onWalletUpdated,
+  tryAutoWalletConnection
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import {
@@ -22,13 +26,15 @@ export const useWallet = () => {
   const [wantedChainId, setWantedChainId] = useState<EChainId>();
   const [currentChainId, setCurrentChain] = useState<EChain>();
 
-  const handleSafeAppConnection = walletAddress => {
+  const handleSafeAppConnection = (walletAddress, isGnosisSafe) => {
     setWalletAccountAtom(walletAddress);
-    setSafeAppAtom(true);
+    if (isGnosisSafe) {
+      setSafeAppAtom(true);
+    }
   };
 
   useEffect(() => {
-    trySafeAppConnection(handleSafeAppConnection);
+    tryAutoWalletConnection(handleSafeAppConnection);
   }, []);
 
   const handleWalletChanged = (chainId, walletAddress) => {
@@ -75,7 +81,7 @@ export const useWallet = () => {
         'info',
         null,
         null,
-        true
+        true,
       );
     } else {
       resetNotification();

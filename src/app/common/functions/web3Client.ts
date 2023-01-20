@@ -126,21 +126,36 @@ const usesNoncesAddresses = [
 let walletAddress;
 let walletProvider;
 
-export const trySafeAppConnection = async callback => {
+export const tryAutoWalletConnection = async callback => {
   const gnosisLabel = 'Safe';
   const onboardState = onboard.state.get();
 
+  let walletLabel = undefined;
+  let isGnosisSafe = false;
+  // first try safe app connection
   if (
     onboardState.walletModules.find(
       walletModule => walletModule.label == gnosisLabel,
     )
   ) {
+    walletLabel = gnosisLabel;
+    isGnosisSafe = true;
+  }
+  // check if there is a wallet saved on local storage
+  const previouslyConnectedWallets = JSON.parse(
+    window.localStorage.getItem('connectedWallets'),
+  );
+  if (previouslyConnectedWallets) {
+    walletLabel = previouslyConnectedWallets[0];
+  }
+  // if its safe app or a wallet address is saved on local storage, auto connect
+  if (walletLabel) {
     try {
       const connection = await connectToWallet({
-        autoSelect: { label: gnosisLabel, disableModals: true },
+        autoSelect: { label: walletLabel, disableModals: true },
       });
 
-      callback(connection.address);
+      callback(connection.address, isGnosisSafe);
     } catch (error) {
       console.log(error);
     }
@@ -163,6 +178,12 @@ export const connectToWallet = async (connectOptions?) => {
       walletAddress = wallets[0].accounts[0].address;
       wa.domain = unstoppableUser ? wallets[0].instance.user.sub : null;
       wa.address = wallets[0].accounts[0].address;
+      // save in local storage
+      const connectedWallets = wallets.map(({ label }) => label);
+      window.localStorage.setItem(
+        'connectedWallets',
+        JSON.stringify(connectedWallets),
+      );
       heapTrack('walletConnected', {
         walletType: wallets[0].label,
         chain: wallets[0].chains[0].id,
@@ -177,14 +198,14 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0x781c9e6f0eEEdFE16329880731e25Fd57fE27e13'
+  //return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
   return walletAddress;
 };
 
 export const changeNetwork = async (chain: EChain) => {
   let chainId;
 
-  if (!walletAddress) return;
+  if (!walletAddress) return { success: false, undefined };
 
   if (chain === EChain.ETHEREUM) {
     chainId =
@@ -218,6 +239,12 @@ export const onWalletUpdated = async callback => {
   wallets.subscribe(wallets => {
     if (wallets[0]) {
       walletAddress = wallets[0].accounts[0].address;
+      // save in local storage
+      const connectedWallets = wallets.map(({ label }) => label);
+      window.localStorage.setItem(
+        'connectedWallets',
+        JSON.stringify(connectedWallets),
+      );
       callback(wallets[0].chains[0].id, wallets[0].accounts[0].address);
     }
   });
@@ -232,7 +259,7 @@ export const getCurrentChainId = async () => {
 };
 
 export const getChainNameById = chainId => {
-  return chains.find(chain => chain.id == chainId).label;
+  return chains.find(chain => chain.id == chainId)?.label;
 };
 
 export const startBiconomy = async (chain, provider) => {
@@ -332,6 +359,42 @@ export const sendTransaction = async (
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
     let receipt = await provider.waitForTransaction(transactionHash);
     return receipt;
+  } catch (error) {
+    console.log(error);
+    console.log({
+      abi: abi,
+      address: address,
+      functionSignature: functionSignature,
+      params: params,
+      walletAddress: walletAddress,
+    });
+    return processSendError(error);
+  }
+};
+
+export const callStatic = async (
+  abi,
+  address,
+  functionSignature,
+  params = []
+) => {
+  try {
+    const provider = walletProvider;
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(address, abi, signer);
+
+    const method = contract.callStatic[functionSignature].apply(
+      null,
+      params,
+    );
+
+    let txResult = await method;
+
+    if (ethers.BigNumber.isBigNumber(txResult)) {
+      return txResult.toString();
+    }
+    
+    return txResult;
   } catch (error) {
     console.log(error);
     console.log({
@@ -684,7 +747,12 @@ export const callContract = async (
 
     return txResult;
   } catch (error) {
-    console.log({abi: abi, address:address, functionSignature:functionSignature, params:params});
+    console.log({
+      abi: abi,
+      address: address,
+      functionSignature: functionSignature,
+      params: params,
+    });
     // here do all error handling to readable stuff
     console.log(error);
   }
@@ -729,7 +797,11 @@ export const binarySearchForBlock = async (
   );
   let closestBlock;
 
-  while (lowestEstimatedBlock?.number != undefined && highestEstimatedBlock?.number != undefined && lowestEstimatedBlock?.number <= highestEstimatedBlock?.number) {
+  while (
+    lowestEstimatedBlock?.number != undefined &&
+    highestEstimatedBlock?.number != undefined &&
+    lowestEstimatedBlock?.number <= highestEstimatedBlock?.number
+  ) {
     closestBlock = await provider.getBlock(
       Math.floor(
         (highestEstimatedBlock?.number + lowestEstimatedBlock?.number) / 2,
@@ -926,7 +998,7 @@ export const getBalanceOf = async (
     abi,
     tokenAddress,
     'balanceOf(address)',
-    [walletAddress],
+    [getCurrentWalletAddress()],
     chain,
   );
 
@@ -981,7 +1053,7 @@ export const getAllowance = async (
     abi,
     tokenAddress,
     'allowance(address,address)',
-    [walletAddress, spenderAddress],
+    [getCurrentWalletAddress(), spenderAddress],
     chain,
   );
 
@@ -1215,12 +1287,15 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
 
   const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
 
-  // The fiatId for USDC is 1
+  // fiatIds:
+  // USD: 0
+  // EUR: 1
+  // ETH: 2
   const priceInUSDC = await callContract(
     abi,
     priceFeedRouter,
     'getPrice(address,uint256)',
-    [lPTokenAddress, 1],
+    [lPTokenAddress, 0],
     chain,
   );
 

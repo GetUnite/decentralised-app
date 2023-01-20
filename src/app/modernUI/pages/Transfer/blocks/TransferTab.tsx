@@ -30,17 +30,17 @@ export const TransferTab = ({ ...rest }) => {
 
   return (
     <Box fill>
-      <Box style={{ minHeight: '380px' }} justify="center">
-        {isTransferring ? (
-          <Box
-            align="center"
-            justify="center"
-            fill="vertical"
-            margin={{ top: 'large', bottom: 'medium' }}
-          >
-            <Spinner pad="large" />
-          </Box>
-        ) : (
+      {isTransferring ? (
+        <Box
+          align="center"
+          justify="center"
+          fill="vertical"
+          style={{ minHeight: '512px' }}
+        >
+          <Spinner pad="large" />
+        </Box>
+      ) : (
+        <>
           <Box margin={{ top: 'large' }}>
             <TopHeader ibAlluosInfo={ibAlluosInfo} isLoading={isLoading} />
             <Box margin={{ top: 'medium' }}>
@@ -58,21 +58,30 @@ export const TransferTab = ({ ...rest }) => {
                 disabled={isLoading}
               />
             </Box>
-            <Box margin={{ top: '11px' }}>
+            <Box margin={{ top: '6px' }}>
               <Box direction="row" justify="between">
-              <Text size="13px" color="soul">
-                   {recipientAddressValue === '' ? 'Recipient' : `Recipient: ${recipientAddressValue}`}
+                <Text size="14px" color="soul">
+                  Recipient
                 </Text>
               </Box>
-              <TextInput
-                value={recipientAddress}
-                onChange={handleRecipientAddressChange}
-                placeholder="Address or Unstoppable domain"
-                disabled={isLoading}
-              />
-              <Text color="error" size="small" margin={{ top: 'small' }}>
-                {recipientAddressError}
-              </Text>
+              <Box margin={{ top: 'xxsmall' }}>
+                <TextInput
+                  value={recipientAddress}
+                  onChange={handleRecipientAddressChange}
+                  placeholder="Address or Unstoppable domain"
+                  disabled={isLoading}
+                />
+              </Box>
+              <Box height="13px" margin={{ top: '4px', bottom: '12px' }}>
+                <Text
+                  color={recipientAddressValue != '' ? 'soul' : 'error'}
+                  size="small"
+                >
+                  {recipientAddressValue != ''
+                    ? recipientAddressValue
+                    : recipientAddressError}
+                </Text>
+              </Box>
             </Box>
             <FeeInfo
               useBiconomy={useBiconomy}
@@ -82,21 +91,21 @@ export const TransferTab = ({ ...rest }) => {
               isLoading={isLoading}
             />
           </Box>
-        )}
-      </Box>
-      <Box margin={{ top: 'large' }}>
-        <SubmitButton
-          primary
-          disabled={
-            isTransferring ||
-            !(+(transferValue || 0) > 0) ||
-            hasErrors ||
-            recipientAddress === ''
-          }
-          label="Transfer"
-          onClick={() => handleTransfer()}
-        />
-      </Box>
+          <Box margin={{ top: 'medium' }}>
+            <SubmitButton
+              primary
+              disabled={
+                isTransferring ||
+                !(+(transferValue || 0) > 0) ||
+                hasErrors ||
+                recipientAddress === ''
+              }
+              label="Transfer"
+              onClick={() => handleTransfer()}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   );
 };

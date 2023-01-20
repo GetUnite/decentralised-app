@@ -1,5 +1,5 @@
 import { toExactFixed } from 'app/common/functions/utils';
-import { Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 
 export const TopHeader = ({ ibAlluosInfo, isLoading, ...rest }) => {
@@ -9,22 +9,27 @@ export const TopHeader = ({ ibAlluosInfo, isLoading, ...rest }) => {
       return toExactFixed(token.balance, 5) + ' ' + token.label;
     });
   return (
-    <>
+    <Box height="54px">
       {isLoading ? (
-        <Skeleton />
+        <Skeleton borderRadius="20px" height="22px" />
       ) : (
         <>
           {alluoTextBalances.length > 0 ? (
-            <Text textAlign="center" weight="bold">
-              Assets earning yield: {alluoTextBalances.join(', ')}
-            </Text>
+            <>
+              <Text textAlign="center" weight="bold" size="18px">
+                Assets earning yield:
+              </Text>
+              <Text textAlign="center" weight="bold" size="18px">
+                {alluoTextBalances.join(', ')}
+              </Text>
+            </>
           ) : (
-            <Text textAlign="center" weight="bold">
+            <Text textAlign="center" weight="bold" size="18px">
               You don’t have any assets earning yield.
             </Text>
           )}
         </>
       )}
-    </>
+    </Box>
   );
 };

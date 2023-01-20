@@ -1,14 +1,8 @@
-import { heapTrack } from 'app/common/functions/heapClient';
-import {
-  approve,
-  getAllowance,
-  getBalanceOf
-} from 'app/common/functions/web3Client';
-import { useNotification } from 'app/common/state';
-import { TDepositStep } from 'app/common/types/farm';
+import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
+import { TPossibleStep } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 
-const possibleDepositSteps: TDepositStep[] = [
+const possibleDepositSteps: TPossibleStep[] = [
   { id: 0, label: 'Approve' },
   { id: 1, label: 'Deposit' },
 ];
@@ -16,31 +10,23 @@ const possibleDepositSteps: TDepositStep[] = [
 export const useBoostFarmDeposit = ({
   selectedFarmInfo,
   selectedSupportedToken,
+  selectedSupportedTokenInfo,
   depositValue,
   setDepositValue,
-  startBoostDepositConfirmation,
+  startLockedBoostDepositConfirmation,
+  handleApprove,
   handleDeposit,
 }) => {
-  // other state control files
-  const { setNotification } = useNotification();
-
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
 
-  // data
-  const selectedSupportedTokenInfo = useRef<any>({
-    balance: 0,
-    allowance: 0,
-  });
-
   // Deposit steps
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const selectedSupportedTokenSteps = useRef<TDepositStep[]>();
+  const selectedSupportedTokenSteps = useRef<TPossibleStep[]>();
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
-  const [isApproving, setIsApproving] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedFarmInfo && selectedSupportedToken) {
@@ -51,7 +37,7 @@ export const useBoostFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    let neededSteps: TDepositStep[] = [];
+    let neededSteps: TPossibleStep[] = [];
 
     const allowance = await getAllowance(
       selectedSupportedToken?.address,
@@ -84,35 +70,6 @@ export const useBoostFarmDeposit = ({
     setIsFetchingSupportedTokenInfo(false);
   };
 
-  const handleApprove = async () => {
-    setIsApproving(true);
-
-    try {
-      const tx = await approve(
-        selectedFarmInfo.current?.farmAddress,
-        selectedSupportedToken?.address,
-        selectedFarmInfo.current?.chain,
-      );
-      heapTrack('approvedTransactionMined', {
-        pool: 'boost',
-        currency: selectedSupportedToken?.label,
-        amount: depositValue,
-      });
-      // Next step
-      setCurrentStep(currentStep + 1);
-      setNotification(
-        'Approved successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current?.chain,
-      );
-    } catch (err) {
-      setNotification(err, 'error');
-    }
-
-    setIsApproving(false);
-  };
-
   const handleDepositValueChange = value => {
     setDepositValueError('');
     if (+value > +selectedSupportedTokenInfo.current?.balance) {
@@ -125,26 +82,32 @@ export const useBoostFarmDeposit = ({
   const handleCurrentStep = async () => {
     const possibleDepositStep = possibleDepositSteps.find(
       possibleDepositStep =>
-        possibleDepositStep.id == selectedSupportedTokenSteps.current[currentStep].id,
+        possibleDepositStep.id ==
+        selectedSupportedTokenSteps.current[currentStep].id,
     );
 
-    switch (possibleDepositStep.id) {
-      case 0:
-        await handleApprove();
-        break;
+    try {
+      switch (possibleDepositStep.id) {
+        case 0:
+          await handleApprove();
+          // Next step
+          setCurrentStep(currentStep + 1);
+          break;
 
-      case 1:
-        (await selectedFarmInfo.current?.isLocked)
-          ? startBoostDepositConfirmation()
-          : handleDeposit();
-        break;
+        case 1:
+          (await selectedFarmInfo.current?.isLocked)
+            ? startLockedBoostDepositConfirmation()
+            : handleDeposit();
+          break;
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return {
     depositValue,
     handleDepositValueChange,
-    isApproving,
     depositValueError,
     hasErrors: depositValueError != '',
     isFetchingSupportedTokenInfo,

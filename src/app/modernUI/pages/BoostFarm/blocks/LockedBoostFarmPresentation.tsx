@@ -24,7 +24,7 @@ export const LockedBoostFarmPresentation = ({
       <Box gap="large" margin={{ top: '20px' }} align="center">
         {isLoading ? (
           <Box fill>
-            <Skeleton height="28px" count={2} />
+            <Skeleton height="28px" count={2} borderRadius="20px"/>
           </Box>
         ) : (
           <Text textAlign="center" weight="bold" size="28px">

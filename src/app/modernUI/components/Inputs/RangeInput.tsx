@@ -24,7 +24,6 @@ export const RangeInput = ({
             {label}
           </Text>
         </Box>
-
         <RelativeBox
           margin={{ top: 'xxsmall' }}
           pad="8px"

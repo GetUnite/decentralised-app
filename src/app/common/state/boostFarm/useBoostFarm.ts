@@ -3,19 +3,27 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
-  convertToLP, depositIntoBoostFarm, getBoostFarmInterest,
+  depositIntoBoostFarm,
+  getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getMaximumLPValueAsToken,
   withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
+  approve,
   getTotalAssets,
   getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import {
+  isCorrectNetwork,
+  isSafeApp,
+  walletAccount,
+  wantedChain
+} from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
@@ -305,9 +313,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'wETH',
-    ],
+    lowSlippageTokenLabels: ['wETH'],
     apyFarmAddresses: {
       baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -402,9 +408,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'CRV',
-    ],
+    lowSlippageTokenLabels: ['CRV'],
     apyFarmAddresses: {
       baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -500,10 +504,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: [
-      'FRAX',
-      'USDC'
-    ],
+    lowSlippageTokenLabels: ['FRAX', 'USDC'],
     apyFarmAddresses: {
       baseApyAddress: 'd05cb04d-f1e5-451d-95a2-6a3a9da001ad',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
@@ -528,6 +529,7 @@ export const useBoostFarm = ({ id }) => {
 
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [isCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
@@ -541,6 +543,12 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
+  // withdraw selected supportedTokenInfo
+  const selectedSupportedTokenInfo = useRef<any>({
+    boostDepositedAmount: 0,
+    balance: 0,
+    allowance: 0,
+  });
 
   // booster farm rewards control
   const rewardsInfo = useRef<any>(defaultRewards);
@@ -556,6 +564,7 @@ export const useBoostFarm = ({ id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
@@ -577,15 +586,17 @@ export const useBoostFarm = ({ id }) => {
     !cookies.has_seen_locked_boost_farms && selectedFarm.current?.isLocked;
   const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
     useState<boolean>(false);
-  const [showBoostDepositConfirmation, setShowBoostDepositConfirmation] =
-    useState<boolean>(false);
+  const [
+    showLockedBoostDepositConfirmation,
+    setShowLockedBoostDepositConfirmation,
+  ] = useState<boolean>(false);
   const showHeading =
     !showBoostFarmPresentation && !showLockedBoostFarmPresentation;
   const showTabs =
     !showBoostFarmPresentation &&
     !showLockedBoostFarmPresentation &&
     !showBoostWithdrawalConfirmation &&
-    !showBoostDepositConfirmation;
+    !showLockedBoostDepositConfirmation;
 
   // harvest dates for the farms
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
@@ -628,7 +639,7 @@ export const useBoostFarm = ({ id }) => {
     if (walletAccountAtom) {
       loadFarmInfo();
     }
-  }, [walletAccountAtom]);
+  }, [walletAccountAtom, isCorrectNetworkAtom]);
 
   // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
@@ -674,7 +685,15 @@ export const useBoostFarm = ({ id }) => {
         farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        const depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+        const depositedAmount =
+          +depositedAmountInLP > 0 && isCorrectNetwork
+            ? await getMaximumLPValueAsToken(
+                farm.farmAddress,
+                EEthereumAddresses.USDC,
+                6,
+                depositedAmountInLP,
+              )
+            : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
@@ -750,12 +769,12 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startBoostDepositConfirmation = async () => {
-    setShowBoostDepositConfirmation(true);
+  const startLockedBoostDepositConfirmation = async () => {
+    setShowLockedBoostDepositConfirmation(true);
   };
 
-  const cancelBoostDepositConfirmation = async () => {
-    setShowBoostDepositConfirmation(false);
+  const cancelLockedBoostDepositConfirmation = async () => {
+    setShowLockedBoostDepositConfirmation(false);
   };
 
   const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
@@ -774,19 +793,20 @@ export const useBoostFarm = ({ id }) => {
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
     setShowBoostWithdrawalConfirmation(false);
+
+    // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
+    const withdrawPercentage = Math.round(
+      +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
+    );
+
+    const valueToWithdraw =
+      selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
+
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarmInfo.current.farmAddress,
         selectedSupportedToken.address,
-        // The withdraw value is always referent to the selected supported token
-        // But the contract for booster farm withdrawal expects the value as LP/Shares
-        // Thus, convert the value into LP
-        await convertToLP(
-          withdrawValue,
-          selectedSupportedToken.address,
-          selectedSupportedToken.decimals,
-          selectedFarmInfo.current.valueOf1LPinUSDC,
-        ),
+        valueToWithdraw,
         selectedSupportedToken.decimals,
         selectedFarmInfo.current.chain,
         useBiconomy,
@@ -798,6 +818,9 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.boostDepositedAmount =
+        selectedSupportedTokenInfo.current.boostDepositedAmount -
+        +withdrawValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');
@@ -806,10 +829,37 @@ export const useBoostFarm = ({ id }) => {
     setIsWithdrawing(false);
   };
 
+  const handleApprove = async () => {
+    setIsApproving(true);
+
+    try {
+      const tx = await approve(
+        selectedFarmInfo.current?.farmAddress,
+        selectedSupportedToken?.address,
+        selectedFarmInfo.current?.chain,
+      );
+      heapTrack('approvedTransactionMined', {
+        pool: 'boost',
+        currency: selectedSupportedToken?.label,
+        amount: depositValue,
+      });
+      setNotification(
+        'Approved successfully',
+        'success',
+        tx.transactionHash,
+        selectedFarmInfo.current?.chain,
+      );
+    } catch (err) {
+      setNotification(err, 'error');
+    }
+
+    setIsApproving(false);
+  };
+
   // deposit method
   const handleDeposit = async () => {
     setIsDepositing(true);
-    setShowBoostDepositConfirmation(false);
+    setShowLockedBoostDepositConfirmation(false);
     try {
       heapTrack('startedDepositing', {
         pool: 'boost',
@@ -836,6 +886,8 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.balance =
+        selectedSupportedTokenInfo.current.balance - +depositValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');
@@ -845,6 +897,8 @@ export const useBoostFarm = ({ id }) => {
   };
 
   return {
+    walletAccountAtom,
+    isCorrectNetworkAtom,
     // presentation
     showTabs,
     showHeading,
@@ -874,14 +928,17 @@ export const useBoostFarm = ({ id }) => {
     // deposit
     depositValue,
     setDepositValue,
+    handleApprove,
+    isApproving,
     handleDeposit,
     isDepositing,
-    showBoostDepositConfirmation,
-    startBoostDepositConfirmation,
-    cancelBoostDepositConfirmation,
+    showLockedBoostDepositConfirmation,
+    startLockedBoostDepositConfirmation,
+    cancelLockedBoostDepositConfirmation,
     //withdraw
     withdrawValue,
     setWithdrawValue,
+    selectedSupportedTokenInfo,
     handleWithdraw,
     isWithdrawing,
     showBoostWithdrawalConfirmation,

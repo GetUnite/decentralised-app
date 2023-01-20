@@ -44,7 +44,15 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
             align="center"
             justify="start"
             fill="horizontal"
-            height={notificationAtom.message != '' ? '148px' : '100px'}
+            height={
+              isSmall(size)
+                ? notificationAtom.message != ''
+                  ? '108px'
+                  : '60px'
+                : notificationAtom.message != ''
+                ? '148px'
+                : '100px'
+            }
             style={{ position: 'sticky', top: '0px', zIndex: 2 }}
           >
             <Nav
@@ -55,9 +63,10 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               pad={{ horizontal: 'medium', vertical: 'small' }}
               gap="none"
               fill="horizontal"
-              height="100px"
+              height={isSmall(size) ? '60px' : '100px'}
+              style={{justifyContent: isSmall(size) ? 'space-between' : ''}}
             >
-              <Box direction="row" align="center" style={{ flex: 1 }}>
+              <Box direction="row" align="center" flex={!isSmall(size) ? true : false}>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                   <Link to={modernUiPaths.MAIN}>
                     <Image
@@ -76,7 +85,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   </Link>
                 </div>
               </Box>
-              {isSmall(size) || (
+              {!isSmall(size) && (
                 <MenuItem
                   direction="row"
                   gap="large"
@@ -121,29 +130,39 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
               <Box
                 direction={isSmall(size) ? 'column' : 'row'}
                 justify={isSmall(size) ? 'center' : 'between'}
+                pad={{ horizontal: isSmall(size) ? '20px' : '' }}
                 fill
               >
-                <Box>
+                <Box
+                  direction={'column'}
+                  fill
+                  justify={isSmall(size) ? 'center' : 'start'}
+                  align={isSmall(size) ? 'center' : 'start'}
+                >
                   <img width="137px" src={isLightMode ? logo : logoDark} />
-                  <Box direction="row" gap="24px" margin={{ top: '60px' }}>
+                  <Box
+                    direction="row"
+                    gap="24px"
+                    margin={{ top: isSmall(size) ? '20px' : '40px' }}
+                  >
                     <a
                       href="https://apps.apple.com/us/app/alluo/id1604572992"
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <img src={appStore} width="170px" />
+                      <img src={appStore} width="155px" />
                     </a>
                     <a
                       href="https://play.google.com/store/apps/details?id=com.alluo"
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <img src={googlePlay} width="183px" />
+                      <img src={googlePlay} width="168px" />
                     </a>
                   </Box>
                 </Box>
-                <Box direction="row" gap="64px">
-                  <Box>
+                <Box direction="row" gap="64px" justify={isSmall(size) ? 'center' : 'end'} margin={{top: isSmall(size) ? '20px' : ''}}>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       About us
                     </Text>
@@ -184,7 +203,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       The vote
                     </a>
                   </Box>
-                  <Box>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       Social
                     </Text>
@@ -237,7 +256,7 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                       Telegram
                     </a>
                   </Box>
-                  <Box>
+                  <Box width="110px">
                     <Text size="14px" weight={700} margin={{ bottom: '38px' }}>
                       Support
                     </Text>
@@ -256,10 +275,12 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 </Box>
               </Box>
               <Box
-                direction="row"
-                justify="between"
+                direction={isSmall(size) ? 'column' : 'row'}
+                justify={isSmall(size) ? 'center' : 'between'}
+                align={isSmall(size) ? 'center' : 'between'}
+                gap={isSmall(size) ? '20px' : ''}
                 fill
-                pad={{ top: '50px' }}
+                pad={{ top: isSmall(size) ? '20px' : '50px'}}
                 style={{ borderTop: `2px solid ${dividerColor}` }}
               >
                 <Box direction="row" gap="medium">
@@ -296,13 +317,25 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                   >
                     <Image src={isLightMode ? discord : discordDark} />
                   </a>
-                  <a href="https://blog.alluo.io/" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://blog.alluo.io/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? medium : mediumDark} />
                   </a>
-                  <a href="https://twitter.com/AlluoApp" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://twitter.com/AlluoApp"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? twitter : twitterDark} />
                   </a>
-                  <a href="https://t.me/+Ir2-mWe8fQhhNzQ0" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://t.me/+Ir2-mWe8fQhhNzQ0"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Image src={isLightMode ? telegram : telegramDark} />
                   </a>
                 </Box>

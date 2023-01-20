@@ -1,6 +1,8 @@
+import { EChain } from 'app/common/constants/chains';
 import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Tab, Tabs } from 'app/modernUI/components';
+import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import { Box, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FarmDepositTab, FarmWithdrawalTab } from './blocks';
 
@@ -13,9 +15,26 @@ export const Farm = () => {
     isLoading,
     selectSupportedToken,
     selectedSupportedToken,
+    // deposit
+    depositValue,
+    setDepositValue,
+    handleApprove,
+    handleDeposit,
+    //withdraw
+    withdrawValue,
+    setWithdrawValue,
+    handleWithdraw,
+    isWithdrawing,
+    // biconomy
+    useBiconomy,
+    setUseBiconomy,
+    isApproving,
+    isDepositing,
   } = useFarm({
     id,
   });
+
+  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <ResponsiveContext.Consumer>
@@ -26,27 +45,51 @@ export const Farm = () => {
             heading={selectedFarm?.name}
             showChainBadge={!isLoading}
           >
-            <Tabs>
-              <Tab title="Deposit">
-                <FarmDepositTab
-                  selectedFarm={selectedFarm}
-                  isLoading={isLoading}
-                  selectedSupportedToken={selectedSupportedToken}
-                  selectSupportedToken={selectSupportedToken}
-                  updateFarmInfo={updateFarmInfo}
-                />
-              </Tab>
-              <Tab title="Withdraw">
-                <FarmWithdrawalTab
-                  selectedFarm={selectedFarm}
-                  isLoading={isLoading}
-                  updateFarmInfo={updateFarmInfo}
-                  selectedSupportedToken={selectedSupportedToken}
-                  selectSupportedToken={selectSupportedToken}
-                />
-              </Tab>
-            </Tabs>
-            <Box margin={{ top: '26px' }} justify="center" direction='row'>
+            {isDepositing || isApproving || isWithdrawing ? (
+              <Box
+                align="center"
+                justify="center"
+                fill="vertical"
+                style={{
+                  minHeight:
+                    selectedFarm?.chain == EChain.POLYGON ? '580px' : '551px',
+                }}
+              >
+                <Spinner pad="large" />
+              </Box>
+            ) : (
+              <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
+                <Tab title="Deposit">
+                  <FarmDepositTab
+                    selectedFarm={selectedFarm}
+                    isLoading={isLoading}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
+                    depositValue={depositValue}
+                    setDepositValue={setDepositValue}
+                    handleApprove={handleApprove}
+                    handleDeposit={handleDeposit}
+                    useBiconomy={useBiconomy}
+                    setUseBiconomy={setUseBiconomy}
+                  />
+                </Tab>
+                <Tab title="Withdraw">
+                  <FarmWithdrawalTab
+                    selectedFarm={selectedFarm}
+                    isLoading={isLoading}
+                    selectedSupportedToken={selectedSupportedToken}
+                    selectSupportedToken={selectSupportedToken}
+                    withdrawValue={withdrawValue}
+                    setWithdrawValue={setWithdrawValue}
+                    handleWithdraw={handleWithdraw}
+                    isWithdrawing={isWithdrawing}
+                    useBiconomy={useBiconomy}
+                    setUseBiconomy={setUseBiconomy}
+                  />
+                </Tab>
+              </Tabs>
+            )}
+            <Box margin={{ top: '26px' }} justify="center" direction="row">
               <Text size="12px">
                 Find out where these funds are being invested{' '}
                 <a
