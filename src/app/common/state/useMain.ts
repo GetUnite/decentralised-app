@@ -20,8 +20,7 @@ import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import {
-  getBoostFarmInterest,
-  getMaximumLPValueAsToken
+  getBoostFarmInterest
 } from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
 
@@ -283,16 +282,8 @@ export const useMain = () => {
       );
       farmInfo.depositedAmountInLP = depositedAmountInLP;
       // Let's use the depositedAmount to store the deposited amount in USD(C)
-      // callStatic withdraw from pool with the maximum amount of LP tokens to get the equivalent on the request token
-      farmInfo.depositedAmount =
-        +depositedAmountInLP > 0
-          ? await getMaximumLPValueAsToken(
-              farm.farmAddress,
-              EEthereumAddresses.USDC,
-              6,
-              depositedAmountInLP,
-            )
-          : 0;
+      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
+      farmInfo.depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
