@@ -2,6 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import { useFarm } from 'app/common/state/farm';
 import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
 import { Box, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FarmDepositTab, FarmWithdrawalTab } from './blocks';
 
@@ -33,6 +34,8 @@ export const Farm = () => {
     id,
   });
 
+  const [selectedTab, setSelectedTab] = useState(0);
+
   return (
     <ResponsiveContext.Consumer>
       {_ => (
@@ -47,16 +50,15 @@ export const Farm = () => {
                 align="center"
                 justify="center"
                 fill="vertical"
-                margin={{ top: 'large', bottom: 'medium' }}
                 style={{
                   minHeight:
-                    selectedFarm?.chain == EChain.POLYGON ? '504px' : '475px',
+                    selectedFarm?.chain == EChain.POLYGON ? '580px' : '551px',
                 }}
               >
                 <Spinner pad="large" />
               </Box>
             ) : (
-              <Tabs>
+              <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
                 <Tab title="Deposit">
                   <FarmDepositTab
                     selectedFarm={selectedFarm}

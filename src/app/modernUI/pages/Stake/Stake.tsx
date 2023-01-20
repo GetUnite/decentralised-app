@@ -12,6 +12,7 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
+import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { LockTab } from './blocks/LockTab';
 import { ReunlockConfirmation } from './blocks/ReunlockConfirmation';
@@ -58,6 +59,8 @@ export const Stake = ({ ...rest }) => {
   const allTimersAreFinished =
     timerIsFinished(alluoInfo?.depositUnlockTime) &&
     timerIsFinished(alluoInfo?.withdrawUnlockTime);
+
+  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <ResponsiveContext.Consumer>
@@ -137,14 +140,13 @@ export const Stake = ({ ...rest }) => {
                 </Box>
               </Box>
               <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-                {isLocking || isApproving || isWithdrawing ? (
+                {isLocking || isApproving || isUnlocking ? (
                   <Box
                     align="center"
                     justify="center"
                     fill="vertical"
-                    margin={{ top: 'large', bottom: 'medium' }}
                     style={{
-                      minHeight: '536px',
+                      minHeight: selectedTab == 0 ? '538px': '579px',
                     }}
                   >
                     <Spinner pad="large" />
@@ -157,7 +159,10 @@ export const Stake = ({ ...rest }) => {
                         cancelReunlockConfirmation={cancelReunlockConfirmation}
                       />
                     ) : (
-                      <Tabs>
+                      <Tabs
+                        selectedTab={selectedTab}
+                        setSelectedTab={setSelectedTab}
+                      >
                         <Tab title="Lock">
                           <LockTab
                             isLoading={isLoading}

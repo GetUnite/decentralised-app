@@ -1,10 +1,10 @@
 import exclamation from 'app/modernUI/images/blackExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
-export const BoostFarmDepositConfirmation = ({
+export const LockedBoostFarmDepositConfirmation = ({
   selectedFarmInfo,
   handleDeposit,
-  cancelBoostDepositConfirmation,
+  cancelLockedBoostDepositConfirmation,
   nextHarvestDate,
   ...rest
 }) => {
@@ -36,7 +36,7 @@ export const BoostFarmDepositConfirmation = ({
             label={`Cancel withdraw and comeback on ${nextHarvestDate.format(
               'DD MMMM',
             )}`}
-            onClick={cancelBoostDepositConfirmation}
+            onClick={cancelLockedBoostDepositConfirmation}
             style={{
               textAlign: 'center',
               color: '#2A73FF',

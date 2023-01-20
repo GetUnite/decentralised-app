@@ -1,11 +1,7 @@
-import { mode } from "app/common/state/atoms";
+import { mode } from 'app/common/state/atoms';
 import { colors } from 'app/modernUI/theme';
-import {
-  Box,
-  Button, ButtonExtendedProps, Text
-} from 'grommet';
+import { Box, Button, ButtonExtendedProps, Text } from 'grommet';
 import { normalizeColor } from 'grommet/utils';
-import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
@@ -27,13 +23,21 @@ const StyledButton = styled(Button)<ButtonExtendedProps | any>`
   font-weight: bold;
 `;
 
-export const Tabs = ({ children = [], ...rest }) => {
+export const Tabs = ({
+  children = [],
+  selectedTab,
+  setSelectedTab,
+  ...rest
+}) => {
   const [modeAtom] = useRecoilState(mode);
-  const [selected, setSelected] = useState(0);
   return (
     <>
       <Box
-        style={{boxShadow:`inset 0px 0px 0px 1px ${modeAtom === 'light' ? colors.BLACK_8 : colors.BLUE_80}`}}
+        style={{
+          boxShadow: `inset 0px 0px 0px 1px ${
+            modeAtom === 'light' ? colors.BLACK_8 : colors.BLUE_80
+          }`,
+        }}
         background="tabSwitch"
         direction="row"
         height="38px"
@@ -45,11 +49,11 @@ export const Tabs = ({ children = [], ...rest }) => {
           <Box flex direction="row" key={i}>
             <StyledButton
               size="small"
-              selected={selected === i}
+              selected={selectedTab === i}
               justify="center"
               fill
               key={i}
-              onClick={() => setSelected(i)}
+              onClick={() => setSelectedTab(i)}
             >
               <Box fill justify="center" align="center">
                 <Text size="small">{tab.props.title}</Text>
@@ -58,7 +62,7 @@ export const Tabs = ({ children = [], ...rest }) => {
           </Box>
         ))}
       </Box>
-      {children[selected]}
+      {children[selectedTab]}
     </>
   );
 };
