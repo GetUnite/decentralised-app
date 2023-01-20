@@ -1,7 +1,4 @@
-import {
-  getAllowance,
-  getBalanceOf
-} from 'app/common/functions/web3Client';
+import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 
@@ -13,6 +10,7 @@ const possibleDepositSteps: TPossibleStep[] = [
 export const useBoostFarmDeposit = ({
   selectedFarmInfo,
   selectedSupportedToken,
+  selectedSupportedTokenInfo,
   depositValue,
   setDepositValue,
   startLockedBoostDepositConfirmation,
@@ -21,12 +19,6 @@ export const useBoostFarmDeposit = ({
 }) => {
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
-
-  // data
-  const selectedSupportedTokenInfo = useRef<any>({
-    balance: 0,
-    allowance: 0,
-  });
 
   // Deposit steps
   const [currentStep, setCurrentStep] = useState<number>(0);

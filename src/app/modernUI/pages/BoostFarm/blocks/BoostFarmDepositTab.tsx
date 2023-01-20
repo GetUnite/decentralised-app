@@ -14,6 +14,7 @@ export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarmInfo,
   selectSupportedToken,
+    selectedSupportedTokenInfo,
   selectedSupportedToken,
   isCorrectNetworkAtom,
   // deposit
@@ -31,13 +32,13 @@ export const BoostFarmDepositTab = ({
     depositValueError,
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
-    selectedSupportedTokenInfo,
     currentStep,
     selectedSupportedTokenSteps,
     handleCurrentStep,
   } = useBoostFarmDeposit({
     selectedFarmInfo,
     selectedSupportedToken,
+    selectedSupportedTokenInfo,
     depositValue,
     setDepositValue,
     startLockedBoostDepositConfirmation,

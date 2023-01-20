@@ -546,6 +546,8 @@ export const useBoostFarm = ({ id }) => {
   // withdraw selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     boostDepositedAmount: 0,
+    balance: 0,
+    allowance: 0,
   });
 
   // booster farm rewards control
@@ -792,17 +794,14 @@ export const useBoostFarm = ({ id }) => {
     setIsWithdrawing(true);
     setShowBoostWithdrawalConfirmation(false);
 
-    console.log(withdrawValue, selectedSupportedTokenInfo.current.boostDepositedAmount);
     // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
     const withdrawPercentage = Math.round(
       +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
     );
-    console.log(withdrawPercentage)
+
     const valueToWithdraw =
       selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
 
-      console.log(selectedFarmInfo.current.depositedAmountInLP);
-      console.log(valueToWithdraw, )
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarmInfo.current.farmAddress,
@@ -819,6 +818,9 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.boostDepositedAmount =
+        selectedSupportedTokenInfo.current.boostDepositedAmount -
+        +withdrawValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');
@@ -884,6 +886,8 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.balance =
+        selectedSupportedTokenInfo.current.balance - +depositValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');
