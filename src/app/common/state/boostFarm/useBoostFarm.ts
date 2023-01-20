@@ -546,6 +546,8 @@ export const useBoostFarm = ({ id }) => {
   // withdraw selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     boostDepositedAmount: 0,
+    balance: 0,
+    allowance: 0,
   });
 
   // booster farm rewards control
@@ -816,6 +818,9 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.boostDepositedAmount =
+        selectedSupportedTokenInfo.current.boostDepositedAmount -
+        +withdrawValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');
@@ -881,6 +886,8 @@ export const useBoostFarm = ({ id }) => {
         tx.transactionHash,
         selectedFarmInfo.current.chain,
       );
+      selectedSupportedTokenInfo.current.balance =
+        selectedSupportedTokenInfo.current.balance - +depositValue;
       await updateFarmInfo();
     } catch (error) {
       setNotification(error, 'error');

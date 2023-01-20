@@ -181,6 +181,9 @@ export const BoostFarm = () => {
                             selectedFarmInfo={selectedFarmInfo}
                             isLoading={isLoading}
                             selectedSupportedToken={selectedSupportedToken}
+                            selectedSupportedTokenInfo={
+                              selectedSupportedTokenInfo
+                            }
                             selectSupportedToken={selectSupportedToken}
                             isCorrectNetworkAtom={isCorrectNetworkAtom}
                             // deposit
@@ -202,14 +205,14 @@ export const BoostFarm = () => {
                             isLoading={isLoading}
                             selectedFarmInfo={selectedFarmInfo}
                             selectedSupportedToken={selectedSupportedToken}
+                            selectedSupportedTokenInfo={
+                              selectedSupportedTokenInfo
+                            }
                             selectSupportedToken={selectSupportedToken}
                             isCorrectNetworkAtom={isCorrectNetworkAtom}
                             // withdraw
                             withdrawValue={withdrawValue}
                             setWithdrawValue={setWithdrawValue}
-                            selectedSupportedTokenInfo={
-                              selectedSupportedTokenInfo
-                            }
                             startBoostWithdrawalConfirmation={
                               startBoostWithdrawalConfirmation
                             }
