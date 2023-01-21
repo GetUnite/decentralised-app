@@ -71,20 +71,22 @@ export const useWallet = () => {
 
   const checkCurrentChain = async (chainId?) => {
     const chainIdToUse = chainId != undefined ? chainId : wantedChainId;
-    const isCorrectNetwork = (await getCurrentChainId()) == chainIdToUse;
-    setIsCorrectNetworkAtom(isCorrectNetwork);
-    if (!isCorrectNetwork) {
-      setNotification(
-        `Please change your wallet network to ${getChainNameById(
-          chainIdToUse,
-        )}`,
-        'info',
-        null,
-        null,
-        true,
-      );
-    } else {
-      resetNotification();
+    if (chainIdToUse != undefined) {
+      const isCorrectNetwork = (await getCurrentChainId()) == chainIdToUse;
+      setIsCorrectNetworkAtom(isCorrectNetwork);
+      if (!isCorrectNetwork) {
+        setNotification(
+          `Please change your wallet network to ${getChainNameById(
+            chainIdToUse,
+          )}`,
+          'info',
+          null,
+          null,
+          true,
+        );
+      } else {
+        resetNotification();
+      }
     }
   };
 
