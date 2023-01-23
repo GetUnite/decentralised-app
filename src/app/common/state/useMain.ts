@@ -10,7 +10,7 @@ import {
   getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
 import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
@@ -43,6 +43,7 @@ export const useMain = () => {
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // farms
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
@@ -77,6 +78,7 @@ export const useMain = () => {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    setWantedChainAtom(undefined);
     fetchFarmsInfo();
   }, [walletAccountAtom]);
 

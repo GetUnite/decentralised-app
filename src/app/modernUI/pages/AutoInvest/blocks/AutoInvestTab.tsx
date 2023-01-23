@@ -51,7 +51,6 @@ export const AutoInvestTab = ({ ...rest }) => {
   return (
     <Box fill>
       <Box
-        style={{ minHeight: useEndDate ? '535px' : '448px' }}
         justify="center"
       >
         {isStartingStream || isApproving || isDepositing ? (
@@ -59,7 +58,7 @@ export const AutoInvestTab = ({ ...rest }) => {
             align="center"
             justify="center"
             fill="vertical"
-            margin={{ top: 'large', bottom: 'medium' }}
+            style={{ minHeight: useEndDate ? '611px' : '524px' }}
           >
             <Spinner pad="large" />
           </Box>
@@ -172,7 +171,7 @@ export const AutoInvestTab = ({ ...rest }) => {
                 }
                 value={
                   selectedSupportedFromToken?.sign +
-                  (+streamValue * 0.5 / 100).toLocaleString()
+                  ((+streamValue * 0.5) / 100).toLocaleString()
                 }
                 isLoading={
                   isLoading ||
@@ -192,32 +191,32 @@ export const AutoInvestTab = ({ ...rest }) => {
                 }
               />
             </Box>
+            <Box margin={{ top: 'medium' }}>
+              <SubmitButton
+                primary
+                disabled={
+                  isLoading ||
+                  hasErrors ||
+                  isUpdatingSelectedStreamOption ||
+                  isApproving ||
+                  isDepositing ||
+                  streamValue == ''
+                }
+                label={
+                  isLoading || isUpdatingSelectedStreamOption
+                    ? 'Loading...'
+                    : `Step ${currentStep + 1} of ${
+                        selectedStreamOptionSteps?.length
+                      }: ${selectedStreamOptionSteps[currentStep]?.label}`
+                }
+                onClick={handleCurrentStep}
+                glowing={
+                  currentStep > 0 && !isDepositing && !isApproving && !isLoading
+                }
+              />
+            </Box>
           </Box>
         )}
-      </Box>
-      <Box margin={{ top: 'large' }}>
-        <SubmitButton
-          primary
-          disabled={
-            isLoading ||
-            hasErrors ||
-            isUpdatingSelectedStreamOption ||
-            isApproving ||
-            isDepositing ||
-            streamValue == ''
-          }
-          label={
-            isLoading || isUpdatingSelectedStreamOption
-              ? 'Loading...'
-              : `Step ${currentStep + 1} of ${
-                  selectedStreamOptionSteps?.length
-                }: ${selectedStreamOptionSteps[currentStep]?.label}`
-          }
-          onClick={handleCurrentStep}
-          glowing={
-            currentStep > 0 && !isDepositing && !isApproving && !isLoading
-          }
-        />
       </Box>
     </Box>
   );

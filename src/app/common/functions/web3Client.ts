@@ -221,9 +221,9 @@ export const changeNetwork = async (chain: EChain) => {
         : EChainId.POL_MUMBAI;
   }
 
-  const success = await onboard.setChain({ chainId: chainId });
+  await onboard.setChain({ chainId: chainId });
 
-  return { success, chainId };
+  return chainId ;
 };
 
 export const getChainById = chainId => {

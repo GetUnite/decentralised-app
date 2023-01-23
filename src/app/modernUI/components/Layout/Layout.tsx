@@ -141,9 +141,11 @@ export const Layout = ({ children, notificationId = null, ...rest }) => {
                 >
                   <img width="137px" src={isLightMode ? logo : logoDark} />
                   <Box
+                  fill
                     direction="row"
-                    gap="24px"
+                    gap={isSmall(size) ? '' : '24px'}
                     margin={{ top: isSmall(size) ? '20px' : '40px' }}
+                    justify={isSmall(size) ? 'around' : 'start'}
                   >
                     <a
                       href="https://apps.apple.com/us/app/alluo/id1604572992"

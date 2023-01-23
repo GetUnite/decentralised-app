@@ -24,7 +24,7 @@ export const useWallet = () => {
   const [, setIsCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
   const [, setSafeAppAtom] = useRecoilState(isSafeApp);
   const [wantedChainId, setWantedChainId] = useState<EChainId>();
-  const [currentChainId, setCurrentChain] = useState<EChain>();
+  const [currentChainId, setCurrentChainId] = useState<EChain>();
 
   const handleSafeAppConnection = (walletAddress, isGnosisSafe) => {
     setWalletAccountAtom(walletAddress);
@@ -38,7 +38,7 @@ export const useWallet = () => {
   }, []);
 
   const handleWalletChanged = (chainId, walletAddress) => {
-    setCurrentChain(chainId);
+    setCurrentChainId(chainId);
     setWalletAccountAtom(walletAddress);
   };
 
@@ -50,34 +50,32 @@ export const useWallet = () => {
     if (walletAccountAtom) {
       checkCurrentChain();
     }
-  }, [currentChainId]);
+  }, [currentChainId, wantedChainId]);
 
   useEffect(() => {
     if (walletAccountAtom) {
+      setIsCorrectNetworkAtom(false);
       networkChange();
     }
   }, [wantedChainAtom]);
 
   const networkChange = async () => {
-    const { success, chainId } = await changeNetwork(wantedChainAtom);
-    setWantedChainId(chainId);
-    if (!success) {
-      checkCurrentChain(chainId);
+    if (wantedChainAtom != undefined) {
+      const chainId = await changeNetwork(wantedChainAtom);
+      setWantedChainId(chainId);
     } else {
       resetNotification();
-      setIsCorrectNetworkAtom(success);
     }
   };
 
-  const checkCurrentChain = async (chainId?) => {
-    const chainIdToUse = chainId != undefined ? chainId : wantedChainId;
-    if (chainIdToUse != undefined) {
-      const isCorrectNetwork = (await getCurrentChainId()) == chainIdToUse;
+  const checkCurrentChain = async () => {
+    if (wantedChainId != undefined) {
+      const isCorrectNetwork = (await getCurrentChainId()) == wantedChainId;
       setIsCorrectNetworkAtom(isCorrectNetwork);
       if (!isCorrectNetwork) {
         setNotification(
           `Please change your wallet network to ${getChainNameById(
-            chainIdToUse,
+            wantedChainId,
           )}`,
           'info',
           null,
@@ -87,6 +85,8 @@ export const useWallet = () => {
       } else {
         resetNotification();
       }
+    } else {
+      resetNotification();
     }
   };
 
