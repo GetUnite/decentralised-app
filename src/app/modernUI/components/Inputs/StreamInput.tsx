@@ -36,9 +36,11 @@ interface IStreamInput {
   toTokenOptions?: TSupportedToken[];
   selectedToToken?: TSupportedToken;
   setSelectedToToken?: Function;
-  error: string;
+  error?: string;
   maxValue?: string;
-  disabled: boolean;
+  disabled?: boolean;
+  isSmall?: boolean;
+  style?: object;
 }
 
 export const StreamInput = ({
@@ -52,9 +54,10 @@ export const StreamInput = ({
   toTokenOptions,
   selectedToToken,
   setSelectedToToken,
-  error,
+  error = undefined,
   disabled = false,
-  ...rest
+  isSmall = false,
+  style,
 }: IStreamInput) => {
   const [formattedValue, setFormattedValue] = useState('');
   const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
@@ -62,7 +65,7 @@ export const StreamInput = ({
 
   return (
     <>
-      <Box>
+      <Box style={style}>
         <Box direction="row" justify="between">
           <Text size="medium" color="soul">
             {label}
@@ -108,7 +111,9 @@ export const StreamInput = ({
                   disabled={disabled}
                 />
               )}
-              <Text margin={{ right: '10px' }}> to </Text>
+              {fromTokenOptions && toTokenOptions && (
+                <Text margin={{ right: '10px' }}> to </Text>
+              )}
               {toTokenOptions && (
                 <TokenSelector
                   selectedToken={selectedToToken}
@@ -117,18 +122,21 @@ export const StreamInput = ({
                   disabled={disabled}
                 />
               )}
-              / month
+              {isSmall ? (
+                <>{formattedValue.length < 9 && <Text color="soul">/m</Text>}</>
+              ) : (
+                '/ month'
+              )}
             </ThemeContext.Extend>
           </AbsoluteBox>
         </RelativeBox>
-        <Box
-          height="13px"
-        >
-        {error && (
-          <Text color="error" size="small" margin={{ top: 'small' }}>
-            {error}
-          </Text>
-        )}</Box>
+        <Box height="13px">
+          {error && (
+            <Text color="error" size="small" margin={{ top: 'small' }}>
+              {error}
+            </Text>
+          )}
+        </Box>
       </Box>
     </>
   );

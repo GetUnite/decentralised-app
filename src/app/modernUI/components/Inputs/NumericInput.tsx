@@ -114,7 +114,7 @@ export const NumericInput = ({
           </AbsoluteBox>
         </RelativeBox>
         <Box
-          margin={{ top: 'small' }}
+          margin={{ top: '4px' ,bottom: '12px'}}
           height={slippageWarning ? '60px' : '13px'}
         >
           {error ? (

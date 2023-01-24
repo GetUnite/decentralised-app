@@ -8,7 +8,8 @@ interface IDateInput {
   label?: string;
   date?: string;
   setDate: Function;
-  disabled: boolean;
+  disabled?: boolean;
+  style?: object;
 }
 
 export const DateInput = ({
@@ -16,11 +17,12 @@ export const DateInput = ({
   date,
   setDate,
   disabled = false,
+  style = {},
   ...rest
 }: IDateInput) => {
   const { isLightMode } = useMode();
   return (
-    <>
+    <Box style={style}>
       <Text size="medium" color="soul">
         {label}
       </Text>
@@ -33,6 +35,6 @@ export const DateInput = ({
           calendarClassName={!isLightMode ? 'dark' : ''}
         />
       </Box>
-    </>
+    </Box>
   );
 };

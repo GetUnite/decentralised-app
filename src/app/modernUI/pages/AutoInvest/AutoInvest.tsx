@@ -1,11 +1,6 @@
 import { useMode } from 'app/common/state';
 import { useAutoInvest } from 'app/common/state/autoInvest/useAutoInvest';
-import {
-  ConnectionButton,
-  Layout,
-  Spinner,
-  Tooltip
-} from 'app/modernUI/components';
+import { ConnectionButton, Layout, Tooltip } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Card, Grid, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
@@ -51,7 +46,7 @@ export const AutoInvest = () => {
               <Box margin={{ top: '72px' }}>
                 <>
                   {walletAccountAtom && isLoading ? (
-                    <Skeleton count={1} height="45px" borderRadius="20px"/>
+                    <Skeleton count={1} height="45px" borderRadius="20px" />
                   ) : (
                     <Box direction="row" justify="between" align="center">
                       <Text size="24px" weight={700}>
@@ -69,7 +64,7 @@ export const AutoInvest = () => {
                   )}
                   <Box
                     margin={{ top: '36px' }}
-                    pad={{bottom: "20px"}}
+                    pad={{ bottom: '20px' }}
                     background="card"
                     round="16px"
                     style={{ boxShadow: '0px -1px 4px #CCCCCC' }}
@@ -87,7 +82,15 @@ export const AutoInvest = () => {
                           fill="horizontal"
                           rows="xxsmall"
                           align="center"
-                          columns={{ size: 'xsmall', count: 'fit' }}
+                          columns={[
+                            '150px',
+                            '150px',
+                            '150px',
+                            '150px',
+                            '130px',
+                            '150px',
+                            '170px',
+                          ]}
                           pad="none"
                           style={{ fontSize: '16px' }}
                         >
@@ -96,7 +99,7 @@ export const AutoInvest = () => {
                             <span>streams to</span>
                             <Box direction="row">
                               <Tooltip text="total value streamed">
-                              <span>TVS</span>
+                                <span>TVS</span>
                               </Tooltip>
                             </Box>
                             <span>flow rate</span>
@@ -108,18 +111,7 @@ export const AutoInvest = () => {
                       </Card>
                     )}
                     {isLoading && walletAccountAtom ? (
-                      <Box
-                        pad={{ horizontal: 'medium' }}
-                        background="card"
-                        margin="none"
-                        align="center"
-                        justify="center"
-                        fill="horizontal"
-                        height="120px"
-                        style={{ borderTop: `0.5px solid ${dividerColor}` }}
-                      >
-                        <Spinner pad="medium" />
-                      </Box>
+                      <StreamCard isLoading={true} />
                     ) : (
                       <>
                         {walletAccountAtom ? (
