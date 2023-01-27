@@ -123,7 +123,7 @@ export const farmOptions: Array<TFarm> = [
       },
     ],
   },
-  {
+  /*{
     id: 4,
     farmAddress: EEthereumAddresses.IBALLUOUSD,
     type: 'usd',
@@ -152,7 +152,7 @@ export const farmOptions: Array<TFarm> = [
         sign: '$',
       },
     ],
-  },
+  },*/
   {
     id: 5,
     farmAddress: EEthereumAddresses.IBALLUOEUR,
