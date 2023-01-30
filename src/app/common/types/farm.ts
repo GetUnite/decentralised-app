@@ -48,4 +48,6 @@ export type TBoostFarm = TFarm & {
   valueOf1LPinUSDC?: number;
   // For locked boost farms
   isLocked?: boolean;
+  unlockedBalance?: string;
+  withdrawToken?: TSupportedToken;
 }

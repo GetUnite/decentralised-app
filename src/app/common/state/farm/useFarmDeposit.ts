@@ -1,125 +1,111 @@
-import {
-  getAllowance,
-  getBalanceOf
-} from 'app/common/functions/web3Client';
+import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
+import vaultIn from 'app/modernUI/animations/vault-in.svg';
 import { useEffect, useState } from 'react';
 
-const possibleDepositSteps: TPossibleStep[] = [
-  { id: 0, label: 'Approve' },
-  { id: 1, label: 'Deposit' },
+export const possibleDepositSteps: TPossibleStep[] = [
+  {
+    id: 0,
+    label: 'Approve deposit',
+    successLabel: 'Deposit approved',
+    errorLabel: 'Approval failed',
+  },
+  {
+    id: 1,
+    label: 'Deposit',
+    successLabel: '',
+    errorLabel: 'Failed to deposit tokens',
+    successImage: vaultIn
+  },
 ];
 
 export const useFarmDeposit = ({
-  selectedFarm,
+  selectedFarmInfo,
   selectedSupportedToken,
+  selectedSupportedTokenInfo,
+  steps,
   // deposit
   depositValue,
   setDepositValue,
-  handleApprove,
-  handleDeposit,
 }) => {
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
-
-  // data
-  const [selectedSupportedTokenInfo, setSelectedSupportedTokenInfo] =
-    useState<any>({
-      balance: 0,
-      allowance: 0,
-    });
-
-  // Deposit steps
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [selectedSupportedTokenSteps, setSelectedSupportedTokenSteps] =
-    useState<TPossibleStep[]>();
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
 
   useEffect(() => {
-    if (selectedFarm && selectedSupportedToken) {
+    if (selectedFarmInfo && selectedSupportedToken) {
       updateBalanceAndAllowance();
+      updateSteps();
     }
   }, [selectedSupportedToken]);
 
   useEffect(() => {
-    if (selectedFarm && selectedSupportedToken && depositValue != undefined) {
-      // the inputs might not be ok after this
-      handleDepositValueChange(depositValue);
+    if (selectedFarmInfo && selectedSupportedToken && depositValue != '') {
+      updateSteps();
     }
-  }, [selectedSupportedTokenInfo]);
+  }, [depositValue]);
 
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    let neededSteps: TPossibleStep[] = [];
-
     const allowance = await getAllowance(
       selectedSupportedToken.address,
-      selectedFarm.farmAddress,
-      selectedFarm.chain,
+      selectedFarmInfo.farmAddress,
+      selectedFarmInfo.chain,
     );
-
-    // If the allowance is not higher than 0 ask for approval
-    if (!(+allowance > 0)) {
-      neededSteps.push(possibleDepositSteps[0]);
-    }
 
     const balance = await getBalanceOf(
       selectedSupportedToken.address,
       selectedSupportedToken.decimals,
-      selectedFarm.chain,
+      selectedFarmInfo.chain,
     );
 
-    setSelectedSupportedTokenInfo({ balance: balance, allowance: allowance });
+    selectedSupportedTokenInfo.current = {
+      ...selectedSupportedTokenInfo.current,
+      balance: balance,
+      allowance: allowance,
+    };
 
-    // Deposit step is always there
-    neededSteps.push(possibleDepositSteps[1]);
-
-    setSelectedSupportedTokenSteps(neededSteps);
+    // the inputs might not be ok after this
+    await handleDepositValueChange(depositValue);
 
     setIsFetchingSupportedTokenInfo(false);
   };
 
+  const updateSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // If the allowance is not higher than 0 ask for approval
+    if (!(+selectedSupportedTokenInfo.current?.allowance > 0)) {
+      neededSteps.push(possibleDepositSteps[0]);
+    }
+
+    // Deposit step is always there
+    neededSteps.push({
+      ...possibleDepositSteps[1],
+      label: `Deposit ${depositValue} ${selectedSupportedToken.label}`,
+      successLabel: `${depositValue} ${selectedSupportedToken.label} deposited`,
+    });
+
+    steps.current = neededSteps;
+  };
+
   const handleDepositValueChange = value => {
     setDepositValueError('');
-    if (+value > +selectedSupportedTokenInfo.balance) {
+    if (+value > +selectedSupportedTokenInfo.current?.balance) {
       setDepositValueError('Insufficient balance');
     }
     setDepositValue(value);
   };
 
-  // executes the handle for the current step
-  const handleCurrentStep = async () => {
-    const possibleDepositStep = possibleDepositSteps.find(
-      possibleDepositStep =>
-        possibleDepositStep.id == selectedSupportedTokenSteps[currentStep].id,
-    );
-
-    switch (possibleDepositStep.id) {
-      case 0:
-        await handleApprove();
-        // Next step
-        setCurrentStep(currentStep + 1);
-        break;
-
-      case 1:
-        await handleDeposit();
-        break;
-    }
-  };
-
   return {
-    depositValue,
     handleDepositValueChange,
     selectedSupportedTokenInfo,
     depositValueError,
     hasErrors: depositValueError != '',
     isFetchingSupportedTokenInfo,
-    currentStep,
-    selectedSupportedTokenSteps,
-    handleCurrentStep,
   };
 };

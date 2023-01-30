@@ -5,61 +5,63 @@ import {
   FeeInfo,
   Info,
   NumericInput,
-  ProjectedWeeklyInfo, SubmitButton
+  ProjectedWeeklyInfo,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
 
 export const BoostFarmDepositTab = ({
   isLoading,
+  selectedFarm,
   selectedFarmInfo,
   selectSupportedToken,
-    selectedSupportedTokenInfo,
+  selectedSupportedTokenInfo,
   selectedSupportedToken,
   isCorrectNetworkAtom,
   // deposit
   depositValue,
   setDepositValue,
-  handleApprove,
-  startLockedBoostDepositConfirmation,
-  handleDeposit,
+  startLockedBoostLockConfirmation,
   // biconomy
   useBiconomy,
   setUseBiconomy,
+  // steps
+  startProcessingSteps,
+  steps
 }) => {
   const {
     hasErrors,
     depositValueError,
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
-    currentStep,
-    selectedSupportedTokenSteps,
-    handleCurrentStep,
   } = useBoostFarmDeposit({
     selectedFarmInfo,
+    selectSupportedToken,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
     depositValue,
     setDepositValue,
-    startLockedBoostDepositConfirmation,
-    handleApprove,
-    handleDeposit,
+    steps
   });
 
   return (
     <Box fill>
       <Box margin={{ top: 'large' }}>
-        <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} isCorrectNetworkAtom={isCorrectNetworkAtom}/>
+        <TopHeader
+          selectedFarmInfo={selectedFarmInfo}
+          isLoading={isLoading}
+          isCorrectNetworkAtom={isCorrectNetworkAtom}
+        />
       </Box>
       <Box margin={{ top: 'medium' }}>
         <NumericInput
-          label={`Deposit ${
+          label={`${selectedFarmInfo.current?.isLocked ? 'Lock' : 'Deposit'} ${
             selectedSupportedToken ? selectedSupportedToken?.label : ''
           }`}
           tokenSign={selectedSupportedToken?.sign}
           onValueChange={handleDepositValueChange}
           value={depositValue}
-          isLoadingMaxValue={isFetchingSupportedTokenInfo}
           maxButton={true}
           maxValue={selectedSupportedTokenInfo.current?.balance}
           tokenOptions={selectedFarmInfo.current?.supportedTokens || []}
@@ -96,6 +98,16 @@ export const BoostFarmDepositTab = ({
           }
           isLoading={isLoading}
         />
+        {selectedFarm.current?.isLocked && (
+          <Info
+            label="Unlocked balance"
+            value={
+              selectedFarmInfo.current?.sign +
+              (+selectedFarmInfo.current?.unlockedBalance).toLocaleString()
+            }
+            isLoading={isLoading}
+          />
+        )}
         <FeeInfo
           biconomyToggle={selectedFarmInfo.current?.chain == EChain.POLYGON}
           useBiconomy={false}
@@ -110,22 +122,21 @@ export const BoostFarmDepositTab = ({
       <Box margin={{ top: 'medium' }}>
         <SubmitButton
           primary
-          disabled={
+          // TODO uncomment
+          /*disabled={
             isLoading ||
             !(+depositValue > 0) ||
             isFetchingSupportedTokenInfo ||
             hasErrors
-          }
+          }*/
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
-              : selectedSupportedTokenSteps.current?.length > 1
-              ? `Step ${currentStep + 1} of ${
-                  selectedSupportedTokenSteps.current?.length
-                }: ${selectedSupportedTokenSteps.current[currentStep]?.label}`
-              : `${selectedSupportedTokenSteps.current[currentStep]?.label}`
+              : selectedFarmInfo.current?.isLocked
+              ? 'Lock'
+              : 'Deposit'
           }
-          onClick={handleCurrentStep}
+          onClick={selectedFarmInfo.current?.isLocked ? startLockedBoostLockConfirmation : startProcessingSteps}
         />
       </Box>
     </Box>

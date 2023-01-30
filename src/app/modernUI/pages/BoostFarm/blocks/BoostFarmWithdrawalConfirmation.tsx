@@ -6,7 +6,7 @@ export const BoostFarmWithdrawalConfirmation = ({
   selectedFarmInfo,
   withdrawValue,
   withdrawTokenLabel,
-  handleWithdraw,
+  startProcessingSteps,
   cancelBoostWithdrawalConfirmation,
   nextHarvestDate,
   losablePendingRewards,
@@ -32,7 +32,7 @@ export const BoostFarmWithdrawalConfirmation = ({
           <Button
             primary
             label="I still want to withdraw now"
-            onClick={handleWithdraw}
+            onClick={startProcessingSteps}
             style={{ width: '360px' }}
           />
           <Button

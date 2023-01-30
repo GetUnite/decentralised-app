@@ -1,53 +1,71 @@
 import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const possibleDepositSteps: TPossibleStep[] = [
-  { id: 0, label: 'Approve' },
-  { id: 1, label: 'Deposit' },
+export const possibleDepositSteps: TPossibleStep[] = [
+  {
+    id: 0,
+    label: 'Approve deposit',
+    successLabel: 'Deposit approved',
+    errorLabel: 'Approval failed',
+  },
+  {
+    id: 1,
+    label: 'Deposit',
+    successLabel: '',
+    errorLabel: 'Failed to deposit tokens',
+  },
+  {
+    id: 2,
+    label: 'Lock',
+    successLabel: '',
+    errorLabel: 'Failed to lock tokens',
+  },
 ];
 
 export const useBoostFarmDeposit = ({
   selectedFarmInfo,
+  selectSupportedToken,
   selectedSupportedToken,
   selectedSupportedTokenInfo,
   depositValue,
   setDepositValue,
-  startLockedBoostDepositConfirmation,
-  handleApprove,
-  handleDeposit,
+  steps,
 }) => {
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
-
-  // Deposit steps
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const selectedSupportedTokenSteps = useRef<TPossibleStep[]>();
 
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
 
   useEffect(() => {
+    if (selectedFarmInfo && selectedFarmInfo.current?.isLocked) {
+      selectSupportedToken(selectedFarmInfo.current?.supportedTokens[0]);
+    }
+  }, []);
+
+  useEffect(() => {
     if (selectedFarmInfo && selectedSupportedToken) {
       updateBalanceAndAllowance();
+      updateSteps();
     }
   }, [selectedSupportedToken]);
 
+  useEffect(() => {
+    if (selectedFarmInfo && selectedSupportedToken && depositValue != '') {
+      updateSteps();
+    }
+  }, [depositValue]);
+
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
-
-    let neededSteps: TPossibleStep[] = [];
 
     const allowance = await getAllowance(
       selectedSupportedToken?.address,
       selectedFarmInfo.current?.farmAddress,
       selectedFarmInfo.current?.chain,
     );
-    // If the allowance is not higher than 0 ask for approval
-    if (!(+allowance > 0)) {
-      neededSteps.push(possibleDepositSteps[0]);
-    }
 
     const balance = await getBalanceOf(
       selectedSupportedToken?.address,
@@ -56,18 +74,37 @@ export const useBoostFarmDeposit = ({
     );
 
     selectedSupportedTokenInfo.current = {
+      ...selectedSupportedTokenInfo.current,
       balance: balance,
       allowance: allowance,
     };
 
-    // Deposit step is always there
-    neededSteps.push(possibleDepositSteps[1]);
-
-    selectedSupportedTokenSteps.current = neededSteps;
-
     await handleDepositValueChange(depositValue);
 
     setIsFetchingSupportedTokenInfo(false);
+  };
+
+  const updateSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // If the allowance is not higher than 0 ask for approval
+    if (!(+selectedSupportedTokenInfo.current?.allowance > 0)) {
+      neededSteps.push(possibleDepositSteps[0]);
+    }
+
+    // Deposit/Lock step is always there
+    var stepToAdd = selectedFarmInfo.current?.isLocked
+      ? possibleDepositSteps[2]
+      : possibleDepositSteps[1];
+    neededSteps.push({
+      ...stepToAdd,
+      label: `${stepToAdd.label} ${depositValue} ${selectedSupportedToken.label}`,
+      successLabel: `${depositValue} ${selectedSupportedToken.label} ${
+        selectedFarmInfo.current?.isLocked ? 'locked' : 'deposited'
+      }.`,
+    });
+
+    steps.current = neededSteps;
   };
 
   const handleDepositValueChange = value => {
@@ -78,33 +115,6 @@ export const useBoostFarmDeposit = ({
     setDepositValue(value);
   };
 
-  // executes the handle for the current step
-  const handleCurrentStep = async () => {
-    const possibleDepositStep = possibleDepositSteps.find(
-      possibleDepositStep =>
-        possibleDepositStep.id ==
-        selectedSupportedTokenSteps.current[currentStep].id,
-    );
-
-    try {
-      switch (possibleDepositStep.id) {
-        case 0:
-          await handleApprove();
-          // Next step
-          setCurrentStep(currentStep + 1);
-          break;
-
-        case 1:
-          (await selectedFarmInfo.current?.isLocked)
-            ? startLockedBoostDepositConfirmation()
-            : handleDeposit();
-          break;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   return {
     depositValue,
     handleDepositValueChange,
@@ -112,8 +122,5 @@ export const useBoostFarmDeposit = ({
     hasErrors: depositValueError != '',
     isFetchingSupportedTokenInfo,
     selectedSupportedTokenInfo,
-    currentStep,
-    selectedSupportedTokenSteps,
-    handleCurrentStep,
   };
 };

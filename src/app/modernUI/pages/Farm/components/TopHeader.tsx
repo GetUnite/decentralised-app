@@ -2,8 +2,8 @@ import { toExactFixed } from 'app/common/functions/utils';
 import { Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 
-export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
-  const { first, second } = selectedFarm?.depositDividedAmount || 0;
+export const TopHeader = ({ selectedFarmInfo, isLoading, ...rest }) => {
+  const { first, second } = selectedFarmInfo?.depositDividedAmount || 0;
   return (
     <>
       {isLoading ? (
@@ -11,9 +11,9 @@ export const TopHeader = ({ selectedFarm, isLoading, ...rest }) => {
       ) : (
         <Text textAlign="center" weight="bold" size="18px">
           Your balance currently earning <br />
-          {+toExactFixed(selectedFarm.interest, 2).toLocaleString()}% APY is{' '}
-          {selectedFarm.sign}
-          {(+first).toLocaleString()}
+          {+toExactFixed(selectedFarmInfo.interest, 2).toLocaleString()}% APY is{' '}
+          {selectedFarmInfo.sign}
+          {(+first).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           <Text color="softText" size="18px">
             {second}
           </Text>

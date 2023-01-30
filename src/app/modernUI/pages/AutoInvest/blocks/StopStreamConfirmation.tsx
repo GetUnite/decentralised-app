@@ -29,7 +29,7 @@ export const StopStreamConfirmation = ({
               onClickOutside={() => setStopStreamConfirmation(false)}
             >
               <Box
-                round={'medium'}
+                round={'16px'}
                 overflow="auto"
                 width="medium"
                 height="375px"

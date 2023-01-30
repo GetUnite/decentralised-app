@@ -4,10 +4,11 @@ import Skeleton from 'react-loading-skeleton';
 
 export const TopHeader = ({ ibAlluosInfo, isLoading, ...rest }) => {
   const alluoTextBalances = ibAlluosInfo
-    .filter(token => token.balance > 0)
+    .filter(token => token.balance > 0.00001)
     .map(token => {
       return toExactFixed(token.balance, 5) + ' ' + token.label;
     });
+
   return (
     <Box height="54px">
       {isLoading ? (

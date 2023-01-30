@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink= "http://www.w3.org/1999/xlink" preserveAspectRatio="none" viewBox="0 0 343 211" style="background-color:#FFFFFF; overflow:hidden">
+    <title>Coins 1</title>
+    <!-- Layers -->
+    <!-- Layer: Right purple coin -->
+    <svg x="103.01" y="87.25" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="103.01;109.1;103.01"/>
+        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="87.25;93.34;87.25"/>
+        <g label="flipped" transform="scale(1 1)">
+            <g label="layerRotation" transform="rotate(0)">
+                <svg x="-0" y="-0" width="31.08" height="31.08" style ="overflow:visible" opacity="1" label="Right purple coinContainer">
+                    <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                    <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                    <animate attributeName="opacity" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="1;0.7;1"/>
+                    <g clip-path="" label="maskPath">
+                        <g label="layerShadow" filter="">
+                        <!-- Layer: Ellipse 14 -->
+                        <svg x="0" y="0" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="31.08" height="31.08" style ="overflow:visible" opacity="1" label="Ellipse 14Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M19.378,30.595c8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 -8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 0,0,0,0,0,0zM19.378,30.595" fill="#C9CFEA" id="ellipse_14" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="2.45">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#ellipse_14" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M19.378,30.595c8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 -8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 0,0,0,0,0,0zM19.378,30.595;M11.784,18.605c5.056,-1.289,8.11,-6.433,6.821,-11.489 -1.289,-5.056,-6.433,-8.11,-11.489,-6.821 -5.056,1.289,-8.11,6.433,-6.821,11.489 1.289,5.056,6.433,8.11,11.489,6.821 0,0,0,0,0,0zM11.784,18.605;M19.378,30.595c8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 -8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 0,0,0,0,0,0zM19.378,30.595"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <rect fill="none" height="100%" rx="0" stroke="#00000000" stroke-width="1" width="100%" x="0" y="0">
+                            <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                            <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;18.9;31.08"/>
+                        </rect>
+                        </g>
+                    </g>
+                </svg>
+            </g>
+        </g>
+    </svg>
+    <!-- Layer: Left purple coin -->
+    <svg x="180.49" y="132.33" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="180.49;184.06;180.49"/>
+        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="132.33;111.9;132.33"/>
+        <g label="flipped" transform="scale(1 1)">
+            <g label="layerRotation" transform="rotate(0)">
+                <svg x="-0" y="-0" width="31.08" height="31.08" style ="overflow:visible" opacity="1" label="Left purple coinContainer">
+                    <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                    <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                    <animate attributeName="opacity" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="1;0.5;1"/>
+                    <g clip-path="" label="maskPath">
+                        <g label="layerShadow" filter="">
+                        <!-- Layer: Ellipse 15 -->
+                        <svg x="0" y="0" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="31.08" height="31.08" style ="overflow:visible" opacity="1" label="Ellipse 15Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M11.702,0.485c-8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 0,0,0,0,0,0zM11.702,0.485" fill="#C9CFEA" id="ellipse_15" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="2.45">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#ellipse_15" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M11.702,0.485c-8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 0,0,0,0,0,0zM11.702,0.485;M9.014,0.374c-6.404,1.633,-10.273,8.148,-8.64,14.553 1.633,6.404,8.148,10.273,14.553,8.64 6.404,-1.633,10.273,-8.148,8.64,-14.553 -1.633,-6.404,-8.148,-10.273,-14.553,-8.64 0,0,0,0,0,0zM9.014,0.374;M11.702,0.485c-8.314,2.12,-13.336,10.578,-11.216,18.893 2.12,8.314,10.578,13.336,18.893,11.216 8.314,-2.12,13.336,-10.578,11.216,-18.893 -2.12,-8.314,-10.578,-13.336,-18.893,-11.216 0,0,0,0,0,0zM11.702,0.485"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector 48 -->
+                        <svg x="7.44" y="12.96" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="7.44;5.73;7.44"/>
+                            <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="12.96;9.98;12.96"/>
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="2.97" height="6.91" style ="overflow:visible" opacity="1" label="Vector 48Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="2.97;2.29;2.97"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="6.91;5.32;6.91"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0.548,0c-0.749,1.555,-1.313,5.114,2.422,6.91" fill="#00000000" id="vector_48" stroke="#000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-linecap="round" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#vector_48" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M0.548,0c-0.749,1.555,-1.313,5.114,2.422,6.91;M0.422,0c-0.577,1.197,-1.012,3.937,1.868,5.32;M0.548,0c-0.749,1.555,-1.313,5.114,2.422,6.91"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <rect fill="none" height="100%" rx="0" stroke="#00000000" stroke-width="1" width="100%" x="0" y="0">
+                            <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                            <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="31.08;23.94;31.08"/>
+                        </rect>
+                        </g>
+                    </g>
+                </svg>
+            </g>
+        </g>
+    </svg>
+    <!-- Layer: Top right coin -->
+    <svg x="154.46" y="21.13" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="154.46;158.91;154.46"/>
+        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="21.13;5;21.13"/>
+        <g label="flipped" transform="scale(1 1)">
+            <g label="layerRotation" transform="rotate(0)">
+                <svg x="-0" y="-0" width="99.54" height="86.51" style ="overflow:visible" opacity="1" label="Top right coinContainer">
+                    <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                    <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="99.54;90.64;99.54"/>
+                    <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="86.51;78.78;86.51"/>
+                    <g clip-path="" label="maskPath">
+                        <g label="layerShadow" filter="">
+                        <!-- Layer: Ellipse 426 -->
+                        <svg x="0" y="0" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="88.14" height="86.51" style ="overflow:visible" opacity="1" label="Ellipse 426Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="88.14;80.26;88.14"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="86.51;78.78;86.51"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M33.4,1.406c23.609,-6.019,47.525,7.838,53.418,30.951 5.893,23.112,-8.469,46.728,-32.078,52.747 -23.609,6.019,-47.525,-7.838,-53.418,-30.951 -5.893,-23.113,8.469,-46.728,32.078,-52.747 0,0,0,0,0,0zM33.4,1.406" fill="#FCD400" id="ellipse_426" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="2.45">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#ellipse_426" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M33.4,1.406c23.609,-6.019,47.525,7.838,53.418,30.951 5.893,23.112,-8.469,46.728,-32.078,52.747 -23.609,6.019,-47.525,-7.838,-53.418,-30.951 -5.893,-23.113,8.469,-46.728,32.078,-52.747 0,0,0,0,0,0zM33.4,1.406;M30.414,1.281c21.498,-5.481,43.276,7.138,48.642,28.185 5.366,21.047,-7.711,42.553,-29.21,48.034 -21.498,5.481,-43.276,-7.138,-48.643,-28.185 -5.366,-21.047,7.711,-42.553,29.21,-48.034 0,0,0,0,0,0zM30.414,1.281;M33.4,1.406c23.609,-6.019,47.525,7.838,53.418,30.951 5.893,23.112,-8.469,46.728,-32.078,52.747 -23.609,6.019,-47.525,-7.838,-53.418,-30.951 -5.893,-23.113,8.469,-46.728,32.078,-52.747 0,0,0,0,0,0zM33.4,1.406"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Ellipse 428 -->
+                        <svg x="11.01" y="10.8" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="11.01;10.03;11.01"/>
+                            <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="10.8;9.83;10.8"/>
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="66.1" height="64.88" style ="overflow:visible" opacity="1" label="Ellipse 428Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="66.1;60.19;66.1"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="64.88;59.08;64.88"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M25.048,1.055c17.705,-4.514,35.641,5.879,40.061,23.212 4.419,17.334,-6.351,35.044,-24.056,39.558 -17.705,4.514,-35.641,-5.879,-40.061,-23.212 -4.419,-17.334,6.351,-35.045,24.056,-39.558 0,0,0,0,0,0zM25.048,1.055" fill="#00000000" id="ellipse_428" stroke="#FFFFFF" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#ellipse_428" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M25.048,1.055c17.705,-4.514,35.641,5.879,40.061,23.212 4.419,17.334,-6.351,35.044,-24.056,39.558 -17.705,4.514,-35.641,-5.879,-40.061,-23.212 -4.419,-17.334,6.351,-35.045,24.056,-39.558 0,0,0,0,0,0zM25.048,1.055;M22.808,0.96c16.122,-4.11,32.455,5.353,36.479,21.137 4.024,15.784,-5.783,31.912,-21.906,36.022 -16.122,4.11,-32.455,-5.353,-36.479,-21.137 -4.024,-15.784,5.783,-31.912,21.906,-36.022 0,0,0,0,0,0zM22.808,0.96;M25.048,1.055c17.705,-4.514,35.641,5.879,40.061,23.212 4.419,17.334,-6.351,35.044,-24.056,39.558 -17.705,4.514,-35.641,-5.879,-40.061,-23.212 -4.419,-17.334,6.351,-35.045,24.056,-39.558 0,0,0,0,0,0zM25.048,1.055"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector -->
+                        <svg x="11.02" y="11.86" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="11.02;10.03;11.02"/>
+                            <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="11.86;10.8;11.86"/>
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="66.1" height="62.76" style ="overflow:visible" opacity="1" label="VectorContainer">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="66.1;60.19;66.1"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="62.76;57.15;62.76"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0.991,39.56c-4.42,-17.334,6.351,-35.046,24.057,-39.56M65.109,23.2c4.42,17.334,-6.351,35.046,-24.057,39.56" fill="#00000000" id="vector" stroke="#E2B420" stroke-dasharray="0" stroke-dashoffset="0" stroke-linecap="round" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#vector" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M0.991,39.56c-4.42,-17.334,6.351,-35.046,24.057,-39.56M65.109,23.2c4.42,17.334,-6.351,35.046,-24.057,39.56;M0.903,36.024c-4.024,-15.785,5.783,-31.913,21.906,-36.024M59.287,21.126c4.024,15.785,-5.783,31.913,-21.906,36.024;M0.991,39.56c-4.42,-17.334,6.351,-35.046,24.057,-39.56M65.109,23.2c4.42,17.334,-6.351,35.046,-24.057,39.56"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector 120 -->
+                        <svg x="54" y="22.59" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="54;49.18;54"/>
+                            <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="22.59;20.57;22.59"/>
+                            <g label="flipped" transform="scale(1 -1)">
+                                <g label="layerRotation" transform="rotate(-90)">
+                                    <svg x="-0" y="-0" width="44.45" height="45.54" style ="overflow:visible" opacity="1" label="Vector 120Container">
+                                        <animate attributeName="x" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="-0;-0;-0"/>
+                                        <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="44.45;40.48;44.45"/>
+                                        <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="45.54;41.47;45.54"/>
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0,20.601c13.01,-1.084,20.599,-11.927,22.766,-20.601 2.169,10.843,11.926,18.433,21.684,21.686 -14.094,2.168,-20.599,14.096,-21.684,23.854 -1.083,-9.759,-8.672,-21.686,-22.766,-24.939 0,0,0,0,0,0zM0,20.601" fill="#FFFFFF" id="vector_120" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="4.89">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#vector_120" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M0,20.601c13.01,-1.084,20.599,-11.927,22.766,-20.601 2.169,10.843,11.926,18.433,21.684,21.686 -14.094,2.168,-20.599,14.096,-21.684,23.854 -1.083,-9.759,-8.672,-21.686,-22.766,-24.939 0,0,0,0,0,0zM0,20.601;M0,18.76c11.848,-0.987,18.759,-10.861,20.733,-18.76 1.975,9.874,10.861,16.785,19.747,19.748 -12.835,1.975,-18.759,12.836,-19.747,21.722 -0.987,-8.886,-7.898,-19.748,-20.733,-22.71 0,0,0,0,0,0zM0,18.76;M0,20.601c13.01,-1.084,20.599,-11.927,22.766,-20.601 2.169,10.843,11.926,18.433,21.684,21.686 -14.094,2.168,-20.599,14.096,-21.684,23.854 -1.083,-9.759,-8.672,-21.686,-22.766,-24.939 0,0,0,0,0,0zM0,20.601"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <rect fill="none" height="100%" rx="0" stroke="#00000000" stroke-width="1" width="100%" x="0" y="0">
+                            <animate attributeName="height" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="86.51;78.78;86.51"/>
+                            <animate attributeName="width" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="99.54;90.64;99.54"/>
+                        </rect>
+                        </g>
+                    </g>
+                </svg>
+            </g>
+        </g>
+    </svg>
+    <!-- Layer: Top left coin -->
+    <svg x="89" y="21" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="21;31;21"/>
+        <g label="flipped" transform="scale(1 1)">
+            <g label="layerRotation" transform="rotate(0)">
+                <svg x="-0" y="-0" width="40.95" height="43.82" style ="overflow:visible" opacity="1" label="Top left coinContainer">
+                    <g clip-path="" label="maskPath">
+                        <g label="layerShadow" filter="">
+                        <!-- Layer: Ellipse 426 -->
+                        <svg x="0" y="0" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="40.95" height="40.2" style ="overflow:visible" opacity="1" label="Ellipse 426Container">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M15.518,0.653c10.969,-2.797,22.08,3.642,24.818,14.382 2.738,10.74,-3.935,21.714,-14.903,24.511 -10.969,2.797,-22.08,-3.642,-24.818,-14.382 -2.738,-10.74,3.935,-21.714,14.903,-24.511 0,0,0,0,0,0zM15.518,0.653" fill="#FCD400" id="ellipse_427" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="2.45"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Ellipse 428 -->
+                        <svg x="5.12" y="5.01" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="30.71" height="30.15" style ="overflow:visible" opacity="1" label="Ellipse 428Container">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M11.637,0.49c8.226,-2.098,16.559,2.732,18.612,10.787 2.053,8.055,-2.951,16.285,-11.177,18.383 -8.226,2.098,-16.559,-2.732,-18.612,-10.787 -2.053,-8.055,2.951,-16.285,11.177,-18.383 0,0,0,0,0,0zM11.637,0.49" fill="#00000000" id="ellipse_429" stroke="#FFFFFF" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#ellipse_429" keySplines="0 0 1 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M11.637,0.49c8.226,-2.098,16.559,2.732,18.612,10.787 2.053,8.055,-2.951,16.285,-11.177,18.383 -8.226,2.098,-16.559,-2.732,-18.612,-10.787 -2.053,-8.055,2.951,-16.285,11.177,-18.383 0,0,0,0,0,0zM11.637,0.49;M11.637,0.49c8.226,-2.098,16.559,2.732,18.612,10.787 2.053,8.055,-2.951,16.285,-11.177,18.383 -8.226,2.098,-16.559,-2.732,-18.612,-10.787 -2.053,-8.055,2.951,-16.285,11.177,-18.383 0,0,0,0,0,0zM11.637,0.49;M11.637,0.49c8.226,-2.098,16.559,2.732,18.612,10.787 2.053,8.055,-2.951,16.285,-11.177,18.383 -8.226,2.098,-16.559,-2.732,-18.612,-10.787 -2.053,-8.055,2.951,-16.285,11.177,-18.383 0,0,0,0,0,0zM11.637,0.49"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector -->
+                        <svg x="5.12" y="5.48" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="30.72" height="29.18" style ="overflow:visible" opacity="1" label="VectorContainer">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0.461,18.38c-2.054,-8.054,2.951,-16.283,11.179,-18.38M30.259,10.8c2.054,8.054,-2.951,16.283,-11.179,18.38" fill="#00000000" id="vector_1" stroke="#E2B420" stroke-dasharray="0" stroke-dashoffset="0" stroke-linecap="round" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#vector_1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M0.461,18.38c-2.054,-8.054,2.951,-16.283,11.179,-18.38M30.259,10.8c2.054,8.054,-2.951,16.283,-11.179,18.38;M0.461,18.38c-2.054,-8.054,2.951,-16.283,11.179,-18.38M30.259,10.8c2.054,8.054,-2.951,16.283,-11.179,18.38;M0.461,18.38c-2.054,-8.054,2.951,-16.283,11.179,-18.38M30.259,10.8c2.054,8.054,-2.951,16.283,-11.179,18.38"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector 120 -->
+                        <svg x="15.13" y="23.93" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="20.5" height="19.89" style ="overflow:visible" opacity="1" label="Vector 120Container">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M6.661,0c1.005,5.982,-3.005,10.644,-6.661,12.616 5.13,-0.268,9.667,3.254,12.251,7.274 -0.642,-6.595,3.981,-10.893,8.249,-12.502 -4.517,0.632,-10.757,-1.416,-13.839,-7.388 0,0,0,0,0,0zM6.661,0" fill="#FFFFFF" id="vector_121" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="4.89"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <rect fill="none" height="100%" rx="0" stroke="#00000000" stroke-width="1" width="100%" x="0" y="0"/>
+                        </g>
+                    </g>
+                </svg>
+            </g>
+        </g>
+    </svg>
+    <!-- Layer: Bottom left coin -->
+    <svg x="101.38" y="142.29" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+        <animate attributeName="y" calcMode="spline" dur="2s" fill="freeze" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="142.29;129.29;142.29"/>
+        <g label="flipped" transform="scale(1 1)">
+            <g label="layerRotation" transform="rotate(0)">
+                <svg x="-0" y="-0" width="49.76" height="50.43" style ="overflow:visible" opacity="1" label="Bottom left coinContainer">
+                    <g clip-path="" label="maskPath">
+                        <g label="layerShadow" filter="">
+                        <!-- Layer: Oval -->
+                        <svg x="0" y="0" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="47.69" height="47.69" style ="overflow:visible" opacity="1" label="OvalContainer">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M23.845,0c13.169,0,23.845,10.676,23.845,23.845 0,13.169,-10.676,23.845,-23.845,23.845 -13.169,0,-23.845,-10.676,-23.845,-23.845 0,-13.169,10.676,-23.845,23.845,-23.845 0,0,0,0,0,0zM23.845,0" fill="#FCD400" id="oval" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="2.45"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector -->
+                        <svg x="31.2" y="6.73" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="11.29" height="25.29" style ="overflow:visible" opacity="1" label="VectorContainer">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0,0c9.592,4.173,13.91,15.496,9.646,25.29" fill="#00000000" id="vector_2" stroke="#E2B420" stroke-dasharray="0" stroke-dashoffset="0" stroke-linecap="round" stroke-miterlimit="4" stroke-width="1">
+                                                <animate attributeName="d" calcMode="spline" dur="2s" fill="freeze" href="#vector_2" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" keyTimes="0;0.5;1" repeatCount="indefinite" values="M0,0c9.592,4.173,13.91,15.496,9.646,25.29;M0,0c9.592,4.173,13.91,15.496,9.646,25.29;M0,0c9.592,4.173,13.91,15.496,9.646,25.29"/>
+                                            </path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Vector 121 -->
+                        <svg x="21.29" y="50.43" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 -1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="28.47" height="29.17" style ="overflow:visible" opacity="1" label="Vector 121Container">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0,13.196c8.333,-0.694,13.193,-7.64,14.582,-13.196 1.389,6.945,7.639,11.807,13.888,13.89 -9.027,1.389,-13.193,9.029,-13.888,15.28 -0.694,-6.251,-5.555,-13.89,-14.582,-15.974 0,0,0,0,0,0zM0,13.196" fill="#FFFFFF" id="vector_122" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="4.89"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- Layer: Ellipse 486 -->
+                        <svg x="26.55" y="1.52" width="0.01" height="0.01" style ="overflow:visible" opacity="1" label="anchorPointContainer">
+                            <g label="flipped" transform="scale(1 1)">
+                                <g label="layerRotation" transform="rotate(0)">
+                                    <svg x="-0" y="-0" width="1.17" height="1.17" style ="overflow:visible" opacity="1" label="Ellipse 486Container">
+                                        <g clip-path="" label="maskPath">
+                                            <g label="layerShadow" filter="">
+                                            <path d="M0.585,1.17c0.322,0,0.585,-0.263,0.585,-0.585 0,-0.322,-0.263,-0.585,-0.585,-0.585 -0.322,0,-0.585,0.263,-0.585,0.585 0,0.322,0.263,0.585,0.585,0.585zM0.585,1.17" fill="#E2B420" id="ellipse_486" stroke="#00000000" stroke-dasharray="0" stroke-dashoffset="0" stroke-miterlimit="4" stroke-width="1"/>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </g>
+                            </g>
+                        </svg>
+                        <rect fill="none" height="100%" rx="0" stroke="#00000000" stroke-width="1" width="100%" x="0" y="0"/>
+                        </g>
+                    </g>
+                </svg>
+            </g>
+        </g>
+    </svg>
+</svg>

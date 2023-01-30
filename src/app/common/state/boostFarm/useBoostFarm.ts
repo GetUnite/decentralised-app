@@ -1,28 +1,28 @@
 import { EEthereumAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
-  claimBoostFarmLPRewards,
-  claimBoostFarmNonLPRewards,
-  depositIntoBoostFarm,
-  getBoostFarmInterest,
-  getBoostFarmPendingRewards,
-  getBoostFarmRewards,
-  getMaximumLPValueAsToken,
-  withdrawFromBoostFarm
+    claimBoostFarmLPRewards,
+    claimBoostFarmNonLPRewards,
+    depositIntoBoostFarm,
+    getBoostFarmInterest,
+    getBoostFarmPendingRewards,
+    getBoostFarmRewards,
+    getMaximumLPValueAsToken,
+    withdrawFromBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  approve,
-  getTotalAssets,
-  getUserDepositedLPAmount,
-  getValueOf1LPinUSDC
+    approve,
+    getTotalAssets,
+    getUserDepositedLPAmount,
+    getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import {
-  isCorrectNetwork,
-  isSafeApp,
-  walletAccount,
-  wantedChain
+    isCorrectNetwork,
+    isSafeApp,
+    walletAccount,
+    wantedChain
 } from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
@@ -32,6 +32,10 @@ import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { useNotification } from '../useNotification';
+import { useProcessingSteps } from '../useProcessingSteps';
+import { possibleDepositSteps } from './useBoostFarmDeposit';
+import { possibleWithdrawSteps } from './useBoostFarmWithdrawal';
+import { possibleLockedWithdrawSteps } from './useLockedBoostFarmWithdrawal';
 
 export const boostFarmOptions: Array<TBoostFarm> = [
   {
@@ -543,11 +547,12 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
-  // withdraw selected supportedTokenInfo
+  // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     boostDepositedAmount: 0,
     balance: 0,
     allowance: 0,
+    unlocked: 0,
   });
 
   // booster farm rewards control
@@ -560,12 +565,22 @@ export const useBoostFarm = ({ id }) => {
   const [depositValue, setDepositValue] = useState<string>('');
   const [withdrawValue, setWithdrawValue] = useState<string>('');
 
+  // steps
+  const {
+    isProcessing,
+    setIsProcessing,
+    currentStep,
+    steps,
+    stepWasSuccessful,
+    stepError,
+    successTransactionHash,
+    resetProcessing,
+  } = useProcessingSteps();
+
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
+  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
 
   const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
@@ -584,26 +599,33 @@ export const useBoostFarm = ({ id }) => {
     !cookies.has_seen_boost_farms && !selectedFarm.current?.isLocked;
   const showLockedBoostFarmPresentation =
     !cookies.has_seen_locked_boost_farms && selectedFarm.current?.isLocked;
+  // normal withdraw/unlock
   const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
     useState<boolean>(false);
+  // when depositing
+  const [showLockedBoostLockConfirmation, setShowLockedBoostLockConfirmation] =
+    useState<boolean>(false);
+  // withdraw unlocked on locked boost farms
   const [
-    showLockedBoostDepositConfirmation,
-    setShowLockedBoostDepositConfirmation,
+    showLockedBoostWithdrawalConfirmation,
+    setShowLockedBoostWithdrawalConfirmation,
   ] = useState<boolean>(false);
   const showHeading =
-    !showBoostFarmPresentation && !showLockedBoostFarmPresentation;
+    !showBoostFarmPresentation &&
+    !showLockedBoostFarmPresentation &&
+    !isProcessing;
   const showTabs =
+    !isProcessing &&
     !showBoostFarmPresentation &&
     !showLockedBoostFarmPresentation &&
     !showBoostWithdrawalConfirmation &&
-    !showLockedBoostDepositConfirmation;
+    !showLockedBoostLockConfirmation;
 
   // harvest dates for the farms
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
-  const nextHarvestDate = moment()
-    .subtract(1, 'days')
-    .add(1, 'week')
-    .day('Monday');
+  const nextHarvestDate = useRef<any>(
+    moment().subtract(1, 'days').add(1, 'week').day('Sunday'),
+  );
 
   // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
   useEffect(() => {
@@ -686,7 +708,7 @@ export const useBoostFarm = ({ id }) => {
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
         const depositedAmount =
-          +depositedAmountInLP > 0 && isCorrectNetwork
+          +depositedAmountInLP > 0 && isCorrectNetworkAtom == true
             ? await getMaximumLPValueAsToken(
                 farm.farmAddress,
                 EEthereumAddresses.USDC,
@@ -769,12 +791,8 @@ export const useBoostFarm = ({ id }) => {
     setIsClamingRewards(false);
   };
 
-  const startLockedBoostDepositConfirmation = async () => {
-    setShowLockedBoostDepositConfirmation(true);
-  };
-
-  const cancelLockedBoostDepositConfirmation = async () => {
-    setShowLockedBoostDepositConfirmation(false);
+  const startLockedBoostLockConfirmation = async () => {
+    setShowLockedBoostLockConfirmation(true);
   };
 
   const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
@@ -785,13 +803,19 @@ export const useBoostFarm = ({ id }) => {
     setShowBoostWithdrawalConfirmation(true);
   };
 
-  const cancelBoostWithdrawalConfirmation = async () => {
+  const startLockedBoostWithdrawalConfirmation = () => {
+    setShowLockedBoostWithdrawalConfirmation(true);
+  };
+
+  const cancelConfirmations = async () => {
+    stopProcessingSteps();
     setShowBoostWithdrawalConfirmation(false);
+    setShowLockedBoostWithdrawalConfirmation(false);
+    setShowLockedBoostLockConfirmation(false);
   };
 
   // withdraw method
   const handleWithdraw = async () => {
-    setIsWithdrawing(true);
     setShowBoostWithdrawalConfirmation(false);
 
     // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
@@ -811,27 +835,16 @@ export const useBoostFarm = ({ id }) => {
         selectedFarmInfo.current.chain,
         useBiconomy,
       );
-
-      setNotification(
-        'Withdrew successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current.chain,
-      );
       selectedSupportedTokenInfo.current.boostDepositedAmount =
         selectedSupportedTokenInfo.current.boostDepositedAmount -
         +withdrawValue;
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-
-    setIsWithdrawing(false);
   };
 
   const handleApprove = async () => {
-    setIsApproving(true);
-
     try {
       const tx = await approve(
         selectedFarmInfo.current?.farmAddress,
@@ -843,23 +856,14 @@ export const useBoostFarm = ({ id }) => {
         currency: selectedSupportedToken?.label,
         amount: depositValue,
       });
-      setNotification(
-        'Approved successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current?.chain,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (err) {
-      setNotification(err, 'error');
+      throw err;
     }
-
-    setIsApproving(false);
   };
 
   // deposit method
   const handleDeposit = async () => {
-    setIsDepositing(true);
-    setShowLockedBoostDepositConfirmation(false);
     try {
       heapTrack('startedDepositing', {
         pool: 'boost',
@@ -874,7 +878,6 @@ export const useBoostFarm = ({ id }) => {
         selectedFarmInfo.current.chain,
         useBiconomy,
       );
-      setDepositValue('');
       heapTrack('depositTransactionMined', {
         pool: 'boost',
         currency: selectedSupportedToken.label,
@@ -888,12 +891,56 @@ export const useBoostFarm = ({ id }) => {
       );
       selectedSupportedTokenInfo.current.balance =
         selectedSupportedTokenInfo.current.balance - +depositValue;
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
+  };
 
-    setIsDepositing(false);
+  const startProcessingSteps = async () => {
+    cancelConfirmations();
+    setIsProcessing(true);
+    await handleCurrentStep();
+  };
+
+  const stopProcessingSteps = async () => {
+    resetProcessing();
+    setDepositValue('');
+    setWithdrawValue('');
+    await updateFarmInfo();
+  };
+
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    setIsHandlingStep(true);
+
+    const step = possibleBoostFarmSteps.find(
+      step => step.id == steps.current[currentStep.current].id,
+    );
+
+    try {
+      switch (step.id) {
+        case 0:
+          await handleApprove();
+          break;
+
+        case 1:
+        case 2: // lock
+          await handleDeposit();
+          break;
+
+        case 3:
+        case 4: // unlock
+        case 5: // locked withdraw
+          await handleWithdraw();
+          break;
+      }
+      stepWasSuccessful.current = true;
+    } catch (error) {
+      stepError.current = error;
+      stepWasSuccessful.current = false;
+    }
+    setIsHandlingStep(false);
   };
 
   return {
@@ -905,6 +952,8 @@ export const useBoostFarm = ({ id }) => {
     showBoostFarmPresentation,
     showLockedBoostFarmPresentation,
     // farm
+    selectedFarm,
+    updateFarmInfo,
     isLoading,
     selectedFarmInfo,
     selectSupportedToken,
@@ -929,20 +978,28 @@ export const useBoostFarm = ({ id }) => {
     depositValue,
     setDepositValue,
     handleApprove,
-    isApproving,
     handleDeposit,
-    isDepositing,
-    showLockedBoostDepositConfirmation,
-    startLockedBoostDepositConfirmation,
-    cancelLockedBoostDepositConfirmation,
+    showLockedBoostLockConfirmation,
+    startLockedBoostLockConfirmation,
     //withdraw
     withdrawValue,
     setWithdrawValue,
     selectedSupportedTokenInfo,
     handleWithdraw,
-    isWithdrawing,
     showBoostWithdrawalConfirmation,
     startBoostWithdrawalConfirmation,
-    cancelBoostWithdrawalConfirmation,
+    showLockedBoostWithdrawalConfirmation,
+    startLockedBoostWithdrawalConfirmation,
+    // steps
+    cancelConfirmations,
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
   };
 };

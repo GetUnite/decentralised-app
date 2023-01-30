@@ -20,4 +20,9 @@ export type TAllowance = {
 export type TPossibleStep = {
   id: number;
   label: string;
+  errorLabel?: string;
+  successLabel?: string;
+  image?: string;
+  successMessage?: string;
+  successImage?: string;
 };

@@ -1,8 +1,28 @@
 import { getIfUserHasWithdrawalRequest } from 'app/common/functions/farm';
-import { useState } from 'react';
+import { TPossibleStep } from 'app/common/types/global';
+import vaultIn from 'app/modernUI/animations/vault-in.svg';
+import vault from 'app/modernUI/animations/vault.svg';
+import { useEffect, useState } from 'react';
 import { useNotification } from '../useNotification';
 
-export const useFarmWithdrawal = ({ selectedFarm, setWithdrawValue }) => {
+export const possibleWithdrawSteps: TPossibleStep[] = [
+  {
+    id: 2,
+    label: '',
+    errorLabel: 'Failed to withdraw tokens',
+    successLabel: '',
+    image: vault,
+    successImage: vaultIn
+  },
+];
+
+export const useFarmWithdrawal = ({
+  selectedFarmInfo,
+  selectedSupportedToken,
+  withdrawValue,
+  setWithdrawValue,
+  steps,
+}) => {
   // other control files
   const { setNotification } = useNotification();
 
@@ -17,8 +37,8 @@ export const useFarmWithdrawal = ({ selectedFarm, setWithdrawValue }) => {
     setIsWithdrawalRequestsLoading(true);
     try {
       const userRequests = await getIfUserHasWithdrawalRequest(
-        selectedFarm.farmAddress,
-        selectedFarm.chain,
+        selectedFarmInfo.farmAddress,
+        selectedFarmInfo.chain,
       );
       const userRequestslength = userRequests.length;
       if (userRequestslength > 0) {
@@ -42,9 +62,30 @@ export const useFarmWithdrawal = ({ selectedFarm, setWithdrawValue }) => {
     setIsWithdrawalRequestsLoading(false);
   };
 
+  // when the selected token changes, trigger balance update
+  useEffect(() => {
+    if (selectedFarmInfo) {
+      updateSteps();
+    }
+  }, [withdrawValue]);
+
+  // function that updates the balance of the selected token on change
+  const updateSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // Withdraw step is always there
+    neededSteps.push({
+      ...possibleWithdrawSteps[0],
+      label: `Withdrawing ${withdrawValue} ${selectedSupportedToken.label}`,
+      successLabel: `${withdrawValue} ${selectedSupportedToken.label} withdrawn`,
+    });
+
+    steps.current = neededSteps;
+  };
+
   const handleWithdrawalFieldChange = value => {
     setWithdrawValueError('');
-    if (+value > +selectedFarm?.depositedAmount) {
+    if (+value > +selectedFarmInfo?.depositedAmount) {
       setWithdrawValueError('Insufficient balance');
     }
     setWithdrawValue(value);

@@ -15,10 +15,12 @@ import {
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
+import { useProcessingSteps } from '../useProcessingSteps';
+import { possibleDepositSteps } from './useFarmDeposit';
+import { possibleWithdrawSteps } from './useFarmWithdrawal';
 
 export const farmOptions: Array<TFarm> = [
   {
@@ -221,12 +223,11 @@ export const farmOptions: Array<TFarm> = [
   },
 ];
 
+const possibleFarmSteps = [...possibleDepositSteps, ...possibleWithdrawSteps];
+
 export const useFarm = ({ id }) => {
   // react
   const navigate = useNavigate();
-
-  // other control files
-  const { setNotification } = useNotification();
 
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
@@ -234,34 +235,51 @@ export const useFarm = ({ id }) => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
   // selected farm control
-  const [availableFarms] = useState<TFarm[]>(farmOptions);
-  const [selectedFarm, setSelectedFarm] = useState<TFarm>();
+  const selectedFarm = useRef<TFarm>(
+    farmOptions.find(availableFarm => availableFarm.id == id),
+  );
+  const [selectedFarmInfo, setSelectedFarmInfo] = useState<TFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
     useState<TSupportedToken>();
+  // selected supportedTokenInfo
+  const selectedSupportedTokenInfo = useRef<any>({
+    balance: 0,
+    allowance: 0,
+  });
 
   // inputs
   const [depositValue, setDepositValue] = useState<string>('');
   const [withdrawValue, setWithdrawValue] = useState<string>('');
 
+  // steps
+  const {
+    isProcessing,
+    setIsProcessing,
+    currentStep,
+    steps,
+    stepWasSuccessful,
+    stepError,
+    successTransactionHash,
+    resetProcessing,
+  } = useProcessingSteps();
+
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
+  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarm) {
-      setWantedChainAtom(selectedFarm.chain);
+    if (walletAccountAtom && selectedFarmInfo) {
+      setWantedChainAtom(selectedFarmInfo.chain);
     }
-  }, [walletAccountAtom, selectedFarm]);
+  }, [walletAccountAtom, selectedFarmInfo]);
 
   useEffect(() => {
     const selectFarm = async id => {
       try {
-        let farm = availableFarms.find(availableFarm => availableFarm.id == id);
+        let farm = farmOptions.find(availableFarm => availableFarm.id == id);
         if (!farm) {
           navigate('/');
           return;
@@ -270,7 +288,7 @@ export const useFarm = ({ id }) => {
         farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
 
         heapTrack('farm', { pool: 'Ib', currency: farm.type });
-        setSelectedFarm(farm);
+        setSelectedFarmInfo(farm);
         setSelectedsupportedToken(farm.supportedTokens[0]);
       } catch (error) {
         console.log(error);
@@ -283,30 +301,32 @@ export const useFarm = ({ id }) => {
   }, [walletAccountAtom]);
 
   useEffect(() => {
-    if (selectedFarm) {
+    if (selectedFarmInfo) {
       setUseBiconomy(
-        isSafeAppAtom || EChain.POLYGON != selectedFarm?.chain ? false : true,
+        isSafeAppAtom || EChain.POLYGON != selectedFarmInfo?.chain
+          ? false
+          : true,
       );
     }
-  }, [selectedFarm]);
+  }, [selectedFarmInfo]);
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarm);
+      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
       setSelectedsupportedToken(
         farm.supportedTokens?.find(
           st => st?.address == selectedSupportedToken?.address,
         ),
       );
-      setSelectedFarm(farm);
+      setSelectedFarmInfo(farm);
     } catch (error) {
       console.log(error);
     }
     setIsLoading(false);
   };
 
-  const getUpdatedFarmInfo = async (farm = selectedFarm) => {
+  const getUpdatedFarmInfo = async (farm = selectedFarmInfo) => {
     try {
       let farmInfo;
 
@@ -338,13 +358,11 @@ export const useFarm = ({ id }) => {
   };
 
   const handleApprove = async () => {
-    setIsApproving(true);
-
     try {
       const tx = await approve(
-        selectedFarm.farmAddress,
+        selectedFarmInfo.farmAddress,
         selectedSupportedToken.address,
-        selectedFarm.chain,
+        selectedFarmInfo.chain,
         useBiconomy,
       );
       heapTrack('approvedTransactionMined', {
@@ -352,22 +370,13 @@ export const useFarm = ({ id }) => {
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      setNotification(
-        'Approved successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarm.chain,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (err) {
-      setNotification(err, 'error');
+      throw err;
     }
-
-    setIsApproving(false);
   };
 
   const handleDeposit = async () => {
-    setIsDepositing(true);
-
     try {
       heapTrack('startedDepositing', {
         pool: 'Ib',
@@ -376,77 +385,106 @@ export const useFarm = ({ id }) => {
       });
       const tx = await deposit(
         selectedSupportedToken.address,
-        selectedFarm.farmAddress,
+        selectedFarmInfo.farmAddress,
         depositValue,
         selectedSupportedToken.decimals,
-        selectedFarm.chain,
+        selectedFarmInfo.chain,
         useBiconomy,
       );
-      setDepositValue('');
       heapTrack('depositTransactionMined', {
         pool: 'Ib',
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      setNotification(
-        'Deposit successful',
-        'success',
-        tx.transactionHash,
-        selectedFarm.chain,
-      );
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-    setIsDepositing(false);
   };
 
   const handleWithdraw = async () => {
-    setIsWithdrawing(true);
-
     try {
       const tx = await withdraw(
         selectedSupportedToken.address,
-        selectedFarm.farmAddress,
+        selectedFarmInfo.farmAddress,
         +withdrawValue,
-        selectedFarm.chain,
+        selectedFarmInfo.chain,
         useBiconomy,
       );
-      setNotification(
-        'Successfully withdrew',
-        'success',
-        tx.transactionHash,
-        selectedFarm.chain,
-      );
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
+  };
 
-    setIsWithdrawing(false);
+  const startProcessingSteps = async () => {
+    setIsProcessing(true);
+    await handleCurrentStep();
+  };
+
+  const stopProcessingSteps = async () => {
+    resetProcessing();
+    setDepositValue('');
+    setWithdrawValue('');
+    await updateFarmInfo();
+  };
+
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    setIsHandlingStep(true);
+
+    const step = possibleFarmSteps.find(
+      step => step.id == steps.current[currentStep.current].id,
+    );
+
+    console.log(step);
+    try {
+      switch (step.id) {
+        case 0:
+          await handleApprove();
+          break;
+
+        case 1:
+          await handleDeposit();
+          break;
+
+        case 2:
+          await handleWithdraw();
+          break;
+      }
+      stepWasSuccessful.current = true;
+    } catch (error) {
+      stepError.current = error;
+      stepWasSuccessful.current = false;
+    }
+    setIsHandlingStep(false);
   };
 
   return {
     isLoading,
-    availableFarms,
     selectedFarm,
-    updateFarmInfo,
+    selectedFarmInfo,
     selectedSupportedToken,
     selectSupportedToken,
+    selectedSupportedTokenInfo,
     // deposit
     depositValue,
     setDepositValue,
-    handleApprove,
-    handleDeposit,
-    isApproving,
-    isDepositing,
-    //withdraw
+    // withdraw
     withdrawValue,
     setWithdrawValue,
-    handleWithdraw,
-    isWithdrawing,
     // biconomy
     useBiconomy,
     setUseBiconomy,
+    // steps
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
   };
 };
