@@ -41,9 +41,7 @@ export const StepsProcessing = ({
   const checkedCircleColor = isLightMode ? '#C9CFEA' : '#C9CFEA';
   const errorColor = '#FF0000';
 
-
   const step = steps[currentStep.current];
-  console.log(steps, step);
   const isLastStep = currentStep.current == steps.length - 1;
   const stepWasProcessedSuccessfully =
     !isHandlingStep && stepWasSuccessful == true;

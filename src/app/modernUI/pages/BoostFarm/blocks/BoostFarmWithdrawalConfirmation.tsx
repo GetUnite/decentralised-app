@@ -23,7 +23,7 @@ export const BoostFarmWithdrawalConfirmation = ({
           </Text>
           <Text textAlign="center" weight={400} size="16px">
             Any unrealised rewards will be redistributed amongst the pool. Wait
-            until the next harvest on {nextHarvestDate.format('DD MMM')} to earn
+            until the next harvest on {nextHarvestDate.current.format('DD MMM')} to earn
             all pending rewards.
           </Text>
         </Box>
@@ -37,7 +37,7 @@ export const BoostFarmWithdrawalConfirmation = ({
           />
           <Button
             plain
-            label={`Cancel withdraw and come back on ${nextHarvestDate.format(
+            label={`Cancel withdraw and come back on ${nextHarvestDate.current.format(
               'DD MMMM',
             )}`}
             onClick={cancelBoostWithdrawalConfirmation}

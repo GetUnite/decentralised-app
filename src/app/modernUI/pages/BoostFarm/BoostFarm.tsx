@@ -4,7 +4,6 @@ import { useBoostFarm } from 'app/common/state/boostFarm';
 import {
   Layout,
   Modal,
-  Spinner,
   StepsProcessing,
   Tab,
   Tabs,
@@ -12,7 +11,6 @@ import {
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
-import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useParams } from 'react-router-dom';
 import { UnlockCountdown } from '../Stake/components/UnlockCountdown';
@@ -36,6 +34,8 @@ export const BoostFarm = () => {
   const {
     walletAccountAtom,
     isCorrectNetworkAtom,
+    selectedTab,
+    setSelectedTab,
     // presentation
     showTabs,
     showHeading,
@@ -53,8 +53,6 @@ export const BoostFarm = () => {
     rewardsInfo,
     seeRewardsAsStable,
     setSeeRewardsAsStable,
-    claimRewards,
-    isClamingRewards,
     // pending rewards
     isLoadingPendingRewards,
     pendingRewardsInfo,
@@ -88,11 +86,11 @@ export const BoostFarm = () => {
     steps,
     stepError,
     handleCurrentStep,
+    processingTitle,
+    startClaimRewardsSteps,
   } = useBoostFarm({
     id,
   });
-
-  const [selectedTab, setSelectedTab] = useState(0);
 
   const farmName = (
     <span>
@@ -119,15 +117,7 @@ export const BoostFarm = () => {
             >
               {isProcessing ? (
                 <StepsProcessing
-                  title={
-                    selectedTab == 0
-                      ? selectedFarm.current?.isLocked
-                        ? 'Locking funds...'
-                        : 'Depositing funds...'
-                      : selectedFarm.current?.isLocked
-                      ? 'Unlocking funds...'
-                      : 'Withdrawing funds...'
-                  }
+                  title={processingTitle.current}
                   steps={steps.current}
                   currentStep={currentStep}
                   isHandlingStep={isHandlingStep}
@@ -288,7 +278,9 @@ export const BoostFarm = () => {
                     {selectedFarm.current?.isLocked && (
                       <>
                         {+selectedFarmInfo.current?.unlockedBalance > 0 &&
-                          timerIsFinished(nextHarvestDate.current?.valueOf()) && (
+                          timerIsFinished(
+                            nextHarvestDate.current?.valueOf(),
+                          ) && (
                             <Box
                               round="16px"
                               width="245px"
@@ -386,99 +378,97 @@ export const BoostFarm = () => {
                           : { size: '0px' }
                       }
                     >
-                      {isClamingRewards ? (
-                        <Box align="center" justify="center" fill>
-                          <Spinner pad="large" />
-                        </Box>
-                      ) : (
-                        <Box fill>
-                          <Heading
-                            size="small"
-                            level={3}
-                            margin={{ bottom: '12px', top: '0px' }}
-                            fill
-                          >
-                            <Box direction="row" justify="between" fill>
-                              {isLoading || isLoadingRewards ? (
-                                <Box fill>
-                                  <Skeleton height="18px" borderRadius="20px" />
-                                </Box>
-                              ) : (
-                                <>
-                                  <Text size="18px">Rewards</Text>
-                                  <Box direction="row">
-                                    {selectedFarmInfo.current?.rewards?.icons?.map(
-                                      (icon, i) => (
-                                        <TokenIcon
-                                          key={i}
-                                          label={icon}
-                                          style={
-                                            i > 0
-                                              ? { marginLeft: '-0.6rem' }
-                                              : {}
-                                          }
-                                        />
-                                      ),
-                                    )}
-                                  </Box>
-                                </>
-                              )}
-                            </Box>
-                          </Heading>
-
-                          <Box margin={{ bottom: '16px' }}>
+                      <Box fill>
+                        <Heading
+                          size="small"
+                          level={3}
+                          margin={{ bottom: '12px', top: '0px' }}
+                          fill
+                        >
+                          <Box direction="row" justify="between" fill>
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" borderRadius="20px" />
-                            ) : (
-                              <Box direction="row" justify="between">
-                                <Text weight="bold" size="16px">
-                                  {seeRewardsAsStable
-                                    ? rewardsInfo.current?.stableLabel
-                                    : rewardsInfo.current?.label}
-                                </Text>
-
-                                <Text weight="bold" size="16px">
-                                  {seeRewardsAsStable
-                                    ? '$' + rewardsInfo.current?.stableValue
-                                    : rewardsInfo.current?.value}
-                                </Text>
+                              <Box fill>
+                                <Skeleton height="18px" borderRadius="20px" />
                               </Box>
+                            ) : (
+                              <>
+                                <Text size="18px">Rewards</Text>
+                                <Box direction="row">
+                                  {selectedFarmInfo.current?.rewards?.icons?.map(
+                                    (icon, i) => (
+                                      <TokenIcon
+                                        key={i}
+                                        label={icon}
+                                        style={
+                                          i > 0 ? { marginLeft: '-0.6rem' } : {}
+                                        }
+                                      />
+                                    ),
+                                  )}
+                                </Box>
+                              </>
                             )}
                           </Box>
+                        </Heading>
 
-                          <Box gap="12px">
-                            <Button
-                              primary
-                              label={'Withdraw ' + rewardsInfo.current?.label}
-                              style={{
-                                borderRadius: '58px',
-                                width: '197px',
-                                padding: '6px 16px',
-                              }}
-                              onClick={claimRewards}
-                              disabled={isLoading || isLoadingRewards}
-                            />
-                            <Button
-                              onClick={() =>
-                                setSeeRewardsAsStable(!seeRewardsAsStable)
-                              }
-                              plain
-                              disabled={isLoading || isLoadingRewards}
-                            >
-                              <Box direction="row" justify="center">
-                                <Text size="12px" weight={500} color="#2A73FF">
-                                  {seeRewardsAsStable
-                                    ? 'Show in ' +
-                                      rewardsInfo.current?.label +
-                                      ' LP tokens'
-                                    : 'Show in ' +
-                                      rewardsInfo.current?.stableLabel}
-                                </Text>
-                              </Box>
-                            </Button>
-                          </Box>
+                        <Box margin={{ bottom: '16px' }}>
+                          {isLoading || isLoadingRewards ? (
+                            <Skeleton height="16px" borderRadius="20px" />
+                          ) : (
+                            <Box direction="row" justify="between">
+                              <Text weight="bold" size="16px">
+                                {seeRewardsAsStable
+                                  ? rewardsInfo.current?.stableLabel
+                                  : rewardsInfo.current?.label}
+                              </Text>
+
+                              <Text weight="bold" size="16px">
+                                {seeRewardsAsStable
+                                  ? '$' + rewardsInfo.current?.stableValue
+                                  : rewardsInfo.current?.value}
+                              </Text>
+                            </Box>
+                          )}
                         </Box>
-                      )}
+
+                        <Box gap="12px">
+                          <Button
+                            primary
+                            label={`Withdraw ${
+                              seeRewardsAsStable
+                                ? rewardsInfo.current?.stableLabel
+                                : rewardsInfo.current?.label
+                            }`}
+                            style={{
+                              borderRadius: '58px',
+                              width: '197px',
+                              padding: '6px 16px',
+                            }}
+                            onClick={startClaimRewardsSteps}
+                            disabled={
+                              isLoading || isLoadingRewards || isProcessing
+                            }
+                          />
+                          <Button
+                            onClick={() =>
+                              setSeeRewardsAsStable(!seeRewardsAsStable)
+                            }
+                            plain
+                            disabled={isLoading || isLoadingRewards}
+                          >
+                            <Box direction="row" justify="center">
+                              <Text size="12px" weight={500} color="#2A73FF">
+                                {seeRewardsAsStable
+                                  ? 'Show in ' +
+                                    rewardsInfo.current?.label +
+                                    ' LP tokens'
+                                  : 'Show in ' +
+                                    rewardsInfo.current?.stableLabel}
+                              </Text>
+                            </Box>
+                          </Button>
+                        </Box>
+                      </Box>
                     </Box>
                     <Box
                       round="16px"

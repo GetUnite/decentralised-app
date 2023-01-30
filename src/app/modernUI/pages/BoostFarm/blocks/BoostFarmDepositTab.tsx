@@ -28,7 +28,7 @@ export const BoostFarmDepositTab = ({
   setUseBiconomy,
   // steps
   startProcessingSteps,
-  steps
+  steps,
 }) => {
   const {
     hasErrors,
@@ -42,7 +42,7 @@ export const BoostFarmDepositTab = ({
     selectedSupportedTokenInfo,
     depositValue,
     setDepositValue,
-    steps
+    steps,
   });
 
   return (
@@ -123,12 +123,12 @@ export const BoostFarmDepositTab = ({
         <SubmitButton
           primary
           // TODO uncomment
-          /*disabled={
+          disabled={
             isLoading ||
             !(+depositValue > 0) ||
             isFetchingSupportedTokenInfo ||
             hasErrors
-          }*/
+          }
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
@@ -136,7 +136,11 @@ export const BoostFarmDepositTab = ({
               ? 'Lock'
               : 'Deposit'
           }
-          onClick={selectedFarmInfo.current?.isLocked ? startLockedBoostLockConfirmation : startProcessingSteps}
+          onClick={
+            selectedFarmInfo.current?.isLocked
+              ? startLockedBoostLockConfirmation
+              : startProcessingSteps
+          }
         />
       </Box>
     </Box>
