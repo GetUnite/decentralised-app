@@ -4,24 +4,31 @@ import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
-  getIbAlluoInfo,
-  transferToAddress
+    getIbAlluoInfo,
+    transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
-import { useNotification } from 'app/common/state';
+import { useProcessingSteps } from 'app/common/state';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TPossibleStep } from 'app/common/types/global';
 import { TIbAlluoInfo } from 'app/common/types/transfer';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+
+export const possibleTransferSteps: TPossibleStep[] = [
+  {
+    id: 0,
+    label: 'Transfer',
+    successLabel: '',
+    errorLabel: 'Tranfer failed',
+  },
+];
 
 export const useTransfer = () => {
   // atoms
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
-
-  // notifications
-  const { setNotification } = useNotification();
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(!isSafeAppAtom);
@@ -39,8 +46,21 @@ export const useTransfer = () => {
   const [recipientAddressValue, setRecipientAddressValue] =
     useState<string>('');
 
+  // steps
+  const {
+    isProcessing,
+    setIsProcessing,
+    currentStep,
+    steps,
+    stepWasSuccessful,
+    stepError,
+    successTransactionHash,
+    resetProcessing,
+    successImage,
+  } = useProcessingSteps();
+
   // loading control
-  const [isTransferring, setIsTransferring] = useState<boolean>(false);
+  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -50,6 +70,31 @@ export const useTransfer = () => {
       fetchIbAlluosInfo();
     }
   }, [walletAccountAtom]);
+
+  // when the selected token changes, trigger balance update
+  useEffect(() => {
+    updateSteps();
+  }, [transferValue, recipientAddress]);
+
+  // function that updates the balance of the selected token on change
+  const updateSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    let recipientAddressVal: any = recipientAddressValue;
+    if (/^[ A-Za-z0-9]*$/.test(recipientAddress)) {
+      recipientAddressVal = recipientAddress;
+    }
+
+    // Withdraw step is always there
+    neededSteps.push({
+      ...possibleTransferSteps[0],
+      label: `Tranfering ${transferValue} ${selectedIbAlluoInfo?.label}`,
+      successLabel: `${transferValue} ${selectedIbAlluoInfo?.label} transfered successfully`,
+      successMessage: `${transferValue} ${selectedIbAlluoInfo?.label} sent to ${recipientAddressVal}`,
+    });
+
+    steps.current = neededSteps;
+  };
 
   const setSelectedIbAlluoBySymbol = tokenInfo => {
     setSelectedIbAlluo(tokenInfo.type);
@@ -122,47 +167,61 @@ export const useTransfer = () => {
     setRecipientAddressError('');
     setRecipientAddressValue('');
 
-    if(value != '')
-    if (/\.(?=[^\.]+$)/.test(value)) {
-      const inputTld = value.split(/\.(?=[^\.]+$)/);
-      const found = udTlds.find(
-        ele => inputTld && inputTld.length > 0 && inputTld[1].includes(ele),
-      );
-      if (found) {
-        resolution
-          .owner(value)
-          .then(address => {
-            setRecipientAddressValue(address);
-            setRecipientAddressError('');
-            return address;
-          })
-          .catch(error => {
-            if (error.code === 'UnregisteredDomain') {
-              console.log('Domain is not registered');
-            }
-          });
-      }
+    if (value != '')
+      if (/\.(?=[^\.]+$)/.test(value)) {
+        const inputTld = value.split(/\.(?=[^\.]+$)/);
+        const found = udTlds.find(
+          ele => inputTld && inputTld.length > 0 && inputTld[1].includes(ele),
+        );
+        if (found) {
+          resolution
+            .owner(value)
+            .then(address => {
+              setRecipientAddressValue(address);
+              setRecipientAddressError('');
+              return address;
+            })
+            .catch(error => {
+              if (error.code === 'UnregisteredDomain') {
+                console.log('Domain is not registered');
+              }
+            });
+        }
 
-      if (!addressIsValid(value)) {
+        if (!addressIsValid(value)) {
+          setRecipientAddressError(
+            'Recipient address or domain name is not valid',
+          );
+        }
+      } else if (/^[ A-Za-z0-9]*$/.test(value)) {
+        setRecipientAddressError('');
+        if (!addressIsValid(value)) {
+          setRecipientAddressError(
+            'Recipient address or domain name is not valid',
+          );
+        }
+      } else {
         setRecipientAddressError(
           'Recipient address or domain name is not valid',
         );
       }
-    } else if (/^[ A-Za-z0-9]*$/.test(value)) {
-      setRecipientAddressError('');
-      if (!addressIsValid(value)) {
-        setRecipientAddressError(
-          'Recipient address or domain name is not valid',
-        );
-      }
-    } else {
-      setRecipientAddressError('Recipient address or domain name is not valid');
-    }
     setRecipientAddress(value);
   };
 
+  const startProcessingSteps = async () => {
+    setIsProcessing(true);
+    await handleCurrentStep();
+  };
+
+  const stopProcessingSteps = async () => {
+    resetProcessing();
+    setTransferValue('');
+    setRecipientAddressValue('');
+    setRecipientAddress('');
+    await fetchIbAlluosInfo();
+  };
+
   const handleTransfer = async () => {
-    setIsTransferring(true);
     let recipientAddressVal: any = recipientAddressValue;
     if (/^[ A-Za-z0-9]*$/.test(recipientAddress)) {
       recipientAddressVal = recipientAddress;
@@ -178,22 +237,32 @@ export const useTransfer = () => {
         recipientAddressVal,
         useBiconomy,
       );
-      await fetchIbAlluosInfo();
-      setTransferValue('');
-      setNotification(
-        'Transfer successful',
-        'success',
-        tx.transactionHash,
-        EChain.POLYGON,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      console.error(error);
-      setNotification(error, 'error');
+      throw error;
     }
+  };
 
-    setIsTransferring(false);
-    setRecipientAddressValue('');
-    setRecipientAddress('');
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    setIsHandlingStep(true);
+
+    const step = possibleTransferSteps.find(
+      step => step.id == steps.current[currentStep.current].id,
+    );
+
+    try {
+      switch (step.id) {
+        case 0:
+          await handleTransfer();
+          break;
+      }
+      stepWasSuccessful.current = true;
+    } catch (error) {
+      stepError.current = error;
+      stepWasSuccessful.current = false;
+    }
+    setIsHandlingStep(false);
   };
 
   const getTokenSign = (type = 'usd') => {
@@ -215,8 +284,6 @@ export const useTransfer = () => {
     transferValue,
     selectedIbAlluoInfo,
     handleTransferValueChange,
-    isTransferring,
-    handleTransfer,
     ibAlluosInfo,
     recipientAddress,
     recipientAddressValue,
@@ -226,5 +293,15 @@ export const useTransfer = () => {
     useBiconomy,
     setUseBiconomy,
     isLoading,
+    // steps
+    isProcessing,
+    isHandlingStep,
+    currentStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
   };
 };

@@ -4,78 +4,52 @@ import vault from 'app/modernUI/animations/vault.svg';
 import vaultBottomLeft from 'app/modernUI/images/vaults/vault-bottom-left.svg';
 import { useEffect, useState } from 'react';
 
-export const possibleWithdrawSteps: TPossibleStep[] = [
+export const possibleLockedWithdrawSteps: TPossibleStep[] = [
   {
-    id: 3,
-    label: 'Withdraw',
+    id: 5,
+    label: '',
     errorLabel: 'Failed to withdraw tokens',
     successLabel: '',
     image: vault,
     successImage: vaultBottomLeft,
   },
-  {
-    id: 3,
-    label: 'Unlock',
-    errorLabel: 'Failed to unlock tokens',
-    successLabel: '',
-  },
 ];
 
-export const useBoostFarmWithdrawal = ({
+export const useLockedBoostFarmWithdrawal = ({
   selectedFarmInfo,
-  selectSupportedToken,
   selectedSupportedToken,
   selectedSupportedTokenInfo,
-  withdrawValue,
-  setWithdrawValue,
   steps,
+  startProcessingSteps,
 }) => {
-  // inputs validation
-  const [withdrawValueError, setWithdrawValueError] = useState<string>('');
-
   // loading control
   const [isFetchingSupportedTokenInfo, setIsFetchingSupportedTokenInfo] =
     useState(true);
-
-  useEffect(() => {
-    if (selectedFarmInfo && selectedFarmInfo.current?.isLocked) {
-      selectSupportedToken(selectedFarmInfo.current?.withdrawToken);
-    }
-  }, []);
 
   // when the selected token changes, trigger balance update
   useEffect(() => {
     if (selectedFarmInfo && selectedSupportedToken) {
       updateSelectedTokenBalance();
-      updateSteps();
     }
   }, [selectedSupportedToken]);
-
-  useEffect(() => {
-    if (selectedFarmInfo) {
-      updateSteps();
-    }
-  }, [withdrawValue]);
 
   // function that updates the balance of the selected token on change
   const updateSelectedTokenBalance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    const boostDepositedAmount =
+    const unlockedBalance =
       selectedFarmInfo.current?.depositedAmountInLP > 0
         ? await getMaximumLPValueAsToken(
             selectedFarmInfo.current.farmAddress,
             selectedSupportedToken.address,
             selectedSupportedToken.decimals,
-            selectedFarmInfo.current?.depositedAmountInLP,
+            selectedFarmInfo.current.unlockedBalance,
           )
         : 0;
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,
-      boostDepositedAmount: boostDepositedAmount,
+      unlocked: unlockedBalance,
     };
-
-    await handleWithdrawalFieldChange(withdrawValue);
 
     setIsFetchingSupportedTokenInfo(false);
   };
@@ -84,37 +58,25 @@ export const useBoostFarmWithdrawal = ({
     let neededSteps: TPossibleStep[] = [];
 
     // Withdraw/Unlock step is always there
-    var stepToAdd = selectedFarmInfo.current?.isLocked
-      ? possibleWithdrawSteps[1]
-      : possibleWithdrawSteps[0];
-    var successLabel = selectedFarmInfo.current?.isLocked
-      ? 'Unlock requested'
-      : `${withdrawValue} ${selectedSupportedToken.label} withdrawn`;
-
+    var stepToAdd = possibleLockedWithdrawSteps[0];
     neededSteps.push({
       ...stepToAdd,
-      label: `${stepToAdd.label} ${withdrawValue} ${selectedSupportedToken.label}`,
-      successLabel: successLabel,
+      label: `${stepToAdd.label} ${selectedSupportedTokenInfo.current?.unlocked} ${selectedSupportedToken.label}`,
+      successLabel: `${selectedSupportedTokenInfo.current?.unlocked} ${selectedSupportedToken.label} withdrawn`,
     });
 
     steps.current = neededSteps;
   };
 
-  // handles withdraw input change
-  const handleWithdrawalFieldChange = value => {
-    setWithdrawValueError('');
-    if (+value > selectedSupportedTokenInfo.current?.boostDepositedAmount) {
-      setWithdrawValueError('Insufficient balance');
-    }
-    setWithdrawValue(value);
+  const updateStepsAndStartProcessing = async () => {
+    // updates steps
+    await updateSteps();
+    // starts steps
+    startProcessingSteps();
   };
 
   return {
-    withdrawValueError,
-    withdrawValue,
-    handleWithdrawalFieldChange,
-    hasErrors: withdrawValueError != '',
     isFetchingSupportedTokenInfo,
-    selectedSupportedTokenInfo,
+    updateStepsAndStartProcessing,
   };
 };

@@ -1,10 +1,11 @@
-import { toExactFixed } from 'app/common/functions/utils';
+import { timerIsFinished, toExactFixed } from 'app/common/functions/utils';
 import { useMode } from 'app/common/state';
 import { useBoostFarm } from 'app/common/state/boostFarm';
 import {
   Layout,
   Modal,
   Spinner,
+  StepsProcessing,
   Tab,
   Tabs,
   TokenIcon
@@ -14,11 +15,16 @@ import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useParams } from 'react-router-dom';
+import { UnlockCountdown } from '../Stake/components/UnlockCountdown';
 import {
   BoostFarmDepositTab,
   BoostFarmPresentation,
   BoostFarmWithdrawalConfirmation,
-  BoostFarmWithdrawalTab, LockedBoostFarmDepositConfirmation, LockedBoostFarmPresentation
+  BoostFarmWithdrawalTab,
+  LockedBoostFarmLockConfirmation,
+  LockedBoostFarmPresentation,
+  LockedBoostFarmUnlockConfirmation,
+  LockedBoostFarmWithdrawUnlockedConfirmation
 } from './blocks';
 import { } from './blocks/BoostFarmWithdrawalConfirmation';
 
@@ -36,10 +42,12 @@ export const BoostFarm = () => {
     showBoostFarmPresentation,
     showLockedBoostFarmPresentation,
     // farm
+    selectedFarm,
     isLoading,
     selectedFarmInfo,
     selectSupportedToken,
     selectedSupportedToken,
+    updateFarmInfo,
     // rewards
     isLoadingRewards,
     rewardsInfo,
@@ -59,22 +67,27 @@ export const BoostFarm = () => {
     // deposit
     depositValue,
     setDepositValue,
-    handleApprove,
-    isApproving,
-    handleDeposit,
-    isDepositing,
-    showLockedBoostDepositConfirmation,
-    startLockedBoostDepositConfirmation,
-    cancelLockedBoostDepositConfirmation,
+    showLockedBoostLockConfirmation,
+    startLockedBoostLockConfirmation,
     //withdraw
     withdrawValue,
     setWithdrawValue,
     selectedSupportedTokenInfo,
-    handleWithdraw,
-    isWithdrawing,
     showBoostWithdrawalConfirmation,
     startBoostWithdrawalConfirmation,
-    cancelBoostWithdrawalConfirmation,
+    showLockedBoostWithdrawalConfirmation,
+    startLockedBoostWithdrawalConfirmation,
+    // steps
+    cancelConfirmations,
+    isProcessing,
+    currentStep,
+    stepWasSuccessful,
+    isHandlingStep,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    stepError,
+    handleCurrentStep,
   } = useBoostFarm({
     id,
   });
@@ -83,10 +96,10 @@ export const BoostFarm = () => {
 
   const farmName = (
     <span>
-      {selectedFarmInfo.current && (
+      {selectedFarm.current && (
         <>
-          {selectedFarmInfo.current?.isLocked && <span>🔒</span>}
-          {selectedFarmInfo.current?.name}
+          {selectedFarm.current?.isLocked && <span>🔒</span>}
+          {selectedFarm.current?.name}
           <span style={{ color: '#1C1CFF' }}> BOOST</span>
         </>
       )}
@@ -99,22 +112,31 @@ export const BoostFarm = () => {
           <Box direction={!isSmall(size) ? 'row' : 'column'} gap="small">
             <Box flex></Box>
             <Modal
-              chain={selectedFarmInfo.current?.chain}
+              chain={selectedFarm.current?.chain}
               heading={farmName}
-              showChainBadge={!isLoading}
               noHeading={!showHeading}
+              closeAction={!showTabs ? cancelConfirmations : undefined}
             >
-              {isApproving || isDepositing || isWithdrawing ? (
-                <Box
-                  align="center"
-                  justify="center"
-                  fill="vertical"
-                  style={{
-                    minHeight: selectedTab == 0 ? '595px' : '642px',
-                  }}
-                >
-                  <Spinner pad="large" />
-                </Box>
+              {isProcessing ? (
+                <StepsProcessing
+                  title={
+                    selectedTab == 0
+                      ? selectedFarm.current?.isLocked
+                        ? 'Locking funds...'
+                        : 'Depositing funds...'
+                      : selectedFarm.current?.isLocked
+                      ? 'Unlocking funds...'
+                      : 'Withdrawing funds...'
+                  }
+                  steps={steps.current}
+                  currentStep={currentStep}
+                  isHandlingStep={isHandlingStep}
+                  stepWasSuccessful={stepWasSuccessful.current}
+                  stepError={stepError.current}
+                  stopProcessingSteps={stopProcessingSteps}
+                  handleCurrentStep={handleCurrentStep}
+                  minHeight={selectedTab == 0 ? '595px' : '642px'}
+                />
               ) : (
                 <>
                   {showBoostFarmPresentation && (
@@ -127,45 +149,43 @@ export const BoostFarm = () => {
                   {showLockedBoostFarmPresentation && (
                     <LockedBoostFarmPresentation
                       selectedFarmInfo={selectedFarmInfo}
-                      farmName={farmName}
+                      farmName={selectedFarmInfo.current?.name}
                       isLoading={isLoading}
                     />
                   )}
-                  {showLockedBoostDepositConfirmation && (
-                    <LockedBoostFarmDepositConfirmation
+                  {showLockedBoostLockConfirmation && (
+                    <LockedBoostFarmLockConfirmation
                       selectedFarmInfo={selectedFarmInfo}
-                      handleDeposit={handleDeposit}
-                      cancelLockedBoostDepositConfirmation={
-                        cancelLockedBoostDepositConfirmation
-                      }
-                      nextHarvestDate={nextHarvestDate}
+                      cancelLockedBoostLockConfirmation={cancelConfirmations}
+                      nextHarvestDate={nextHarvestDate.current}
+                      // steps
+                      startProcessingSteps={startProcessingSteps}
                     />
                   )}
                   {showBoostWithdrawalConfirmation && (
                     <>
                       {selectedFarmInfo.current?.isLocked ? (
-                        <BoostFarmWithdrawalConfirmation
-                          selectedFarmInfo={selectedFarmInfo}
-                          withdrawValue={withdrawValue}
+                        <LockedBoostFarmUnlockConfirmation
                           withdrawTokenLabel={selectedSupportedToken?.label}
-                          handleWithdraw={handleWithdraw}
-                          cancelBoostWithdrawalConfirmation={
-                            cancelBoostWithdrawalConfirmation
-                          }
-                          nextHarvestDate={nextHarvestDate}
+                          withdrawValue={withdrawValue}
+                          cancelBoostUnlockConfirmation={cancelConfirmations}
+                          nextHarvestDate={nextHarvestDate.current}
                           losablePendingRewards={losablePendingRewards}
+                          // steps
+                          startProcessingSteps={startProcessingSteps}
                         />
                       ) : (
                         <BoostFarmWithdrawalConfirmation
                           selectedFarmInfo={selectedFarmInfo}
                           withdrawValue={withdrawValue}
                           withdrawTokenLabel={selectedSupportedToken?.label}
-                          handleWithdraw={handleWithdraw}
                           cancelBoostWithdrawalConfirmation={
-                            cancelBoostWithdrawalConfirmation
+                            cancelConfirmations
                           }
                           nextHarvestDate={nextHarvestDate}
                           losablePendingRewards={losablePendingRewards}
+                          // steps
+                          startProcessingSteps={startProcessingSteps}
                         />
                       )}
                     </>
@@ -176,8 +196,13 @@ export const BoostFarm = () => {
                         selectedTab={selectedTab}
                         setSelectedTab={setSelectedTab}
                       >
-                        <Tab title="Deposit">
+                        <Tab
+                          title={
+                            selectedFarm.current?.isLocked ? 'Lock' : 'Deposit'
+                          }
+                        >
                           <BoostFarmDepositTab
+                            selectedFarm={selectedFarm}
                             selectedFarmInfo={selectedFarmInfo}
                             isLoading={isLoading}
                             selectedSupportedToken={selectedSupportedToken}
@@ -187,21 +212,29 @@ export const BoostFarm = () => {
                             selectSupportedToken={selectSupportedToken}
                             isCorrectNetworkAtom={isCorrectNetworkAtom}
                             // deposit
-                            handleApprove={handleApprove}
                             depositValue={depositValue}
                             setDepositValue={setDepositValue}
-                            startLockedBoostDepositConfirmation={
-                              startLockedBoostDepositConfirmation
+                            startLockedBoostLockConfirmation={
+                              startLockedBoostLockConfirmation
                             }
-                            handleDeposit={handleDeposit}
                             // biconomy
                             useBiconomy={useBiconomy}
                             setUseBiconomy={setUseBiconomy}
+                            // steps
+                            startProcessingSteps={startProcessingSteps}
+                            steps={steps}
                           />
                         </Tab>
-                        <Tab title="Withdraw">
+                        <Tab
+                          title={
+                            selectedFarm.current?.isLocked
+                              ? 'Unlock'
+                              : 'Withdraw'
+                          }
+                        >
                           <BoostFarmWithdrawalTab
                             // farm
+                            selectedFarm={selectedFarm}
                             isLoading={isLoading}
                             selectedFarmInfo={selectedFarmInfo}
                             selectedSupportedToken={selectedSupportedToken}
@@ -219,6 +252,8 @@ export const BoostFarm = () => {
                             // biconomy
                             useBiconomy={useBiconomy}
                             setUseBiconomy={setUseBiconomy}
+                            // steps
+                            steps={steps}
                           />
                         </Tab>
                       </Tabs>
@@ -250,6 +285,91 @@ export const BoostFarm = () => {
                 !showBoostFarmPresentation &&
                 !showLockedBoostFarmPresentation && (
                   <Box gap="12px">
+                    {selectedFarm.current?.isLocked && (
+                      <>
+                        {+selectedFarmInfo.current?.unlockedBalance > 0 &&
+                          timerIsFinished(nextHarvestDate.current?.valueOf()) && (
+                            <Box
+                              round="16px"
+                              width="245px"
+                              align="start"
+                              justify="between"
+                              gap="16px"
+                              direction="column"
+                              height="154px"
+                              background="modal"
+                              pad={{ vertical: 'medium', horizontal: 'medium' }}
+                              border={
+                                isLightMode
+                                  ? { color: '#EBEBEB', size: '1px' }
+                                  : { size: '0px' }
+                              }
+                            >
+                              {isLoading ? (
+                                <Box
+                                  style={{ minHeight: '54px' }}
+                                  fill="horizontal"
+                                >
+                                  <Skeleton
+                                    count={2}
+                                    height="19px"
+                                    borderRadius="20px"
+                                  />
+                                </Box>
+                              ) : (
+                                <Text size="18px" weight="bold">
+                                  {toExactFixed(100, 2)}{' '}
+                                  {selectedFarm.current?.name} unlocked
+                                </Text>
+                              )}
+                              <Button
+                                primary
+                                label="Withdraw now"
+                                style={{
+                                  borderRadius: '58px',
+                                  width: '197px',
+                                  padding: '6px 16px',
+                                }}
+                                onClick={() => {
+                                  startLockedBoostWithdrawalConfirmation();
+                                }}
+                                disabled={isLoading}
+                              />
+                              {showLockedBoostWithdrawalConfirmation && (
+                                <LockedBoostFarmWithdrawUnlockedConfirmation
+                                  selectedFarmInfo={selectedFarmInfo}
+                                  selectedSupportedToken={
+                                    selectedSupportedToken
+                                  }
+                                  selectedSupportedTokenInfo={
+                                    selectedSupportedTokenInfo
+                                  }
+                                  selectSupportedToken={selectSupportedToken}
+                                  cancelConfirmations={cancelConfirmations}
+                                  // loading
+                                  isLoading={isLoading}
+                                  // steps
+                                  startProcessingSteps={startProcessingSteps}
+                                  steps={steps}
+                                />
+                              )}
+                            </Box>
+                          )}
+                        {!timerIsFinished(
+                          nextHarvestDate.current?.valueOf(),
+                        ) && (
+                          <>
+                            <UnlockCountdown
+                              date={nextHarvestDate.current?.valueOf()}
+                              onComplete={updateFarmInfo}
+                              label={`UNLOCKING ${toExactFixed(100, 2)} ${
+                                selectedFarm.current?.name
+                              } IN`}
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
                     <Box
                       round="16px"
                       overflow="hidden"
@@ -384,7 +504,8 @@ export const BoostFarm = () => {
                       style={
                         showBoostWithdrawalConfirmation
                           ? {
-                              boxShadow: '0px 0px 20px 0px rgba(255, 152, 17, 0.2)',
+                              boxShadow:
+                                '0px 0px 20px 0px rgba(255, 152, 17, 0.2)',
                             }
                           : {}
                       }
@@ -421,7 +542,8 @@ export const BoostFarm = () => {
                           <Skeleton height="8px" borderRadius="20px" />
                         ) : (
                           <Text size="8px" weight={400}>
-                            Available {nextHarvestDate.format('DD MMM')} · Last
+                            Available{' '}
+                            {nextHarvestDate.current?.format('DD MMM')} · Last
                             harvested {previousHarvestDate.format('DD MMM')}
                           </Text>
                         )}

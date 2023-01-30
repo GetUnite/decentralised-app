@@ -16,12 +16,11 @@ import { farmOptions } from 'app/common/state/farm/useFarm';
 import { TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
-import {
-  getBoostFarmInterest
-} from '../functions/boostFarm';
+import { getBoostFarmInterest } from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
 
 const possibleStableTokens = [
@@ -40,6 +39,9 @@ const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
 const possibleViewTypes = ['View my farms only', 'View all farms'];
 
 export const useMain = () => {
+  // react
+  const location = useLocation();
+
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
@@ -174,6 +176,10 @@ export const useMain = () => {
       console.log(error);
     }
     setIsLoading(false);
+
+    if (walletAccountAtom && location.search.includes('view_type=my_farms')) {
+      setViewType('View my farms only');
+    }
     // We can probably get away with calculating total value invested in usd after showing the first screen
     let tdaiu = 0;
     const farmsWithDepositedAmount = availableFarms.filter(

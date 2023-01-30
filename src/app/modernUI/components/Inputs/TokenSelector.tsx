@@ -27,7 +27,11 @@ export const TokenSelector = ({
         open={isOpen}
         plain
         style={{ height: '100%' }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (tokenOptions.length > 1) {
+            setIsOpen(!isOpen);
+          }
+        }}
         label={
           <Box align="center">
             <Box
@@ -37,7 +41,9 @@ export const TokenSelector = ({
               margin={{ right: '16px' }}
             >
               <TokenIcon label={selectedToken?.label} />
-              <Down size="small" color={textColor}/>
+              {tokenOptions.length > 1 && (
+                <Down size="small" color={textColor} />
+              )}
             </Box>
           </Box>
         }

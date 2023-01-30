@@ -54,7 +54,6 @@ export const useWallet = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      setIsCorrectNetworkAtom(false);
       networkChange();
     }
   }, [wantedChainAtom]);
@@ -62,15 +61,21 @@ export const useWallet = () => {
   const networkChange = async () => {
     if (wantedChainAtom != undefined) {
       const chainId = await changeNetwork(wantedChainAtom);
-      setWantedChainId(chainId);
+      if (chainId == wantedChainId) {
+        checkCurrentChain(chainId);
+      } else {
+        setWantedChainId(chainId);
+      }
     } else {
+      setIsCorrectNetworkAtom(undefined);
       resetNotification();
     }
   };
 
-  const checkCurrentChain = async () => {
-    if (wantedChainId != undefined) {
-      const isCorrectNetwork = (await getCurrentChainId()) == wantedChainId;
+  const checkCurrentChain = async (chainId?) => {
+    const chainToUse = chainId != undefined ? chainId : wantedChainId;
+    if (chainToUse != undefined) {
+      const isCorrectNetwork = (await getCurrentChainId()) == chainToUse;
       setIsCorrectNetworkAtom(isCorrectNetwork);
       if (!isCorrectNetwork) {
         setNotification(

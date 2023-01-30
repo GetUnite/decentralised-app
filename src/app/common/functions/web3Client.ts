@@ -301,7 +301,7 @@ export const processSendError = error => {
   }
 
   if (error.code == 417) {
-    throw 'Error while estimating gas. Please try again';
+    throw 'Error while estimating gas';
   }
 
   const errorString = error.toString();
@@ -311,10 +311,10 @@ export const processSendError = error => {
   }
 
   if (errorString.includes('reverted by the EVM')) {
-    throw 'Transaction has been reverted by the EVM. Please try again';
+    throw 'Transaction has been reverted by the EVM';
   }
 
-  throw 'Something went wrong with your transaction. Please try again';
+  throw 'Something went wrong with your transaction';
 };
 
 export const sendTransaction = async (
