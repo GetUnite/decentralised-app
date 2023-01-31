@@ -75,9 +75,9 @@ export const LockTab = ({
         <SubmitButton
           primary
           // TODO uncomment
-          /*disabled={
+          disabled={
             isLoading || hasErrors || lockValue == '' || isLoadingRequiredSteps
-          }*/
+          }
           label={isLoadingRequiredSteps ? 'Loading...' : 'Lock'}
           onClick={startProcessingSteps}
         />
