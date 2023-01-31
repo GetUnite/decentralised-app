@@ -515,7 +515,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     },
     isNewest: true,
   },
-  {
+  /*{
     id: 5,
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
     type: 'booster',
@@ -616,7 +616,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       decimals: 18,
       sign: '€',
     },
-  },
+  },*/
 ];
 
 const defaultRewards = {
@@ -1020,23 +1020,18 @@ export const useBoostFarm = ({ id }) => {
   const startClaimRewardsSteps = async () => {
     let neededSteps: TPossibleStep[] = [];
 
+    const label = seeRewardsAsStable
+      ? rewardsInfo.current?.stableLabel
+      : rewardsInfo.current?.label;
+    const value = seeRewardsAsStable
+      ? rewardsInfo.current?.stableValue
+      : rewardsInfo.current?.value;
+
     // Withdraw step is always there
     neededSteps.push({
       ...possibleBoostFarmSteps[0],
-      label: `Claiming ${
-        seeRewardsAsStable
-          ? rewardsInfo.current?.stableValue
-          : rewardsInfo.current?.value
-      } ${
-        seeRewardsAsStable
-          ? rewardsInfo.current?.stableLabel
-          : rewardsInfo.current?.label
-      }`,
-      successLabel: `${
-        seeRewardsAsStable
-          ? rewardsInfo.current?.stableValue
-          : rewardsInfo.current?.value
-      } ${seeRewardsAsStable ? 'USDC' : 'CVX-ETH'} claimed`,
+      label: `Claiming ${value} ${label}`,
+      successLabel: `${value} ${label} claimed`,
     });
 
     processingTitle.current = 'Claiming rewards...';

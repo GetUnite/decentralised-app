@@ -1,7 +1,7 @@
 import { getIfUserHasWithdrawalRequest } from 'app/common/functions/farm';
 import { TPossibleStep } from 'app/common/types/global';
-import vaultIn from 'app/modernUI/animations/vault-in.svg';
-import vault from 'app/modernUI/animations/vault.svg';
+import openVault from 'app/modernUI/animations/openVault.svg';
+import vaultUnlocking from 'app/modernUI/animations/vaultUnlocking.svg';
 import { useEffect, useState } from 'react';
 import { useNotification } from '../useNotification';
 
@@ -11,8 +11,8 @@ export const possibleWithdrawSteps: TPossibleStep[] = [
     label: '',
     errorLabel: 'Failed to withdraw tokens',
     successLabel: '',
-    image: vault,
-    successImage: vaultIn
+    image: vaultUnlocking,
+    successImage: openVault,
   },
 ];
 

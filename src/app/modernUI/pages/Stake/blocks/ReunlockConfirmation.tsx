@@ -2,9 +2,8 @@ import exclamation from 'app/modernUI/images/yellowExclamation.svg';
 import { Box, Button, Text } from 'grommet';
 
 export const ReunlockConfirmation = ({
-  handleUnlock,
   cancelReunlockConfirmation,
-  ...rest
+  startProcessingSteps,
 }) => {
   return (
     <>
@@ -24,7 +23,7 @@ export const ReunlockConfirmation = ({
           <Button
             primary
             label="Unlock tokens and reset countdown"
-            onClick={handleUnlock}
+            onClick={startProcessingSteps}
             style={{ width: '360px' }}
           />
           <Button

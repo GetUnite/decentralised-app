@@ -1,6 +1,6 @@
 import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
-import vaultIn from 'app/modernUI/animations/vault-in.svg';
+import openVault from 'app/modernUI/animations/openVault.svg';
 import { useEffect, useState } from 'react';
 
 export const possibleDepositSteps: TPossibleStep[] = [
@@ -15,7 +15,7 @@ export const possibleDepositSteps: TPossibleStep[] = [
     label: 'Deposit',
     successLabel: '',
     errorLabel: 'Failed to deposit tokens',
-    successImage: vaultIn
+    successImage: openVault,
   },
 ];
 
