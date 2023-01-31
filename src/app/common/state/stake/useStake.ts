@@ -20,10 +20,15 @@ import {
 import { toExactFixed } from 'app/common/functions/utils';
 import { getValueOf1LPinUSDC } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TPossibleStep } from 'app/common/types/global';
+import openVault from 'app/modernUI/animations/openVault.svg';
+import vaultUnlocking from 'app/modernUI/animations/vaultUnlocking.svg';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
+import { useProcessingSteps } from '../useProcessingSteps';
+import { possibleLockSteps } from './useLock';
+import { possibleUnlockSteps } from './useUnlock';
 
 export type TAlluoStakingInfo = {
   balance?: string;
@@ -45,13 +50,32 @@ const defaultRewards = {
   stableAddress: EEthereumAddresses.USDC,
 };
 
+const possibleStakeSteps = [
+  {
+    id: 3,
+    label: '',
+    errorLabel: 'Failed to withdraw tokens',
+    successLabel: '',
+    image: vaultUnlocking,
+    successImage: openVault,
+  },
+  {
+    id: 4,
+    label: '',
+    errorLabel: 'Failed to claim rewards',
+    successLabel: '',
+  },
+  ...possibleLockSteps,
+  ...possibleUnlockSteps,
+];
+
 export const useStake = () => {
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
-  // other state control files
-  const { setNotification } = useNotification();
+  // tabs
+  const [selectedTab, setSelectedTab] = useState(0);
 
   // alluo info
   const [alluoInfo, setAlluoInfo] = useState<TAlluoStakingInfo>();
@@ -59,6 +83,19 @@ export const useStake = () => {
   // inputs
   const [lockValue, setLockValue] = useState<string>('');
   const [unlockValue, setUnlockValue] = useState<number>(0);
+
+  // steps
+  const {
+    isProcessing,
+    setIsProcessing,
+    currentStep,
+    steps,
+    stepWasSuccessful,
+    stepError,
+    successTransactionHash,
+    resetProcessing,
+  } = useProcessingSteps();
+  const processingTitle = useRef<string>();
 
   //rewards control
   const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
@@ -68,15 +105,11 @@ export const useStake = () => {
   const nextHarvestDate = moment()
     .subtract(1, 'days')
     .add(1, 'week')
-    .day('Monday');
+    .day('Sunday');
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isLocking, setIsLocking] = useState<boolean>(false);
-  const [isUnlocking, setIsUnlocking] = useState<boolean>(false);
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
+  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
@@ -126,49 +159,28 @@ export const useStake = () => {
     }
     setIsLoading(false);
   };
-  const handleApprove = async () => {
-    setIsApproving(true);
 
+  const handleApprove = async () => {
     try {
       const tx = await approveAlluoStaking();
-      setNotification(
-        'Successfully approved',
-        'success',
-        tx.transactionHash,
-        EChain.ETHEREUM,
-      );
-      await updateAlluoInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-
-    setIsApproving(false);
   };
 
   const handleLock = async () => {
-    setIsLocking(true);
-
     try {
       heapTrack('stakeLockAmount', { amount: lockValue });
       heapTrack('stakeLockButtonClicked');
       const tx = await lockAlluo(lockValue);
-      setNotification(
-        'Successfully locked',
-        'success',
-        tx.transactionHash,
-        EChain.ETHEREUM,
-      );
-      await updateAlluoInfo();
-      setLockValue(null);
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-
-    setIsLocking(false);
   };
 
   const handleUnlock = async () => {
-    setIsUnlocking(true);
     let tx;
     try {
       heapTrack('stakeUnlockAmount', { amount: unlockValue });
@@ -178,25 +190,19 @@ export const useStake = () => {
       } else {
         tx = await unlockAlluo(+alluoInfo.lockedInLp * (+unlockValue / 100));
       }
-      setNotification('Successfully unlocked', 'success', tx.transactionHash, EChain.ETHEREUM);
-      await updateAlluoInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-    setIsUnlocking(false);
   };
 
   const handleWithdraw = async () => {
-    setIsWithdrawing(true);
     try {
-      await withdrawAlluo();
-      await updateAlluoInfo();
-      setNotification('Transaction confirmed. $ALLUO tokens withdrawn to wallet.', 'success');
+      const tx = await withdrawAlluo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      console.error('Error', error);
-      setNotification(error, 'error');
+      throw error;
     }
-    setIsWithdrawing(false);
   };
 
   const startReunlockConfirmation = () => {
@@ -236,35 +242,122 @@ export const useStake = () => {
   };
 
   const claimRewards = async () => {
-    setIsClamingRewards(true);
     try {
       const tx = await claimStakingRewards();
-      await updateAlluoInfo();
-      setNotification(
-        'Rewards claimed successfully',
-        'success',
-        tx.transactionHash,
-        EChain.ETHEREUM,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-    setIsClamingRewards(false);
+  };
+
+  const startProcessingSteps = async () => {
+    cancelReunlockConfirmation();
+    processingTitle.current =
+      processingTitle.current != undefined
+        ? processingTitle.current
+        : selectedTab == 0
+        ? 'Locking funds...'
+        : 'Unlocking funds...';
+    setIsProcessing(true);
+    await handleCurrentStep();
+  };
+
+  const startWithdrawSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // Withdraw step is always there
+    neededSteps.push({
+      ...possibleStakeSteps[0],
+      label: `Withdrawing ${alluoInfo?.unlocked} $ALLUO`,
+      successLabel: `${alluoInfo?.unlocked} $ALLUO withdrawn`,
+    });
+
+    processingTitle.current = 'Withdrawing funds...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
+  };
+
+  const startClaimRewardsSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    // Withdraw step is always there
+    const label = seeRewardsAsStable
+      ? rewardsInfo.stableLabel
+      : rewardsInfo.label;
+    const value = seeRewardsAsStable
+      ? rewardsInfo.stableValue
+      : rewardsInfo.value;
+    neededSteps.push({
+      ...possibleStakeSteps[1],
+      label: `Claiming ${value} ${label}`,
+      successLabel: `${value} ${label} claimed`,
+    });
+
+    processingTitle.current = 'Claiming rewards...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
+  };
+
+  const stopProcessingSteps = async () => {
+    processingTitle.current = undefined;
+    resetProcessing();
+    setUnlockValue(0);
+    setLockValue('');
+    await updateAlluoInfo();
+  };
+
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    setIsHandlingStep(true);
+
+    const step = possibleStakeSteps.find(
+      step => step.id == steps.current[currentStep.current].id,
+    );
+
+    try {
+      switch (step.id) {
+        case 0:
+          await handleApprove();
+          break;
+
+        case 1:
+          await handleLock();
+          break;
+
+        case 2:
+          await handleUnlock();
+          break;
+
+        case 3:
+          await handleWithdraw();
+          break;
+
+        case 4:
+          await claimRewards();
+          break;
+      }
+      stepWasSuccessful.current = true;
+    } catch (error) {
+      stepError.current = error;
+      stepWasSuccessful.current = false;
+    }
+    setIsHandlingStep(false);
   };
 
   return {
+    selectedTab,
+    setSelectedTab,
     walletAccountAtom,
     isLoading,
     alluoInfo,
     updateAlluoInfo,
-    handleWithdraw,
-    isWithdrawing,
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
     seeRewardsAsStable,
     setSeeRewardsAsStable,
-    isClamingRewards,
     isLoadingRewards,
     rewardsInfo,
     pendingRewardsInfo,
@@ -275,14 +368,21 @@ export const useStake = () => {
     // lock
     lockValue,
     setLockValue,
-    isApproving,
-    isLocking,
-    handleApprove,
-    handleLock,
-    // unlock 
+    // unlock
     unlockValue,
     setUnlockValue,
-    handleUnlock,
-    isUnlocking
+    // steps
+    isProcessing,
+    currentStep,
+    processingTitle,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
+    startWithdrawSteps,
+    startClaimRewardsSteps,
   };
 };

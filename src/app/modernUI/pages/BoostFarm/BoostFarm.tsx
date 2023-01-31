@@ -13,7 +13,7 @@ import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 import { useParams } from 'react-router-dom';
-import { UnlockCountdown } from '../Stake/components/UnlockCountdown';
+import { UnlockCountdown } from '../../components/Countdown/UnlockCountdown';
 import {
   BoostFarmDepositTab,
   BoostFarmPresentation,

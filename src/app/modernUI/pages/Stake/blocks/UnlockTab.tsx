@@ -12,10 +12,12 @@ export const UnlockTab = ({
   // unlock
   unlockValue,
   setUnlockValue,
-  handleUnlock,
+  // steps
+  steps,
+  startProcessingSteps,
 }) => {
   const { projectedUnlockValue, handleUnlockValueChange, unlockValueError } =
-    useUnlock({ alluoInfo, setUnlockValue });
+    useUnlock({ alluoInfo, unlockValue, setUnlockValue, steps });
 
   return (
     <Box fill>
@@ -66,10 +68,13 @@ export const UnlockTab = ({
       <Box margin={{ top: 'large' }} style={{ height: 52 }}>
         <SubmitButton
           primary
-          disabled={+unlockValue === 0}
+          // TODO: uncoment
+          //disabled={+unlockValue === 0 && +alluoInfo.lockedInLp > 0}
           label="Unlock"
           onClick={
-            !allTimersAreFinished ? startReunlockConfirmation : handleUnlock
+            !allTimersAreFinished
+              ? startReunlockConfirmation
+              : startProcessingSteps
           }
         />
       </Box>

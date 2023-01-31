@@ -1,34 +1,40 @@
 import { TPossibleStep } from 'app/common/types/global';
 import { useEffect, useState } from 'react';
 
-const possibleLockSteps: TPossibleStep[] = [
-  { id: 0, label: 'Approve' },
-  { id: 1, label: 'Lock' },
+export const possibleLockSteps: TPossibleStep[] = [
+  {
+    id: 0,
+    label: 'Approve lock',
+    successLabel: 'Lock approved',
+    errorLabel: 'Approval failed',
+  },
+  {
+    id: 1,
+    label: 'Lock',
+    successLabel: '',
+    errorLabel: 'Failed to lock tokens',
+  },
 ];
 
 export const useLock = ({
   alluoInfo,
+  lockValue,
   setLockValue,
-  handleApprove,
-  handleLock,
+  steps
 }) => {
   // inputs
   const [lockValueError, setLockValueError] = useState<string>();
-
-  // lock steps
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [lockSteps, setLockSteps] = useState<TPossibleStep[]>();
 
   // loading control
   const [isLoadingRequiredSteps, setIsLoadingRequiredSteps] = useState(true);
 
   useEffect(() => {
     if (alluoInfo?.allowance != undefined) {
-      loadRequiredSteps();
+      updateSteps();
     }
-  }, [alluoInfo]);
+  }, [alluoInfo, lockValue]);
 
-  const loadRequiredSteps = async () => {
+  const updateSteps = async () => {
     let neededSteps: TPossibleStep[] = [];
 
     // If the allowance is not higher than 0 ask for approval
@@ -37,9 +43,13 @@ export const useLock = ({
     }
 
     // Lock step is always there
-    neededSteps.push(possibleLockSteps[1]);
+    neededSteps.push({
+      ...possibleLockSteps[1],
+      label: `Lock ${lockValue} $ALLUO`,
+      successLabel: `${lockValue} $ALLUO locked`,
+    });
 
-    setLockSteps(neededSteps);
+    steps.current = neededSteps;
 
     setIsLoadingRequiredSteps(false);
   };
@@ -52,30 +62,7 @@ export const useLock = ({
     setLockValue(value);
   };
 
-  // executes the handle for the current step
-  const handleCurrentStep = async () => {
-    const possibleDepositStep = possibleLockSteps.find(
-      possibleDepositStep =>
-        possibleDepositStep.id == lockSteps[currentStep].id,
-    );
-
-    switch (possibleDepositStep.id) {
-      case 0:
-        await handleApprove();
-        // Next step
-        setCurrentStep(currentStep + 1);
-        break;
-
-      case 1:
-        await handleLock();
-        break;
-    }
-  };
-
   return {
-    currentStep,
-    lockSteps,
-    handleCurrentStep,
     handleLockValueChange,
     lockValueError,
     hasErrors: lockValueError != '',

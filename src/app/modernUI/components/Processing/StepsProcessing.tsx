@@ -3,6 +3,7 @@ import { TPossibleStep } from 'app/common/types/global';
 import floatingCoinsAnimation from 'app/modernUI/animations/floatingCoins.svg';
 import check from 'app/modernUI/images/check.svg';
 import cross from 'app/modernUI/images/cross.svg';
+import floatingErrorCoinsDark from 'app/modernUI/images/floatingErrorCoins-dark.svg';
 import floatingErrorCoins from 'app/modernUI/images/floatingErrorCoins.svg';
 import { Box, Button, Text } from 'grommet';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +55,7 @@ export const StepsProcessing = ({
 
   // not processing and step failed
   if (stepFailed) {
-    finalImage = floatingErrorCoins;
+    finalImage = isLightMode ? floatingErrorCoins : floatingErrorCoinsDark;
   }
 
   // not processing and step was succesful
