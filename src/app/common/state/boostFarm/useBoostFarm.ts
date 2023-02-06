@@ -3,12 +3,16 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
+  claimLockedBoostFarmRewards,
   depositIntoBoostFarm,
   getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getLockedBoostWithdrawalsInfo,
   getMaximumLPValueAsToken,
-  withdrawFromBoostFarm
+  unlockFromLockedBoostFarm,
+  withdrawFromBoostFarm,
+  withdrawFromLockedBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
@@ -31,7 +35,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useBoostFarmDeposit';
 import { possibleWithdrawSteps } from './useBoostFarmWithdrawal';
@@ -515,13 +518,13 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     },
     isNewest: true,
   },
-  /*{
+  {
     id: 5,
-    farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
+    farmAddress: EEthereumAddresses.FRXETHVAULT,
     type: 'booster',
     isLocked: true,
     chain: EChain.ETHEREUM,
-    name: 'Frx-ETH/ETH',
+    name: 'FrxETH/ETH',
     sign: '$',
     icons: [
       'FRAX',
@@ -540,9 +543,10 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       label: 'CVX-ETH',
       icons: ['CVX', 'ETH'],
       stableLabel: 'USDC',
+      address: EEthereumAddresses.CVXETH,
       stableAddress: EEthereumAddresses.USDC,
     },
-    lPTokenAddress: EEthereumAddresses.FRAXUSDC,
+    lPTokenAddress: EEthereumAddresses.FRXETH,
     supportedTokens: [
       {
         label: 'agEUR',
@@ -605,18 +609,19 @@ export const boostFarmOptions: Array<TBoostFarm> = [
         sign: '₿',
       },
     ],
-    lowSlippageTokenLabels: ['FRAX', 'USDC'],
+    lowSlippageTokenLabels: ['FRAX', 'ETH'],
     apyFarmAddresses: {
       baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
     withdrawToken: {
-      label: 'Frx-ETH/ETH',
-      address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+      label: 'FrxETH/ETH',
+      address: EEthereumAddresses.FRXETH,
       decimals: 18,
-      sign: '€',
+      sign: '',
     },
-  },*/
+    isNewest: true,
+  },
 ];
 
 const defaultRewards = {
@@ -654,9 +659,6 @@ export const useBoostFarm = ({ id }) => {
   // tabs control
   const [selectedTab, setSelectedTab] = useState(0);
 
-  // other state control files
-  const { setNotification } = useNotification();
-
   // selected farm control
   const selectedFarm = useRef<TBoostFarm>(
     boostFarmOptions.find(availableFarm => availableFarm.id == id),
@@ -693,13 +695,13 @@ export const useBoostFarm = ({ id }) => {
     stepError,
     successTransactionHash,
     resetProcessing,
+    isHandlingStep,
+    setIsHandlingStep,
   } = useProcessingSteps();
   const processingTitle = useRef<string>();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
 
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
@@ -836,6 +838,14 @@ export const useBoostFarm = ({ id }) => {
             : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
+        if (farm.isLocked) {
+          const userWithdrawals = await getLockedBoostWithdrawalsInfo(
+            farm.farmAddress,
+            farm.chain,
+          );
+          farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
+          farmInfo.isUnlocking = userWithdrawals.isUnlocking;
+        }
       }
 
       return { ...farm, ...farmInfo };
@@ -885,7 +895,15 @@ export const useBoostFarm = ({ id }) => {
 
   const claimRewards = async () => {
     try {
-      const tx = seeRewardsAsStable
+      const tx = selectedFarm.current?.isLocked
+        ? await claimLockedBoostFarmRewards(
+            selectedFarmInfo.current.farmAddress,
+            seeRewardsAsStable
+              ? selectedFarm.current?.rewards.stableAddress
+              : selectedFarm.current?.rewards.address,
+            selectedFarmInfo.current.chain,
+          )
+        : seeRewardsAsStable
         ? await claimBoostFarmNonLPRewards(
             selectedFarmInfo.current.farmAddress,
             selectedFarmInfo.current.rewards.stableAddress,
@@ -926,8 +944,6 @@ export const useBoostFarm = ({ id }) => {
 
   // withdraw method
   const handleWithdraw = async () => {
-    setShowBoostWithdrawalConfirmation(false);
-
     // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
     const withdrawPercentage = Math.round(
       +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
@@ -945,9 +961,36 @@ export const useBoostFarm = ({ id }) => {
         selectedFarmInfo.current.chain,
         useBiconomy,
       );
-      selectedSupportedTokenInfo.current.boostDepositedAmount =
-        selectedSupportedTokenInfo.current.boostDepositedAmount -
-        +withdrawValue;
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleUnlock = async () => {
+    try {
+      const tx = await unlockFromLockedBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        withdrawValue,
+        selectedSupportedToken.decimals,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // withdraw from locked boost method
+  const handleWithdrawUnlocked = async () => {
+    try {
+      const tx = await withdrawFromLockedBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        selectedSupportedToken.address,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
       successTransactionHash.current = tx.transactionHash;
     } catch (error) {
       throw error;
@@ -1027,7 +1070,6 @@ export const useBoostFarm = ({ id }) => {
       ? rewardsInfo.current?.stableValue
       : rewardsInfo.current?.value;
 
-    // Withdraw step is always there
     neededSteps.push({
       ...possibleBoostFarmSteps[0],
       label: `Claiming ${value} ${label}`,
@@ -1063,14 +1105,20 @@ export const useBoostFarm = ({ id }) => {
           break;
 
         case 1:
-        case 2: // lock
+        case 2: // locked boost
           await handleDeposit();
           break;
 
         case 3:
-        case 4: // unlock
-        case 5: // locked withdraw
           await handleWithdraw();
+          break;
+
+        case 4: // unlock locked boost
+          await handleUnlock();
+          break;
+
+        case 5: // withdraw unlocked from locked boost
+          await handleWithdrawUnlocked();
           break;
 
         case 6:

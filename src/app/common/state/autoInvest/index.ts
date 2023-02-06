@@ -1,4 +1,4 @@
 export * from './useAutoInvest';
-export * from './useAutoInvestTab';
+export * from './useStartStream';
 export * from './useStreamCard';
 

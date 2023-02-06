@@ -73,7 +73,7 @@ export const StepsProcessing = ({
       justify="between"
       pad={{ bottom: '40px' }}
       fill
-      style={{ minHeight: minHeight }}
+      style={{ minHeight: minHeight, maxHeight: minHeight }}
     >
       <Box gap="24px">
         <Box fill="horizontal" align="center">
@@ -175,80 +175,79 @@ export const StepsProcessing = ({
       </Box>
       <Box gap="24px" align="center">
         {stepWasSuccessful != undefined ? (
-          <div className="fade-in">
-            <img src={finalImage} height="224px" />
-          </div>
+          <Box className="fade-in" fill>
+            <img src={finalImage} />
+          </Box>
         ) : (
-          <img src={finalImage} height="224px" />
+          <img src={finalImage} />
         )}
-
-        <Box height="81px" justify="end">
-          {isHandlingStep && (
-            <Text size="14px" weight={400}>
-              Waiting for confirmation in wallet...
+      </Box>
+      <Box height="81px" justify="end" align='center'>
+        {isHandlingStep && (
+          <Text size="14px" weight={400}>
+            Waiting for confirmation in wallet...
+          </Text>
+        )}
+        {!isHandlingStep && stepWasSuccessful == true && (
+          <Box gap="20px" align="center">
+            <Text size="14px" weight={400} textAlign="center">
+              {step.successMessage ? step.successMessage : step.successLabel}
             </Text>
-          )}
-          {!isHandlingStep && stepWasSuccessful == true && (
-            <Box gap="20px" align="center">
-              <Text size="14px" weight={400} textAlign="center">
-                {step.successMessage ? step.successMessage : step.successLabel}
-              </Text>
-              <Button
-                primary
-                label={
-                  allStepsFinishedSuccessfully
-                    ? 'View your farms'
-                    : 'Continue to ' + step.label
+            <Button
+              primary
+              label={
+                allStepsFinishedSuccessfully
+                  ? 'View your farms'
+                  : 'Continue to ' + step.label
+              }
+              style={{
+                borderRadius: '58px',
+                minWidth: '197px',
+                height: '40px',
+                padding: '8px 24px 8px 24px',
+              }}
+              onClick={() => {
+                if (allStepsFinishedSuccessfully) {
+                  navigate('/?view_type=my_farms');
+                } else {
+                  currentStep.current = currentStep.current + 1;
+                  stepWasSuccessful = undefined;
+                  handleCurrentStep();
                 }
+              }}
+            />
+          </Box>
+        )}
+        {!isHandlingStep && stepWasSuccessful == false && (
+          <Box gap="20px" align="center">
+            <Text size="14px" weight={400}>
+              Transaction failed
+            </Text>
+            <Box direction="row" gap="16px">
+              <Button
+                label="close"
                 style={{
                   borderRadius: '58px',
-                  minWidth: '197px',
+                  minWidth: '113px',
+                  height: '40px',
+                  padding: '6px 24px 6px 24px',
+                }}
+                onClick={() => stopProcessingSteps()}
+              />
+              <Button
+                primary
+                label="try again"
+                style={{
+                  borderRadius: '58px',
+                  minWidth: '113px',
                   height: '40px',
                   padding: '8px 24px 8px 24px',
                 }}
-                onClick={() => {
-                  if (allStepsFinishedSuccessfully) {
-                    navigate('/?view_type=my_farms');
-                  } else {
-                    currentStep.current = currentStep.current + 1;
-                    stepWasSuccessful = undefined;
-                    handleCurrentStep();
-                  }
-                }}
+                onClick={() => handleCurrentStep()}
               />
             </Box>
-          )}
-          {!isHandlingStep && stepWasSuccessful == false && (
-            <Box gap="20px" align="center">
-              <Text size="14px" weight={400}>
-                Transaction failed
-              </Text>
-              <Box direction="row" gap="16px">
-                <Button
-                  label="close"
-                  style={{
-                    borderRadius: '58px',
-                    minWidth: '113px',
-                    height: '40px',
-                    padding: '6px 24px 6px 24px',
-                  }}
-                  onClick={() => stopProcessingSteps()}
-                />
-                <Button
-                  primary
-                  label="try again"
-                  style={{
-                    borderRadius: '58px',
-                    minWidth: '113px',
-                    height: '40px',
-                    padding: '8px 24px 8px 24px',
-                  }}
-                  onClick={() => handleCurrentStep()}
-                />
-              </Box>
-            </Box>
-          )}
-        </Box>
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { TPossibleStep } from '../types/global';
 
 export const useProcessingSteps = () => {
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false); // is processing all steps
+  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false); // step is being handled
   const currentStep = useRef<number>(0);
   const steps = useRef<TPossibleStep[]>();
   const stepWasSuccessful = useRef<boolean>();
@@ -25,6 +26,8 @@ export const useProcessingSteps = () => {
     stepError,
     successTransactionHash,
     resetProcessing,
-    successImage
+    successImage,
+    isHandlingStep,
+    setIsHandlingStep
   };
 };

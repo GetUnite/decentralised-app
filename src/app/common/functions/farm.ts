@@ -5,7 +5,7 @@ import { toDecimals } from './utils';
 import {
   callContract,
   getCurrentWalletAddress,
-  sendTransaction
+  getHandlerContractInstance, sendTransaction
 } from './web3Client';
 
 export const deposit = async (
@@ -146,7 +146,9 @@ export const getIfUserHasWithdrawalRequest = async (farmAddress, chain) => {
   ];
 
   const handlerAddress =
-    chain == EChain.POLYGON ? EPolygonAddresses.HANDLER : EEthereumAddresses.HANDLER;
+    chain == EChain.POLYGON
+      ? EPolygonAddresses.HANDLER
+      : EEthereumAddresses.HANDLER;
 
   const isUserWaiting = await callContract(
     abi,
@@ -187,4 +189,30 @@ export const getIfUserHasWithdrawalRequest = async (farmAddress, chain) => {
     w => w.user.toLowerCase() === getCurrentWalletAddress().toLowerCase(),
   );
   return usersWithdrawals;
+};
+
+export const getIfWithdrawalWasAddedToQueue = async (blockNumber, chain) => {
+  const handlerInstance = await getHandlerContractInstance(blockNumber, chain);
+
+  let eventFilter = handlerInstance.filters.WithdrawalSatisfied();
+  let events = await handlerInstance.queryFilter(eventFilter, blockNumber);
+  if (
+    events.find(event => {
+      return event.args?.user.toLowerCase() == getCurrentWalletAddress();
+    })
+  ) {
+    return false;
+  }
+
+  eventFilter = handlerInstance.filters.AddedToQueue();
+  events = await handlerInstance.queryFilter(eventFilter, blockNumber);
+  if (
+    events.find(event => {
+      return event.args?.user.toLowerCase() == getCurrentWalletAddress();
+    })
+  ) {
+    return true;
+  }
+
+  return false;
 };

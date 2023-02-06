@@ -6,6 +6,7 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import handlerAbi from 'app/common/abis/handler.json';
 import {
   EEthereumAddresses,
   EPolygonAddresses
@@ -223,7 +224,7 @@ export const changeNetwork = async (chain: EChain) => {
 
   await onboard.setChain({ chainId: chainId });
 
-  return chainId ;
+  return chainId;
 };
 
 export const getChainById = chainId => {
@@ -376,24 +377,21 @@ export const callStatic = async (
   abi,
   address,
   functionSignature,
-  params = []
+  params = [],
 ) => {
   try {
     const provider = walletProvider;
     const signer = provider.getSigner();
     const contract = new ethers.Contract(address, abi, signer);
 
-    const method = contract.callStatic[functionSignature].apply(
-      null,
-      params,
-    );
+    const method = contract.callStatic[functionSignature].apply(null, params);
 
     let txResult = await method;
 
     if (ethers.BigNumber.isBigNumber(txResult)) {
       return txResult.toString();
     }
-    
+
     return txResult;
   } catch (error) {
     console.log(error);
@@ -1300,4 +1298,18 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
   );
 
   return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
+};
+
+export const getHandlerContractInstance = (blockNumber, chain) => {
+  const readOnlyProvider = getReadOnlyProvider(chain);
+  readOnlyProvider.resetEventsBlock(blockNumber - 1);
+  const handlerInstance = new ethers.Contract(
+    chain == EChain.POLYGON
+      ? EPolygonAddresses.HANDLER
+      : EEthereumAddresses.HANDLER,
+    handlerAbi,
+    readOnlyProvider,
+  );
+
+  return handlerInstance;
 };

@@ -7,8 +7,8 @@ export type TBoostFarmRewards = {
   value?: string;
   stableLabel?: string;
   stableValue?: number;
+  address?: string; // locked boost need to know the address of the rewards aswel
   stableAddress?: string;
-  curvePoolAddress?: string;
   pendingValue?: number;
 };
 
@@ -49,5 +49,6 @@ export type TBoostFarm = TFarm & {
   // For locked boost farms
   isLocked?: boolean;
   unlockedBalance?: string;
+  isUnlocking?:boolean;
   withdrawToken?: TSupportedToken;
-}
+};

@@ -77,8 +77,8 @@ export const TokenSelector = ({
                       gap="6px"
                       pad={{ horizontal: '12px', vertical: '4px' }}
                     >
-                      <TokenIcon label={tokenOption.label} />
-                      <Text size="16px">{tokenOption.label}</Text>
+                      <TokenIcon label={tokenOption?.label} />
+                      <Text size="16px">{tokenOption?.label}</Text>
                     </Box>
                   </Button>
                 );

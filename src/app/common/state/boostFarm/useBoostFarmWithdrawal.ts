@@ -1,7 +1,7 @@
 import { getMaximumLPValueAsToken } from 'app/common/functions/boostFarm';
 import { TPossibleStep } from 'app/common/types/global';
+import openVault from 'app/modernUI/animations/openVault.svg';
 import vaultUnlocking from 'app/modernUI/animations/vaultUnlocking.svg';
-import vaultBottomLeft from 'app/modernUI/images/vaults/vault-bottom-left.svg';
 import { useEffect, useState } from 'react';
 
 export const possibleWithdrawSteps: TPossibleStep[] = [
@@ -11,10 +11,10 @@ export const possibleWithdrawSteps: TPossibleStep[] = [
     errorLabel: 'Failed to withdraw tokens',
     successLabel: '',
     image: vaultUnlocking,
-    successImage: vaultBottomLeft,
+    successImage: openVault,
   },
   {
-    id: 3,
+    id: 4,
     label: 'Unlock',
     errorLabel: 'Failed to unlock tokens',
     successLabel: '',

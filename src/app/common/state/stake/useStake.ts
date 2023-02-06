@@ -94,6 +94,8 @@ export const useStake = () => {
     stepError,
     successTransactionHash,
     resetProcessing,
+    isHandlingStep,
+    setIsHandlingStep,
   } = useProcessingSteps();
   const processingTitle = useRef<string>();
 
@@ -109,7 +111,6 @@ export const useStake = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);

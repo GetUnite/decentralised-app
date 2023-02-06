@@ -18,6 +18,7 @@ export const AutoInvest = () => {
     isStoppingStream,
     handleStopStream,
     canStartStreams,
+    updateAutoInvestInfo
   } = useAutoInvest();
 
   const { isLightMode } = useMode();
@@ -53,7 +54,7 @@ export const AutoInvest = () => {
                         Active Streams
                       </Text>
                       {walletAccountAtom && canStartStreams && (
-                        <Link to={'/autoinvest/add'}>
+                        <Link to={'/autoinvest/start'}>
                           <Button
                             label="Start new stream"
                             style={{ width: '170px' }}
@@ -139,9 +140,12 @@ export const AutoInvest = () => {
                                       <StreamCard
                                         key={index}
                                         from={stream.from}
+                                        sourceDepositedAmount={stream.sourceDepositedAmount}
                                         fromAddress={stream.fromAddress}
+                                        fromStAddress={stream.fromStAddress}
                                         to={stream.to}
                                         toAddress={stream.toAddress}
+                                        toStAddress={stream.toStAddress}
                                         tvs={stream.tvs}
                                         flowPerMonth={stream.flowPerMonth}
                                         startDate={stream.startDate}
@@ -156,6 +160,7 @@ export const AutoInvest = () => {
                                         sign={stream.sign}
                                         handleStopStream={handleStopStream}
                                         isStoppingStream={isStoppingStream}
+                                        updateAutoInvestInfo={updateAutoInvestInfo}
                                       />
                                     );
                                   })}

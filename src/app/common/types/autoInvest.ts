@@ -1,14 +1,9 @@
-import { TSupportedToken } from './global';
-
-export type TStreamCreationStep = {
-  id: number;
-  label: string;
-};
+import { TPossibleStep, TSupportedToken } from './global';
 
 export type TStreamOptionCreationSteps = {
   fromTokenAddress: string;
   toTokenAddress: string;
-  steps: TStreamCreationStep[];
+  steps: TPossibleStep[];
 };
 
 export type TStreamOption = {

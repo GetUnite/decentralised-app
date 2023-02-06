@@ -14,9 +14,9 @@ export const BoostFarmWithdrawalConfirmation = ({
 }) => {
   return (
     <>
-      <Box margin={{ top: '45px' }} align="center">
+      <Box margin={{ top: '70px' }} align="center">
         <img src={exclamation} alt="exclamation" />
-        <Box gap="35px" margin={{ top: '45px' }}>
+        <Box gap="40px" margin={{ top: '73px' }}>
           <Text textAlign="center" weight="bold" size="24px">
             If you withdraw {withdrawValue} {withdrawTokenLabel} now, about
             ${toExactFixed(losablePendingRewards, 6)} in pending rewards won't be realised.
@@ -28,7 +28,7 @@ export const BoostFarmWithdrawalConfirmation = ({
           </Text>
         </Box>
 
-        <Box gap="30px" margin={{ top: '48px' }}>
+        <Box gap="32px" margin={{ top: '50px' }}>
           <Button
             primary
             label="I still want to withdraw now"
