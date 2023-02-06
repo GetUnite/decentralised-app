@@ -90,6 +90,112 @@ export const withdrawFromBoostFarm = async (
   }
 };
 
+export const unlockFromLockedBoostFarm = async (
+  farmAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'uint256',
+            name: 'assets',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'receiver',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'owner',
+            type: 'address',
+          },
+        ],
+        name: 'withdraw',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'shares',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const amountInDecimals = toDecimals(amount, decimals);
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'withdraw(uint256,address,address)',
+      [amountInDecimals, getCurrentWalletAddress(), getCurrentWalletAddress()],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const withdrawFromLockedBoostFarm = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'exitToken',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'receiver',
+            type: 'address',
+          },
+        ],
+        name: 'claim',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'amount',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claim(address,address)',
+      [tokenAddress, getCurrentWalletAddress()],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   const abi = [
     {
@@ -400,5 +506,91 @@ export const claimBoostFarmNonLPRewards = async (
     return tx;
   } catch (error) {
     throw error;
+  }
+};
+
+export const claimLockedBoostFarmRewards = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'exitToken',
+            type: 'address',
+          },
+        ],
+        name: 'claimRewards',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'rewardTokens',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewards(address)',
+      [tokenAddress],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLockedBoostWithdrawalsInfo = async (farmAddress, chain) => {
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      name: 'userWithdrawals',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'withdrawalRequested',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'withdrawalAvailable',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const userWithdrawals = await callContract(
+    abi,
+    farmAddress,
+    'userWithdrawals(address)',
+    [getCurrentWalletAddress()],
+    chain,
+  );
+  
+  return {
+    unlockedBalance: (userWithdrawals.withdrawalAvailable).toNumber(),
+    isUnlocking: (userWithdrawals.withdrawalRequested).toNumber() > 0
   }
 };

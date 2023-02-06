@@ -1,20 +1,32 @@
+import { EChain } from 'app/common/constants/chains';
 import { useMode } from 'app/common/state';
 import { useStreamCard } from 'app/common/state/autoInvest/useStreamCard';
-import { DateInput, StreamInput, TokenIcon } from 'app/modernUI/components';
+import {
+  DateInput,
+  Modal,
+  StepsProcessing,
+  StreamInput,
+  TokenIcon
+} from 'app/modernUI/components';
+import pencilDark from 'app/modernUI/images/pencil-dark.svg';
+import pencil from 'app/modernUI/images/pencil.svg';
 import saveStreamDark from 'app/modernUI/images/saveStream-dark.svg';
 import saveStream from 'app/modernUI/images/saveStream.svg';
 import stopStreamDark from 'app/modernUI/images/stopStream-dark.svg';
 import stopStream from 'app/modernUI/images/stopStream.svg';
-import { Box, Button, Grid, ResponsiveContext, Text } from 'grommet';
+import { Box, Button, Grid, Layer, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { AddFundsConfirmation } from '../blocks/AddFundsConfirmation';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 
 interface IStreamCard {
   from?: string;
   fromAddress?: string;
+  fromStAddress?: string;
   to?: string;
   toAddress?: string;
+  toStAddress?: string;
   tvs?: string;
   flowPerMonth?: string;
   startDate?: string;
@@ -24,13 +36,18 @@ interface IStreamCard {
   sign?: string;
   isStoppingStream?: boolean;
   isLoading?: boolean;
+  updateAutoInvestInfo?: any;
+  sourceDepositedAmount?: string;
 }
 
 export const StreamCard = ({
   from,
+  sourceDepositedAmount,
   fromAddress,
+  fromStAddress,
   to,
   toAddress,
+  toStAddress,
   tvs,
   flowPerMonth,
   startDate,
@@ -40,19 +57,47 @@ export const StreamCard = ({
   isStoppingStream,
   sign,
   isLoading = false,
+  updateAutoInvestInfo,
 }: IStreamCard) => {
   const {
+    // errors
+    hasErrors,
+    streamValueError,
+    newEndDateError,
+    // edit mode
     isEditMode,
     setIsEditMode,
     // inputs
     newEndDate,
     setNewEndDate,
     streamValue,
-    setStreamValue,
+    validateInputs,
     // confirmations
     stopStreamConfirmation,
     setStopStreamConfirmation,
-  } = useStreamCard({ endDate });
+    addFundsConfirmation,
+    setAddFundsConfirmation,
+    // steps
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
+  } = useStreamCard({
+    from,
+    sourceDepositedAmount,
+    endDate,
+    fromAddress,
+    fromStAddress,
+    to,
+    toAddress,
+    toStAddress,
+    updateAutoInvestInfo,
+  });
 
   const { isLightMode } = useMode();
 
@@ -129,22 +174,10 @@ export const StreamCard = ({
                       <StreamInput
                         tokenSign={sign}
                         value={streamValue}
-                        onValueChange={value => setStreamValue(value)}
+                        onValueChange={validateInputs}
                         isSmall={true}
                         style={{ width: '80%' }}
                       />
-                      /*<NumberFormat
-                        value={formattedStreamValue}
-                        customInput={TextInput}
-                        thousandSeparator={thousandsSeparator}
-                        decimalSeparator={decimalSeparator}
-                        onValueChange={values => {
-                          const { formattedValue, value } = values;
-                          setStreamValue(value);
-                          setFormattedStreamValue(formattedValue);
-                        }}
-                        style={{width: "80%"}}
-                      />*/
                     )}
                   </Box>
                   <span>{startDate}</span>
@@ -164,13 +197,13 @@ export const StreamCard = ({
                     <Box direction="row">
                       {!isEditMode ? (
                         <>
-                          {/*<Button plain onClick={() => setIsEditMode(true)}>
-                            <Image
+                          <Button plain onClick={() => setIsEditMode(true)}>
+                            <img
                               src={isLightMode ? pencil : pencilDark}
                               height={22}
                               width={22}
                             />
-                      </Button>*/}
+                          </Button>
                           <StopStreamConfirmation
                             stopStreamConfirmation={stopStreamConfirmation}
                             setStopStreamConfirmation={
@@ -189,11 +222,39 @@ export const StreamCard = ({
                               src={isLightMode ? stopStream : stopStreamDark}
                             />
                           </Button>
-                          <Button plain onClick={() => setIsEditMode(false)}>
+                          <Button
+                            plain
+                            disabled={hasErrors || streamValue == ''}
+                            onClick={() => startProcessingSteps()}
+                          >
                             <img
                               src={isLightMode ? saveStream : saveStreamDark}
                             />
                           </Button>
+                          {isProcessing && (
+                            <Layer>
+                              <Modal
+                                chain={EChain.POLYGON}
+                                heading={''}
+                                noHeading={isProcessing}
+                                closeAction={
+                                  isProcessing ? stopProcessingSteps : undefined
+                                }
+                              >
+                                <StepsProcessing
+                                  title="Editing stream..."
+                                  steps={steps.current}
+                                  currentStep={currentStep}
+                                  isHandlingStep={isHandlingStep}
+                                  stepWasSuccessful={stepWasSuccessful.current}
+                                  stepError={stepError.current}
+                                  stopProcessingSteps={stopProcessingSteps}
+                                  handleCurrentStep={handleCurrentStep}
+                                  minHeight={'627px'}
+                                />
+                              </Modal>
+                            </Layer>
+                          )}
                         </>
                       )}
                     </Box>
@@ -201,7 +262,34 @@ export const StreamCard = ({
                 </>
               )}
             </Grid>
-          </Box>
+          </Box>{' '}
+          {isEditMode && (
+            <Box
+              fill="horizontal"
+              justify="start"
+              direction="row"
+              height="24px"
+              pad={{ horizontal: 'medium', vertical: 'none' }}
+            >
+              {hasErrors && (
+                <Text color="error">
+                  {newEndDateError != '' ? (
+                    newEndDateError
+                  ) : (
+                    <>
+                      <span>{streamValueError}. </span>
+                      <AddFundsConfirmation
+                        addFundsConfirmation={addFundsConfirmation}
+                        setAddFundsConfirmation={setAddFundsConfirmation}
+                        setIsEditMode={setIsEditMode}
+                        fromAddress={fromAddress}
+                      />
+                    </>
+                  )}
+                </Text>
+              )}
+            </Box>
+          )}
         </>
       )}
     </ResponsiveContext.Consumer>

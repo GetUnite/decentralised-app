@@ -3,12 +3,15 @@ import {
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
-import { deposit, withdraw } from 'app/common/functions/farm';
+import {
+  deposit,
+  getIfWithdrawalWasAddedToQueue,
+  withdraw
+} from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  approve,
-  getInterest,
+  approve, getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount
 } from 'app/common/functions/web3Client';
@@ -261,11 +264,12 @@ export const useFarm = ({ id }) => {
     stepError,
     successTransactionHash,
     resetProcessing,
+    isHandlingStep,
+    setIsHandlingStep,
   } = useProcessingSteps();
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
 
   // biconomy
   const [useBiconomy, setUseBiconomy] = useState(false);
@@ -412,6 +416,17 @@ export const useFarm = ({ id }) => {
         useBiconomy,
       );
       successTransactionHash.current = tx.transactionHash;
+      const blockNumber = tx.blockNumber;
+      // the withdrawal might be instant or get into a buffer queue.
+      const wasAddedToQueue = await getIfWithdrawalWasAddedToQueue(
+        blockNumber,
+        selectedFarm.current?.chain,
+      );
+
+      // change the step message to tell the user the withdraw was added to the queue
+      if (wasAddedToQueue) {
+        console.log('here i guess');
+      }
     } catch (error) {
       throw error;
     }
@@ -437,7 +452,6 @@ export const useFarm = ({ id }) => {
       step => step.id == steps.current[currentStep.current].id,
     );
 
-    console.log(step);
     try {
       switch (step.id) {
         case 0:

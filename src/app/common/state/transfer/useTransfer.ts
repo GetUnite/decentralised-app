@@ -4,8 +4,8 @@ import { EPolygonAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
-    getIbAlluoInfo,
-    transferToAddress
+  getIbAlluoInfo,
+  transferToAddress
 } from 'app/common/functions/transfer';
 import { addressIsValid, isNumeric } from 'app/common/functions/utils';
 import { useProcessingSteps } from 'app/common/state';
@@ -57,10 +57,11 @@ export const useTransfer = () => {
     successTransactionHash,
     resetProcessing,
     successImage,
+    isHandlingStep,
+    setIsHandlingStep,
   } = useProcessingSteps();
 
   // loading control
-  const [isHandlingStep, setIsHandlingStep] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {

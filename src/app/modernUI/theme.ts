@@ -349,7 +349,7 @@ export const theme = deepMerge(grommet, {
       `,
     thumb: { color: 'primaryStatic' },
   },
-  layer: { overlay: { background: 'container' } },
+  layer: { overlay: { background: 'rgba(217, 217, 217, 0.6)' }, border :{radius: '16px'}},
   menu: {
     item: { gap: '50px' },
     icons: { color: { dark: colors.WHITE, light: colors.BLACK } },

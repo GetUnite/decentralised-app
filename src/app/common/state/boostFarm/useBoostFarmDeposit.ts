@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 export const possibleDepositSteps: TPossibleStep[] = [
   {
     id: 0,
-    label: 'Approve deposit',
-    successLabel: 'Deposit approved',
+    label: '',
+    successLabel: '',
     errorLabel: 'Approval failed',
   },
   {
@@ -89,7 +89,15 @@ export const useBoostFarmDeposit = ({
 
     // If the allowance is not higher than 0 ask for approval
     if (!(+selectedSupportedTokenInfo.current?.allowance > 0)) {
-      neededSteps.push(possibleDepositSteps[0]);
+      neededSteps.push({
+        ...possibleDepositSteps[0],
+        label: `Approve ${
+          selectedFarmInfo.current?.isLocked ? 'lock' : 'deposit'
+        }`,
+        successLabel: `${
+          selectedFarmInfo.current?.isLocked ? 'Lock' : 'Deposit'
+        } approved`,
+      });
     }
 
     // Deposit/Lock step is always there

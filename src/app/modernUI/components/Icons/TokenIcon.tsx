@@ -104,7 +104,7 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       src = iballuobtc;
       break;
 
-      case 'Frx-ETH/ETH':
+      case 'FrxETH/ETH':
       src = frxetheth;
       break;
 

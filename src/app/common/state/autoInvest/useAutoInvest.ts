@@ -6,7 +6,11 @@ import {
   stopStream
 } from 'app/common/functions/autoInvest';
 import { fromLocaleString, toExactFixed } from 'app/common/functions/utils';
-import { getBalance, getBalanceOf } from 'app/common/functions/web3Client';
+import {
+  getBalance,
+  getBalanceOf,
+  getUserDepositedAmount
+} from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   TStreamOption,
@@ -158,16 +162,18 @@ export const useAutoInvest = () => {
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.POLYGON);
-      updateAutoInvestInfo();
     }
+    updateAutoInvestInfo();
   }, [walletAccountAtom]);
 
   const updateAutoInvestInfo = async () => {
     setIsLoading(true);
-    const numberOfStreams = await fetchStreamsInfo();
-    // if all streams options are being used there is no need to get the assets
-    if (!(numberOfStreams > 1)) {
-      await fetchAssetsInfo();
+    if (walletAccountAtom) {
+      const numberOfStreams = await fetchStreamsInfo();
+      // if all streams options are being used there is no need to get the assets
+      if (!(numberOfStreams > 1)) {
+        await fetchAssetsInfo();
+      }
     }
 
     setIsLoading(false);
@@ -253,9 +259,16 @@ export const useAutoInvest = () => {
           endDate.setSeconds(endDateTimestamp);
           streamsArray.push({
             from: element.fromLabel,
+            // deposited amount to validate stream edition
+            sourceDepositedAmount: await getUserDepositedAmount(
+              element.fromIbAlluoAddress,
+              EChain.POLYGON,
+            ),
             fromAddress: element.fromIbAlluoAddress,
+            fromStAddress: element.fromStIbAlluoAddress,
             to: element.toLabel,
             toAddress: element.ricochetMarketAddress,
+            toStAddress: element.toStIbAlluoAddress,
             flowPerSecond: flowPerSecond,
             flowPerMonth: toExactFixed(flowPerMonth, 6),
             startDate: new Date(
@@ -357,5 +370,6 @@ export const useAutoInvest = () => {
     fundedUntilByStreamOptions,
     handleStopStream,
     canStartStreams,
+    updateAutoInvestInfo,
   };
 };

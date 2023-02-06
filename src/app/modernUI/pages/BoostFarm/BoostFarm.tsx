@@ -125,7 +125,7 @@ export const BoostFarm = () => {
                   stepError={stepError.current}
                   stopProcessingSteps={stopProcessingSteps}
                   handleCurrentStep={handleCurrentStep}
-                  minHeight={selectedTab == 0 ? '595px' : '642px'}
+                  minHeight={selectedTab == 0 ? '598px' : '644px'}
                 />
               ) : (
                 <>
@@ -156,11 +156,7 @@ export const BoostFarm = () => {
                     <>
                       {selectedFarmInfo.current?.isLocked ? (
                         <LockedBoostFarmUnlockConfirmation
-                          withdrawTokenLabel={selectedSupportedToken?.label}
-                          withdrawValue={withdrawValue}
-                          cancelBoostUnlockConfirmation={cancelConfirmations}
                           nextHarvestDate={nextHarvestDate.current}
-                          losablePendingRewards={losablePendingRewards}
                           // steps
                           startProcessingSteps={startProcessingSteps}
                         />
@@ -277,10 +273,22 @@ export const BoostFarm = () => {
                   <Box gap="12px">
                     {selectedFarm.current?.isLocked && (
                       <>
-                        {+selectedFarmInfo.current?.unlockedBalance > 0 &&
-                          timerIsFinished(
+                        {/*is unlocking and the timer isn't finished yet*/}
+                        {selectedFarmInfo.current?.isUnlocking &&
+                          !timerIsFinished(
                             nextHarvestDate.current?.valueOf(),
                           ) && (
+                            <UnlockCountdown
+                              date={nextHarvestDate.current?.valueOf()}
+                              onComplete={updateFarmInfo}
+                              label={`UNLOCKING ${toExactFixed(100, 2)} ${
+                                selectedFarm.current?.name
+                              } IN`}
+                            />
+                          )}
+                        {/*is not unlocking and there is unlocked value to claim*/}
+                        {!selectedFarmInfo.current?.isUnlocking &&
+                          +selectedFarmInfo.current?.unlockedBalance > 0 && (
                             <Box
                               round="16px"
                               width="245px"
@@ -347,19 +355,6 @@ export const BoostFarm = () => {
                               )}
                             </Box>
                           )}
-                        {!timerIsFinished(
-                          nextHarvestDate.current?.valueOf(),
-                        ) && (
-                          <>
-                            <UnlockCountdown
-                              date={nextHarvestDate.current?.valueOf()}
-                              onComplete={updateFarmInfo}
-                              label={`UNLOCKING ${toExactFixed(100, 2)} ${
-                                selectedFarm.current?.name
-                              } IN`}
-                            />
-                          </>
-                        )}
                       </>
                     )}
                     <Box
@@ -482,7 +477,8 @@ export const BoostFarm = () => {
                       background="modal"
                       pad={{ vertical: 'medium', horizontal: 'medium' }}
                       border={
-                        showBoostWithdrawalConfirmation
+                        showBoostWithdrawalConfirmation &&
+                        !selectedFarm.current?.isLocked
                           ? {
                               color: '#F59F31',
                               size: '0.5px',
@@ -492,7 +488,8 @@ export const BoostFarm = () => {
                           : { size: '0px' }
                       }
                       style={
-                        showBoostWithdrawalConfirmation
+                        showBoostWithdrawalConfirmation &&
+                        !selectedFarm.current?.isLocked
                           ? {
                               boxShadow:
                                 '0px 0px 20px 0px rgba(255, 152, 17, 0.2)',
