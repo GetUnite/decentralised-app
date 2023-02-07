@@ -952,8 +952,9 @@ export const useBoostFarm = ({ id }) => {
       +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
     );
 
-    const valueToWithdraw =
-      +(+selectedFarmInfo.current.depositedAmountInLP).toFixed(18) * withdrawPercentage;
+    const valueToWithdraw = (
+      selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage
+    ).toFixed(18);
 
     console.log({
       withdrawValue,
@@ -961,7 +962,6 @@ export const useBoostFarm = ({ id }) => {
       depositedAmountInLP: selectedFarmInfo.current.depositedAmountInLP,
       withdrawPercentage,
       valueToWithdraw,
-      valueToWithdrawAsFixed: valueToWithdraw.toFixed(18)
     });
 
     try {
