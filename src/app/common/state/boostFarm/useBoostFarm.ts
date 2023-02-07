@@ -614,6 +614,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
       baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
       boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
     },
+    forcedInterest: '9.50',
     withdrawToken: {
       label: 'FrxETH/ETH',
       address: EEthereumAddresses.FRXETH,
@@ -744,7 +745,7 @@ export const useBoostFarm = ({ id }) => {
   // harvest dates for the farms
   const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
   const nextHarvestDate = useRef<any>(
-    moment().subtract(1, 'days').add(1, 'week').day('Sunday'),
+    moment().subtract(1, 'days').add(1, 'week').day('Sunday').set('hour', 12),
   );
 
   // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
@@ -808,11 +809,13 @@ export const useBoostFarm = ({ id }) => {
       );
 
       farmInfo = {
-        interest: await getBoostFarmInterest(
-          farm.farmAddress,
-          farm.apyFarmAddresses,
-          farm.chain,
-        ),
+        interest: farm.forcedInterest
+          ? farm.forcedInterest
+          : await getBoostFarmInterest(
+              farm.farmAddress,
+              farm.apyFarmAddresses,
+              farm.chain,
+            ),
         totalAssetSupply:
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
           valueOf1LPinUSDC,
@@ -951,6 +954,14 @@ export const useBoostFarm = ({ id }) => {
 
     const valueToWithdraw =
       selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
+
+    console.log({
+      withdrawValue,
+      depositedAmount: selectedSupportedTokenInfo.current.boostDepositedAmount,
+      depositedAmountInLP: selectedFarmInfo.current.depositedAmountInLP,
+      withdrawPercentage,
+      valueToWithdraw,
+    });
 
     try {
       const tx = await withdrawFromBoostFarm(
