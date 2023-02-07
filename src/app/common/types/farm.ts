@@ -51,4 +51,6 @@ export type TBoostFarm = TFarm & {
   unlockedBalance?: string;
   isUnlocking?:boolean;
   withdrawToken?: TSupportedToken;
+  // forced apy when it cant be calculated
+  forcedInterest?: string;
 };
