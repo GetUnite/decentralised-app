@@ -85,6 +85,8 @@ export const StartStreamModal = ({ ...rest }) => {
                     stopProcessingSteps={stopProcessingSteps}
                     handleCurrentStep={handleCurrentStep}
                     minHeight={useEndDate ? '657px' : '570px'}
+                    allFinishedLabel="Go to autoInvest"
+                    allFinishedLink='/autoinvest'
                   />
                 ) : (
                   <Box margin={{ top: '46px' }}>

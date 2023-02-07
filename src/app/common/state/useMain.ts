@@ -22,6 +22,7 @@ import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { getBoostFarmInterest } from '../functions/boostFarm';
 import { toExactFixed } from '../functions/utils';
+import { useNotification } from './useNotification';
 
 const possibleStableTokens = [
   'agEUR',
@@ -46,6 +47,9 @@ export const useMain = () => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
+
+  // other state control files
+  const { setNotification } = useNotification();
 
   // farms
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
@@ -82,6 +86,10 @@ export const useMain = () => {
   useEffect(() => {
     setWantedChainAtom(undefined);
     fetchFarmsInfo();
+    const today = new Date();
+    if(today.getDay() === 0){
+      setNotification("🔒 Boost farm deposits and withdrawals will be actioned today ⏰", "warning", undefined, undefined, true);
+    }
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -272,7 +280,7 @@ export const useMain = () => {
     );
 
     farmInfo = {
-      interest: await getBoostFarmInterest(
+      interest: farm.forcedInterest ? farm.forcedInterest : await getBoostFarmInterest(
         farm.farmAddress,
         farm.apyFarmAddresses,
         farm.chain,

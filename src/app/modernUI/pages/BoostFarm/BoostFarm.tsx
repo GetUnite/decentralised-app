@@ -125,7 +125,15 @@ export const BoostFarm = () => {
                   stepError={stepError.current}
                   stopProcessingSteps={stopProcessingSteps}
                   handleCurrentStep={handleCurrentStep}
-                  minHeight={selectedTab == 0 ? '598px' : '644px'}
+                  minHeight={
+                    selectedFarm.current?.isLocked
+                      ? selectedTab == 0
+                        ? '644px'
+                        : '644px'
+                      : selectedTab == 0
+                      ? '598px'
+                      : '644px'
+                  }
                 />
               ) : (
                 <>

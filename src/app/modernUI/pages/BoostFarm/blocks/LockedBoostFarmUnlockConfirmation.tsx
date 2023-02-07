@@ -22,7 +22,7 @@ export const LockedBoostFarmUnlockConfirmation = ({
           <Text textAlign="center" weight="bold" size="24px">
             {lessThanHalfHourToHarvest
               ? `Unlock requests made less than 30 minutes before harvest could miss today’s harvest cycle`
-              : `Just a reminder that funds in locked boost pools are harvested every Sunday between 1 - 4 AM UTC`}
+              : `Just a reminder that funds in locked boost pools are harvested every Sunday after 12 PM UTC`}
           </Text>
           <Text
             textAlign="center"

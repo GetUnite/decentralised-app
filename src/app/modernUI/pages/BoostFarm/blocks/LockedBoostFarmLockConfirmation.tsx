@@ -43,7 +43,7 @@ export const LockedBoostFarmLockConfirmation = ({
         >
           Locked BOOST farms have a{' '}
           <Text weight="bold">weekly lock-in period</Text>. Deposits and
-          withdrawal requests are actioned every Sunday between 1 - 4 AM UTC.
+          withdrawal requests are actioned every Sunday after 12 PM UTC.
         </Text>
 
         <Box gap="30px" margin={{ top: '40px' }}>
