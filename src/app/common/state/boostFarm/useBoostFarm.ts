@@ -948,13 +948,16 @@ export const useBoostFarm = ({ id }) => {
   // withdraw method
   const handleWithdraw = async () => {
     // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
-    const withdrawPercentage = Math.round(
-      +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
-    );
-
-    const valueToWithdraw = (
-      selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage
+    const withdrawPercentage = +(
+      +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount
     ).toFixed(18);
+
+    const valueToWithdraw =
+      withdrawPercentage == 1
+        ? selectedFarmInfo.current.depositedAmountInLP
+        : (
+            selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage
+          ).toFixed(18);
 
     console.log({
       withdrawValue,
