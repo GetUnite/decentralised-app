@@ -80,7 +80,7 @@ export const fromDecimals = (
 const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
 const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
-function roundDown(number, decimals) {
+export const roundDown = (number, decimals) => {
   decimals = decimals || 0;
   return ( Math.floor( number * Math.pow(10, decimals) ) / Math.pow(10, decimals) );
 }
