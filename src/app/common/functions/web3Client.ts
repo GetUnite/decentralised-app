@@ -17,7 +17,8 @@ import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
-const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
+const ethereumTestnetProviderUrl =
+  'https://rpc.tenderly.co/fork/164a4eea-db22-4d7e-8dd0-c4a41a4554fd';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =
@@ -25,8 +26,7 @@ const ethereumProviderUrl =
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
 
-const polygonTestnetProviderUrl =
-  'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
+const polygonTestnetProviderUrl = 'https://polygon-rpc.com/';
 const polygonMainnetProviderUrl = 'https://polygon-rpc.com/';
 const polygonProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
@@ -209,17 +209,17 @@ export const changeNetwork = async (chain: EChain) => {
   if (!walletAddress) return { success: false, undefined };
 
   if (chain === EChain.ETHEREUM) {
-    chainId =
-      process.env.REACT_APP_NET === 'mainnet'
+    chainId = EChainId.ETH_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
         ? EChainId.ETH_MAINNET
-        : EChainId.ETH_SEPOLIA;
+        : EChainId.ETH_SEPOLIA;*/
   }
 
   if (chain === EChain.POLYGON) {
-    chainId = chainId =
-      process.env.REACT_APP_NET === 'mainnet'
+    chainId = EChainId.POL_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
         ? EChainId.POL_MAINNET
-        : EChainId.POL_MUMBAI;
+        : EChainId.POL_MUMBAI;*/
   }
 
   await onboard.setChain({ chainId: chainId });
@@ -329,11 +329,16 @@ export const sendTransaction = async (
   let provider;
 
   try {
-    if (useBiconomy) {
-      const biconomy = await startBiconomy(chain, walletProvider);
-      provider = biconomy.getEthersProvider();
+    // uses tenderly on ethereum
+    if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
+      provider = getReadOnlyProvider(chain);
     } else {
-      provider = walletProvider;
+      if (useBiconomy) {
+        const biconomy = await startBiconomy(chain, walletProvider);
+        provider = biconomy.getEthersProvider();
+      } else {
+        provider = walletProvider;
+      }
     }
 
     let contractInterface = new ethers.utils.Interface(abi);
@@ -346,7 +351,7 @@ export const sendTransaction = async (
     let rawTx = {
       to: address,
       data: data,
-      from: walletAddress,
+      from: getCurrentWalletAddress(),
     };
 
     let finalTx;
@@ -367,7 +372,7 @@ export const sendTransaction = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
-      walletAddress: walletAddress,
+      walletAddress: getCurrentWalletAddress(),
     });
     return processSendError(error);
   }
@@ -816,10 +821,7 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-const marketApiURl =
-  process.env.REACT_APP_NET === 'mainnet'
-    ? 'https://protocol-mainnet.gnosis.io/api'
-    : 'https://protocol-mainnet.dev.gnosisdev.com/api';
+const marketApiURl = 'https://protocol-mainnet.gnosis.io/api';
 
 export const getPrice = async (
   sellToken,

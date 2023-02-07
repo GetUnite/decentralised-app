@@ -251,6 +251,8 @@ export const StreamCard = ({
                                   stopProcessingSteps={stopProcessingSteps}
                                   handleCurrentStep={handleCurrentStep}
                                   minHeight={'627px'}
+                                  allFinishedLabel="Go to autoInvest"
+                                  allFinishedLink="/autoinvest"
                                 />
                               </Modal>
                             </Layer>

@@ -18,6 +18,8 @@ type TStepsProcessing = {
   stopProcessingSteps: Function;
   handleCurrentStep: Function;
   minHeight: string;
+  allFinishedLabel?: string;
+  allFinishedLink?:string;
 };
 
 export const StepsProcessing = ({
@@ -30,6 +32,8 @@ export const StepsProcessing = ({
   stopProcessingSteps,
   handleCurrentStep,
   minHeight,
+  allFinishedLabel,
+  allFinishedLink
 }: TStepsProcessing) => {
   // react
   const navigate = useNavigate();
@@ -197,8 +201,8 @@ export const StepsProcessing = ({
               primary
               label={
                 allStepsFinishedSuccessfully
-                  ? 'View your farms'
-                  : 'Continue to ' + step.label
+                  ? allFinishedLabel ? allFinishedLabel : 'View your farms'
+                  : 'Continue to ' + steps[currentStep.current + 1].label.toLowerCase()
               }
               style={{
                 borderRadius: '58px',
@@ -208,7 +212,7 @@ export const StepsProcessing = ({
               }}
               onClick={() => {
                 if (allStepsFinishedSuccessfully) {
-                  navigate('/?view_type=my_farms');
+                  navigate(allFinishedLink ? allFinishedLink : '/?view_type=my_farms');
                 } else {
                   currentStep.current = currentStep.current + 1;
                   stepWasSuccessful = undefined;

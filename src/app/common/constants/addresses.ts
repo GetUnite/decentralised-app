@@ -75,7 +75,7 @@ export enum EEthereumAddressesMainnet {
   DOLAFRAXBPVAULT = '0x1EE566Fd6918101C578a1d2365d632ED39BEd740',
 
   FRXETH = '0xf43211935C781D5ca1a41d2041F397B8A7366C7A',
-  FRXETHVAULT = '0x62E0B61e1891Df4bDb77B1d19fc227cCeF969eC6', 
+  FRXETHVAULT = '0x62E0B61e1891Df4bDb77B1d19fc227cCeF969eC6',
 
   USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   USDT = '0xdAC17F958D2ee523a2206206994597C13D831ec7',
@@ -91,7 +91,7 @@ export enum EEthereumAddressesMainnet {
   WBTC = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
 
   CRV = '0xD533a949740bb3306d119CC777fa900bA034cd52',
-  CVX = '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B'
+  CVX = '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
 }
 
 enum EPolygonAddressesMumbai {
@@ -158,12 +158,12 @@ enum EPolygonAddressesMainnet {
   TWOWAYMARKETIBALLUOUSDBTC = '0xbB5C64B929b1E60c085dcDf88dfe41c6b9dcf65B',
 }
 
-export const EPolygonAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
+export const EPolygonAddresses = EPolygonAddressesMainnet;
+/*process.env.REACT_APP_NET === 'mainnet'
     ? EPolygonAddressesMainnet
-    : EPolygonAddressesMumbai;
+    : EPolygonAddressesMumbai;*/
 
-export const EEthereumAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
+export const EEthereumAddresses = EEthereumAddressesMainnet;
+/*process.env.REACT_APP_NET === 'mainnet'
     ? EEthereumAddressesMainnet
-    : EEthereumAddressesTestnet;
+    : EEthereumAddressesTestnet;*/
