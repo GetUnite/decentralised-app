@@ -9,6 +9,7 @@ import {
   getAlluoStakingAPR,
   getAlluoStakingWalletAddressInfo,
   getEarnedAlluo,
+  getRewardsInterest,
   getStakingPendingRewards,
   getTotalAlluoLocked,
   getUnlockedAlluo,
@@ -25,6 +26,7 @@ import openVault from 'app/modernUI/animations/openVault.svg';
 import vaultUnlocking from 'app/modernUI/animations/vaultUnlocking.svg';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleLockSteps } from './useLock';
@@ -70,6 +72,8 @@ const possibleStakeSteps = [
 ];
 
 export const useStake = () => {
+  // react
+  const [cookies] = useCookies(['has_seen_stake']);
   // atoms
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
@@ -100,6 +104,7 @@ export const useStake = () => {
   const processingTitle = useRef<string>();
 
   //rewards control
+  const rewardsApy = useRef<number>(0);
   const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
@@ -111,11 +116,13 @@ export const useStake = () => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingRewardsApy, setIsLoadingRewardsApy] = useState<boolean>(true);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
 
   // confirmation/information control
+  const showStakePresentation = !cookies.has_seen_stake;
   const [showReunlockConfirmation, setShowReunlockConfirmation] =
     useState<boolean>(false);
 
@@ -123,6 +130,7 @@ export const useStake = () => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
       heapTrack('stake');
+      updateRewardsApy();
       updateAlluoInfo();
     }
   }, [walletAccountAtom]);
@@ -132,6 +140,12 @@ export const useStake = () => {
       updateRewardsInfo();
     }
   }, [alluoInfo]);
+
+  const updateRewardsApy = async () => {
+    setIsLoadingRewardsApy(true);
+    rewardsApy.current = await getRewardsInterest();
+    setIsLoadingRewardsApy(false);
+  }
 
   const updateAlluoInfo = async () => {
     setShowReunlockConfirmation(false);
@@ -366,6 +380,10 @@ export const useStake = () => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    isLoadingRewardsApy,
+    rewardsApy,
+    // information/ confirmation
+    showStakePresentation,
     // lock
     lockValue,
     setLockValue,

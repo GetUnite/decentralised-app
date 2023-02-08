@@ -397,7 +397,7 @@ export const convertToLP = async (
   return (usdcPrice * value) / valueOf1LPinUSDC;
 };
 
-const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
+const boostFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 export const getBoostFarmInterest = async (
   farmVaultAddress,
   apyFarmAddresses,
@@ -419,12 +419,12 @@ export const getBoostFarmInterest = async (
       10000;
 
   const baseApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
   ).then(res => res.json());
   const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
 
   const boostApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
   ).then(res => res.json());
   const boostApyData =
     boostApyJsonResult.data[boostApyJsonResult.data.length - 1];

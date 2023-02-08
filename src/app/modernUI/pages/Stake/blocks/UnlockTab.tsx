@@ -69,7 +69,7 @@ export const UnlockTab = ({
         <SubmitButton
           primary
           // TODO: uncoment
-          disabled={+unlockValue === 0 && +alluoInfo.lockedInLp > 0}
+          disabled={unlockValue == 0 || !(+alluoInfo.lockedInLp > 0)}
           label="Unlock"
           onClick={
             !allTimersAreFinished
