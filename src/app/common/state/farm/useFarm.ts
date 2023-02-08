@@ -41,19 +41,19 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'DAI',
-        address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+        address: EPolygonAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        address: EPolygonAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'USDT',
-        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+        address: EPolygonAddresses.USDT,
         decimals: 6,
         sign: '$',
       },
@@ -113,7 +113,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WETH',
-        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+        address: EPolygonAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
@@ -131,7 +131,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WBTC',
-        address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+        address: EPolygonAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -179,19 +179,19 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
@@ -209,7 +209,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
@@ -227,7 +227,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
