@@ -66,7 +66,7 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT', 'EURS', 'jEUR'],
+    icons: ['agEUR'],//'EURT', 'EURS', 'jEUR'],
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       {
