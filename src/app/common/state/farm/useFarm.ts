@@ -62,29 +62,35 @@ export const farmOptions: Array<TFarm> = [
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       {
+        label: 'agEUR',
+        address: EPolygonAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      /*{
         label: 'EURS',
-        address: '0xE111178A87A3BFf0c8d18DECBa5798827539Ae99',
+        address: EPolygonAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'PAR',
-        address: '0xE2Aa7db6dA1dAE97C5f5C6914d285fBfCC32A128',
+        address: EPolygonAddresses.PAR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'jEUR',
-        address: '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
+        address: EPolygonAddresses.JEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0x7BDF330f423Ea880FF95fC41A280fD5eCFD3D09f',
+        address: EPolygonAddresses.EURT,
         decimals: 6,
         sign: '€',
-      },
+      },*/
     ],
   },
   {
