@@ -61,15 +61,22 @@ export const useBoostFarmWithdrawal = ({
   const updateSelectedTokenBalance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    const boostDepositedAmount =
-      selectedFarmInfo.current?.depositedAmountInLP > 0
-        ? await getMaximumLPValueAsToken(
-            selectedFarmInfo.current.farmAddress,
-            selectedSupportedToken.address,
-            selectedSupportedToken.decimals,
-            selectedFarmInfo.current?.depositedAmountInLP,
-          )
-        : 0;
+    let boostDepositedAmount;
+    if (selectedFarmInfo.current?.isLocked) {
+      boostDepositedAmount =
+        selectedFarmInfo.current?.depositedAmountInLP *
+        selectedFarmInfo.current?.valueOf1LPinUSDC;
+    } else {
+      boostDepositedAmount =
+        selectedFarmInfo.current?.depositedAmountInLP > 0
+          ? await getMaximumLPValueAsToken(
+              selectedFarmInfo.current.farmAddress,
+              selectedSupportedToken.address,
+              selectedSupportedToken.decimals,
+              selectedFarmInfo.current?.depositedAmountInLP,
+            )
+          : 0;
+    }
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,
       boostDepositedAmount: boostDepositedAmount,

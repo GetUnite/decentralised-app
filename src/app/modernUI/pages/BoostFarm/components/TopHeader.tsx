@@ -30,7 +30,9 @@ export const TopHeader = ({
                     2,
                   ).toLocaleString()}
                   % APY is {selectedFarmInfo.current?.sign}
-                  {(+first).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {(+first).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                   <Text color="softText" size="18px">
                     {second}
                   </Text>
@@ -44,8 +46,10 @@ export const TopHeader = ({
                     style={{ justifyContent: 'center' }}
                   >
                     You have{' '}
-                    {(+selectedFarmInfo.current
-                      ?.depositedAmountInLP).toLocaleString()}{' '}
+                    {toExactFixed(
+                      +selectedFarmInfo.current?.depositedAmountInLP,
+                      4,
+                    )}{' '}
                     {selectedFarmInfo.current?.name}
                   </Text>
                   <Box direction="row" justify="center">
@@ -67,8 +71,11 @@ export const TopHeader = ({
                         <Text>
                           Current value:
                           <br />
-                          {(+selectedFarmInfo.current
-                            ?.depositedAmount).toLocaleString()} USD
+                          {toExactFixed(
+                            +selectedFarmInfo.current?.depositedAmount,
+                            2,
+                          )}{' '}
+                          USD
                         </Text>
                       }
                     >

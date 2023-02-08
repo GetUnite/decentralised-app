@@ -19,7 +19,7 @@ type TStepsProcessing = {
   handleCurrentStep: Function;
   minHeight: string;
   allFinishedLabel?: string;
-  allFinishedLink?:string;
+  allFinishedLink?: string;
 };
 
 export const StepsProcessing = ({
@@ -33,7 +33,7 @@ export const StepsProcessing = ({
   handleCurrentStep,
   minHeight,
   allFinishedLabel,
-  allFinishedLink
+  allFinishedLink,
 }: TStepsProcessing) => {
   // react
   const navigate = useNavigate();
@@ -88,9 +88,10 @@ export const StepsProcessing = ({
         <Box>
           {steps.map((step, index) => {
             return (
-              <Box key={index} direction="row" gap="30px" align="center">
+              <Box key={index} direction="row" gap="30px" align="start">
                 <Box
                   round="50%"
+                  margin={{ top: '12px' }}
                   background={
                     // Succefully processed steps
                     // All steps worked (all checked)
@@ -186,7 +187,7 @@ export const StepsProcessing = ({
           <img src={finalImage} />
         )}
       </Box>
-      <Box height="81px" justify="end" align='center'>
+      <Box height="81px" justify="end" align="center">
         {isHandlingStep && (
           <Text size="14px" weight={400}>
             Waiting for confirmation in wallet...
@@ -201,8 +202,11 @@ export const StepsProcessing = ({
               primary
               label={
                 allStepsFinishedSuccessfully
-                  ? allFinishedLabel ? allFinishedLabel : 'View your farms'
-                  : 'Continue to ' + steps[currentStep.current + 1].label.toLowerCase()
+                  ? allFinishedLabel
+                    ? allFinishedLabel
+                    : 'View your farms'
+                  : 'Continue to ' +
+                    steps[currentStep.current + 1].label.toLowerCase()
               }
               style={{
                 borderRadius: '58px',
@@ -212,7 +216,9 @@ export const StepsProcessing = ({
               }}
               onClick={() => {
                 if (allStepsFinishedSuccessfully) {
-                  navigate(allFinishedLink ? allFinishedLink : '/?view_type=my_farms');
+                  navigate(
+                    allFinishedLink ? allFinishedLink : '/?view_type=my_farms',
+                  );
                 } else {
                   currentStep.current = currentStep.current + 1;
                   stepWasSuccessful = undefined;

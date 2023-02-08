@@ -8,10 +8,12 @@ import {
   StepsProcessing,
   Tab,
   Tabs,
-  TokenIcon
+  TokenIcon,
+  Tooltip
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
+import { CircleInformation } from 'grommet-icons';
 import Skeleton from 'react-loading-skeleton';
 import { UnlockCountdown } from '../../components/Countdown/UnlockCountdown';
 import { LockTab } from './blocks/LockTab';
@@ -255,12 +257,20 @@ export const Stake = ({ ...rest }) => {
                             <Skeleton height="16px" borderRadius="20px" />
                           ) : (
                             <Box direction="row" justify="between">
-                              <Text weight="bold" size="16px">
-                                {seeRewardsAsStable
-                                  ? rewardsInfo.stableLabel
-                                  : rewardsInfo.label}
-                              </Text>
-
+                              <Box direction="row" align="center" gap="6px">
+                                <Text weight="bold" size="16px">
+                                  {seeRewardsAsStable
+                                    ? rewardsInfo.stableLabel
+                                    : rewardsInfo.label}
+                                </Text>
+                                <Tooltip text={`Rewards for staking $ALLUO tokens are paid in auto-compounding CVX/ETH. The longer you leave your rewards unclaimed, the larger they will get. The current APY is {25%}. Stakers can also vote in governance rounds, held every 2 weeks.`}>
+                                  <CircleInformation
+                                    color="soul"
+                                    size="16px"
+                                    style={{ marginTop: '-2px' }}
+                                  />
+                                </Tooltip>
+                              </Box>
                               <Text weight="bold" size="16px">
                                 {seeRewardsAsStable
                                   ? '$' + rewardsInfo.stableValue

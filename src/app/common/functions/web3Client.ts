@@ -18,7 +18,7 @@ import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl =
-  'https://rpc.tenderly.co/fork/164a4eea-db22-4d7e-8dd0-c4a41a4554fd';
+  'https://rpc.tenderly.co/fork/0a0fe54f-def2-4ca8-bae4-f47f1b34df63';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =

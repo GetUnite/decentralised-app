@@ -59,12 +59,20 @@ export const BoostFarmWithdrawalTab = ({
           label={`${selectedFarm.current?.isLocked ? 'Unlock' : 'Withdraw'} ${
             selectedSupportedToken ? selectedSupportedToken?.label : ''
           }`}
-          available={selectedSupportedTokenInfo.current?.boostDepositedAmount}
+          available={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
           tokenSign={selectedSupportedToken?.sign}
           onValueChange={handleWithdrawalFieldChange}
           value={withdrawValue}
           maxButton={true}
-          maxValue={selectedSupportedTokenInfo.current?.boostDepositedAmount}
+          maxValue={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
           tokenOptions={
             (selectedFarm.current?.isLocked
               ? [selectedFarmInfo.current?.withdrawToken]
@@ -78,9 +86,10 @@ export const BoostFarmWithdrawalTab = ({
               ? `The current value of ${toExactFixed(
                   selectedFarmInfo.current?.depositedAmountInLP,
                   2,
-                )} ${selectedFarmInfo.current?.name} is $${
-                  selectedSupportedTokenInfo.current?.boostDepositedAmount
-                }`
+                )} ${selectedFarmInfo.current?.name} is $${toExactFixed(
+                  selectedSupportedTokenInfo.current?.boostDepositedAmount,
+                  2,
+                )}`
               : `Withdrawing in any token other than
                     ${selectedFarmInfo.current?.lowSlippageTokenLabels?.join(
                       '/',
@@ -151,12 +160,12 @@ export const BoostFarmWithdrawalTab = ({
               : 'Withdraw'
           }
           // TODO get disabled back here
-          disabled={
+          /*disabled={
             isLoading ||
             isFetchingSupportedTokenInfo ||
             withdrawValue == '' ||
             hasErrors
-          }
+          }*/
           onClick={() =>
             startBoostWithdrawalConfirmation(
               selectedSupportedTokenInfo.current?.boostDepositedAmount,

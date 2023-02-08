@@ -5,13 +5,15 @@ import {
 import { EChain } from 'app/common/constants/chains';
 import {
   deposit,
+  getIfUserHasWithdrawalRequest,
   getIfWithdrawalWasAddedToQueue,
   withdraw
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  approve, getInterest,
+  approve,
+  getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount
 } from 'app/common/functions/web3Client';
@@ -21,6 +23,7 @@ import { TSupportedToken } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useFarmDeposit';
 import { possibleWithdrawSteps } from './useFarmWithdrawal';
@@ -237,6 +240,9 @@ export const useFarm = ({ id }) => {
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
+  // other state control files
+  const { setNotification } = useNotification();
+
   // selected farm control
   const selectedFarm = useRef<TFarm>(
     farmOptions.find(availableFarm => availableFarm.id == id),
@@ -311,8 +317,30 @@ export const useFarm = ({ id }) => {
           ? false
           : true,
       );
+      fetchIfUserHasWithdrawalRequest();
     }
   }, [selectedFarmInfo]);
+
+  const fetchIfUserHasWithdrawalRequest = async () => {
+    try {
+      const isUserWaiting = await getIfUserHasWithdrawalRequest(
+        selectedFarmInfo.farmAddress,
+        selectedFarmInfo.chain,
+      );
+
+      if (isUserWaiting) {
+        setNotification(
+          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          'info',
+          undefined,
+          undefined,
+          true,
+        );
+      }
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+  };
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
@@ -423,9 +451,18 @@ export const useFarm = ({ id }) => {
         selectedFarm.current?.chain,
       );
 
-      // change the step message to tell the user the withdraw was added to the queue
       if (wasAddedToQueue) {
-        console.log('here i guess');
+        steps.current[currentStep.current].successMessage = 'In progress...';
+        steps.current[
+          currentStep.current
+        ].successLabel = `Your withdrawal request for ${withdrawValue} ${selectedSupportedToken.label} was added to the queue and will be processed soon`;
+        setNotification(
+          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          'info',
+          undefined,
+          undefined,
+          true,
+        );
       }
     } catch (error) {
       throw error;
