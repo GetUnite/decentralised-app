@@ -15,6 +15,7 @@ export const BoostFarmDepositTab = ({
   isLoading,
   selectedFarm,
   selectedFarmInfo,
+  interest,
   selectSupportedToken,
   selectedSupportedTokenInfo,
   selectedSupportedToken,
@@ -50,6 +51,7 @@ export const BoostFarmDepositTab = ({
       <Box margin={{ top: 'large' }}>
         <TopHeader
           selectedFarmInfo={selectedFarmInfo}
+          interest={interest}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
@@ -75,7 +77,7 @@ export const BoostFarmDepositTab = ({
         <ProjectedWeeklyInfo
           depositedAmount={selectedFarmInfo.current?.depositedAmount}
           inputValue={depositValue}
-          interest={selectedFarmInfo.current?.interest}
+          interest={interest.current}
           sign={selectedFarmInfo.current?.sign}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
@@ -84,9 +86,9 @@ export const BoostFarmDepositTab = ({
           label="APY"
           value={
             toExactFixed(
-              selectedFarmInfo.current?.interest,
+              interest.current,
               2,
-            ).toLocaleString() + '%'
+            ) + '%'
           }
           isLoading={isLoading}
         />

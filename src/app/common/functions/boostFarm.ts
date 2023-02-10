@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
@@ -6,6 +7,8 @@ import {
   callStatic,
   getCurrentWalletAddress,
   getPrice,
+  getReadOnlyProvider,
+  QueryFilter,
   sendTransaction
 } from './web3Client';
 
@@ -588,9 +591,86 @@ export const getLockedBoostWithdrawalsInfo = async (farmAddress, chain) => {
     [getCurrentWalletAddress()],
     chain,
   );
-  
+
+  const unlockingBalance = +ethers.utils.formatEther(
+    userWithdrawals.withdrawalRequested,
+  );
   return {
-    unlockedBalance: (userWithdrawals.withdrawalAvailable).toNumber(),
-    isUnlocking: (userWithdrawals.withdrawalRequested).toNumber() > 0
+    unlockedBalance: +ethers.utils.formatEther(
+      userWithdrawals.withdrawalAvailable,
+    ),
+    unlockingBalance,
+    isUnlocking: unlockingBalance > 0,
+  };
+};
+
+export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
+  const abi = [
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'timestamp',
+          type: 'uint256',
+        },
+      ],
+      name: 'Looped',
+      type: 'event',
+    },
+  ];
+
+  const provider = getReadOnlyProvider(chain);
+  let toBlock = await provider.getBlockNumber();
+  let fromBlock = toBlock - 1000;
+
+  let looped = [];
+  while (looped.length == 0) {
+    looped = await QueryFilter(
+      abi,
+      farmAddress,
+      'Looped',
+      [],
+      fromBlock,
+      chain,
+      toBlock,
+    );
+
+    toBlock = fromBlock;
+    fromBlock -= 1000;
+  }
+  
+  return (looped[0].args[0]).toNumber();
+};
+
+export const unlockUserFunds = async (
+  farmAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        "inputs": [],
+        "name": "unlockUserFunds",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'unlockUserFunds()',
+      [],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
   }
 };

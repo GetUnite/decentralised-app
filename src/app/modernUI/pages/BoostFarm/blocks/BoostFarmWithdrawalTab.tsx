@@ -16,6 +16,7 @@ export const BoostFarmWithdrawalTab = ({
   selectedFarm,
   isLoading,
   selectedFarmInfo,
+  interest,
   selectSupportedToken,
   selectedSupportedToken,
   isCorrectNetworkAtom,
@@ -50,6 +51,7 @@ export const BoostFarmWithdrawalTab = ({
       <Box margin={{ top: 'large' }}>
         <TopHeader
           selectedFarmInfo={selectedFarmInfo}
+          interest={interest}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
@@ -61,7 +63,8 @@ export const BoostFarmWithdrawalTab = ({
           }`}
           available={
             selectedFarm.current?.isLocked
-              ? selectedFarmInfo.current?.depositedAmountInLP
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
               : selectedSupportedTokenInfo.current?.boostDepositedAmount
           }
           tokenSign={selectedSupportedToken?.sign}
@@ -70,7 +73,8 @@ export const BoostFarmWithdrawalTab = ({
           maxButton={true}
           maxValue={
             selectedFarm.current?.isLocked
-              ? selectedFarmInfo.current?.depositedAmountInLP
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
               : selectedSupportedTokenInfo.current?.boostDepositedAmount
           }
           tokenOptions={
@@ -105,19 +109,14 @@ export const BoostFarmWithdrawalTab = ({
         <ProjectedWeeklyInfo
           depositedAmount={selectedFarmInfo.current?.depositedAmount}
           inputValue={-1 * +withdrawValue}
-          interest={selectedFarmInfo.current?.interest}
+          interest={interest.current}
           sign={selectedFarmInfo.current?.sign}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
         <Info
           label="APY"
-          value={
-            toExactFixed(
-              selectedFarmInfo.current?.interest,
-              2,
-            ).toLocaleString() + '%'
-          }
+          value={toExactFixed(interest.current, 2) + '%'}
           isLoading={isLoading}
         />
         <Info
@@ -160,12 +159,12 @@ export const BoostFarmWithdrawalTab = ({
               : 'Withdraw'
           }
           // TODO get disabled back here
-          /*disabled={
+          disabled={
             isLoading ||
             isFetchingSupportedTokenInfo ||
             withdrawValue == '' ||
             hasErrors
-          }*/
+          }
           onClick={() =>
             startBoostWithdrawalConfirmation(
               selectedSupportedTokenInfo.current?.boostDepositedAmount,

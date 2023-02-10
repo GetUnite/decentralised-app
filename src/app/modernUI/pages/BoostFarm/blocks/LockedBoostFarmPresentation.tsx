@@ -6,17 +6,18 @@ import lock from 'app/modernUI/images/lock.svg';
 import Skeleton from 'react-loading-skeleton';
 
 export const LockedBoostFarmPresentation = ({
-  selectedFarmInfo,
+  selectedFarm,
   farmName,
-  isLoading,
+  isLoadingInterest,
+  interest,
   ...rest
 }) => {
   const [, setCookies] = useCookies(['has_seen_locked_boost_farms']);
 
   const rewardsLabel =
-    selectedFarmInfo.current?.rewards.label +
+    selectedFarm.current?.rewards.label +
     ' or ' +
-    selectedFarmInfo.current?.rewards.stableLabel;
+    selectedFarm.current?.rewards.stableLabel;
 
   return (
     <>
@@ -27,19 +28,18 @@ export const LockedBoostFarmPresentation = ({
       <Box margin={{ top: '60px' }} align="center">
         <img src={lock} alt="lock" width={140} />
         <Box margin={{ top: '28px' }} fill>
-          {isLoading ? (
+          {isLoadingInterest ? (
             <Box fill>
               <Skeleton height="37px" count={2} borderRadius="20px" />
             </Box>
           ) : (
             <Text textAlign="center" weight="bold" size="28px">
-              Earn {toExactFixed(selectedFarmInfo.current?.interest, 2)}% as{' '}
-              {rewardsLabel} tokens
+              Earn {toExactFixed(interest, 2)}% as {rewardsLabel} tokens
             </Text>
           )}
           <Text textAlign="center" margin={{ top: '23px' }}>
             Locked BOOST farms have a weekly lock-in period. Deposits and
-            withdrawal requests are actioned every Sunday at time.
+            withdrawal requests are actioned every Sunday from 12 PM UTC.
           </Text>
         </Box>
         <Button

@@ -8,9 +8,11 @@ import {
   getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getLastHarvestDateTimestamp,
   getLockedBoostWithdrawalsInfo,
   getMaximumLPValueAsToken,
   unlockFromLockedBoostFarm,
+  unlockUserFunds,
   withdrawFromBoostFarm,
   withdrawFromLockedBoostFarm
 } from 'app/common/functions/boostFarm';
@@ -638,6 +640,12 @@ const possibleBoostFarmSteps = [
     errorLabel: 'Failed to claim rewards',
     successLabel: '',
   },
+  {
+    id: 7,
+    label: '',
+    errorLabel: 'Failed to claim rewards',
+    successLabel: '',
+  },
   ...possibleDepositSteps,
   ...possibleWithdrawSteps,
   ...possibleLockedWithdrawSteps,
@@ -667,6 +675,7 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
+  const interest = useRef<any>();
 
   // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
@@ -703,7 +712,7 @@ export const useBoostFarm = ({ id }) => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const [isLoadingInterest, setIsLoadingInterest] = useState<boolean>(true);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
@@ -743,15 +752,14 @@ export const useBoostFarm = ({ id }) => {
     !showLockedBoostLockConfirmation;
 
   // harvest dates for the farms
-  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
-  const nextHarvestDate = useRef<any>(
-    moment().subtract(1, 'days').add(1, 'week').day('Sunday').set('hour', 12),
-  );
+  const previousHarvestDate = useRef<any>();
+  const nextHarvestDate = useRef<any>();
 
   // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      updateInterest();
     }
   }, [walletAccountAtom]);
 
@@ -773,6 +781,16 @@ export const useBoostFarm = ({ id }) => {
         };
         setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
 
+        const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.chain,
+        );
+        const lastHarvestDate = new Date(0);
+        lastHarvestDate.setSeconds(lastHarvestDateTimestamp);
+
+        previousHarvestDate.current = moment(lastHarvestDate);
+        nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
+
         setIsLoading(false);
         await updateRewardsInfo();
       } catch (error) {
@@ -784,11 +802,24 @@ export const useBoostFarm = ({ id }) => {
     }
   }, [walletAccountAtom, isCorrectNetworkAtom]);
 
+  const updateInterest = async () => {
+    setIsLoadingInterest(true);
+    interest.current = selectedFarm.current?.forcedInterest
+      ? selectedFarm.current?.forcedInterest
+      : await getBoostFarmInterest(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.apyFarmAddresses,
+          selectedFarm.current?.chain,
+        );
+    setIsLoadingInterest(false);
+  };
+
   // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
+    setIsLoading(true);
     try {
       const farm = await getUpdatedFarmInfo(selectedFarm.current);
-      selectedFarmInfo.current = farm;
+      selectedFarmInfo.current = { ...selectedFarmInfo, ...farm };
       setSelectedSupportedToken(
         farm.supportedTokens?.find(
           st => st?.address == selectedSupportedToken?.address,
@@ -797,6 +828,7 @@ export const useBoostFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const getUpdatedFarmInfo = async farm => {
@@ -807,15 +839,7 @@ export const useBoostFarm = ({ id }) => {
         farm.lPTokenAddress,
         farm.chain,
       );
-
       farmInfo = {
-        interest: farm.forcedInterest
-          ? farm.forcedInterest
-          : await getBoostFarmInterest(
-              farm.farmAddress,
-              farm.apyFarmAddresses,
-              farm.chain,
-            ),
         totalAssetSupply:
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
           valueOf1LPinUSDC,
@@ -823,8 +847,10 @@ export const useBoostFarm = ({ id }) => {
         valueOf1LPinUSDC: valueOf1LPinUSDC,
       };
       if (walletAccountAtom) {
-        const depositedAmountInLP =
-          await getUserDepositedLPAmount(farm.farmAddress, farm.chain);
+        const depositedAmountInLP = await getUserDepositedLPAmount(
+          farm.farmAddress,
+          farm.chain,
+        );
         farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
@@ -846,6 +872,7 @@ export const useBoostFarm = ({ id }) => {
             farm.chain,
           );
           farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
+          farmInfo.unlockingBalance = userWithdrawals.unlockingBalance;
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;
         }
       }
@@ -921,8 +948,35 @@ export const useBoostFarm = ({ id }) => {
     }
   };
 
+  const manualUnlock = async () => {
+    try {
+      const tx = await unlockUserFunds(
+        selectedFarm.current?.farmAddress,
+        selectedFarm.current?.chain,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const startLockedBoostLockConfirmation = async () => {
     setShowLockedBoostLockConfirmation(true);
+  };
+
+  const startLockedBoostManualUnlockSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    neededSteps.push({
+      ...possibleBoostFarmSteps[1],
+      label: `Manually unlocking ${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label}`,
+      successLabel: `$${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label} unlocked`,
+    });
+
+    processingTitle.current = 'Manually unlocking...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
   };
 
   const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
@@ -1128,6 +1182,13 @@ export const useBoostFarm = ({ id }) => {
         case 6:
           await claimRewards();
           break;
+
+        case 7:
+          await manualUnlock();
+          break;
+        default:
+          throw 'Something went wrong';
+          break;
       }
       stepWasSuccessful.current = true;
     } catch (error) {
@@ -1154,6 +1215,9 @@ export const useBoostFarm = ({ id }) => {
     selectedFarmInfo,
     selectSupportedToken,
     selectedSupportedToken,
+    // interest
+    interest,
+    isLoadingInterest,
     // rewards
     isLoadingRewards,
     rewardsInfo,
@@ -1184,6 +1248,7 @@ export const useBoostFarm = ({ id }) => {
     startBoostWithdrawalConfirmation,
     showLockedBoostWithdrawalConfirmation,
     startLockedBoostWithdrawalConfirmation,
+    startLockedBoostManualUnlockSteps,
     // steps
     cancelConfirmations,
     isProcessing,

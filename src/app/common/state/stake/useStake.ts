@@ -108,7 +108,7 @@ export const useStake = () => {
   const [rewardsInfo, setRewardsInfo] = useState<any>(defaultRewards);
   const [pendingRewardsInfo, setPendingRewardsInfo] = useState<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
-  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
+  const previousHarvestDate = moment().subtract(1, 'days').day('Sunday');
   const nextHarvestDate = moment()
     .subtract(1, 'days')
     .add(1, 'week')

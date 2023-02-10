@@ -6,7 +6,6 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
-import handlerAbi from 'app/common/abis/handler.json';
 import {
   EEthereumAddresses,
   EPolygonAddresses
@@ -199,7 +198,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
+  return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
   return walletAddress;
 };
 
@@ -768,6 +767,7 @@ export const QueryFilter = async (
   params,
   blockNumber,
   chain,
+  toBlockNumber = undefined
 ) => {
   const readOnlyProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
@@ -775,7 +775,7 @@ export const QueryFilter = async (
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
-    const logs = await contract.queryFilter(event, blockNumber, blockNumber);
+    const logs = await contract.queryFilter(event, blockNumber, toBlockNumber ? toBlockNumber : blockNumber);
 
     return logs;
   } catch (error) {
@@ -1300,18 +1300,4 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
   );
 
   return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
-};
-
-export const getHandlerContractInstance = (blockNumber, chain) => {
-  const readOnlyProvider = getReadOnlyProvider(chain);
-  readOnlyProvider.resetEventsBlock(blockNumber - 1);
-  const handlerInstance = new ethers.Contract(
-    chain == EChain.POLYGON
-      ? EPolygonAddresses.HANDLER
-      : EEthereumAddresses.HANDLER,
-    handlerAbi,
-    readOnlyProvider,
-  );
-
-  return handlerInstance;
 };
