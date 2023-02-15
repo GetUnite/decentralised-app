@@ -625,6 +625,111 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     },
     isNewest: true,
   },
+  {
+    id: 6,
+    farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
+    type: 'booster',
+    isLocked: true,
+    chain: EChain.ETHEREUM,
+    name: 'CVX/FRAXBP',
+    sign: '$',
+    icons: [
+      'FRAX',
+      'USDC',
+      'agEUR',
+      'CRV',
+      'CVX',
+      'DAI',
+      'EURS',
+      'EURT',
+      'WETH',
+      'WBTC',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      address: EEthereumAddresses.CVXETH,
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.CVXFRAXBP,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: EEthereumAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: EEthereumAddresses.CRV,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: EEthereumAddresses.CVX,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: EEthereumAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: EEthereumAddresses.EURS,
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: EEthereumAddresses.EURT,
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: EEthereumAddresses.FRAX,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EEthereumAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: EEthereumAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: EEthereumAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: ['FRAX', 'CVX'],
+    apyFarmAddresses: {
+      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
+    forcedInterest: '9.50',
+    withdrawToken: {
+      label: 'CVX/FRAXBP',
+      address: EEthereumAddresses.CVXFRAXBP,
+      decimals: 18,
+      sign: '',
+    },
+    isNewest: true,
+  },
 ];
 
 const defaultRewards = {
@@ -871,6 +976,7 @@ export const useBoostFarm = ({ id }) => {
             farm.farmAddress,
             farm.chain,
           );
+          console.log(userWithdrawals);
           farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
           farmInfo.unlockingBalance = userWithdrawals.unlockingBalance;
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;

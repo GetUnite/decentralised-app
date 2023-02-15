@@ -38,14 +38,16 @@ export const useLockedBoostFarmWithdrawal = ({
     setIsFetchingSupportedTokenInfo(true);
 
     const unlockedBalance =
-      selectedFarmInfo.current?.depositedAmountInLP > 0
+      selectedFarmInfo.current?.unlockedBalance > 0
         ? await getMaximumLPValueAsToken(
-            selectedFarmInfo.current.farmAddress,
+            selectedFarmInfo.current?.farmAddress,
             selectedSupportedToken.address,
             selectedSupportedToken.decimals,
-            selectedFarmInfo.current.unlockedBalance,
+            selectedFarmInfo.current?.unlockedBalance,
+            true // is Locked
           )
         : 0;
+        
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,
       unlocked: unlockedBalance,

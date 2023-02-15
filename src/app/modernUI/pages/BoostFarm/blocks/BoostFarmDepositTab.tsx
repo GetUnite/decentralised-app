@@ -105,7 +105,7 @@ export const BoostFarmDepositTab = ({
             label="Unlocked balance"
             value={
               selectedFarmInfo.current?.sign +
-              (+selectedFarmInfo.current?.unlockedBalance).toLocaleString()
+              toExactFixed(+selectedFarmInfo.current?.unlockedBalance,4)
             }
             isLoading={isLoading}
           />

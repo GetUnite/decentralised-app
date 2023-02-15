@@ -260,18 +260,20 @@ export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   );
 
   let pendingRewardsByToken = [];
-  for (const pendingRewardsArray of shareholderAccruedRewards) {
-    for (const pendingRewards of pendingRewardsArray) {
-      const rewardByToken = pendingRewardsByToken.find(
-        prbt => prbt.token == pendingRewards.token,
-      );
-      if (rewardByToken) {
-        rewardByToken.amount += +pendingRewards.amount;
-      } else {
-        pendingRewardsByToken.push({
-          token: pendingRewards.token,
-          amount: +pendingRewards.amount,
-        });
+  if (shareholderAccruedRewards != undefined) {
+    for (const pendingRewardsArray of shareholderAccruedRewards) {
+      for (const pendingRewards of pendingRewardsArray) {
+        const rewardByToken = pendingRewardsByToken.find(
+          prbt => prbt.token == pendingRewards.token,
+        );
+        if (rewardByToken) {
+          rewardByToken.amount += +pendingRewards.amount;
+        } else {
+          pendingRewardsByToken.push({
+            token: pendingRewards.token,
+            amount: +pendingRewards.amount,
+          });
+        }
       }
     }
   }
@@ -346,6 +348,7 @@ export const getMaximumLPValueAsToken = async (
   tokenAddress,
   tokenDecimals,
   amount,
+  isLocked = false,
 ) => {
   const abi = [
     {
@@ -360,21 +363,57 @@ export const getMaximumLPValueAsToken = async (
       stateMutability: 'nonpayable',
       type: 'function',
     },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'exitToken',
+          type: 'address',
+        },
+        {
+          internalType: 'address',
+          name: 'receiver',
+          type: 'address',
+        },
+      ],
+      name: 'claim',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
   ];
 
   const amountInDecimals = toDecimals(amount, 18);
 
-  const valueInDecimals = await callStatic(
-    abi,
-    farmAddress,
-    'withdrawToNonLp(uint256,address,address,address)',
-    [
-      amountInDecimals,
-      getCurrentWalletAddress(),
-      getCurrentWalletAddress(),
-      tokenAddress,
-    ],
-  );
+  let valueInDecimals;
+  if (isLocked) {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'claim(address,address)',
+      [tokenAddress, getCurrentWalletAddress()],
+    );
+  } else {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'withdrawToNonLp(uint256,address,address,address)',
+      [
+        amountInDecimals,
+        getCurrentWalletAddress(),
+        getCurrentWalletAddress(),
+        tokenAddress,
+      ],
+    );
+  }
+
+  console.log(valueInDecimals);
 
   const value = fromDecimals(valueInDecimals, tokenDecimals);
 
@@ -640,8 +679,8 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     toBlock = fromBlock;
     fromBlock -= 1000;
   }
-  
-  return (looped[0].args[0]).toNumber();
+
+  return looped[0].args[0].toNumber();
 };
 
 export const unlockUserFunds = async (
@@ -652,11 +691,11 @@ export const unlockUserFunds = async (
   try {
     const abi = [
       {
-        "inputs": [],
-        "name": "unlockUserFunds",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
+        inputs: [],
+        name: 'unlockUserFunds',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
       },
     ];
 

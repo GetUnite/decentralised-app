@@ -17,7 +17,7 @@ import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl =
-  'https://rpc.tenderly.co/fork/0a0fe54f-def2-4ca8-bae4-f47f1b34df63';
+  'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =
@@ -382,9 +382,15 @@ export const callStatic = async (
   address,
   functionSignature,
   params = [],
+  chain = EChain.ETHEREUM,
 ) => {
   try {
-    const provider = walletProvider;
+    let provider;
+    if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
+      provider = getReadOnlyProvider(chain);
+    } else {
+      provider = walletProvider;
+    }
     const signer = provider.getSigner();
     const contract = new ethers.Contract(address, abi, signer);
 
@@ -767,7 +773,7 @@ export const QueryFilter = async (
   params,
   blockNumber,
   chain,
-  toBlockNumber = undefined
+  toBlockNumber = undefined,
 ) => {
   const readOnlyProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
@@ -775,7 +781,11 @@ export const QueryFilter = async (
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
-    const logs = await contract.queryFilter(event, blockNumber, toBlockNumber ? toBlockNumber : blockNumber);
+    const logs = await contract.queryFilter(
+      event,
+      blockNumber,
+      toBlockNumber ? toBlockNumber : blockNumber,
+    );
 
     return logs;
   } catch (error) {

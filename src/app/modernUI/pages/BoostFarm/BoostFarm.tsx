@@ -302,6 +302,7 @@ export const BoostFarm = () => {
                           nextHarvestDate.current?.valueOf() &&
                           !timerIsFinished(
                             nextHarvestDate.current?.valueOf(),
+                            false,
                           ) && (
                             <Box margin={{ bottom: '12px' }}>
                               <UnlockCountdown
@@ -309,7 +310,7 @@ export const BoostFarm = () => {
                                 onComplete={updateFarmInfo}
                                 label={`UNLOCKING ${toExactFixed(
                                   selectedFarmInfo.current?.unlockingBalance,
-                                  2,
+                                  4,
                                 )} ${selectedFarm.current?.name} IN`}
                               />
                             </Box>
@@ -319,6 +320,7 @@ export const BoostFarm = () => {
                           nextHarvestDate.current?.valueOf() &&
                           timerIsFinished(
                             nextHarvestDate.current?.valueOf(),
+                            false,
                           ) && (
                             <Box
                               round="16px"
@@ -397,7 +399,7 @@ export const BoostFarm = () => {
                                 <Text size="18px" weight="bold">
                                   {toExactFixed(
                                     selectedFarmInfo.current?.unlockedBalance,
-                                    2,
+                                    4,
                                   )}{' '}
                                   {selectedFarm.current?.name} unlocked
                                 </Text>

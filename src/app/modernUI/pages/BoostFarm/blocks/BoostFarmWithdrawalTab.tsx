@@ -67,7 +67,7 @@ export const BoostFarmWithdrawalTab = ({
                 selectedFarmInfo.current?.unlockingBalance
               : selectedSupportedTokenInfo.current?.boostDepositedAmount
           }
-          tokenSign={selectedSupportedToken?.sign}
+          tokenSign={selectedSupportedToken?.sign ? selectedSupportedToken?.sign : ''}
           onValueChange={handleWithdrawalFieldChange}
           value={withdrawValue}
           maxButton={true}
@@ -132,7 +132,7 @@ export const BoostFarmWithdrawalTab = ({
             label="Unlocked balance"
             value={
               selectedFarmInfo.current?.sign +
-              (+selectedFarmInfo.current?.unlockedBalance).toLocaleString()
+              toExactFixed(+selectedFarmInfo.current?.unlockedBalance,4)
             }
             isLoading={isLoading}
           />
