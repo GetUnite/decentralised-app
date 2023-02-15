@@ -5,13 +5,15 @@ import {
 import { EChain } from 'app/common/constants/chains';
 import {
   deposit,
+  getIfUserHasWithdrawalRequest,
   getIfWithdrawalWasAddedToQueue,
   withdraw
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
-  approve, getInterest,
+  approve,
+  getInterest,
   getTotalAssetSupply,
   getUserDepositedAmount
 } from 'app/common/functions/web3Client';
@@ -21,6 +23,7 @@ import { TSupportedToken } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useFarmDeposit';
 import { possibleWithdrawSteps } from './useFarmWithdrawal';
@@ -38,19 +41,19 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'DAI',
-        address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+        address: EPolygonAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+        address: EPolygonAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'USDT',
-        address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+        address: EPolygonAddresses.USDT,
         decimals: 6,
         sign: '$',
       },
@@ -63,33 +66,39 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT', 'EURS', 'jEUR'],
+    icons: ['agEUR'],//'EURT', 'EURS', 'jEUR'],
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       {
+        label: 'agEUR',
+        address: EPolygonAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      /*{
         label: 'EURS',
-        address: '0xE111178A87A3BFf0c8d18DECBa5798827539Ae99',
+        address: EPolygonAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'PAR',
-        address: '0xE2Aa7db6dA1dAE97C5f5C6914d285fBfCC32A128',
+        address: EPolygonAddresses.PAR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'jEUR',
-        address: '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c',
+        address: EPolygonAddresses.JEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0x7BDF330f423Ea880FF95fC41A280fD5eCFD3D09f',
+        address: EPolygonAddresses.EURT,
         decimals: 6,
         sign: '€',
-      },
+      },*/
     ],
   },
   {
@@ -104,7 +113,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WETH',
-        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+        address: EPolygonAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
@@ -122,7 +131,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WBTC',
-        address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+        address: EPolygonAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -170,19 +179,19 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
@@ -200,7 +209,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
@@ -218,7 +227,7 @@ export const farmOptions: Array<TFarm> = [
     supportedTokens: [
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -236,6 +245,9 @@ export const useFarm = ({ id }) => {
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
+
+  // other state control files
+  const { setNotification } = useNotification();
 
   // selected farm control
   const selectedFarm = useRef<TFarm>(
@@ -311,8 +323,30 @@ export const useFarm = ({ id }) => {
           ? false
           : true,
       );
+      fetchIfUserHasWithdrawalRequest();
     }
   }, [selectedFarmInfo]);
+
+  const fetchIfUserHasWithdrawalRequest = async () => {
+    try {
+      const isUserWaiting = await getIfUserHasWithdrawalRequest(
+        selectedFarmInfo.farmAddress,
+        selectedFarmInfo.chain,
+      );
+
+      if (isUserWaiting) {
+        setNotification(
+          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          'info',
+          undefined,
+          undefined,
+          true,
+        );
+      }
+    } catch (error) {
+      setNotification(error, 'error');
+    }
+  };
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
@@ -423,9 +457,18 @@ export const useFarm = ({ id }) => {
         selectedFarm.current?.chain,
       );
 
-      // change the step message to tell the user the withdraw was added to the queue
       if (wasAddedToQueue) {
-        console.log('here i guess');
+        steps.current[currentStep.current].successMessage = 'In progress...';
+        steps.current[
+          currentStep.current
+        ].successLabel = `Your withdrawal request for ${withdrawValue} ${selectedSupportedToken.label} was added to the queue and will be processed soon`;
+        setNotification(
+          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          'info',
+          undefined,
+          undefined,
+          true,
+        );
       }
     } catch (error) {
       throw error;

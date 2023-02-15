@@ -4,8 +4,8 @@ import { EChain } from '../constants/chains';
 import { toDecimals } from './utils';
 import {
   callContract,
-  getCurrentWalletAddress,
-  getHandlerContractInstance, sendTransaction
+  getCurrentWalletAddress, QueryFilter,
+  sendTransaction
 } from './web3Client';
 
 export const deposit = async (
@@ -97,52 +97,6 @@ export const getIfUserHasWithdrawalRequest = async (farmAddress, chain) => {
       stateMutability: 'view',
       type: 'function',
     },
-    {
-      inputs: [{ internalType: 'address', name: '', type: 'address' }],
-      name: 'ibAlluoToWithdrawalSystems',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: 'lastWithdrawalRequest',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'lastSatisfiedWithdrawal',
-          type: 'uint256',
-        },
-        {
-          internalType: 'uint256',
-          name: 'totalWithdrawalAmount',
-          type: 'uint256',
-        },
-        { internalType: 'bool', name: 'resolverTrigger', type: 'bool' },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
-    {
-      inputs: [
-        { internalType: 'address', name: '_ibAlluo', type: 'address' },
-        { internalType: 'uint256', name: '_id', type: 'uint256' },
-      ],
-      name: 'getWithdrawal',
-      outputs: [
-        {
-          components: [
-            { internalType: 'address', name: 'user', type: 'address' },
-            { internalType: 'address', name: 'token', type: 'address' },
-            { internalType: 'uint256', name: 'amount', type: 'uint256' },
-            { internalType: 'uint256', name: 'time', type: 'uint256' },
-          ],
-          internalType: 'struct LiquidityHandler.Withdrawal',
-          name: '',
-          type: 'tuple',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-    },
   ];
 
   const handlerAddress =
@@ -153,49 +107,118 @@ export const getIfUserHasWithdrawalRequest = async (farmAddress, chain) => {
   const isUserWaiting = await callContract(
     abi,
     handlerAddress,
-    'isUserWaiting(address, address)',
+    'isUserWaiting(address,address)',
     [farmAddress, getCurrentWalletAddress()],
     chain,
   );
 
-  if (!isUserWaiting) return [];
-
-  // const ibAlluoToWithdrawalSystems =
-  const ibAlluoToWithdrawalSystems = await callContract(
-    abi,
-    handlerAddress,
-    'ibAlluoToWithdrawalSystems(address)',
-    [farmAddress],
-    chain,
-  );
-
-  const { lastSatisfiedWithdrawal, lastWithdrawalRequest } =
-    ibAlluoToWithdrawalSystems;
-  const allWithdrawalRequests = [];
-
-  for (let i = +lastSatisfiedWithdrawal + 1; i <= +lastWithdrawalRequest; i++) {
-    const withdrawal = await callContract(
-      abi,
-      handlerAddress,
-      'getWithdrawal(address,uint256)',
-      [farmAddress, i],
-      chain,
-    );
-    allWithdrawalRequests.push(withdrawal);
-  }
-
-  const allWithdrawals = await Promise.all(allWithdrawalRequests);
-  const usersWithdrawals = allWithdrawals.filter(
-    w => w.user.toLowerCase() === getCurrentWalletAddress().toLowerCase(),
-  );
-  return usersWithdrawals;
+  return isUserWaiting;
 };
 
 export const getIfWithdrawalWasAddedToQueue = async (blockNumber, chain) => {
-  const handlerInstance = await getHandlerContractInstance(blockNumber, chain);
+  const abi = [
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'address',
+          name: 'ibAlluo',
+          type: 'address',
+        },
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'user',
+          type: 'address',
+        },
+        {
+          indexed: false,
+          internalType: 'address',
+          name: 'token',
+          type: 'address',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'queueIndex',
+          type: 'uint256',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'satisfiedTime',
+          type: 'uint256',
+        },
+      ],
+      name: 'WithdrawalSatisfied',
+      type: 'event',
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'address',
+          name: 'ibAlluo',
+          type: 'address',
+        },
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'user',
+          type: 'address',
+        },
+        {
+          indexed: false,
+          internalType: 'address',
+          name: 'token',
+          type: 'address',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'queueIndex',
+          type: 'uint256',
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'requestTime',
+          type: 'uint256',
+        },
+      ],
+      name: 'AddedToQueue',
+      type: 'event',
+    },
+  ];
+  
+  const handlerAddress =
+    chain == EChain.POLYGON
+      ? EPolygonAddresses.HANDLER
+      : EEthereumAddresses.HANDLER;
 
-  let eventFilter = handlerInstance.filters.WithdrawalSatisfied();
-  let events = await handlerInstance.queryFilter(eventFilter, blockNumber);
+  let events = await QueryFilter(
+    abi,
+    handlerAddress,
+    'WithdrawalSatisfied',
+    [],
+    blockNumber,
+    chain,
+  );
+
   if (
     events.find(event => {
       return event.args?.user.toLowerCase() == getCurrentWalletAddress();
@@ -204,8 +227,14 @@ export const getIfWithdrawalWasAddedToQueue = async (blockNumber, chain) => {
     return false;
   }
 
-  eventFilter = handlerInstance.filters.AddedToQueue();
-  events = await handlerInstance.queryFilter(eventFilter, blockNumber);
+  events = await QueryFilter(
+    abi,
+    handlerAddress,
+    'AddedToQueue',
+    [],
+    blockNumber,
+    chain,
+  );
   if (
     events.find(event => {
       return event.args?.user.toLowerCase() == getCurrentWalletAddress();

@@ -118,8 +118,9 @@ export const addressIsValid = address => {
   return ethers.utils.isAddress(address);
 };
 
-export const timerIsFinished = expectedTime => {
-  return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
+export const timerIsFinished = (expectedTime, multiply = true) => {
+  const timeToUse = multiply ? expectedTime * 1000 : expectedTime;
+  return +timeToUse === 0 || +timeToUse <= Date.now();
 };
 
 export const getNextMonday = (date = new Date()) => {

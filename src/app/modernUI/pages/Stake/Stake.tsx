@@ -8,14 +8,17 @@ import {
   StepsProcessing,
   Tab,
   Tabs,
-  TokenIcon
+  TokenIcon,
+  Tooltip
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
+import { CircleInformation } from 'grommet-icons';
 import Skeleton from 'react-loading-skeleton';
 import { UnlockCountdown } from '../../components/Countdown/UnlockCountdown';
 import { LockTab } from './blocks/LockTab';
 import { ReunlockConfirmation } from './blocks/ReunlockConfirmation';
+import { StakePresentation } from './blocks/StakePresentation';
 import { UnlockTab } from './blocks/UnlockTab';
 
 export const Stake = ({ ...rest }) => {
@@ -39,6 +42,10 @@ export const Stake = ({ ...rest }) => {
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    isLoadingRewardsApy,
+    rewardsApy,
+    // information/confirmation
+    showStakePresentation,
     // lock
     lockValue,
     setLockValue,
@@ -146,7 +153,7 @@ export const Stake = ({ ...rest }) => {
                 chain={EChain.ETHEREUM}
                 heading={'Stake $ALLUO'}
                 closeAction={isProcessing ? stopProcessingSteps : undefined}
-                noHeading={isProcessing}
+                noHeading={isProcessing || showStakePresentation}
               >
                 {isProcessing ? (
                   <StepsProcessing
@@ -162,12 +169,16 @@ export const Stake = ({ ...rest }) => {
                   />
                 ) : (
                   <>
-                    {showReunlockConfirmation ? (
+                    {showReunlockConfirmation && (
                       <ReunlockConfirmation
                         cancelReunlockConfirmation={cancelReunlockConfirmation}
                         startProcessingSteps={startProcessingSteps}
                       />
-                    ) : (
+                    )}
+                    {showStakePresentation && (
+                      <StakePresentation rewardsApy={rewardsApy.current} isLoadingRewardsApy={isLoadingRewardsApy} />
+                    )}
+                    {!showReunlockConfirmation && !showStakePresentation && (
                       <Tabs
                         selectedTab={selectedTab}
                         setSelectedTab={setSelectedTab}
@@ -204,7 +215,7 @@ export const Stake = ({ ...rest }) => {
                 )}
               </Modal>
               <Box flex>
-                {walletAccountAtom && (
+                {walletAccountAtom && !showStakePresentation && (
                   <Box gap="12px">
                     <Box
                       round="16px"
@@ -255,12 +266,25 @@ export const Stake = ({ ...rest }) => {
                             <Skeleton height="16px" borderRadius="20px" />
                           ) : (
                             <Box direction="row" justify="between">
-                              <Text weight="bold" size="16px">
-                                {seeRewardsAsStable
-                                  ? rewardsInfo.stableLabel
-                                  : rewardsInfo.label}
-                              </Text>
-
+                              <Box direction="row" align="center" gap="6px">
+                                <Text weight="bold" size="16px">
+                                  {seeRewardsAsStable
+                                    ? rewardsInfo.stableLabel
+                                    : rewardsInfo.label}
+                                </Text>
+                                <Tooltip
+                                  text={`Rewards for staking $ALLUO tokens are paid in auto-compounding CVX/ETH. The longer you leave your rewards unclaimed, the larger they will get. The current APY is ${toExactFixed(
+                                    rewardsApy.current,
+                                    2,
+                                  )}%. Stakers can also vote in governance rounds, held every 2 weeks.`}
+                                >
+                                  <CircleInformation
+                                    color="soul"
+                                    size="16px"
+                                    style={{ marginTop: '-2px' }}
+                                  />
+                                </Tooltip>
+                              </Box>
                               <Text weight="bold" size="16px">
                                 {seeRewardsAsStable
                                   ? '$' + rewardsInfo.stableValue

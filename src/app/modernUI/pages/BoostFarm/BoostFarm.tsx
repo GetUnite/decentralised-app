@@ -48,6 +48,9 @@ export const BoostFarm = () => {
     selectSupportedToken,
     selectedSupportedToken,
     updateFarmInfo,
+    // interest
+    interest,
+    isLoadingInterest,
     // rewards
     isLoadingRewards,
     rewardsInfo,
@@ -75,6 +78,7 @@ export const BoostFarm = () => {
     startBoostWithdrawalConfirmation,
     showLockedBoostWithdrawalConfirmation,
     startLockedBoostWithdrawalConfirmation,
+    startLockedBoostManualUnlockSteps,
     // steps
     cancelConfirmations,
     isProcessing,
@@ -113,7 +117,15 @@ export const BoostFarm = () => {
               chain={selectedFarm.current?.chain}
               heading={farmName}
               noHeading={!showHeading}
-              closeAction={!showTabs ? cancelConfirmations : undefined}
+              closeAction={
+                isProcessing
+                  ? stopProcessingSteps
+                  : !showTabs &&
+                    !showBoostFarmPresentation &&
+                    !showLockedBoostFarmPresentation
+                  ? cancelConfirmations
+                  : undefined
+              }
             >
               {isProcessing ? (
                 <StepsProcessing
@@ -139,16 +151,18 @@ export const BoostFarm = () => {
                 <>
                   {showBoostFarmPresentation && (
                     <BoostFarmPresentation
-                      selectedFarmInfo={selectedFarmInfo}
+                      selectedFarm={selectedFarm}
                       farmName={farmName}
-                      isLoading={isLoading}
+                      isLoadingInterest={isLoadingInterest}
+                      interest={interest.current}
                     />
                   )}
                   {showLockedBoostFarmPresentation && (
                     <LockedBoostFarmPresentation
-                      selectedFarmInfo={selectedFarmInfo}
+                      selectedFarm={selectedFarm}
                       farmName={selectedFarmInfo.current?.name}
-                      isLoading={isLoading}
+                      isLoadingInterest={isLoadingInterest}
+                      interest={interest.current}
                     />
                   )}
                   {showLockedBoostLockConfirmation && (
@@ -198,6 +212,7 @@ export const BoostFarm = () => {
                           <BoostFarmDepositTab
                             selectedFarm={selectedFarm}
                             selectedFarmInfo={selectedFarmInfo}
+                            interest={interest}
                             isLoading={isLoading}
                             selectedSupportedToken={selectedSupportedToken}
                             selectedSupportedTokenInfo={
@@ -230,6 +245,7 @@ export const BoostFarm = () => {
                             // farm
                             selectedFarm={selectedFarm}
                             isLoading={isLoading}
+                            interest={interest}
                             selectedFarmInfo={selectedFarmInfo}
                             selectedSupportedToken={selectedSupportedToken}
                             selectedSupportedTokenInfo={
@@ -278,21 +294,75 @@ export const BoostFarm = () => {
               {walletAccountAtom &&
                 !showBoostFarmPresentation &&
                 !showLockedBoostFarmPresentation && (
-                  <Box gap="12px">
+                  <Box>
                     {selectedFarm.current?.isLocked && (
                       <>
                         {/*is unlocking and the timer isn't finished yet*/}
                         {selectedFarmInfo.current?.isUnlocking &&
+                          nextHarvestDate.current?.valueOf() &&
                           !timerIsFinished(
                             nextHarvestDate.current?.valueOf(),
+                            false,
                           ) && (
-                            <UnlockCountdown
-                              date={nextHarvestDate.current?.valueOf()}
-                              onComplete={updateFarmInfo}
-                              label={`UNLOCKING ${toExactFixed(100, 2)} ${
-                                selectedFarm.current?.name
-                              } IN`}
-                            />
+                            <Box margin={{ bottom: '12px' }}>
+                              <UnlockCountdown
+                                date={nextHarvestDate.current?.valueOf()}
+                                onComplete={updateFarmInfo}
+                                label={`UNLOCKING ${toExactFixed(
+                                  selectedFarmInfo.current?.unlockingBalance,
+                                  4,
+                                )} ${selectedFarm.current?.name} IN`}
+                              />
+                            </Box>
+                          )}
+                        {/*the timer finished but is still unlocking*/}
+                        {selectedFarmInfo.current?.isUnlocking &&
+                          nextHarvestDate.current?.valueOf() &&
+                          timerIsFinished(
+                            nextHarvestDate.current?.valueOf(),
+                            false,
+                          ) && (
+                            <Box
+                              round="16px"
+                              width="245px"
+                              align="start"
+                              justify="between"
+                              gap="16px"
+                              direction="column"
+                              background="modal"
+                              margin={{ bottom: '12px' }}
+                              pad={{ vertical: 'medium', horizontal: 'medium' }}
+                              border={
+                                isLightMode
+                                  ? { color: '#EBEBEB', size: '1px' }
+                                  : { size: '0px' }
+                              }
+                            >
+                              <Text
+                                size="11px"
+                                weight="bold"
+                                textAlign="center"
+                              >
+                                Gas fees are too high to harvest 🚨
+                              </Text>
+                              <Text size="10px" textAlign="center">
+                                We’ll keep trying. You can manually unlock, but
+                                will need to pay all fees and lose this week’s
+                                pending rewards
+                              </Text>
+                              <Button
+                                label="Start manual unlock"
+                                style={{
+                                  borderRadius: '58px',
+                                  width: '197px',
+                                  padding: '6px 16px',
+                                }}
+                                onClick={() => {
+                                  startLockedBoostManualUnlockSteps();
+                                }}
+                                disabled={isLoading}
+                              />
+                            </Box>
                           )}
                         {/*is not unlocking and there is unlocked value to claim*/}
                         {!selectedFarmInfo.current?.isUnlocking &&
@@ -306,6 +376,7 @@ export const BoostFarm = () => {
                               direction="column"
                               height="154px"
                               background="modal"
+                              margin={{ bottom: '12px' }}
                               pad={{ vertical: 'medium', horizontal: 'medium' }}
                               border={
                                 isLightMode
@@ -326,7 +397,10 @@ export const BoostFarm = () => {
                                 </Box>
                               ) : (
                                 <Text size="18px" weight="bold">
-                                  {toExactFixed(100, 2)}{' '}
+                                  {toExactFixed(
+                                    selectedFarmInfo.current?.unlockedBalance,
+                                    4,
+                                  )}{' '}
                                   {selectedFarm.current?.name} unlocked
                                 </Text>
                               )}
@@ -374,6 +448,7 @@ export const BoostFarm = () => {
                       gap="small"
                       direction="column"
                       background="modal"
+                      margin={{ bottom: '12px' }}
                       pad={{ vertical: 'medium', horizontal: 'medium' }}
                       border={
                         isLightMode
@@ -539,7 +614,8 @@ export const BoostFarm = () => {
                           <Text size="8px" weight={400}>
                             Available{' '}
                             {nextHarvestDate.current?.format('DD MMM')} · Last
-                            harvested {previousHarvestDate.format('DD MMM')}
+                            harvested{' '}
+                            {previousHarvestDate.current?.format('DD MMM')}
                           </Text>
                         )}
                       </Box>

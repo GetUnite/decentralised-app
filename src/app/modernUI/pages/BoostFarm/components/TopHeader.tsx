@@ -7,6 +7,7 @@ import Skeleton from 'react-loading-skeleton';
 export const TopHeader = ({
   selectedFarmInfo,
   isLoading,
+  interest,
   isCorrectNetworkAtom,
 }) => {
   const { first, second } = selectedFarmInfo.current?.depositDividedAmount || 0;
@@ -25,12 +26,11 @@ export const TopHeader = ({
               {!selectedFarmInfo.current?.isLocked ? (
                 <Text textAlign="center" weight="bold" size="18px">
                   Your balance currently earning <br />
-                  {toExactFixed(
-                    selectedFarmInfo.current?.interest,
-                    2,
-                  ).toLocaleString()}
-                  % APY is {selectedFarmInfo.current?.sign}
-                  {(+first).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {toExactFixed(interest.current, 2)}% APY is{' '}
+                  {selectedFarmInfo.current?.sign}
+                  {(+first).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                   <Text color="softText" size="18px">
                     {second}
                   </Text>
@@ -44,8 +44,10 @@ export const TopHeader = ({
                     style={{ justifyContent: 'center' }}
                   >
                     You have{' '}
-                    {(+selectedFarmInfo.current
-                      ?.depositedAmountInLP).toLocaleString()}{' '}
+                    {toExactFixed(
+                      +selectedFarmInfo.current?.depositedAmountInLP,
+                      4,
+                    )}{' '}
                     {selectedFarmInfo.current?.name}
                   </Text>
                   <Box direction="row" justify="center">
@@ -55,20 +57,18 @@ export const TopHeader = ({
                       size="18px"
                       style={{ justifyContent: 'center' }}
                     >
-                      earning{' '}
-                      {toExactFixed(
-                        selectedFarmInfo.current?.interest,
-                        2,
-                      ).toLocaleString()}
-                      % APY{' '}
+                      earning {toExactFixed(interest.current, 2)}% APY{' '}
                     </Text>
                     <Tooltip
                       text={
                         <Text>
                           Current value:
                           <br />
-                          {(+selectedFarmInfo.current
-                            ?.depositedAmount).toLocaleString()} USD
+                          {toExactFixed(
+                            +selectedFarmInfo.current?.depositedAmount,
+                            2,
+                          )}{' '}
+                          USD
                         </Text>
                       }
                     >

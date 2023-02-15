@@ -157,7 +157,7 @@ export const StartStreamModal = ({ ...rest }) => {
                         }
                       />
                       <Info
-                        label={`${sourceFarmInfo.name} APY`}
+                        label={`${sourceFarmInfo?.name} APY`}
                         value={sourceFarmInfo?.interest + '%'}
                         isLoading={
                           isLoading ||
@@ -166,7 +166,7 @@ export const StartStreamModal = ({ ...rest }) => {
                         }
                       />
                       <Info
-                        label={`${targetFarmInfo.name} APY`}
+                        label={`${targetFarmInfo?.name} APY`}
                         value={targetFarmInfo?.interest + '%'}
                         isLoading={
                           isLoading ||

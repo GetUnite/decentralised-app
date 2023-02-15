@@ -6,7 +6,6 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
-import handlerAbi from 'app/common/abis/handler.json';
 import {
   EEthereumAddresses,
   EPolygonAddresses
@@ -18,7 +17,7 @@ import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
 const ethereumTestnetProviderUrl =
-  'https://rpc.tenderly.co/fork/164a4eea-db22-4d7e-8dd0-c4a41a4554fd';
+  'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =
@@ -199,7 +198,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
+  return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
   return walletAddress;
 };
 
@@ -383,9 +382,15 @@ export const callStatic = async (
   address,
   functionSignature,
   params = [],
+  chain = EChain.ETHEREUM,
 ) => {
   try {
-    const provider = walletProvider;
+    let provider;
+    if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
+      provider = getReadOnlyProvider(chain);
+    } else {
+      provider = walletProvider;
+    }
     const signer = provider.getSigner();
     const contract = new ethers.Contract(address, abi, signer);
 
@@ -768,6 +773,7 @@ export const QueryFilter = async (
   params,
   blockNumber,
   chain,
+  toBlockNumber = undefined,
 ) => {
   const readOnlyProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
@@ -775,7 +781,11 @@ export const QueryFilter = async (
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
-    const logs = await contract.queryFilter(event, blockNumber, blockNumber);
+    const logs = await contract.queryFilter(
+      event,
+      blockNumber,
+      toBlockNumber ? toBlockNumber : blockNumber,
+    );
 
     return logs;
   } catch (error) {
@@ -1300,18 +1310,4 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
   );
 
   return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
-};
-
-export const getHandlerContractInstance = (blockNumber, chain) => {
-  const readOnlyProvider = getReadOnlyProvider(chain);
-  readOnlyProvider.resetEventsBlock(blockNumber - 1);
-  const handlerInstance = new ethers.Contract(
-    chain == EChain.POLYGON
-      ? EPolygonAddresses.HANDLER
-      : EEthereumAddresses.HANDLER,
-    handlerAbi,
-    readOnlyProvider,
-  );
-
-  return handlerInstance;
 };

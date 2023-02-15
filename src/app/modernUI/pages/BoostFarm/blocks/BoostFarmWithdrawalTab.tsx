@@ -16,6 +16,7 @@ export const BoostFarmWithdrawalTab = ({
   selectedFarm,
   isLoading,
   selectedFarmInfo,
+  interest,
   selectSupportedToken,
   selectedSupportedToken,
   isCorrectNetworkAtom,
@@ -50,6 +51,7 @@ export const BoostFarmWithdrawalTab = ({
       <Box margin={{ top: 'large' }}>
         <TopHeader
           selectedFarmInfo={selectedFarmInfo}
+          interest={interest}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
@@ -59,12 +61,22 @@ export const BoostFarmWithdrawalTab = ({
           label={`${selectedFarm.current?.isLocked ? 'Unlock' : 'Withdraw'} ${
             selectedSupportedToken ? selectedSupportedToken?.label : ''
           }`}
-          available={selectedSupportedTokenInfo.current?.boostDepositedAmount}
-          tokenSign={selectedSupportedToken?.sign}
+          available={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
+          tokenSign={selectedSupportedToken?.sign ? selectedSupportedToken?.sign : ''}
           onValueChange={handleWithdrawalFieldChange}
           value={withdrawValue}
           maxButton={true}
-          maxValue={selectedSupportedTokenInfo.current?.boostDepositedAmount}
+          maxValue={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
           tokenOptions={
             (selectedFarm.current?.isLocked
               ? [selectedFarmInfo.current?.withdrawToken]
@@ -78,9 +90,10 @@ export const BoostFarmWithdrawalTab = ({
               ? `The current value of ${toExactFixed(
                   selectedFarmInfo.current?.depositedAmountInLP,
                   2,
-                )} ${selectedFarmInfo.current?.name} is $${
-                  selectedSupportedTokenInfo.current?.boostDepositedAmount
-                }`
+                )} ${selectedFarmInfo.current?.name} is $${toExactFixed(
+                  selectedSupportedTokenInfo.current?.boostDepositedAmount,
+                  2,
+                )}`
               : `Withdrawing in any token other than
                     ${selectedFarmInfo.current?.lowSlippageTokenLabels?.join(
                       '/',
@@ -96,19 +109,14 @@ export const BoostFarmWithdrawalTab = ({
         <ProjectedWeeklyInfo
           depositedAmount={selectedFarmInfo.current?.depositedAmount}
           inputValue={-1 * +withdrawValue}
-          interest={selectedFarmInfo.current?.interest}
+          interest={interest.current}
           sign={selectedFarmInfo.current?.sign}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
         <Info
           label="APY"
-          value={
-            toExactFixed(
-              selectedFarmInfo.current?.interest,
-              2,
-            ).toLocaleString() + '%'
-          }
+          value={toExactFixed(interest.current, 2) + '%'}
           isLoading={isLoading}
         />
         <Info
@@ -124,7 +132,7 @@ export const BoostFarmWithdrawalTab = ({
             label="Unlocked balance"
             value={
               selectedFarmInfo.current?.sign +
-              (+selectedFarmInfo.current?.unlockedBalance).toLocaleString()
+              toExactFixed(+selectedFarmInfo.current?.unlockedBalance,4)
             }
             isLoading={isLoading}
           />

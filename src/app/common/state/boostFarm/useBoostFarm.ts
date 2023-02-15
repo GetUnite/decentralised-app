@@ -8,9 +8,11 @@ import {
   getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getLastHarvestDateTimestamp,
   getLockedBoostWithdrawalsInfo,
   getMaximumLPValueAsToken,
   unlockFromLockedBoostFarm,
+  unlockUserFunds,
   withdrawFromBoostFarm,
   withdrawFromLockedBoostFarm
 } from 'app/common/functions/boostFarm';
@@ -71,61 +73,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -166,61 +168,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -261,61 +263,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -356,61 +358,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -452,61 +454,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -550,61 +552,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -623,6 +625,111 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     },
     isNewest: true,
   },
+  {
+    id: 6,
+    farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
+    type: 'booster',
+    isLocked: true,
+    chain: EChain.ETHEREUM,
+    name: 'CVX/FRAXBP',
+    sign: '$',
+    icons: [
+      'FRAX',
+      'USDC',
+      'agEUR',
+      'CRV',
+      'CVX',
+      'DAI',
+      'EURS',
+      'EURT',
+      'WETH',
+      'WBTC',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      address: EEthereumAddresses.CVXETH,
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.CVXFRAXBP,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: EEthereumAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: EEthereumAddresses.CRV,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: EEthereumAddresses.CVX,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: EEthereumAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: EEthereumAddresses.EURS,
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: EEthereumAddresses.EURT,
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: EEthereumAddresses.FRAX,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EEthereumAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: EEthereumAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: EEthereumAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: ['FRAX', 'CVX'],
+    apyFarmAddresses: {
+      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
+    forcedInterest: '9.50',
+    withdrawToken: {
+      label: 'CVX/FRAXBP',
+      address: EEthereumAddresses.CVXFRAXBP,
+      decimals: 18,
+      sign: '',
+    },
+    isNewest: true,
+  },
 ];
 
 const defaultRewards = {
@@ -634,6 +741,12 @@ const defaultRewards = {
 const possibleBoostFarmSteps = [
   {
     id: 6,
+    label: '',
+    errorLabel: 'Failed to claim rewards',
+    successLabel: '',
+  },
+  {
+    id: 7,
     label: '',
     errorLabel: 'Failed to claim rewards',
     successLabel: '',
@@ -667,6 +780,7 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
+  const interest = useRef<any>();
 
   // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
@@ -703,7 +817,7 @@ export const useBoostFarm = ({ id }) => {
 
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const [isLoadingInterest, setIsLoadingInterest] = useState<boolean>(true);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
@@ -743,15 +857,14 @@ export const useBoostFarm = ({ id }) => {
     !showLockedBoostLockConfirmation;
 
   // harvest dates for the farms
-  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
-  const nextHarvestDate = useRef<any>(
-    moment().subtract(1, 'days').add(1, 'week').day('Sunday').set('hour', 12),
-  );
+  const previousHarvestDate = useRef<any>();
+  const nextHarvestDate = useRef<any>();
 
   // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      updateInterest();
     }
   }, [walletAccountAtom]);
 
@@ -773,6 +886,16 @@ export const useBoostFarm = ({ id }) => {
         };
         setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
 
+        const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.chain,
+        );
+        const lastHarvestDate = new Date(0);
+        lastHarvestDate.setSeconds(lastHarvestDateTimestamp);
+
+        previousHarvestDate.current = moment(lastHarvestDate);
+        nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
+
         setIsLoading(false);
         await updateRewardsInfo();
       } catch (error) {
@@ -784,11 +907,24 @@ export const useBoostFarm = ({ id }) => {
     }
   }, [walletAccountAtom, isCorrectNetworkAtom]);
 
+  const updateInterest = async () => {
+    setIsLoadingInterest(true);
+    interest.current = selectedFarm.current?.forcedInterest
+      ? selectedFarm.current?.forcedInterest
+      : await getBoostFarmInterest(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.apyFarmAddresses,
+          selectedFarm.current?.chain,
+        );
+    setIsLoadingInterest(false);
+  };
+
   // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
+    setIsLoading(true);
     try {
       const farm = await getUpdatedFarmInfo(selectedFarm.current);
-      selectedFarmInfo.current = farm;
+      selectedFarmInfo.current = { ...selectedFarmInfo, ...farm };
       setSelectedSupportedToken(
         farm.supportedTokens?.find(
           st => st?.address == selectedSupportedToken?.address,
@@ -797,6 +933,7 @@ export const useBoostFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const getUpdatedFarmInfo = async farm => {
@@ -807,15 +944,7 @@ export const useBoostFarm = ({ id }) => {
         farm.lPTokenAddress,
         farm.chain,
       );
-
       farmInfo = {
-        interest: farm.forcedInterest
-          ? farm.forcedInterest
-          : await getBoostFarmInterest(
-              farm.farmAddress,
-              farm.apyFarmAddresses,
-              farm.chain,
-            ),
         totalAssetSupply:
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
           valueOf1LPinUSDC,
@@ -830,15 +959,16 @@ export const useBoostFarm = ({ id }) => {
         farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        const depositedAmount =
-          +depositedAmountInLP > 0 && isCorrectNetworkAtom == true
-            ? await getMaximumLPValueAsToken(
-                farm.farmAddress,
-                EEthereumAddresses.USDC,
-                6,
-                depositedAmountInLP,
-              )
-            : 0;
+        const depositedAmount = farm.isLocked
+          ? +depositedAmountInLP * valueOf1LPinUSDC
+          : +depositedAmountInLP > 0 && isCorrectNetworkAtom == true
+          ? await getMaximumLPValueAsToken(
+              farm.farmAddress,
+              EEthereumAddresses.USDC,
+              6,
+              depositedAmountInLP,
+            )
+          : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
         if (farm.isLocked) {
@@ -846,7 +976,9 @@ export const useBoostFarm = ({ id }) => {
             farm.farmAddress,
             farm.chain,
           );
+          console.log(userWithdrawals);
           farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
+          farmInfo.unlockingBalance = userWithdrawals.unlockingBalance;
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;
         }
       }
@@ -922,8 +1054,35 @@ export const useBoostFarm = ({ id }) => {
     }
   };
 
+  const manualUnlock = async () => {
+    try {
+      const tx = await unlockUserFunds(
+        selectedFarm.current?.farmAddress,
+        selectedFarm.current?.chain,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const startLockedBoostLockConfirmation = async () => {
     setShowLockedBoostLockConfirmation(true);
+  };
+
+  const startLockedBoostManualUnlockSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    neededSteps.push({
+      ...possibleBoostFarmSteps[1],
+      label: `Manually unlocking ${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label}`,
+      successLabel: `$${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label} unlocked`,
+    });
+
+    processingTitle.current = 'Manually unlocking...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
   };
 
   const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
@@ -955,17 +1114,7 @@ export const useBoostFarm = ({ id }) => {
     const valueToWithdraw =
       withdrawPercentage == 1
         ? selectedFarmInfo.current.depositedAmountInLP
-        : (
-            selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage
-          ).toFixed(18);
-
-    console.log({
-      withdrawValue,
-      depositedAmount: selectedSupportedTokenInfo.current.boostDepositedAmount,
-      depositedAmountInLP: selectedFarmInfo.current.depositedAmountInLP,
-      withdrawPercentage,
-      valueToWithdraw,
-    });
+        : selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
 
     try {
       const tx = await withdrawFromBoostFarm(
@@ -1139,6 +1288,13 @@ export const useBoostFarm = ({ id }) => {
         case 6:
           await claimRewards();
           break;
+
+        case 7:
+          await manualUnlock();
+          break;
+        default:
+          throw 'Something went wrong';
+          break;
       }
       stepWasSuccessful.current = true;
     } catch (error) {
@@ -1165,6 +1321,9 @@ export const useBoostFarm = ({ id }) => {
     selectedFarmInfo,
     selectSupportedToken,
     selectedSupportedToken,
+    // interest
+    interest,
+    isLoadingInterest,
     // rewards
     isLoadingRewards,
     rewardsInfo,
@@ -1195,6 +1354,7 @@ export const useBoostFarm = ({ id }) => {
     startBoostWithdrawalConfirmation,
     showLockedBoostWithdrawalConfirmation,
     startLockedBoostWithdrawalConfirmation,
+    startLockedBoostManualUnlockSteps,
     // steps
     cancelConfirmations,
     isProcessing,

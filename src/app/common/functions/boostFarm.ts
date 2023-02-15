@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
@@ -6,6 +7,8 @@ import {
   callStatic,
   getCurrentWalletAddress,
   getPrice,
+  getReadOnlyProvider,
+  QueryFilter,
   sendTransaction
 } from './web3Client';
 
@@ -257,18 +260,20 @@ export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   );
 
   let pendingRewardsByToken = [];
-  for (const pendingRewardsArray of shareholderAccruedRewards) {
-    for (const pendingRewards of pendingRewardsArray) {
-      const rewardByToken = pendingRewardsByToken.find(
-        prbt => prbt.token == pendingRewards.token,
-      );
-      if (rewardByToken) {
-        rewardByToken.amount += +pendingRewards.amount;
-      } else {
-        pendingRewardsByToken.push({
-          token: pendingRewards.token,
-          amount: +pendingRewards.amount,
-        });
+  if (shareholderAccruedRewards != undefined) {
+    for (const pendingRewardsArray of shareholderAccruedRewards) {
+      for (const pendingRewards of pendingRewardsArray) {
+        const rewardByToken = pendingRewardsByToken.find(
+          prbt => prbt.token == pendingRewards.token,
+        );
+        if (rewardByToken) {
+          rewardByToken.amount += +pendingRewards.amount;
+        } else {
+          pendingRewardsByToken.push({
+            token: pendingRewards.token,
+            amount: +pendingRewards.amount,
+          });
+        }
       }
     }
   }
@@ -343,6 +348,7 @@ export const getMaximumLPValueAsToken = async (
   tokenAddress,
   tokenDecimals,
   amount,
+  isLocked = false,
 ) => {
   const abi = [
     {
@@ -357,21 +363,57 @@ export const getMaximumLPValueAsToken = async (
       stateMutability: 'nonpayable',
       type: 'function',
     },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'exitToken',
+          type: 'address',
+        },
+        {
+          internalType: 'address',
+          name: 'receiver',
+          type: 'address',
+        },
+      ],
+      name: 'claim',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
   ];
 
   const amountInDecimals = toDecimals(amount, 18);
 
-  const valueInDecimals = await callStatic(
-    abi,
-    farmAddress,
-    'withdrawToNonLp(uint256,address,address,address)',
-    [
-      amountInDecimals,
-      getCurrentWalletAddress(),
-      getCurrentWalletAddress(),
-      tokenAddress,
-    ],
-  );
+  let valueInDecimals;
+  if (isLocked) {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'claim(address,address)',
+      [tokenAddress, getCurrentWalletAddress()],
+    );
+  } else {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'withdrawToNonLp(uint256,address,address,address)',
+      [
+        amountInDecimals,
+        getCurrentWalletAddress(),
+        getCurrentWalletAddress(),
+        tokenAddress,
+      ],
+    );
+  }
+
+  console.log(valueInDecimals);
 
   const value = fromDecimals(valueInDecimals, tokenDecimals);
 
@@ -397,7 +439,7 @@ export const convertToLP = async (
   return (usdcPrice * value) / valueOf1LPinUSDC;
 };
 
-const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
+const boostFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 export const getBoostFarmInterest = async (
   farmVaultAddress,
   apyFarmAddresses,
@@ -419,12 +461,12 @@ export const getBoostFarmInterest = async (
       10000;
 
   const baseApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
   ).then(res => res.json());
   const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
 
   const boostApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
   ).then(res => res.json());
   const boostApyData =
     boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
@@ -588,9 +630,86 @@ export const getLockedBoostWithdrawalsInfo = async (farmAddress, chain) => {
     [getCurrentWalletAddress()],
     chain,
   );
-  
+
+  const unlockingBalance = +ethers.utils.formatEther(
+    userWithdrawals.withdrawalRequested,
+  );
   return {
-    unlockedBalance: (userWithdrawals.withdrawalAvailable).toNumber(),
-    isUnlocking: (userWithdrawals.withdrawalRequested).toNumber() > 0
+    unlockedBalance: +ethers.utils.formatEther(
+      userWithdrawals.withdrawalAvailable,
+    ),
+    unlockingBalance,
+    isUnlocking: unlockingBalance > 0,
+  };
+};
+
+export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
+  const abi = [
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'timestamp',
+          type: 'uint256',
+        },
+      ],
+      name: 'Looped',
+      type: 'event',
+    },
+  ];
+
+  const provider = getReadOnlyProvider(chain);
+  let toBlock = await provider.getBlockNumber();
+  let fromBlock = toBlock - 1000;
+
+  let looped = [];
+  while (looped.length == 0) {
+    looped = await QueryFilter(
+      abi,
+      farmAddress,
+      'Looped',
+      [],
+      fromBlock,
+      chain,
+      toBlock,
+    );
+
+    toBlock = fromBlock;
+    fromBlock -= 1000;
+  }
+
+  return looped[0].args[0].toNumber();
+};
+
+export const unlockUserFunds = async (
+  farmAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'unlockUserFunds',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'unlockUserFunds()',
+      [],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
   }
 };

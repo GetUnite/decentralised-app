@@ -1,45 +1,33 @@
+import { toExactFixed } from 'app/common/functions/utils';
+import stake from 'app/modernUI/images/stake.svg';
 import { Box, Button, Text } from 'grommet';
 import { useCookies } from 'react-cookie';
-
-import { toExactFixed } from 'app/common/functions/utils';
-import booster from 'app/modernUI/images/booster.svg';
 import Skeleton from 'react-loading-skeleton';
 
-export const BoostFarmPresentation = ({
-  selectedFarm,
-  farmName,
-  isLoadingInterest,
-  interest,
-  ...rest
-}) => {
-  const [, setCookies] = useCookies(['has_seen_boost_farms']);
-
-  const rewardsLabel =
-  selectedFarm.current?.rewards.label +
-    ' or ' +
-    selectedFarm.current?.rewards.stableLabel;
+export const StakePresentation = ({ rewardsApy, isLoadingRewardsApy }) => {
+  const [, setCookies] = useCookies(['has_seen_stake']);
 
   return (
     <>
       <Text textAlign="center" size="16px">
-        {farmName} FARM
+        Stake $ALLUO tokens
       </Text>
       <Box gap="large" margin={{ top: '20px' }} align="center">
-        {isLoadingInterest ? (
+        {isLoadingRewardsApy ? (
           <Box fill>
             <Skeleton height="37px" count={2} borderRadius="20px" />
           </Box>
         ) : (
           <Text textAlign="center" weight="bold" size="28px">
-            Earn {toExactFixed(interest, 2)}% as {rewardsLabel} tokens
-            <br />
+            Stake $ALLUO and earn {toExactFixed(rewardsApy, 2)}% as CVX/ETH
+            tokens
           </Text>
         )}
-        <img src={booster} alt="booster" width={275} />
+        <img src={stake} alt="stake" height={226} />
         <Button
           primary
-          label="Deposit to get started"
-          onClick={() => setCookies('has_seen_boost_farms', true)}
+          label="Continue to stake"
+          onClick={() => setCookies('has_seen_stake', true)}
           style={{ width: 310 }}
         />
       </Box>
