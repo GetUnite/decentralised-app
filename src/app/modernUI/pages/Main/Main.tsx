@@ -157,7 +157,7 @@ export const Main = () => {
                           align="end"
                           height="75px"
                         >
-                          <Text size="18px" margin={{ top: '15px' }}>
+                          <Text size="16px" margin={{ top: '15px' }}>
                             Total balance in farms: ${totalDepositedAmountInUsd}
                           </Text>
                         </Box>
@@ -172,7 +172,7 @@ export const Main = () => {
                             />
                             <Box fill="horizontal" justify="start" align="end">
                               <Box direction="row" margin={{ top: '21px' }} justify="center" gap="4px">
-                                <Text size="18px" >
+                                <Text size="16px" >
                                   Total rewards across farms:{' '}
                                   {seeRewardsAsStable ? (
                                     <>{`$${toExactFixed(
