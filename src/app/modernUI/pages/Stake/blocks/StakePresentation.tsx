@@ -23,27 +23,13 @@ export const StakePresentation = ({ rewardsApy, isLoadingRewardsApy }) => {
             tokens
           </Text>
         )}
-        <img src={stake} alt="stake" height={226} />
+        <img src={stake} alt="stake" height={270} />
         <Button
           primary
           label="Continue to stake"
           onClick={() => setCookies('has_seen_stake', true)}
           style={{ width: 310 }}
         />
-      </Box>
-      <Box margin={{ top: '26px' }} justify="center" direction="row">
-        <Text size="12px">
-          Find out where these funds are being invested{' '}
-          <a
-            target="_blank"
-            href="https://docsend.com/view/np9ypdn38jajb9zj"
-            style={{
-              textDecoration: 'none',
-            }}
-          >
-            here
-          </a>
-        </Text>
       </Box>
     </>
   );
