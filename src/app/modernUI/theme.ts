@@ -235,7 +235,12 @@ export const theme = deepMerge(grommet, {
         border: { radius: '18px' },
       },
     },
-
+    disabled: {
+      color: '#999999',
+      background: {
+        color: '#EBEBEB'
+      }
+    },
     primary: {
       color: '#FFFFFF',
       background: { color: '#2A73FF' },

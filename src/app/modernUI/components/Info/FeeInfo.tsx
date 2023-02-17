@@ -31,7 +31,7 @@ export const FeeInfo = ({
         </Box>
       ) : (
         <>
-          <Text size="14px" color="soul">
+          <Text size="14px">
             Gas fee
           </Text>
           <Text size="14px">
