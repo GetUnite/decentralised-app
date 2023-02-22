@@ -36,6 +36,7 @@ export type TFarm = {
   isNewest?: boolean;
   underlyingTokenAddress?: string;
   // For boost farms but needed here for main page
+  depositedAmountInLP?: number;
   rewards?: TBoostFarmRewards;
   isLocked?: boolean;
 };
@@ -44,8 +45,6 @@ export type TBoostFarm = TFarm & {
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
   apyFarmAddresses?: TApyFarmAddresses;
-  // To store boost farm deposited amount to improve ui and functionality
-  depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
   // For locked boost farms
   unlockingBalance?: string;
