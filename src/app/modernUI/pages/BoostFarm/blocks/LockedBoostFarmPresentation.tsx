@@ -5,11 +5,14 @@ import { toExactFixed } from 'app/common/functions/utils';
 import lock from 'app/modernUI/images/lock.svg';
 import Skeleton from 'react-loading-skeleton';
 
+import moment from 'moment';
+
 export const LockedBoostFarmPresentation = ({
   selectedFarm,
   farmName,
   isLoadingInterest,
   interest,
+  nextHarvestDate,
   ...rest
 }) => {
   const [, setCookies] = useCookies(['has_seen_locked_boost_farms']);
@@ -38,8 +41,9 @@ export const LockedBoostFarmPresentation = ({
             </Text>
           )}
           <Text textAlign="center" margin={{ top: '23px' }}>
+            {/*TODO: make this date dynamic with loadFarmInfo() once its optimised*/}
             Locked BOOST farms have a weekly lock-in period. Deposits and
-            withdrawal requests are actioned every Sunday from 12 PM UTC.
+            withdrawal requests are actioned every Sunday at 11pm {/*nextHarvestDate == null ? 'Loading...' : nextHarvestDate.format('dddd [at] h a')*/}.
           </Text>
         </Box>
         <Button

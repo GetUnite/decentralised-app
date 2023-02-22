@@ -48,7 +48,7 @@ export const fromDecimals = (
   decimals,
   isFixed = false,
 ): string => {
-  amount = amount.toString();
+  amount = ((typeof amount === 'undefined') ? "0" : amount.toString());
   let newAmount = '';
 
   if (amount.length <= decimals) {
