@@ -133,6 +133,7 @@ export const useMain = () => {
             totalAssetSupply,
             supportedTokens,
             depositedAmount,
+            depositedAmountInLP,
             depositedAmountInUSD,
             poolShare,
           } = availableFarm.isBoost
@@ -152,6 +153,7 @@ export const useMain = () => {
           availableFarm.totalAssetSupply = totalAssetSupply;
           availableFarm.supportedTokens = supportedTokens;
           availableFarm.depositedAmount = depositedAmount;
+          availableFarm.depositedAmountInLP = depositedAmountInLP;
           availableFarm.depositedAmountInUSD = depositedAmountInUSD;
           availableFarm.poolShare = poolShare;
 
@@ -240,8 +242,8 @@ export const useMain = () => {
         const rewardsAsNumber = fromLocaleString(updatedRewards.value);
         if (rewardsAsNumber > 0.00001) {
           const monthProjection =
-            rewardsAsNumber * Math.pow(1 + rewardsApy, 1 / 12);
-          const yearProjection = rewardsAsNumber * Math.pow(1 + rewardsApy, 1);
+            (farm.depositedAmountInLP * (Math.pow(1 + rewardsApy, 1 / 12) -1)) + rewardsAsNumber;
+          const yearProjection = (farm.depositedAmountInLP * (Math.pow(1 + rewardsApy, 1) -1)) + rewardsAsNumber;
           ri.push({
             farmAddress: farm.farmAddress,
             name: farm.name,
