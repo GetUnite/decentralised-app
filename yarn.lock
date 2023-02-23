@@ -7332,6 +7332,13 @@ eth-sig-util@^1.4.2:
     ethereumjs-abi "git+https://github.com/ethereumjs/ethereumjs-abi.git"
     ethereumjs-util "^5.1.1"
 
+ethereum-block-by-date@^1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/ethereum-block-by-date/-/ethereum-block-by-date-1.4.6.tgz#80227834ab8a5ebd3318ba58b985b07d47731ba8"
+  integrity sha512-MV7QAjeTl3zuVSeRfNdXeJQCfiwc4wCIXiLMnWqarmhyXzzUqq36+aDsqBFbV/D07WiW5JiuQ7KVtLLaqt6WQw==
+  dependencies:
+    moment "^2.29.4"
+
 ethereum-bloom-filters@^1.0.6:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/ethereum-bloom-filters/-/ethereum-bloom-filters-1.0.10.tgz#3ca07f4aed698e75bd134584850260246a5fed8a"

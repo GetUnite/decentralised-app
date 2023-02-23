@@ -198,7 +198,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
+  //return '0xF9AE7A7568BC1d5355462183F5D9B878B49C3686';
   return walletAddress;
 };
 
