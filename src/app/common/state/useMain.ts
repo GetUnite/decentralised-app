@@ -18,7 +18,11 @@ import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { EEthereumAddresses, EPolygonAddresses, EOptimismAddresses} from '../constants/addresses';
+import {
+  EEthereumAddresses,
+  EOptimismAddresses,
+  EPolygonAddresses
+} from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import {
   claimBoostFarmLPRewards,
@@ -241,15 +245,21 @@ export const useMain = () => {
         };
         const rewardsAsNumber = fromLocaleString(updatedRewards.value);
         if (rewardsAsNumber > 0.00001) {
-          const rewardsInUSD = rewardsAsNumber*CVXETHInUSDC;
-          
+          const rewardsInUSD = rewardsAsNumber * CVXETHInUSDC;
+
           const monthProjection =
-            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1 / 12) -1))+rewardsInUSD)/CVXETHInUSDC;
-          
-            const yearProjection = 
-            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1) -1))+rewardsInUSD)/CVXETHInUSDC;
-          
-            ri.push({
+            (Number(farm.depositedAmount) *
+              (Math.pow(1 + Number(farm.interest) / 100, 1 / 12) - 1) +
+              rewardsInUSD) /
+            CVXETHInUSDC;
+
+          const yearProjection =
+            (Number(farm.depositedAmount) *
+              (Math.pow(1 + Number(farm.interest) / 100, 1) - 1) +
+              rewardsInUSD) /
+            CVXETHInUSDC;
+
+          ri.push({
             farmAddress: farm.farmAddress,
             name: farm.name,
             isBoost: farm.isBoost,
@@ -447,7 +457,13 @@ export const useMain = () => {
 
     filteredFarms = filteredFarms.filter(farm => {
       return networkFilter.includes(
-        farm.chain == EChain.ETHEREUM ? 'Ethereum' : farm.chain == EChain.POLYGON ? 'Polygon' : farm.chain == EChain.OP ? 'Optimisim' : 'Polygon',
+        farm.chain == EChain.ETHEREUM
+          ? 'Ethereum'
+          : farm.chain == EChain.POLYGON
+          ? 'Polygon'
+          : farm.chain == EChain.OP
+          ? 'Optimism'
+          : '',
       );
     });
 

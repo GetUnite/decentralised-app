@@ -7,9 +7,7 @@ import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
 import {
-  EEthereumAddresses,
-  EPolygonAddresses,
-  EOptimismAddresses
+  EEthereumAddresses, EOptimismAddresses, EPolygonAddresses
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
