@@ -93,7 +93,7 @@ const chains = [
     id: EChainId.OP_MAINNET,
     token: 'ETH',
     label: 'Optimisim Mainnet',
-    rpcUrl: polygonTestnetProviderUrl,
+    rpcUrl: optimismMainnetProviderUrl,
   },
 ];
 
@@ -239,6 +239,13 @@ export const changeNetwork = async (chain: EChain) => {
         : EChainId.POL_MUMBAI;*/
   }
 
+  if (chain === EChain.OP) {
+    chainId = EChainId.OP_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
+        ? EChainId.OP_MAINNET
+        : EChainId.OP_TESTNET;*/
+  }
+
   await onboard.setChain({ chainId: chainId });
 
   return chainId;
@@ -248,6 +255,8 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
+    ? EChain.ETHEREUM
+    : chainId === EChainId.OP_MAINNET
     ? EChain.ETHEREUM
     : null;
 };
