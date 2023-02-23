@@ -1,6 +1,7 @@
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EPolygonAddresses,
+  EOptimismAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
@@ -31,6 +32,72 @@ import { possibleWithdrawSteps } from './useFarmWithdrawal';
 export const farmOptions: Array<TFarm> = [
   {
     id: 0,
+    farmAddress: EOptimismAddresses.IBALLUOUSD,
+    type: 'usd',
+    chain: EChain.OP,
+    name: 'US Dollar',
+    sign: '$',
+    icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EOptimismAddresses.USDC,
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: EOptimismAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EOptimismAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: EOptimismAddresses.USDT,
+        decimals: 6,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    id: 1,
+    farmAddress: EOptimismAddresses.IBALLUOETH,
+    type: 'eth',
+    chain: EChain.OP,
+    name: 'Ethereum',
+    sign: 'Ξ',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    id: 2,
+    farmAddress: EOptimismAddresses.IBALLUOBTC,
+    type: 'btc',
+    chain: EChain.OP,
+    name: 'Bitcoin',
+    sign: '₿',
+    icons: ['WBTC'],
+    underlyingTokenAddress: EOptimismAddresses.WBTC,
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: EOptimismAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+  },
+  {
+    id: 3,
     farmAddress: EPolygonAddresses.IBALLUOUSD,
     type: 'usd',
     chain: EChain.POLYGON,
@@ -60,7 +127,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 1,
+    id: 4,
     farmAddress: EPolygonAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.POLYGON,
@@ -102,7 +169,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 2,
+    id: 5,
     farmAddress: EPolygonAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.POLYGON,
@@ -120,7 +187,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 3,
+    id: 6,
     farmAddress: EPolygonAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.POLYGON,
@@ -168,7 +235,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },*/
   {
-    id: 5,
+    id: 7,
     farmAddress: EEthereumAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.ETHEREUM,
@@ -198,7 +265,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 6,
+    id: 8,
     farmAddress: EEthereumAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.ETHEREUM,
@@ -216,7 +283,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 7,
+    id: 9,
     farmAddress: EEthereumAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.ETHEREUM,

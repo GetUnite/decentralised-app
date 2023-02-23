@@ -8,7 +8,8 @@ import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EPolygonAddresses,
+  EOptimismAddresses
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
@@ -25,12 +26,23 @@ const ethereumProviderUrl =
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
 
-const polygonTestnetProviderUrl = 'https://polygon-rpc.com/';
-const polygonMainnetProviderUrl = 'https://polygon-rpc.com/';
+const polygonTestnetProviderUrl = 
+  'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
+const polygonMainnetProviderUrl = 
+  'https://polygon-mainnet.g.alchemy.com/v2/rXD0-xC6kL_3_CSI5wHfWfrOI65MJe4A';
 const polygonProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
+
+const optimismMainnetProviderUrl = 
+  'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
+const optimismTestnetProviderUrl = 
+  'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
+const optimisimProviderUrl =
+  process.env.REACT_APP_NET === 'mainnet'
+    ? optimismMainnetProviderUrl
+    : optimismTestnetProviderUrl;
 
 const injected = injectedModule();
 const walletConnect = walletConnectModule({
@@ -75,6 +87,12 @@ const chains = [
     id: EChainId.POL_MUMBAI,
     token: 'MATIC',
     label: 'Polygon Mumbai',
+    rpcUrl: polygonTestnetProviderUrl,
+  },
+  {
+    id: EChainId.OP_MAINNET,
+    token: 'ETH',
+    label: 'Optimisim Mainnet',
     rpcUrl: polygonTestnetProviderUrl,
   },
 ];
@@ -731,7 +749,11 @@ export const approve = async (
 
 export const getReadOnlyProvider = chain => {
   const providerUrl =
-    chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
+    chain === EChain.ETHEREUM 
+    ? ethereumProviderUrl 
+    : chain === EChain.POLYGON 
+    ? polygonProviderUrl
+    : optimisimProviderUrl;
   return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
 };
 
@@ -877,7 +899,15 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
         usd: EPolygonAddresses.IBALLUOUSD,
         eur: EPolygonAddresses.IBALLUOEUR,
         eth: EPolygonAddresses.IBALLUOETH,
-        btc: EPolygonAddresses.IBALLUOBTC,
+        btc: EPolygonAddresses.IBALLUOBTC
+      };
+      break;
+
+    case EChain.OP:
+      ibAlluoAddresses = {
+        usd: EOptimismAddresses.IBALLUOUSD,
+        eth: EOptimismAddresses.IBALLUOETH,
+        btc: EOptimismAddresses.IBALLUOBTC
       };
       break;
 
@@ -886,7 +916,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
         usd: EEthereumAddresses.IBALLUOUSD,
         eur: EEthereumAddresses.IBALLUOEUR,
         eth: EEthereumAddresses.IBALLUOETH,
-        btc: EEthereumAddresses.IBALLUOBTC,
+        btc: EEthereumAddresses.IBALLUOBTC
       };
       break;
     default:

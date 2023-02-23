@@ -18,7 +18,7 @@ import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
+import { EEthereumAddresses, EPolygonAddresses, EOptimismAddresses} from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import {
   claimBoostFarmLPRewards,
@@ -42,7 +42,7 @@ const possibleStableTokens = [
   'USDT',
 ];
 const possibleNonStableTokens = ['CRV', 'CVX', 'FRAX', 'WBTC', 'WETH'];
-const possibleNetworks = ['Polygon', 'Ethereum'];
+const possibleNetworks = ['Polygon', 'Ethereum', 'Optimism'];
 const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
 const possibleViewTypes = ['View my farms only', 'View all farms'];
 
@@ -292,13 +292,14 @@ export const useMain = () => {
       // if the underlying is usdc no need for price
       if (
         farm.underlyingTokenAddress == EPolygonAddresses.USDC ||
-        farm.underlyingTokenAddress == EEthereumAddresses.USDC
+        farm.underlyingTokenAddress == EEthereumAddresses.USDC ||
+        farm.underlyingTokenAddress == EOptimismAddresses.USDC
       ) {
         valueOfAssetInUSDC = 1;
       } else {
         let tokenPriceAddress;
         let tokenDecimals = 18;
-        // for polygon underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
+        // for polygon and OP underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
         switch (farm.underlyingTokenAddress) {
           case EPolygonAddresses.WBTC:
             tokenPriceAddress = EEthereumAddresses.WBTC;
@@ -307,7 +308,13 @@ export const useMain = () => {
           case EPolygonAddresses.WETH:
             tokenPriceAddress = EEthereumAddresses.WETH;
             break;
-          case EPolygonAddresses.EURT:
+          case EOptimismAddresses.WBTC:
+            tokenPriceAddress = EEthereumAddresses.WBTC;
+            tokenDecimals = 8;
+            break;
+          case EOptimismAddresses.WETH:
+            tokenPriceAddress = EEthereumAddresses.WETH;
+            break;
           case EEthereumAddresses.EURT:
             tokenPriceAddress = EEthereumAddresses.EURT;
             tokenDecimals = 6;
@@ -440,7 +447,7 @@ export const useMain = () => {
 
     filteredFarms = filteredFarms.filter(farm => {
       return networkFilter.includes(
-        farm.chain == EChain.ETHEREUM ? 'Ethereum' : 'Polygon',
+        farm.chain == EChain.ETHEREUM ? 'Ethereum' : farm.chain == EChain.POLYGON ? 'Polygon' : farm.chain == EChain.OP ? 'Optimisim' : 'Polygon',
       );
     });
 
