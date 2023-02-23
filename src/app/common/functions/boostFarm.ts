@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import moment from 'moment';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
@@ -413,8 +414,6 @@ export const getMaximumLPValueAsToken = async (
     );
   }
 
-  console.log(valueInDecimals);
-
   const value = fromDecimals(valueInDecimals, tokenDecimals);
 
   return value;
@@ -660,9 +659,26 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     },
   ];
 
+  const EthDater = require('ethereum-block-by-date');
   const provider = getReadOnlyProvider(chain);
-  let toBlock = await provider.getBlockNumber();
-  let fromBlock = toBlock - 1000;
+  const dater = new EthDater(
+    provider, // Ethers provider, required.
+  );
+
+  // Always start the search at the last sunday at 12pm
+  const sunday = moment().startOf('week').set('hour', 12);
+  let block = await dater.getDate(
+    sunday, // Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
+    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
+    false, // Refresh boundaries, optional. Recheck the latest block before request. By default false.
+  );
+
+  let toBlock = block.block + 1000;
+  let fromBlock = block.block;
+
+  // this is the last block we will check. 
+  // swap with toBlock + average amount by day to check from sunday to monday and give up
+  const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
   while (looped.length == 0) {
@@ -676,8 +692,8 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
       toBlock,
     );
 
-    toBlock = fromBlock;
-    fromBlock -= 1000;
+    fromBlock = toBlock;
+    toBlock = toBlock + 1000 > lastBlock ? lastBlock : toBlock + 1000;
   }
 
   return looped[0].args[0].toNumber();

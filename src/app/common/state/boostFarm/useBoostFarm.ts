@@ -976,7 +976,6 @@ export const useBoostFarm = ({ id }) => {
             farm.farmAddress,
             farm.chain,
           );
-          console.log(userWithdrawals);
           farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
           farmInfo.unlockingBalance = userWithdrawals.unlockingBalance;
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;
