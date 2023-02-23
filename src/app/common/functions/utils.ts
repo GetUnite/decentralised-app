@@ -48,7 +48,7 @@ export const fromDecimals = (
   decimals,
   isFixed = false,
 ): string => {
-  amount = amount.toString();
+  amount = ((typeof amount === 'undefined') ? "0" : amount.toString());
   let newAmount = '';
 
   if (amount.length <= decimals) {
@@ -80,7 +80,7 @@ export const fromDecimals = (
 const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
 const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
-function roundDown(number, decimals) {
+export const roundDown = (number, decimals) => {
   decimals = decimals || 0;
   return ( Math.floor( number * Math.pow(10, decimals) ) / Math.pow(10, decimals) );
 }
@@ -118,8 +118,9 @@ export const addressIsValid = address => {
   return ethers.utils.isAddress(address);
 };
 
-export const timerIsFinished = expectedTime => {
-  return +expectedTime === 0 || +expectedTime * 1000 <= Date.now();
+export const timerIsFinished = (expectedTime, multiply = true) => {
+  const timeToUse = multiply ? expectedTime * 1000 : expectedTime;
+  return +timeToUse === 0 || +timeToUse <= Date.now();
 };
 
 export const getNextMonday = (date = new Date()) => {

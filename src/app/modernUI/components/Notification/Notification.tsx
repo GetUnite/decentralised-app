@@ -15,17 +15,20 @@ export const Notification = ({ ...rest }) => {
     success: colors.GREEN,
     error: colors.ERROR,
     info: colors.BLUE,
+    waring: colors.BLACK,
   };
   const bgColors = isLightMode
     ? {
         success: 'successSoft',
         error: 'errorSoft',
         info: 'infoSoft',
+        warning: 'rgba(253, 229, 102, 0.9)',
       }
     : {
         success: 'darkSuccessSoft',
         error: 'darkErrorSoft',
         info: 'darkInfoSoft',
+        warning: 'rgba(253, 229, 102, 0.9)',
       };
   const backgroundColor = bgColors[notificationAtom.type];
   const color = textColors[notificationAtom.type];

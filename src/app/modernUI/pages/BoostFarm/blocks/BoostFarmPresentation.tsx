@@ -6,17 +6,18 @@ import booster from 'app/modernUI/images/booster.svg';
 import Skeleton from 'react-loading-skeleton';
 
 export const BoostFarmPresentation = ({
-  selectedFarmInfo,
+  selectedFarm,
   farmName,
-  isLoading,
+  isLoadingInterest,
+  interest,
   ...rest
 }) => {
   const [, setCookies] = useCookies(['has_seen_boost_farms']);
 
   const rewardsLabel =
-    selectedFarmInfo.current?.rewards.label +
+  selectedFarm.current?.rewards.label +
     ' or ' +
-    selectedFarmInfo.current?.rewards.stableLabel;
+    selectedFarm.current?.rewards.stableLabel;
 
   return (
     <>
@@ -24,14 +25,13 @@ export const BoostFarmPresentation = ({
         {farmName} FARM
       </Text>
       <Box gap="large" margin={{ top: '20px' }} align="center">
-        {isLoading ? (
+        {isLoadingInterest ? (
           <Box fill>
-            <Skeleton height="28px" count={2} borderRadius="20px"/>
+            <Skeleton height="37px" count={2} borderRadius="20px" />
           </Box>
         ) : (
           <Text textAlign="center" weight="bold" size="28px">
-            Earn {toExactFixed(selectedFarmInfo.current?.interest, 2)}% as{' '}
-            {rewardsLabel} tokens
+            Earn {toExactFixed(interest, 2)}% as {rewardsLabel} tokens
             <br />
           </Text>
         )}

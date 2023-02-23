@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+import moment from 'moment';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
@@ -6,6 +8,8 @@ import {
   callStatic,
   getCurrentWalletAddress,
   getPrice,
+  getReadOnlyProvider,
+  QueryFilter,
   sendTransaction
 } from './web3Client';
 
@@ -90,6 +94,112 @@ export const withdrawFromBoostFarm = async (
   }
 };
 
+export const unlockFromLockedBoostFarm = async (
+  farmAddress,
+  amount,
+  decimals,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'uint256',
+            name: 'assets',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'receiver',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'owner',
+            type: 'address',
+          },
+        ],
+        name: 'withdraw',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'shares',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const amountInDecimals = toDecimals(amount, decimals);
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'withdraw(uint256,address,address)',
+      [amountInDecimals, getCurrentWalletAddress(), getCurrentWalletAddress()],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const withdrawFromLockedBoostFarm = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'exitToken',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'receiver',
+            type: 'address',
+          },
+        ],
+        name: 'claim',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'amount',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claim(address,address)',
+      [tokenAddress, getCurrentWalletAddress()],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   const abi = [
     {
@@ -151,18 +261,20 @@ export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
   );
 
   let pendingRewardsByToken = [];
-  for (const pendingRewardsArray of shareholderAccruedRewards) {
-    for (const pendingRewards of pendingRewardsArray) {
-      const rewardByToken = pendingRewardsByToken.find(
-        prbt => prbt.token == pendingRewards.token,
-      );
-      if (rewardByToken) {
-        rewardByToken.amount += +pendingRewards.amount;
-      } else {
-        pendingRewardsByToken.push({
-          token: pendingRewards.token,
-          amount: +pendingRewards.amount,
-        });
+  if (shareholderAccruedRewards != undefined) {
+    for (const pendingRewardsArray of shareholderAccruedRewards) {
+      for (const pendingRewards of pendingRewardsArray) {
+        const rewardByToken = pendingRewardsByToken.find(
+          prbt => prbt.token == pendingRewards.token,
+        );
+        if (rewardByToken) {
+          rewardByToken.amount += +pendingRewards.amount;
+        } else {
+          pendingRewardsByToken.push({
+            token: pendingRewards.token,
+            amount: +pendingRewards.amount,
+          });
+        }
       }
     }
   }
@@ -237,6 +349,7 @@ export const getMaximumLPValueAsToken = async (
   tokenAddress,
   tokenDecimals,
   amount,
+  isLocked = false,
 ) => {
   const abi = [
     {
@@ -251,21 +364,55 @@ export const getMaximumLPValueAsToken = async (
       stateMutability: 'nonpayable',
       type: 'function',
     },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'exitToken',
+          type: 'address',
+        },
+        {
+          internalType: 'address',
+          name: 'receiver',
+          type: 'address',
+        },
+      ],
+      name: 'claim',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'nonpayable',
+      type: 'function',
+    },
   ];
 
   const amountInDecimals = toDecimals(amount, 18);
 
-  const valueInDecimals = await callStatic(
-    abi,
-    farmAddress,
-    'withdrawToNonLp(uint256,address,address,address)',
-    [
-      amountInDecimals,
-      getCurrentWalletAddress(),
-      getCurrentWalletAddress(),
-      tokenAddress,
-    ],
-  );
+  let valueInDecimals;
+  if (isLocked) {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'claim(address,address)',
+      [tokenAddress, getCurrentWalletAddress()],
+    );
+  } else {
+    valueInDecimals = await callStatic(
+      abi,
+      farmAddress,
+      'withdrawToNonLp(uint256,address,address,address)',
+      [
+        amountInDecimals,
+        getCurrentWalletAddress(),
+        getCurrentWalletAddress(),
+        tokenAddress,
+      ],
+    );
+  }
 
   const value = fromDecimals(valueInDecimals, tokenDecimals);
 
@@ -291,7 +438,7 @@ export const convertToLP = async (
   return (usdcPrice * value) / valueOf1LPinUSDC;
 };
 
-const boosterFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
+const boostFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 export const getBoostFarmInterest = async (
   farmVaultAddress,
   apyFarmAddresses,
@@ -313,12 +460,12 @@ export const getBoostFarmInterest = async (
       10000;
 
   const baseApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
   ).then(res => res.json());
   const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
 
   const boostApyJsonResult = await fetch(
-    boosterFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+    boostFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
   ).then(res => res.json());
   const boostApyData =
     boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
@@ -393,6 +540,186 @@ export const claimBoostFarmNonLPRewards = async (
       farmAddress,
       'claimRewardsInNonLp(address)',
       [tokenAddress],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const claimLockedBoostFarmRewards = async (
+  farmAddress,
+  tokenAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'exitToken',
+            type: 'address',
+          },
+        ],
+        name: 'claimRewards',
+        outputs: [
+          {
+            internalType: 'uint256',
+            name: 'rewardTokens',
+            type: 'uint256',
+          },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'claimRewards(address)',
+      [tokenAddress],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLockedBoostWithdrawalsInfo = async (farmAddress, chain) => {
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address',
+        },
+      ],
+      name: 'userWithdrawals',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'withdrawalRequested',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'withdrawalAvailable',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const userWithdrawals = await callContract(
+    abi,
+    farmAddress,
+    'userWithdrawals(address)',
+    [getCurrentWalletAddress()],
+    chain,
+  );
+
+  const unlockingBalance = +ethers.utils.formatEther(
+    userWithdrawals.withdrawalRequested,
+  );
+  return {
+    unlockedBalance: +ethers.utils.formatEther(
+      userWithdrawals.withdrawalAvailable,
+    ),
+    unlockingBalance,
+    isUnlocking: unlockingBalance > 0,
+  };
+};
+
+export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
+  const abi = [
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'timestamp',
+          type: 'uint256',
+        },
+      ],
+      name: 'Looped',
+      type: 'event',
+    },
+  ];
+
+  const EthDater = require('ethereum-block-by-date');
+  const provider = getReadOnlyProvider(chain);
+  const dater = new EthDater(
+    provider, // Ethers provider, required.
+  );
+
+  // Always start the search at the last sunday at 12pm
+  const sunday = moment().startOf('week').set('hour', 12);
+  let block = await dater.getDate(
+    sunday, // Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
+    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
+    false, // Refresh boundaries, optional. Recheck the latest block before request. By default false.
+  );
+
+  let toBlock = block.block + 1000;
+  let fromBlock = block.block;
+
+  // this is the last block we will check. 
+  // swap with toBlock + average amount by day to check from sunday to monday and give up
+  const lastBlock = await provider.getBlockNumber();
+
+  let looped = [];
+  while (looped.length == 0) {
+    looped = await QueryFilter(
+      abi,
+      farmAddress,
+      'Looped',
+      [],
+      fromBlock,
+      chain,
+      toBlock,
+    );
+
+    fromBlock = toBlock;
+    toBlock = toBlock + 1000 > lastBlock ? lastBlock : toBlock + 1000;
+  }
+
+  return looped[0].args[0].toNumber();
+};
+
+export const unlockUserFunds = async (
+  farmAddress,
+  chain = EChain.POLYGON,
+  useBiconomy = false,
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'unlockUserFunds',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ];
+
+    const tx = await sendTransaction(
+      abi,
+      farmAddress,
+      'unlockUserFunds()',
+      [],
       chain,
       useBiconomy,
     );

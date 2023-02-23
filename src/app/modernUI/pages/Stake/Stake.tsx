@@ -5,62 +5,71 @@ import { useStake } from 'app/common/state/stake';
 import {
   Layout,
   Modal,
-  Spinner,
+  StepsProcessing,
   Tab,
   Tabs,
-  TokenIcon
+  TokenIcon,
+  Tooltip
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
-import { useState } from 'react';
+import { CircleInformation } from 'grommet-icons';
 import Skeleton from 'react-loading-skeleton';
+import { UnlockCountdown } from '../../components/Countdown/UnlockCountdown';
 import { LockTab } from './blocks/LockTab';
 import { ReunlockConfirmation } from './blocks/ReunlockConfirmation';
+import { StakePresentation } from './blocks/StakePresentation';
 import { UnlockTab } from './blocks/UnlockTab';
-import { UnlockCountdown } from './components/UnlockCountdown';
 
 export const Stake = ({ ...rest }) => {
   const { isLightMode } = useMode();
 
   const {
+    selectedTab,
+    setSelectedTab,
     isLoading,
     updateAlluoInfo,
     alluoInfo,
-    handleWithdraw,
     walletAccountAtom,
-    isWithdrawing,
     startReunlockConfirmation,
     showReunlockConfirmation,
     cancelReunlockConfirmation,
     seeRewardsAsStable,
     setSeeRewardsAsStable,
-    isClamingRewards,
     isLoadingRewards,
     rewardsInfo,
     pendingRewardsInfo,
-    claimRewards,
     nextHarvestDate,
     previousHarvestDate,
     isLoadingPendingRewards,
+    isLoadingRewardsApy,
+    rewardsApy,
+    // information/confirmation
+    showStakePresentation,
     // lock
     lockValue,
     setLockValue,
-    isApproving,
-    isLocking,
-    handleApprove,
-    handleLock,
     // unlock
     unlockValue,
     setUnlockValue,
-    isUnlocking,
-    handleUnlock,
+    // steps
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    processingTitle,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
+    startWithdrawSteps,
+    startClaimRewardsSteps,
   } = useStake();
 
   const allTimersAreFinished =
     timerIsFinished(alluoInfo?.depositUnlockTime) &&
     timerIsFinished(alluoInfo?.withdrawUnlockTime);
-
-  const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <ResponsiveContext.Consumer>
@@ -86,25 +95,26 @@ export const Stake = ({ ...rest }) => {
                           height="154px"
                           background="modal"
                           pad={{ vertical: 'medium', horizontal: 'medium' }}
+                          border={
+                            isLightMode
+                              ? { color: '#EBEBEB', size: '1px' }
+                              : { size: '0px' }
+                          }
                         >
-                          {isWithdrawing ? (
-                            <Box align="center" justify="center" fill>
-                              <Spinner pad="large" />
-                            </Box>
-                          ) : (
-                            <>
-                              <Text size="18px" weight="bold">
-                                Your unlocked balance is{' '}
-                                {toExactFixed(alluoInfo?.unlocked, 2)}
-                              </Text>
-                              <Button
-                                primary
-                                label="Withdraw $ALLUO"
-                                style={{ borderRadius: '58px', width: '197px' }}
-                                onClick={handleWithdraw}
-                              />
-                            </>
-                          )}
+                          <Text size="18px" weight="bold">
+                            Your unlocked balance is{' '}
+                            {toExactFixed(alluoInfo?.unlocked, 2)}
+                          </Text>
+                          <Button
+                            primary
+                            label="Withdraw $ALLUO"
+                            style={{
+                              borderRadius: '58px',
+                              width: '197px',
+                              padding: '6px 16px',
+                            }}
+                            onClick={startWithdrawSteps}
+                          />
                         </Box>
                       )}
 
@@ -139,26 +149,36 @@ export const Stake = ({ ...rest }) => {
                   )}
                 </Box>
               </Box>
-              <Modal chain={EChain.ETHEREUM} heading={'Stake $ALLUO'}>
-                {isLocking || isApproving || isUnlocking ? (
-                  <Box
-                    align="center"
-                    justify="center"
-                    fill="vertical"
-                    style={{
-                      minHeight: selectedTab == 0 ? '538px': '579px',
-                    }}
-                  >
-                    <Spinner pad="large" />
-                  </Box>
+              <Modal
+                chain={EChain.ETHEREUM}
+                heading={'Stake $ALLUO'}
+                closeAction={isProcessing ? stopProcessingSteps : undefined}
+                noHeading={isProcessing || showStakePresentation}
+              >
+                {isProcessing ? (
+                  <StepsProcessing
+                    title={processingTitle.current}
+                    steps={steps.current}
+                    currentStep={currentStep}
+                    isHandlingStep={isHandlingStep}
+                    stepWasSuccessful={stepWasSuccessful.current}
+                    stepError={stepError.current}
+                    stopProcessingSteps={stopProcessingSteps}
+                    handleCurrentStep={handleCurrentStep}
+                    minHeight={selectedTab == 0 ? '538px' : '579px'}
+                  />
                 ) : (
                   <>
-                    {showReunlockConfirmation ? (
+                    {showReunlockConfirmation && (
                       <ReunlockConfirmation
-                        handleUnlock={handleUnlock}
                         cancelReunlockConfirmation={cancelReunlockConfirmation}
+                        startProcessingSteps={startProcessingSteps}
                       />
-                    ) : (
+                    )}
+                    {showStakePresentation && (
+                      <StakePresentation rewardsApy={rewardsApy.current} isLoadingRewardsApy={isLoadingRewardsApy} />
+                    )}
+                    {!showReunlockConfirmation && !showStakePresentation && (
                       <Tabs
                         selectedTab={selectedTab}
                         setSelectedTab={setSelectedTab}
@@ -169,8 +189,9 @@ export const Stake = ({ ...rest }) => {
                             alluoInfo={alluoInfo}
                             lockValue={lockValue}
                             setLockValue={setLockValue}
-                            handleApprove={handleApprove}
-                            handleLock={handleLock}
+                            // steps
+                            steps={steps}
+                            startProcessingSteps={startProcessingSteps}
                           />
                         </Tab>
                         <Tab title="Unlock">
@@ -183,7 +204,9 @@ export const Stake = ({ ...rest }) => {
                             allTimersAreFinished={allTimersAreFinished}
                             unlockValue={unlockValue}
                             setUnlockValue={setUnlockValue}
-                            handleUnlock={handleUnlock}
+                            // steps
+                            steps={steps}
+                            startProcessingSteps={startProcessingSteps}
                           />
                         </Tab>
                       </Tabs>
@@ -192,7 +215,7 @@ export const Stake = ({ ...rest }) => {
                 )}
               </Modal>
               <Box flex>
-                {walletAccountAtom && (
+                {walletAccountAtom && !showStakePresentation && (
                   <Box gap="12px">
                     <Box
                       round="16px"
@@ -210,91 +233,104 @@ export const Stake = ({ ...rest }) => {
                           : { size: '0px' }
                       }
                     >
-                      {isClamingRewards ? (
-                        <Box align="center" justify="center" fill>
-                          <Spinner pad="large" />
-                        </Box>
-                      ) : (
-                        <Box fill>
-                          <Heading
-                            size="small"
-                            level={3}
-                            margin={{ bottom: '12px', top: '0px' }}
-                            fill
-                          >
-                            <Box direction="row" justify="between" fill>
-                              {isLoading || isLoadingRewards ? (
-                                <Box fill>
-                                  <Skeleton height="18px" borderRadius="20px" />
-                                </Box>
-                              ) : (
-                                <>
-                                  <Text size="18px">Rewards</Text>
-                                  <Box direction="row">
-                                    <TokenIcon key={0} label={'CVX'} />
-                                    <TokenIcon
-                                      key={1}
-                                      label={'ETH'}
-                                      style={{ marginLeft: '-0.6rem' }}
-                                    />
-                                  </Box>
-                                </>
-                              )}
-                            </Box>
-                          </Heading>
-
-                          <Box margin={{ bottom: '16px' }}>
+                      <Box fill>
+                        <Heading
+                          size="small"
+                          level={3}
+                          margin={{ bottom: '12px', top: '0px' }}
+                          fill
+                        >
+                          <Box direction="row" justify="between" fill>
                             {isLoading || isLoadingRewards ? (
-                              <Skeleton height="16px" borderRadius="20px" />
+                              <Box fill>
+                                <Skeleton height="18px" borderRadius="20px" />
+                              </Box>
                             ) : (
-                              <Box direction="row" justify="between">
+                              <>
+                                <Text size="18px">Rewards</Text>
+                                <Box direction="row">
+                                  <TokenIcon key={0} label={'CVX'} />
+                                  <TokenIcon
+                                    key={1}
+                                    label={'ETH'}
+                                    style={{ marginLeft: '-0.6rem' }}
+                                  />
+                                </Box>
+                              </>
+                            )}
+                          </Box>
+                        </Heading>
+
+                        <Box margin={{ bottom: '16px' }}>
+                          {isLoading || isLoadingRewards ? (
+                            <Skeleton height="16px" borderRadius="20px" />
+                          ) : (
+                            <Box direction="row" justify="between">
+                              <Box direction="row" align="center" gap="6px">
                                 <Text weight="bold" size="16px">
                                   {seeRewardsAsStable
                                     ? rewardsInfo.stableLabel
                                     : rewardsInfo.label}
                                 </Text>
-
-                                <Text weight="bold" size="16px">
-                                  {seeRewardsAsStable
-                                    ? '$' + rewardsInfo.stableValue
-                                    : rewardsInfo.value}
-                                </Text>
+                                <Tooltip
+                                  text={`Rewards for staking $ALLUO tokens are paid in auto-compounding CVX/ETH. The longer you leave your rewards unclaimed, the larger they will get. The current APY is ${toExactFixed(
+                                    rewardsApy.current,
+                                    2,
+                                  )}%. Stakers can also vote in governance rounds, held every 2 weeks.`}
+                                >
+                                  <CircleInformation
+                                    color="soul"
+                                    size="16px"
+                                    style={{ marginTop: '-2px' }}
+                                  />
+                                </Tooltip>
                               </Box>
-                            )}
-                          </Box>
-
-                          <Box gap="12px">
-                            <Button
-                              primary
-                              label={'Withdraw ' + rewardsInfo.label}
-                              style={{
-                                borderRadius: '58px',
-                                width: '197px',
-                                padding: '6px 16px',
-                              }}
-                              onClick={claimRewards}
-                              disabled={isLoading || isLoadingRewards}
-                            />
-                            <Button
-                              onClick={() =>
-                                setSeeRewardsAsStable(!seeRewardsAsStable)
-                              }
-                              plain
-                              disabled={isLoading || isLoadingRewards}
-                            >
-                              <Box direction="row" justify="center">
-                                <Text size="12px" weight={500} color="#2A73FF">
-                                  {seeRewardsAsStable
-                                    ? 'Show in ' +
-                                      rewardsInfo.label +
-                                      ' LP tokens'
-                                    : 'Show in ' + rewardsInfo.stableLabel}
-                                </Text>
-                              </Box>
-                            </Button>
-                          </Box>
+                              <Text weight="bold" size="16px">
+                                {seeRewardsAsStable
+                                  ? '$' + rewardsInfo.stableValue
+                                  : rewardsInfo.value}
+                              </Text>
+                            </Box>
+                          )}
                         </Box>
-                      )}
+
+                        <Box gap="12px">
+                          <Button
+                            primary
+                            label={`Withdraw ${
+                              seeRewardsAsStable
+                                ? rewardsInfo.stableLabel
+                                : rewardsInfo.label
+                            }`}
+                            style={{
+                              borderRadius: '58px',
+                              width: '197px',
+                              padding: '6px 16px',
+                            }}
+                            onClick={startClaimRewardsSteps}
+                            disabled={
+                              isLoading || isLoadingRewards || isProcessing
+                            }
+                          />
+                          <Button
+                            onClick={() =>
+                              setSeeRewardsAsStable(!seeRewardsAsStable)
+                            }
+                            plain
+                            disabled={isLoading || isLoadingRewards}
+                          >
+                            <Box direction="row" justify="center">
+                              <Text size="12px" weight={500} color="#2A73FF">
+                                {seeRewardsAsStable
+                                  ? 'Show in ' +
+                                    rewardsInfo.label +
+                                    ' LP tokens'
+                                  : 'Show in ' + rewardsInfo.stableLabel}
+                              </Text>
+                            </Box>
+                          </Button>
+                        </Box>
+                      </Box>
                     </Box>
                     <Box
                       round="16px"

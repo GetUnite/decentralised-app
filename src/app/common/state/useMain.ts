@@ -10,19 +10,26 @@ import {
   getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount } from 'app/common/state/atoms';
+import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
 import { farmOptions } from 'app/common/state/farm/useFarm';
-import { TFarm } from 'app/common/types/farm';
+import { TBoostFarmRewards, TFarm } from 'app/common/types/farm';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import {
-  getBoostFarmInterest
+  claimBoostFarmLPRewards,
+  claimBoostFarmNonLPRewards,
+  claimLockedBoostFarmRewards,
+  getBoostFarmInterest,
+  getBoostFarmRewards
 } from '../functions/boostFarm';
-import { toExactFixed } from '../functions/utils';
+import { getRewardsInterest } from '../functions/stake';
+import { fromLocaleString, toExactFixed } from '../functions/utils';
+import { useNotification } from './useNotification';
 
 const possibleStableTokens = [
   'agEUR',
@@ -40,9 +47,16 @@ const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
 const possibleViewTypes = ['View my farms only', 'View all farms'];
 
 export const useMain = () => {
+  // react
+  const location = useLocation();
+
   // atoms
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
+  const [, setWantedChainAtom] = useRecoilState(wantedChain);
+
+  // other state control files
+  const { setNotification } = useNotification();
 
   // farms
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
@@ -56,6 +70,7 @@ export const useMain = () => {
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
   const [totalDepositedAmountInUsd, setTotalDepositedAmountInUsd] =
     useState<string>();
+  const [rewardsInfo, setRewardsInfo] = useState<TBoostFarmRewards[]>([]);
 
   // filters
   const shouldFilter = useRef(true);
@@ -77,7 +92,18 @@ export const useMain = () => {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    setWantedChainAtom(undefined);
     fetchFarmsInfo();
+    const today = new Date();
+    if (today.getDay() === 0) {
+      setNotification(
+        '🔒 Boost farm deposits and withdrawals will be actioned today ⏰',
+        'warning',
+        undefined,
+        undefined,
+        true,
+      );
+    }
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -107,6 +133,7 @@ export const useMain = () => {
             totalAssetSupply,
             supportedTokens,
             depositedAmount,
+            depositedAmountInLP,
             depositedAmountInUSD,
             poolShare,
           } = availableFarm.isBoost
@@ -126,6 +153,7 @@ export const useMain = () => {
           availableFarm.totalAssetSupply = totalAssetSupply;
           availableFarm.supportedTokens = supportedTokens;
           availableFarm.depositedAmount = depositedAmount;
+          availableFarm.depositedAmountInLP = depositedAmountInLP;
           availableFarm.depositedAmountInUSD = depositedAmountInUSD;
           availableFarm.poolShare = poolShare;
 
@@ -172,6 +200,10 @@ export const useMain = () => {
       console.log(error);
     }
     setIsLoading(false);
+
+    if (walletAccountAtom && location.search.includes('view_type=my_farms')) {
+      setViewType('View my farms only');
+    }
     // We can probably get away with calculating total value invested in usd after showing the first screen
     let tdaiu = 0;
     const farmsWithDepositedAmount = availableFarms.filter(
@@ -187,6 +219,58 @@ export const useMain = () => {
       }
     }
     setTotalDepositedAmountInUsd(toExactFixed(tdaiu, 2));
+
+    // Also, check each boost farm rewards to show on the "view your farms" page
+    const CVXETHInUSDC = await getValueOf1LPinUSDC(
+      EEthereumAddresses.CVXETH,
+      EChain.ETHEREUM,
+    );
+
+    const rewardsApy = (await getRewardsInterest()) / 100;
+
+    let ri = [];
+    for (let index = 0; index < availableFarms.length; index++) {
+      const farm = availableFarms[index];
+      if (farm.isBoost) {
+        const updatedRewards = {
+          ...(await getBoostFarmRewards(
+            farm.farmAddress,
+            CVXETHInUSDC,
+            EChain.ETHEREUM,
+          )),
+        };
+        const rewardsAsNumber = fromLocaleString(updatedRewards.value);
+        if (rewardsAsNumber > 0.00001) {
+          const rewardsInUSD = rewardsAsNumber*CVXETHInUSDC;
+          
+          const monthProjection =
+            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1 / 12) -1))+rewardsInUSD)/CVXETHInUSDC;
+          
+            const yearProjection = 
+            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1) -1))+rewardsInUSD)/CVXETHInUSDC;
+          
+            ri.push({
+            farmAddress: farm.farmAddress,
+            name: farm.name,
+            isBoost: farm.isBoost,
+            isLocked: farm.isLocked,
+            ...updatedRewards,
+            interest: farm.interest,
+            monthProjection: toExactFixed(monthProjection, 8),
+            yearProjection: toExactFixed(yearProjection, 8),
+            stableMonthProjection: toExactFixed(
+              monthProjection * CVXETHInUSDC,
+              2,
+            ),
+            stableYearProjection: toExactFixed(
+              yearProjection * CVXETHInUSDC,
+              2,
+            ),
+          });
+        }
+      }
+    }
+    setRewardsInfo(ri);
   };
 
   const fetchFarmInfo = async farm => {
@@ -264,11 +348,13 @@ export const useMain = () => {
     );
 
     farmInfo = {
-      interest: await getBoostFarmInterest(
-        farm.farmAddress,
-        farm.apyFarmAddresses,
-        farm.chain,
-      ),
+      interest: farm.forcedInterest
+        ? farm.forcedInterest
+        : await getBoostFarmInterest(
+            farm.farmAddress,
+            farm.apyFarmAddresses,
+            farm.chain,
+          ),
       totalAssetSupply:
         +(await getTotalAssets(farm.farmAddress, farm.chain)) *
         valueOf1LPinUSDC,
@@ -426,6 +512,32 @@ export const useMain = () => {
     setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBoost));
   };
 
+  const claimRewards = async (farmAddress, seeRewardsAsStable) => {
+    const farm = availableFarms.find(
+      availableFarm => availableFarm.farmAddress == farmAddress,
+    );
+
+    try {
+      const tx = farm.isLocked
+        ? await claimLockedBoostFarmRewards(
+            farmAddress,
+            seeRewardsAsStable
+              ? farm.rewards.stableAddress
+              : farm.rewards.address,
+            farm.chain,
+          )
+        : seeRewardsAsStable
+        ? await claimBoostFarmNonLPRewards(
+            farm.farmAddress,
+            farm.rewards.stableAddress,
+            farm.chain,
+          )
+        : await claimBoostFarmLPRewards(farm.farmAddress, farm.chain);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     isLoading,
     error,
@@ -451,5 +563,7 @@ export const useMain = () => {
     totalDepositedAmountInUsd,
     isFarming:
       availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0,
+    rewardsInfo,
+    claimRewards,
   };
 };

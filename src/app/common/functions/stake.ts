@@ -469,3 +469,16 @@ export const getStakingPendingRewards = async chain => {
     0,
   );
 };
+
+const boostFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
+export const getRewardsInterest = async () => {
+  // pool id for cvx-eth pool (used as boost)
+  const boostPoolId = '25d9dc49-3182-493a-bda4-0db53b25f457';
+
+  const apyJsonResult = await fetch(boostFarmInterestApiUrl + boostPoolId).then(
+    res => res.json(),
+  );
+  const apyData = apyJsonResult.data[apyJsonResult.data.length - 1];
+
+  return apyData.apy;
+};

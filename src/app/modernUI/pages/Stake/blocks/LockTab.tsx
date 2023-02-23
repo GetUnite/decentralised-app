@@ -1,9 +1,6 @@
 import { toExactFixed } from 'app/common/functions/utils';
 import { useLock } from 'app/common/state/stake';
-import {
-  Info,
-  NumericInput, SubmitButton
-} from 'app/modernUI/components';
+import { Info, NumericInput, SubmitButton } from 'app/modernUI/components';
 import { Box, Text } from 'grommet';
 import Skeleton from 'react-loading-skeleton';
 
@@ -13,22 +10,20 @@ export const LockTab = ({
   // lock
   lockValue,
   setLockValue,
-  handleApprove,
-  handleLock,
+  // steps
+  steps,
+  startProcessingSteps,
 }) => {
   const {
     handleLockValueChange,
     hasErrors,
     lockValueError,
-    handleCurrentStep,
     isLoadingRequiredSteps,
-    lockSteps,
-    currentStep,
   } = useLock({
     alluoInfo,
+    lockValue,
     setLockValue,
-    handleApprove,
-    handleLock,
+    steps,
   });
 
   return (
@@ -79,19 +74,12 @@ export const LockTab = ({
       <Box margin={{ top: 'large' }}>
         <SubmitButton
           primary
+          // TODO uncomment
           disabled={
             isLoading || hasErrors || lockValue == '' || isLoadingRequiredSteps
           }
-          label={
-            isLoadingRequiredSteps
-              ? 'Loading...'
-              : lockSteps?.length > 1
-              ? `Step ${currentStep + 1} of ${lockSteps?.length}: ${
-                  lockSteps[currentStep]?.label
-                }`
-              : `${lockSteps[currentStep]?.label}`
-          }
-          onClick={handleCurrentStep}
+          label={isLoadingRequiredSteps ? 'Loading...' : 'Lock'}
+          onClick={startProcessingSteps}
         />
       </Box>
     </Box>

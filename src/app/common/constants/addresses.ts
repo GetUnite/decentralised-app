@@ -26,6 +26,12 @@ enum EEthereumAddressesTestnet {
   DOLAFRAXBP = '0xE57180685E3348589E9521aa53Af0BCD497E884d', //
   DOLAFRAXBPVAULT = '0x1EE566Fd6918101C578a1d2365d632ED39BEd740', //
 
+  FRXETH = '0xf43211935C781D5ca1a41d2041F397B8A7366C7A', //
+  FRXETHVAULT = '0x1EE566Fd6918101C578a1d2365d632ED39BEd740', //
+
+  CVXFRAXBP = '0x527331f3f550f6f85acfecab9cc0889180c6f1d5',
+  CVXFRAXBPVAULT = '0xF213303D5Ff30c5E12f4fEdf8491f45e7C232f8D',
+
   USDC = '0x0b6bb9E47179390B7Cf708b57ceF65a44a8038a9',
   USDT = '0xdAC17F958D2ee523a2206206994597C13D831ec7', //
   DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F', //
@@ -71,6 +77,12 @@ export enum EEthereumAddressesMainnet {
   DOLAFRAXBP = '0xE57180685E3348589E9521aa53Af0BCD497E884d',
   DOLAFRAXBPVAULT = '0x1EE566Fd6918101C578a1d2365d632ED39BEd740',
 
+  FRXETH = '0xf43211935C781D5ca1a41d2041F397B8A7366C7A',
+  FRXETHVAULT = '0x62E0B61e1891Df4bDb77B1d19fc227cCeF969eC6',
+
+  CVXFRAXBP = '0x527331f3f550f6f85acfecab9cc0889180c6f1d5',
+  CVXFRAXBPVAULT = '0xF213303D5Ff30c5E12f4fEdf8491f45e7C232f8D',
+
   USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   USDT = '0xdAC17F958D2ee523a2206206994597C13D831ec7',
   DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F',
@@ -85,7 +97,7 @@ export enum EEthereumAddressesMainnet {
   WBTC = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
 
   CRV = '0xD533a949740bb3306d119CC777fa900bA034cd52',
-  CVX = '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B'
+  CVX = '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
 }
 
 enum EPolygonAddressesMumbai {
@@ -154,12 +166,12 @@ enum EPolygonAddressesMainnet {
   TWOWAYMARKETIBALLUOUSDBTC = '0xbB5C64B929b1E60c085dcDf88dfe41c6b9dcf65B',
 }
 
-export const EPolygonAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
+export const EPolygonAddresses = EPolygonAddressesMainnet;
+/*process.env.REACT_APP_NET === 'mainnet'
     ? EPolygonAddressesMainnet
-    : EPolygonAddressesMumbai;
+    : EPolygonAddressesMumbai;*/
 
-export const EEthereumAddresses =
-  process.env.REACT_APP_NET === 'mainnet'
+export const EEthereumAddresses = EEthereumAddressesMainnet;
+/*process.env.REACT_APP_NET === 'mainnet'
     ? EEthereumAddressesMainnet
-    : EEthereumAddressesTestnet;
+    : EEthereumAddressesTestnet;*/

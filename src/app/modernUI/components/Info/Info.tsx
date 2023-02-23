@@ -16,7 +16,7 @@ export const Info = ({ label, value, border = true, isLoading, ...rest }) => {
           </Box>
         ) : (
           <>
-            <Text size="14px" color="soul">
+            <Text size="14px">
               {label}
             </Text>
             <Text size="14px">{value ? value : rest.children}</Text>

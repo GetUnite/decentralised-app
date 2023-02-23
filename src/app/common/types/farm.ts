@@ -6,9 +6,9 @@ export type TBoostFarmRewards = {
   label?: string;
   value?: string;
   stableLabel?: string;
-  stableValue?: number;
+  stableValue?: string;
+  address?: string; // locked boost need to know the address of the rewards aswel
   stableAddress?: string;
-  curvePoolAddress?: string;
   pendingValue?: number;
 };
 
@@ -35,17 +35,22 @@ export type TFarm = {
   isBoost?: boolean;
   isNewest?: boolean;
   underlyingTokenAddress?: string;
+  // For boost farms but needed here for main page
+  depositedAmountInLP?: number;
+  rewards?: TBoostFarmRewards;
+  isLocked?: boolean;
 };
 
 export type TBoostFarm = TFarm & {
-  // For boost farms
-  rewards?: TBoostFarmRewards;
   lPTokenAddress?: string;
   lowSlippageTokenLabels?: string[];
   apyFarmAddresses?: TApyFarmAddresses;
-  // To store boost farm deposited amount to improve ui and functionality
-  depositedAmountInLP?: number;
   valueOf1LPinUSDC?: number;
   // For locked boost farms
-  isLocked?: boolean;
-}
+  unlockingBalance?: string;
+  unlockedBalance?: string;
+  isUnlocking?: boolean;
+  withdrawToken?: TSupportedToken;
+  // forced apy when it cant be calculated
+  forcedInterest?: string;
+};

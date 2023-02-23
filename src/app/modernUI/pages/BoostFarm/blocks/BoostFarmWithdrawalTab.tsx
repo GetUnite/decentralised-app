@@ -5,17 +5,21 @@ import {
   FeeInfo,
   Info,
   NumericInput,
-  ProjectedWeeklyInfo, SubmitButton
+  ProjectedWeeklyInfo,
+  SubmitButton
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
 
 export const BoostFarmWithdrawalTab = ({
   // farm
+  selectedFarm,
   isLoading,
   selectedFarmInfo,
+  interest,
   selectSupportedToken,
-  selectedSupportedToken,isCorrectNetworkAtom,
+  selectedSupportedToken,
+  isCorrectNetworkAtom,
   // withdraw
   withdrawValue,
   setWithdrawValue,
@@ -24,6 +28,8 @@ export const BoostFarmWithdrawalTab = ({
   // biconomy
   useBiconomy,
   setUseBiconomy,
+  // steps
+  steps,
 }) => {
   const {
     hasErrors,
@@ -32,36 +38,70 @@ export const BoostFarmWithdrawalTab = ({
     isFetchingSupportedTokenInfo,
   } = useBoostFarmWithdrawal({
     selectedFarmInfo,
+    selectSupportedToken,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
     withdrawValue,
     setWithdrawValue,
+    steps,
   });
 
   return (
     <Box fill>
       <Box margin={{ top: 'large' }}>
-        <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} isCorrectNetworkAtom={isCorrectNetworkAtom}/>
+        <TopHeader
+          selectedFarmInfo={selectedFarmInfo}
+          interest={interest}
+          isLoading={isLoading}
+          isCorrectNetworkAtom={isCorrectNetworkAtom}
+        />
       </Box>
       <Box margin={{ top: 'medium' }}>
         <NumericInput
-          label={`Withdraw ${
+          label={`${selectedFarm.current?.isLocked ? 'Unlock' : 'Withdraw'} ${
             selectedSupportedToken ? selectedSupportedToken?.label : ''
           }`}
-          available={selectedSupportedTokenInfo.current?.boostDepositedAmount}
-          tokenSign={selectedSupportedToken?.sign}
+          available={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
+          tokenSign={selectedSupportedToken?.sign ? selectedSupportedToken?.sign : ''}
           onValueChange={handleWithdrawalFieldChange}
           value={withdrawValue}
           maxButton={true}
-          maxValue={selectedSupportedTokenInfo.current?.boostDepositedAmount}
-          tokenOptions={selectedFarmInfo.current?.supportedTokens || []}
+          maxValue={
+            selectedFarm.current?.isLocked
+              ? selectedFarmInfo.current?.depositedAmountInLP -
+                selectedFarmInfo.current?.unlockingBalance
+              : selectedSupportedTokenInfo.current?.boostDepositedAmount
+          }
+          tokenOptions={
+            (selectedFarm.current?.isLocked
+              ? [selectedFarmInfo.current?.withdrawToken]
+              : selectedFarmInfo.current?.supportedTokens) || []
+          }
           selectedToken={selectedSupportedToken}
           setSelectedToken={selectSupportedToken}
           error={withdrawValueError}
-          slippageWarning={true}
-          lowSlippageTokenLabels={
-            selectedFarmInfo.current?.lowSlippageTokenLabels
+          inputWarning={
+            selectedFarmInfo.current?.isLocked
+              ? `The current value of ${toExactFixed(
+                  selectedFarmInfo.current?.depositedAmountInLP,
+                  2,
+                )} ${selectedFarmInfo.current?.name} is $${toExactFixed(
+                  selectedSupportedTokenInfo.current?.boostDepositedAmount,
+                  2,
+                )}`
+              : `Withdrawing in any token other than
+                    ${selectedFarmInfo.current?.lowSlippageTokenLabels?.join(
+                      '/',
+                    )} increases slippage.
+                    Values shown are an approximation and may change subject to
+                    exhange rates`
           }
+          slippageWarning={!selectedFarmInfo.current?.isLocked}
           disabled={isLoading}
         />
       </Box>
@@ -69,19 +109,14 @@ export const BoostFarmWithdrawalTab = ({
         <ProjectedWeeklyInfo
           depositedAmount={selectedFarmInfo.current?.depositedAmount}
           inputValue={-1 * +withdrawValue}
-          interest={selectedFarmInfo.current?.interest}
+          interest={interest.current}
           sign={selectedFarmInfo.current?.sign}
           isLoading={isLoading}
           isCorrectNetworkAtom={isCorrectNetworkAtom}
         />
         <Info
           label="APY"
-          value={
-            toExactFixed(
-              selectedFarmInfo.current?.interest,
-              2,
-            ).toLocaleString() + '%'
-          }
+          value={toExactFixed(interest.current, 2) + '%'}
           isLoading={isLoading}
         />
         <Info
@@ -92,12 +127,22 @@ export const BoostFarmWithdrawalTab = ({
           }
           isLoading={isLoading}
         />
+        {selectedFarm.current?.isLocked && (
+          <Info
+            label="Unlocked balance"
+            value={
+              selectedFarmInfo.current?.sign +
+              toExactFixed(+selectedFarmInfo.current?.unlockedBalance,4)
+            }
+            isLoading={isLoading}
+          />
+        )}
         <FeeInfo
-          biconomyToggle={selectedFarmInfo.current?.chain == EChain.POLYGON}
+          biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
           showWalletFee={
-            !useBiconomy || selectedFarmInfo.current?.chain != EChain.POLYGON
+            !useBiconomy || selectedFarm.current?.chain != EChain.POLYGON
           }
           disableBiconomy={isLoading}
           isLoading={isLoading}
@@ -106,7 +151,14 @@ export const BoostFarmWithdrawalTab = ({
       <Box margin={{ top: 'medium' }}>
         <SubmitButton
           primary
-          label="Withdraw"
+          label={
+            isFetchingSupportedTokenInfo
+              ? 'Loading...'
+              : selectedFarm.current?.isLocked
+              ? 'Unlock'
+              : 'Withdraw'
+          }
+          // TODO get disabled back here
           disabled={
             isLoading ||
             isFetchingSupportedTokenInfo ||

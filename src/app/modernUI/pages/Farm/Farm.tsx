@@ -1,6 +1,12 @@
 import { EChain } from 'app/common/constants/chains';
 import { useFarm } from 'app/common/state/farm';
-import { Layout, Modal, Spinner, Tab, Tabs } from 'app/modernUI/components';
+import {
+  Layout,
+  Modal,
+  StepsProcessing,
+  Tab,
+  Tabs
+} from 'app/modernUI/components';
 import { Box, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,26 +16,31 @@ export const Farm = () => {
   const { id } = useParams();
 
   const {
-    selectedFarm,
-    updateFarmInfo,
     isLoading,
-    selectSupportedToken,
+    selectedFarm,
+    selectedFarmInfo,
     selectedSupportedToken,
+    selectSupportedToken,
+    selectedSupportedTokenInfo,
     // deposit
     depositValue,
     setDepositValue,
-    handleApprove,
-    handleDeposit,
-    //withdraw
+    // withdraw
     withdrawValue,
     setWithdrawValue,
-    handleWithdraw,
-    isWithdrawing,
     // biconomy
     useBiconomy,
     setUseBiconomy,
-    isApproving,
-    isDepositing,
+    // steps
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    steps,
+    handleCurrentStep,
   } = useFarm({
     id,
   });
@@ -41,68 +52,85 @@ export const Farm = () => {
       {_ => (
         <Layout>
           <Modal
-            chain={selectedFarm?.chain}
-            heading={selectedFarm?.name}
-            showChainBadge={!isLoading}
+            chain={selectedFarm.current?.chain}
+            heading={selectedFarm.current?.name}
+            noHeading={isProcessing}
+            closeAction={isProcessing ? stopProcessingSteps : undefined}
           >
-            {isDepositing || isApproving || isWithdrawing ? (
-              <Box
-                align="center"
-                justify="center"
-                fill="vertical"
-                style={{
-                  minHeight:
-                    selectedFarm?.chain == EChain.POLYGON ? '580px' : '551px',
-                }}
-              >
-                <Spinner pad="large" />
-              </Box>
+            {isProcessing ? (
+              <StepsProcessing
+                title={
+                  selectedTab == 0
+                    ? 'Depositing funds...'
+                    : 'Withdrawing funds...'
+                }
+                steps={steps.current}
+                currentStep={currentStep}
+                isHandlingStep={isHandlingStep}
+                stepWasSuccessful={stepWasSuccessful.current}
+                stepError={stepError.current}
+                stopProcessingSteps={stopProcessingSteps}
+                handleCurrentStep={handleCurrentStep}
+                minHeight={
+                  selectedFarm.current?.chain == EChain.POLYGON
+                    ? '627px'
+                    : '598px'
+                }
+              />
             ) : (
-              <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
-                <Tab title="Deposit">
-                  <FarmDepositTab
-                    selectedFarm={selectedFarm}
-                    isLoading={isLoading}
-                    selectedSupportedToken={selectedSupportedToken}
-                    selectSupportedToken={selectSupportedToken}
-                    depositValue={depositValue}
-                    setDepositValue={setDepositValue}
-                    handleApprove={handleApprove}
-                    handleDeposit={handleDeposit}
-                    useBiconomy={useBiconomy}
-                    setUseBiconomy={setUseBiconomy}
-                  />
-                </Tab>
-                <Tab title="Withdraw">
-                  <FarmWithdrawalTab
-                    selectedFarm={selectedFarm}
-                    isLoading={isLoading}
-                    selectedSupportedToken={selectedSupportedToken}
-                    selectSupportedToken={selectSupportedToken}
-                    withdrawValue={withdrawValue}
-                    setWithdrawValue={setWithdrawValue}
-                    handleWithdraw={handleWithdraw}
-                    isWithdrawing={isWithdrawing}
-                    useBiconomy={useBiconomy}
-                    setUseBiconomy={setUseBiconomy}
-                  />
-                </Tab>
-              </Tabs>
+              <>
+                <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
+                  <Tab title="Deposit">
+                    <FarmDepositTab
+                      selectedFarm={selectedFarm}
+                      selectedFarmInfo={selectedFarmInfo}
+                      isLoading={isLoading}
+                      selectedSupportedToken={selectedSupportedToken}
+                      selectSupportedToken={selectSupportedToken}
+                      selectedSupportedTokenInfo={selectedSupportedTokenInfo}
+                      depositValue={depositValue}
+                      setDepositValue={setDepositValue}
+                      useBiconomy={useBiconomy}
+                      setUseBiconomy={setUseBiconomy}
+                      // steps
+                      startProcessingSteps={startProcessingSteps}
+                      steps={steps}
+                    />
+                  </Tab>
+                  <Tab title="Withdraw">
+                    <FarmWithdrawalTab
+                      selectedFarm={selectedFarm}
+                      selectedFarmInfo={selectedFarmInfo}
+                      isLoading={isLoading}
+                      selectedSupportedToken={selectedSupportedToken}
+                      selectSupportedToken={selectSupportedToken}
+                      withdrawValue={withdrawValue}
+                      setWithdrawValue={setWithdrawValue}
+                      // biconomy
+                      useBiconomy={useBiconomy}
+                      setUseBiconomy={setUseBiconomy}
+                      // steps
+                      startProcessingSteps={startProcessingSteps}
+                      steps={steps}
+                    />
+                  </Tab>
+                </Tabs>
+                <Box margin={{ top: '26px' }} justify="center" direction="row">
+                  <Text size="12px">
+                    Find out where these funds are being invested{' '}
+                    <a
+                      target="_blank"
+                      href="https://docsend.com/view/np9ypdn38jajb9zj"
+                      style={{
+                        textDecoration: 'none',
+                      }}
+                    >
+                      here
+                    </a>
+                  </Text>
+                </Box>
+              </>
             )}
-            <Box margin={{ top: '26px' }} justify="center" direction="row">
-              <Text size="12px">
-                Find out where these funds are being invested{' '}
-                <a
-                  target="_blank"
-                  href="https://docsend.com/view/26j9j8se4vrfu2wh"
-                  style={{
-                    textDecoration: 'none',
-                  }}
-                >
-                  here
-                </a>
-              </Text>
-            </Box>
           </Modal>
         </Layout>
       )}

@@ -16,7 +16,8 @@ import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 
-const ethereumTestnetProviderUrl = 'https://rpc.sepolia.org';
+const ethereumTestnetProviderUrl =
+  'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
 const ethereumMainnetProviderUrl =
   'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
 const ethereumProviderUrl =
@@ -24,8 +25,7 @@ const ethereumProviderUrl =
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
 
-const polygonTestnetProviderUrl =
-  'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
+const polygonTestnetProviderUrl = 'https://polygon-rpc.com/';
 const polygonMainnetProviderUrl = 'https://polygon-rpc.com/';
 const polygonProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
@@ -198,7 +198,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xeC3E9c6769FF576Da3889071c639A0E488815926';
+  //return '0xF9AE7A7568BC1d5355462183F5D9B878B49C3686';
   return walletAddress;
 };
 
@@ -208,22 +208,22 @@ export const changeNetwork = async (chain: EChain) => {
   if (!walletAddress) return { success: false, undefined };
 
   if (chain === EChain.ETHEREUM) {
-    chainId =
-      process.env.REACT_APP_NET === 'mainnet'
+    chainId = EChainId.ETH_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
         ? EChainId.ETH_MAINNET
-        : EChainId.ETH_SEPOLIA;
+        : EChainId.ETH_SEPOLIA;*/
   }
 
   if (chain === EChain.POLYGON) {
-    chainId = chainId =
-      process.env.REACT_APP_NET === 'mainnet'
+    chainId = EChainId.POL_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
         ? EChainId.POL_MAINNET
-        : EChainId.POL_MUMBAI;
+        : EChainId.POL_MUMBAI;*/
   }
 
-  const success = await onboard.setChain({ chainId: chainId });
+  await onboard.setChain({ chainId: chainId });
 
-  return { success, chainId };
+  return chainId;
 };
 
 export const getChainById = chainId => {
@@ -301,7 +301,7 @@ export const processSendError = error => {
   }
 
   if (error.code == 417) {
-    throw 'Error while estimating gas. Please try again';
+    throw 'Error while estimating gas';
   }
 
   const errorString = error.toString();
@@ -311,10 +311,10 @@ export const processSendError = error => {
   }
 
   if (errorString.includes('reverted by the EVM')) {
-    throw 'Transaction has been reverted by the EVM. Please try again';
+    throw 'Transaction has been reverted by the EVM';
   }
 
-  throw 'Something went wrong with your transaction. Please try again';
+  throw 'Something went wrong with your transaction';
 };
 
 export const sendTransaction = async (
@@ -328,11 +328,16 @@ export const sendTransaction = async (
   let provider;
 
   try {
-    if (useBiconomy) {
-      const biconomy = await startBiconomy(chain, walletProvider);
-      provider = biconomy.getEthersProvider();
+    // uses tenderly on ethereum
+    if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
+      provider = getReadOnlyProvider(chain);
     } else {
-      provider = walletProvider;
+      if (useBiconomy) {
+        const biconomy = await startBiconomy(chain, walletProvider);
+        provider = biconomy.getEthersProvider();
+      } else {
+        provider = walletProvider;
+      }
     }
 
     let contractInterface = new ethers.utils.Interface(abi);
@@ -345,7 +350,7 @@ export const sendTransaction = async (
     let rawTx = {
       to: address,
       data: data,
-      from: walletAddress,
+      from: getCurrentWalletAddress(),
     };
 
     let finalTx;
@@ -366,7 +371,7 @@ export const sendTransaction = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
-      walletAddress: walletAddress,
+      walletAddress: getCurrentWalletAddress(),
     });
     return processSendError(error);
   }
@@ -376,24 +381,27 @@ export const callStatic = async (
   abi,
   address,
   functionSignature,
-  params = []
+  params = [],
+  chain = EChain.ETHEREUM,
 ) => {
   try {
-    const provider = walletProvider;
+    let provider;
+    if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
+      provider = getReadOnlyProvider(chain);
+    } else {
+      provider = walletProvider;
+    }
     const signer = provider.getSigner();
     const contract = new ethers.Contract(address, abi, signer);
 
-    const method = contract.callStatic[functionSignature].apply(
-      null,
-      params,
-    );
+    const method = contract.callStatic[functionSignature].apply(null, params);
 
     let txResult = await method;
 
     if (ethers.BigNumber.isBigNumber(txResult)) {
       return txResult.toString();
     }
-    
+
     return txResult;
   } catch (error) {
     console.log(error);
@@ -765,6 +773,7 @@ export const QueryFilter = async (
   params,
   blockNumber,
   chain,
+  toBlockNumber = undefined,
 ) => {
   const readOnlyProvider = getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
@@ -772,7 +781,11 @@ export const QueryFilter = async (
   try {
     const event = contract.filters[eventSignature].apply(null, params);
 
-    const logs = await contract.queryFilter(event, blockNumber, blockNumber);
+    const logs = await contract.queryFilter(
+      event,
+      blockNumber,
+      toBlockNumber ? toBlockNumber : blockNumber,
+    );
 
     return logs;
   } catch (error) {
@@ -818,10 +831,7 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-const marketApiURl =
-  process.env.REACT_APP_NET === 'mainnet'
-    ? 'https://protocol-mainnet.gnosis.io/api'
-    : 'https://protocol-mainnet.dev.gnosisdev.com/api';
+const marketApiURl = 'https://protocol-mainnet.gnosis.io/api';
 
 export const getPrice = async (
   sellToken,

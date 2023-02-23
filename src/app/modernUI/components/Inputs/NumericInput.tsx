@@ -24,17 +24,17 @@ interface INumericInput {
   tokenSign?: string;
   value: string;
   available?: string;
-  onValueChange: Function;
+  onValueChange?: Function;
   selectedToken?: TSupportedToken;
   setSelectedToken?: Function;
   tokenOptions?: TSupportedToken[];
-  error: string;
+  error?: string;
   maxValue?: string | number;
   maxButton?: boolean;
+  inputWarning?: string;
   slippageWarning?: boolean;
-  lowSlippageTokenLabels?: string[];
-  isLoadingMaxValue?: boolean;
   disabled?: boolean;
+  disableNumber?: boolean;
 }
 
 export const NumericInput = ({
@@ -48,14 +48,17 @@ export const NumericInput = ({
   tokenOptions,
   selectedToken,
   setSelectedToken,
-  slippageWarning = false,
-  lowSlippageTokenLabels,
+  inputWarning,
   error,
-  isLoadingMaxValue = false,
   disabled = false,
-  ...rest
+  slippageWarning = false,
+  disableNumber = false,
 }: INumericInput) => {
-  const [formattedValue, setFormattedValue] = useState('');
+  const [formattedValue, setFormattedValue] = useState(
+    value != '' ? (+(+value).toFixed(10)).toLocaleString(undefined, {
+      maximumFractionDigits: 6,
+    }) : ''
+  );
   const thousandsSeparator = Number(10000).toLocaleString().charAt(2);
   const decimalSeparator = Number(1.1).toLocaleString().charAt(1);
 
@@ -66,7 +69,7 @@ export const NumericInput = ({
           <Text size="medium" color="soul">
             {label}
           </Text>
-          {!disabled && (
+          {!disabled && !disableNumber && (
             <Text size="medium" color="soul">
               {available != undefined ? (
                 'Available: ' + tokenSign + toExactFixed(+available, 6)
@@ -82,9 +85,9 @@ export const NumericInput = ({
         <RelativeBox margin={{ top: 'xxsmall' }}>
           <NumberFormat
             value={formattedValue}
-            placeholder="0.00"
+            placeholder={(+"0").toLocaleString(undefined, {minimumFractionDigits: 2})}
             customInput={TextInput}
-            disabled={disabled}
+            disabled={disabled || disableNumber}
             thousandSeparator={thousandsSeparator}
             decimalSeparator={decimalSeparator}
             onValueChange={values => {
@@ -92,8 +95,15 @@ export const NumericInput = ({
               onValueChange(value);
               setFormattedValue(formattedValue);
             }}
+            style={disableNumber ? {border: "1px solid #000000", opacity: 1} : {}}
           />
-          <AbsoluteBox direction="row" gap="xsmall" style={!tokenOptions || disabled ? {right: "8px"} : {right: "0"}}>
+          <AbsoluteBox
+            direction="row"
+            gap="xsmall"
+            style={
+              !tokenOptions || disabled ? { right: '8px' } : { right: '0' }
+            }
+          >
             {maxButton && maxValue != undefined && (
               <MaxButton
                 primary
@@ -114,7 +124,7 @@ export const NumericInput = ({
           </AbsoluteBox>
         </RelativeBox>
         <Box
-          margin={{ top: 'small' }}
+          margin={{ top: '4px', bottom: '12px' }}
           height={slippageWarning ? '60px' : '13px'}
         >
           {error ? (
@@ -123,13 +133,10 @@ export const NumericInput = ({
             </Text>
           ) : (
             <Box fill>
-              {slippageWarning && (
+              {inputWarning && (
                 <>
                   <Text size="small" color="soul">
-                    Withdrawing in any token other than{' '}
-                    {lowSlippageTokenLabels?.join('/')} increases slippage.
-                    Values shown are an approximation and may change subject to
-                    exhange rates
+                    {inputWarning}
                   </Text>
                 </>
               )}

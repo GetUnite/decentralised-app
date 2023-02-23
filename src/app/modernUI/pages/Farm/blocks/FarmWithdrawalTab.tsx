@@ -13,17 +13,19 @@ import { TopHeader } from '../components';
 
 export const FarmWithdrawalTab = ({
   selectedFarm,
+  selectedFarmInfo,
   isLoading,
   selectSupportedToken,
   selectedSupportedToken,
-  //withdraw
+  // withdraw
   withdrawValue,
   setWithdrawValue,
-  handleWithdraw,
-  isWithdrawing,
   // biconomy
   useBiconomy,
   setUseBiconomy,
+  // steps
+  startProcessingSteps,
+  steps,
 }) => {
   const {
     hasErrors,
@@ -31,26 +33,29 @@ export const FarmWithdrawalTab = ({
     handleWithdrawalFieldChange,
     isWithdrawalRequestsLoading,
   } = useFarmWithdrawal({
-    selectedFarm,
+    withdrawValue,
+    selectedSupportedToken,
+    selectedFarmInfo,
     setWithdrawValue,
+    steps,
   });
 
   return (
     <Box fill>
       <Box margin={{ top: 'large' }}>
-        <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
+        <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
             label={`Withdraw ${
               selectedSupportedToken ? selectedSupportedToken?.label : ''
             }`}
-            available={selectedFarm.depositedAmount}
-            tokenSign={selectedFarm.sign}
+            available={selectedFarmInfo?.depositedAmount}
+            tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleWithdrawalFieldChange}
             value={withdrawValue}
             maxButton={true}
-            maxValue={selectedFarm.depositedAmount}
-            tokenOptions={selectedFarm.supportedTokens || []}
+            maxValue={selectedFarmInfo?.depositedAmount}
+            tokenOptions={selectedFarmInfo?.supportedTokens || []}
             selectedToken={selectedSupportedToken}
             setSelectedToken={selectSupportedToken}
             error={withdrawValueError}
@@ -60,30 +65,34 @@ export const FarmWithdrawalTab = ({
       </Box>
       <Box margin={{ top: '11px' }}>
         <ProjectedWeeklyInfo
-          depositedAmount={selectedFarm.depositedAmount}
+          depositedAmount={selectedFarmInfo?.depositedAmount}
           inputValue={-1 * +withdrawValue}
-          interest={selectedFarm.interest}
-          sign={selectedFarm.sign}
+          interest={selectedFarmInfo?.interest}
+          sign={selectedFarmInfo?.sign}
           isLoading={isLoading}
         />
         <Info
           label="APY"
-          value={toExactFixed(selectedFarm.interest, 2).toLocaleString() + '%'}
+          value={
+            toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'
+          }
           isLoading={isLoading}
         />
         <Info
           label="Pool liquidity"
           value={
-            selectedFarm.sign +
-            (+selectedFarm.totalAssetSupply).toLocaleString()
+            selectedFarmInfo?.sign +
+            (+selectedFarmInfo?.totalAssetSupply).toLocaleString()
           }
           isLoading={isLoading}
         />
         <FeeInfo
-          biconomyToggle={selectedFarm.chain == EChain.POLYGON}
+          biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
-          showWalletFee={!useBiconomy || selectedFarm.chain != EChain.POLYGON}
+          showWalletFee={
+            !useBiconomy || selectedFarm.current?.chain != EChain.POLYGON
+          }
           isLoading={isLoading}
         />
       </Box>
@@ -97,7 +106,7 @@ export const FarmWithdrawalTab = ({
             withdrawValue == '' ||
             hasErrors
           }
-          onClick={handleWithdraw}
+          onClick={startProcessingSteps}
         />
       </Box>
     </Box>

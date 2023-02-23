@@ -1,5 +1,3 @@
-import ageur from 'app/modernUI/images/ageur.svg';
-import crv from 'app/modernUI/images/crv.svg';
 import cvx from 'app/modernUI/images/cvx.svg';
 import dai from 'app/modernUI/images/dai.svg';
 import eurs from 'app/modernUI/images/eurs.png';
@@ -12,6 +10,9 @@ import iballuousd from 'app/modernUI/images/iballuousd.svg';
 import jeur from 'app/modernUI/images/jeur.svg';
 import steth from 'app/modernUI/images/steth.svg';
 import tokenPlaceholder from 'app/modernUI/images/tokenPlaceholder.svg';
+import ageur from 'app/modernUI/images/tokens/ageur.svg';
+import crv from 'app/modernUI/images/tokens/crv.svg';
+import frxetheth from 'app/modernUI/images/tokens/frxetheth.svg';
 import usdc from 'app/modernUI/images/usdc.svg';
 import usdt from 'app/modernUI/images/usdt.svg';
 import wbtc from 'app/modernUI/images/wbtc.svg';
@@ -78,6 +79,7 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
     case 'CRV':
       src = crv;
       break;
+
     case 'CVX':
       src = cvx;
       break;
@@ -102,9 +104,13 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       src = iballuobtc;
       break;
 
+      case 'FrxETH/ETH':
+      src = frxetheth;
+      break;
+
     default:
       src = tokenPlaceholder;
       break;
   }
-  return <img width={size} height={size} src={src} alt="tokenIcon" {...rest} />;
+  return <img width="auto" height={size} src={src} alt="tokenIcon" {...rest} />;
 };

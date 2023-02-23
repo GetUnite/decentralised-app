@@ -12,53 +12,51 @@ import { Box } from 'grommet';
 import { TopHeader } from '../components';
 
 export const FarmDepositTab = ({
-  isLoading,
   selectedFarm,
+  isLoading,
+  selectedFarmInfo,
   selectSupportedToken,
   selectedSupportedToken,
+  selectedSupportedTokenInfo,
   // deposit
   depositValue,
   setDepositValue,
-  handleApprove,
-  handleDeposit,
   // biconomy
   useBiconomy,
   setUseBiconomy,
+  // steps   
+  steps,
+  startProcessingSteps
 }) => {
   const {
     hasErrors,
     depositValueError,
     handleDepositValueChange,
-    selectedSupportedTokenInfo,
     isFetchingSupportedTokenInfo,
-    currentStep,
-    selectedSupportedTokenSteps,
-    handleCurrentStep,
   } = useFarmDeposit({
-    selectedFarm,
+    selectedFarmInfo,
     selectedSupportedToken,
+    selectedSupportedTokenInfo,
+    steps,
     depositValue,
     setDepositValue,
-    handleApprove,
-    handleDeposit,
   });
 
   return (
     <Box fill>
       <Box margin={{ top: 'large' }}>
-        <TopHeader selectedFarm={selectedFarm} isLoading={isLoading} />
+        <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
             label={`Deposit ${
               selectedSupportedToken ? selectedSupportedToken?.label : ''
             }`}
-            tokenSign={selectedFarm?.sign}
+            tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleDepositValueChange}
             value={depositValue}
-            maxValue={selectedSupportedTokenInfo?.balance}
-            isLoadingMaxValue={isFetchingSupportedTokenInfo}
+            maxValue={selectedSupportedTokenInfo.current?.balance}
             maxButton={true}
-            tokenOptions={selectedFarm?.supportedTokens || []}
+            tokenOptions={selectedFarmInfo?.supportedTokens || []}
             selectedToken={selectedSupportedToken}
             setSelectedToken={selectSupportedToken}
             error={depositValueError}
@@ -68,30 +66,30 @@ export const FarmDepositTab = ({
       </Box>
       <Box margin={{ top: '11px' }}>
         <ProjectedWeeklyInfo
-          depositedAmount={selectedFarm?.depositedAmount}
+          depositedAmount={selectedFarmInfo?.depositedAmount}
           inputValue={depositValue}
-          interest={selectedFarm?.interest}
-          sign={selectedFarm?.sign}
+          interest={selectedFarmInfo?.interest}
+          sign={selectedFarmInfo?.sign}
           isLoading={isLoading}
         />
         <Info
           label="APY"
-          value={toExactFixed(selectedFarm?.interest, 2).toLocaleString() + '%'}
+          value={toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'}
           isLoading={isLoading}
         />
         <Info
           label="Pool liquidity"
           value={
-            selectedFarm?.sign +
-            (+selectedFarm?.totalAssetSupply).toLocaleString()
+            selectedFarmInfo?.sign +
+            (+selectedFarmInfo?.totalAssetSupply).toLocaleString()
           }
           isLoading={isLoading}
         />
         <FeeInfo
-          biconomyToggle={selectedFarm?.chain == EChain.POLYGON}
+          biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
-          showWalletFee={!useBiconomy || selectedFarm?.chain != EChain.POLYGON}
+          showWalletFee={!useBiconomy || selectedFarm.current?.chain == EChain.POLYGON}
           disableBiconomy={isLoading}
           isLoading={isLoading}
         />
@@ -108,13 +106,9 @@ export const FarmDepositTab = ({
           label={
             isFetchingSupportedTokenInfo
               ? 'Loading...'
-              : selectedSupportedTokenSteps?.length > 1
-              ? `Step ${currentStep + 1} of ${
-                  selectedSupportedTokenSteps?.length
-                }: ${selectedSupportedTokenSteps[currentStep]?.label}`
-              : `${selectedSupportedTokenSteps[currentStep]?.label}`
+              : 'Deposit'
           }
-          onClick={handleCurrentStep}
+          onClick={startProcessingSteps}
         />
       </Box>
     </Box>

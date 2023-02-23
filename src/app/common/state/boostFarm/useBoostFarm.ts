@@ -3,12 +3,18 @@ import { EChain } from 'app/common/constants/chains';
 import {
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
+  claimLockedBoostFarmRewards,
   depositIntoBoostFarm,
   getBoostFarmInterest,
   getBoostFarmPendingRewards,
   getBoostFarmRewards,
+  getLastHarvestDateTimestamp,
+  getLockedBoostWithdrawalsInfo,
   getMaximumLPValueAsToken,
-  withdrawFromBoostFarm
+  unlockFromLockedBoostFarm,
+  unlockUserFunds,
+  withdrawFromBoostFarm,
+  withdrawFromLockedBoostFarm
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
@@ -25,13 +31,16 @@ import {
   wantedChain
 } from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
-import { TSupportedToken } from 'app/common/types/global';
+import { TPossibleStep, TSupportedToken } from 'app/common/types/global';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
+import { useProcessingSteps } from '../useProcessingSteps';
+import { possibleDepositSteps } from './useBoostFarmDeposit';
+import { possibleWithdrawSteps } from './useBoostFarmWithdrawal';
+import { possibleLockedWithdrawSteps } from './useLockedBoostFarmWithdrawal';
 
 export const boostFarmOptions: Array<TBoostFarm> = [
   {
@@ -64,61 +73,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -159,61 +168,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -254,61 +263,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -349,61 +358,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -445,61 +454,61 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     supportedTokens: [
       {
         label: 'agEUR',
-        address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+        address: EEthereumAddresses.AGEUR,
         decimals: 18,
         sign: '€',
       },
       {
         label: 'CRV',
-        address: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+        address: EEthereumAddresses.CRV,
         decimals: 18,
         sign: '',
       },
       {
         label: 'CVX',
-        address: '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
+        address: EEthereumAddresses.CVX,
         decimals: 18,
         sign: '',
       },
       {
         label: 'DAI',
-        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        address: EEthereumAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'EURS',
-        address: '0xdB25f211AB05b1c97D595516F45794528a807ad8',
+        address: EEthereumAddresses.EURS,
         decimals: 2,
         sign: '€',
       },
       {
         label: 'EURT',
-        address: '0xC581b735A1688071A1746c968e0798D642EDE491',
+        address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
       {
         label: 'FRAX',
-        address: '0x853d955aCEf822Db058eb8505911ED77F175b99e',
+        address: EEthereumAddresses.FRAX,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        address: EEthereumAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'WETH',
-        address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        address: EEthereumAddresses.WETH,
         decimals: 18,
         sign: 'Ξ',
       },
       {
         label: 'WBTC',
-        address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        address: EEthereumAddresses.WBTC,
         decimals: 8,
         sign: '₿',
       },
@@ -511,6 +520,216 @@ export const boostFarmOptions: Array<TBoostFarm> = [
     },
     isNewest: true,
   },
+  {
+    id: 5,
+    farmAddress: EEthereumAddresses.FRXETHVAULT,
+    type: 'booster',
+    isLocked: true,
+    chain: EChain.ETHEREUM,
+    name: 'FrxETH/ETH',
+    sign: '$',
+    icons: [
+      'FRAX',
+      'USDC',
+      'agEUR',
+      'CRV',
+      'CVX',
+      'DAI',
+      'EURS',
+      'EURT',
+      'WETH',
+      'WBTC',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      address: EEthereumAddresses.CVXETH,
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.FRXETH,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: EEthereumAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: EEthereumAddresses.CRV,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: EEthereumAddresses.CVX,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: EEthereumAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: EEthereumAddresses.EURS,
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: EEthereumAddresses.EURT,
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: EEthereumAddresses.FRAX,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EEthereumAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: EEthereumAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: EEthereumAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: ['FRAX', 'ETH'],
+    apyFarmAddresses: {
+      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
+    forcedInterest: '9.50',
+    withdrawToken: {
+      label: 'FrxETH/ETH',
+      address: EEthereumAddresses.FRXETH,
+      decimals: 18,
+      sign: '',
+    },
+    isNewest: true,
+  },
+  {
+    id: 6,
+    farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
+    type: 'booster',
+    isLocked: true,
+    chain: EChain.ETHEREUM,
+    name: 'CVX/FRAXBP',
+    sign: '$',
+    icons: [
+      'FRAX',
+      'USDC',
+      'agEUR',
+      'CRV',
+      'CVX',
+      'DAI',
+      'EURS',
+      'EURT',
+      'WETH',
+      'WBTC',
+    ],
+    isBoost: true,
+    rewards: {
+      label: 'CVX-ETH',
+      icons: ['CVX', 'ETH'],
+      stableLabel: 'USDC',
+      address: EEthereumAddresses.CVXETH,
+      stableAddress: EEthereumAddresses.USDC,
+    },
+    lPTokenAddress: EEthereumAddresses.CVXFRAXBP,
+    supportedTokens: [
+      {
+        label: 'agEUR',
+        address: EEthereumAddresses.AGEUR,
+        decimals: 18,
+        sign: '€',
+      },
+      {
+        label: 'CRV',
+        address: EEthereumAddresses.CRV,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'CVX',
+        address: EEthereumAddresses.CVX,
+        decimals: 18,
+        sign: '',
+      },
+      {
+        label: 'DAI',
+        address: EEthereumAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'EURS',
+        address: EEthereumAddresses.EURS,
+        decimals: 2,
+        sign: '€',
+      },
+      {
+        label: 'EURT',
+        address: EEthereumAddresses.EURT,
+        decimals: 6,
+        sign: '€',
+      },
+      {
+        label: 'FRAX',
+        address: EEthereumAddresses.FRAX,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EEthereumAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'WETH',
+        address: EEthereumAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+      {
+        label: 'WBTC',
+        address: EEthereumAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+    lowSlippageTokenLabels: ['FRAX', 'CVX'],
+    apyFarmAddresses: {
+      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+    },
+    forcedInterest: '9.50',
+    withdrawToken: {
+      label: 'CVX/FRAXBP',
+      address: EEthereumAddresses.CVXFRAXBP,
+      decimals: 18,
+      sign: '',
+    },
+    isNewest: true,
+  },
 ];
 
 const defaultRewards = {
@@ -518,6 +737,24 @@ const defaultRewards = {
   stableLabel: 'USDC',
   stableAddress: EEthereumAddresses.USDC,
 };
+
+const possibleBoostFarmSteps = [
+  {
+    id: 6,
+    label: '',
+    errorLabel: 'Failed to claim rewards',
+    successLabel: '',
+  },
+  {
+    id: 7,
+    label: '',
+    errorLabel: 'Failed to claim rewards',
+    successLabel: '',
+  },
+  ...possibleDepositSteps,
+  ...possibleWithdrawSteps,
+  ...possibleLockedWithdrawSteps,
+];
 
 export const useBoostFarm = ({ id }) => {
   // react
@@ -533,8 +770,8 @@ export const useBoostFarm = ({ id }) => {
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
   const [isSafeAppAtom] = useRecoilState(isSafeApp);
 
-  // other state control files
-  const { setNotification } = useNotification();
+  // tabs control
+  const [selectedTab, setSelectedTab] = useState(0);
 
   // selected farm control
   const selectedFarm = useRef<TBoostFarm>(
@@ -543,11 +780,14 @@ export const useBoostFarm = ({ id }) => {
   const selectedFarmInfo = useRef<TBoostFarm>();
   const [selectedSupportedToken, setSelectedSupportedToken] =
     useState<TSupportedToken>();
-  // withdraw selected supportedTokenInfo
+  const interest = useRef<any>();
+
+  // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     boostDepositedAmount: 0,
     balance: 0,
     allowance: 0,
+    unlocked: 0,
   });
 
   // booster farm rewards control
@@ -560,14 +800,24 @@ export const useBoostFarm = ({ id }) => {
   const [depositValue, setDepositValue] = useState<string>('');
   const [withdrawValue, setWithdrawValue] = useState<string>('');
 
+  // steps
+  const {
+    isProcessing,
+    setIsProcessing,
+    currentStep,
+    steps,
+    stepWasSuccessful,
+    stepError,
+    successTransactionHash,
+    resetProcessing,
+    isHandlingStep,
+    setIsHandlingStep,
+  } = useProcessingSteps();
+  const processingTitle = useRef<string>();
+
   // loading control
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
-  const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
-
-  const [isClamingRewards, setIsClamingRewards] = useState<boolean>(false);
+  const [isLoadingInterest, setIsLoadingInterest] = useState<boolean>(true);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(false);
   const [isLoadingPendingRewards, setIsLoadingPendingRewards] =
     useState<boolean>(false);
@@ -584,31 +834,37 @@ export const useBoostFarm = ({ id }) => {
     !cookies.has_seen_boost_farms && !selectedFarm.current?.isLocked;
   const showLockedBoostFarmPresentation =
     !cookies.has_seen_locked_boost_farms && selectedFarm.current?.isLocked;
+  // normal withdraw/unlock
   const [showBoostWithdrawalConfirmation, setShowBoostWithdrawalConfirmation] =
     useState<boolean>(false);
+  // when depositing
+  const [showLockedBoostLockConfirmation, setShowLockedBoostLockConfirmation] =
+    useState<boolean>(false);
+  // withdraw unlocked on locked boost farms
   const [
-    showLockedBoostDepositConfirmation,
-    setShowLockedBoostDepositConfirmation,
+    showLockedBoostWithdrawalConfirmation,
+    setShowLockedBoostWithdrawalConfirmation,
   ] = useState<boolean>(false);
   const showHeading =
-    !showBoostFarmPresentation && !showLockedBoostFarmPresentation;
+    !showBoostFarmPresentation &&
+    !showLockedBoostFarmPresentation &&
+    !isProcessing;
   const showTabs =
+    !isProcessing &&
     !showBoostFarmPresentation &&
     !showLockedBoostFarmPresentation &&
     !showBoostWithdrawalConfirmation &&
-    !showLockedBoostDepositConfirmation;
+    !showLockedBoostLockConfirmation;
 
   // harvest dates for the farms
-  const previousHarvestDate = moment().subtract(1, 'days').day('Monday');
-  const nextHarvestDate = moment()
-    .subtract(1, 'days')
-    .add(1, 'week')
-    .day('Monday');
+  const previousHarvestDate = useRef<any>();
+  const nextHarvestDate = useRef<any>();
 
   // when entering boost farms set wanted chain to ethereum (for now only ethereum has boost farms)
   useEffect(() => {
     if (walletAccountAtom) {
       setWantedChainAtom(EChain.ETHEREUM);
+      updateInterest();
     }
   }, [walletAccountAtom]);
 
@@ -619,16 +875,35 @@ export const useBoostFarm = ({ id }) => {
     }
     const loadFarmInfo = async () => {
       try {
-        heapTrack('farm', {
-          pool: 'boost',
-          currency: selectedFarm.current.name,
-        });
+        var startFirstTimer = performance.now()
 
+        const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.chain,
+        );
+        const lastHarvestDate = new Date(0);
+        lastHarvestDate.setSeconds(lastHarvestDateTimestamp);
+
+        previousHarvestDate.current = moment(lastHarvestDate);
+        nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
+
+        var endFirstTimer = performance.now()
+        console.log(`loadFarmInfo() before farmInfo() took ${endFirstTimer - startFirstTimer} milliseconds`)
+        
+        var startSecondTimer = performance.now()
         selectedFarmInfo.current = {
           ...selectedFarm.current,
           ...(await getUpdatedFarmInfo(selectedFarm.current)),
         };
+        var endSecondTimer = performance.now()
+        console.log(`getUpdatedFarmInfo() took ${endSecondTimer - startSecondTimer} milliseconds`)
+
         setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
+
+        heapTrack('farm', {
+          pool: 'boost',
+          currency: selectedFarm.current.name,
+        });
 
         setIsLoading(false);
         await updateRewardsInfo();
@@ -641,11 +916,24 @@ export const useBoostFarm = ({ id }) => {
     }
   }, [walletAccountAtom, isCorrectNetworkAtom]);
 
+  const updateInterest = async () => {
+    setIsLoadingInterest(true);
+    interest.current = selectedFarm.current?.forcedInterest
+      ? selectedFarm.current?.forcedInterest
+      : await getBoostFarmInterest(
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.apyFarmAddresses,
+          selectedFarm.current?.chain,
+        );
+    setIsLoadingInterest(false);
+  };
+
   // used to update the farm info after withdraw or deposit
   const updateFarmInfo = async () => {
+    setIsLoading(true);
     try {
       const farm = await getUpdatedFarmInfo(selectedFarm.current);
-      selectedFarmInfo.current = farm;
+      selectedFarmInfo.current = { ...selectedFarmInfo, ...farm };
       setSelectedSupportedToken(
         farm.supportedTokens?.find(
           st => st?.address == selectedSupportedToken?.address,
@@ -654,6 +942,7 @@ export const useBoostFarm = ({ id }) => {
     } catch (error) {
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const getUpdatedFarmInfo = async farm => {
@@ -664,19 +953,14 @@ export const useBoostFarm = ({ id }) => {
         farm.lPTokenAddress,
         farm.chain,
       );
-
       farmInfo = {
-        interest: await getBoostFarmInterest(
-          farm.farmAddress,
-          farm.apyFarmAddresses,
-          farm.chain,
-        ),
         totalAssetSupply:
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
           valueOf1LPinUSDC,
         depositedAmount: 0,
         valueOf1LPinUSDC: valueOf1LPinUSDC,
       };
+
       if (walletAccountAtom) {
         const depositedAmountInLP = await getUserDepositedLPAmount(
           farm.farmAddress,
@@ -685,19 +969,29 @@ export const useBoostFarm = ({ id }) => {
         farmInfo.depositedAmountInLP = depositedAmountInLP;
         // Let's use the depositedAmount to store the deposited amount in USD(C)
         // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-        const depositedAmount =
-          +depositedAmountInLP > 0 && isCorrectNetwork
-            ? await getMaximumLPValueAsToken(
-                farm.farmAddress,
-                EEthereumAddresses.USDC,
-                6,
-                depositedAmountInLP,
-              )
-            : 0;
+        const depositedAmount = farm.isLocked
+          ? +depositedAmountInLP * valueOf1LPinUSDC
+          : +depositedAmountInLP > 0 && isCorrectNetworkAtom == true
+          ? await getMaximumLPValueAsToken(
+              farm.farmAddress,
+              EEthereumAddresses.USDC,
+              6,
+              depositedAmountInLP,
+            )
+          : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
+        if (farm.isLocked) {
+          const userWithdrawals = await getLockedBoostWithdrawalsInfo(
+            farm.farmAddress,
+            farm.chain,
+          );
+          farmInfo.unlockedBalance = userWithdrawals.unlockedBalance;
+          farmInfo.unlockingBalance = userWithdrawals.unlockingBalance;
+          farmInfo.isUnlocking = userWithdrawals.isUnlocking;
+        }
       }
-
+      
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
@@ -744,9 +1038,16 @@ export const useBoostFarm = ({ id }) => {
   };
 
   const claimRewards = async () => {
-    setIsClamingRewards(true);
     try {
-      const tx = seeRewardsAsStable
+      const tx = selectedFarm.current?.isLocked
+        ? await claimLockedBoostFarmRewards(
+            selectedFarmInfo.current.farmAddress,
+            seeRewardsAsStable
+              ? selectedFarm.current?.rewards.stableAddress
+              : selectedFarm.current?.rewards.address,
+            selectedFarmInfo.current.chain,
+          )
+        : seeRewardsAsStable
         ? await claimBoostFarmNonLPRewards(
             selectedFarmInfo.current.farmAddress,
             selectedFarmInfo.current.rewards.stableAddress,
@@ -756,25 +1057,41 @@ export const useBoostFarm = ({ id }) => {
             selectedFarmInfo.current.farmAddress,
             selectedFarmInfo.current.chain,
           );
-      await updateRewardsInfo();
-      setNotification(
-        'Rewards claimed successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current.chain,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
-    setIsClamingRewards(false);
   };
 
-  const startLockedBoostDepositConfirmation = async () => {
-    setShowLockedBoostDepositConfirmation(true);
+  const manualUnlock = async () => {
+    try {
+      const tx = await unlockUserFunds(
+        selectedFarm.current?.farmAddress,
+        selectedFarm.current?.chain,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const cancelLockedBoostDepositConfirmation = async () => {
-    setShowLockedBoostDepositConfirmation(false);
+  const startLockedBoostLockConfirmation = async () => {
+    setShowLockedBoostLockConfirmation(true);
+  };
+
+  const startLockedBoostManualUnlockSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    neededSteps.push({
+      ...possibleBoostFarmSteps[1],
+      label: `Manually unlocking ${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label}`,
+      successLabel: `$${selectedFarmInfo.current?.unlockingBalance} ${selectedFarm.current?.withdrawToken.label} unlocked`,
+    });
+
+    processingTitle.current = 'Manually unlocking...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
   };
 
   const startBoostWithdrawalConfirmation = async boostDepositedAmount => {
@@ -785,22 +1102,28 @@ export const useBoostFarm = ({ id }) => {
     setShowBoostWithdrawalConfirmation(true);
   };
 
-  const cancelBoostWithdrawalConfirmation = async () => {
+  const startLockedBoostWithdrawalConfirmation = () => {
+    setShowLockedBoostWithdrawalConfirmation(true);
+  };
+
+  const cancelConfirmations = async () => {
+    resetProcessing();
     setShowBoostWithdrawalConfirmation(false);
+    setShowLockedBoostWithdrawalConfirmation(false);
+    setShowLockedBoostLockConfirmation(false);
   };
 
   // withdraw method
   const handleWithdraw = async () => {
-    setIsWithdrawing(true);
-    setShowBoostWithdrawalConfirmation(false);
-
     // withdraw the percentage of LP based on the percentage of the withdraw value and the selected token
-    const withdrawPercentage = Math.round(
-      +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount,
-    );
+    const withdrawPercentage = +(
+      +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount
+    ).toFixed(18);
 
     const valueToWithdraw =
-      selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
+      withdrawPercentage == 1
+        ? selectedFarmInfo.current.depositedAmountInLP
+        : selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
 
     try {
       const tx = await withdrawFromBoostFarm(
@@ -811,27 +1134,43 @@ export const useBoostFarm = ({ id }) => {
         selectedFarmInfo.current.chain,
         useBiconomy,
       );
-
-      setNotification(
-        'Withdrew successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current.chain,
-      );
-      selectedSupportedTokenInfo.current.boostDepositedAmount =
-        selectedSupportedTokenInfo.current.boostDepositedAmount -
-        +withdrawValue;
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
+  };
 
-    setIsWithdrawing(false);
+  const handleUnlock = async () => {
+    try {
+      const tx = await unlockFromLockedBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        withdrawValue,
+        selectedSupportedToken.decimals,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // withdraw from locked boost method
+  const handleWithdrawUnlocked = async () => {
+    try {
+      const tx = await withdrawFromLockedBoostFarm(
+        selectedFarmInfo.current.farmAddress,
+        selectedSupportedToken.address,
+        selectedFarmInfo.current.chain,
+        useBiconomy,
+      );
+      successTransactionHash.current = tx.transactionHash;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const handleApprove = async () => {
-    setIsApproving(true);
-
     try {
       const tx = await approve(
         selectedFarmInfo.current?.farmAddress,
@@ -843,23 +1182,14 @@ export const useBoostFarm = ({ id }) => {
         currency: selectedSupportedToken?.label,
         amount: depositValue,
       });
-      setNotification(
-        'Approved successfully',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current?.chain,
-      );
+      successTransactionHash.current = tx.transactionHash;
     } catch (err) {
-      setNotification(err, 'error');
+      throw err;
     }
-
-    setIsApproving(false);
   };
 
   // deposit method
   const handleDeposit = async () => {
-    setIsDepositing(true);
-    setShowLockedBoostDepositConfirmation(false);
     try {
       heapTrack('startedDepositing', {
         pool: 'boost',
@@ -874,48 +1204,140 @@ export const useBoostFarm = ({ id }) => {
         selectedFarmInfo.current.chain,
         useBiconomy,
       );
-      setDepositValue('');
       heapTrack('depositTransactionMined', {
         pool: 'boost',
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      setNotification(
-        'Deposit successful',
-        'success',
-        tx.transactionHash,
-        selectedFarmInfo.current.chain,
-      );
       selectedSupportedTokenInfo.current.balance =
         selectedSupportedTokenInfo.current.balance - +depositValue;
-      await updateFarmInfo();
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
-      setNotification(error, 'error');
+      throw error;
     }
+  };
 
-    setIsDepositing(false);
+  const startProcessingSteps = async () => {
+    cancelConfirmations();
+    processingTitle.current =
+      processingTitle.current != undefined
+        ? processingTitle.current
+        : selectedTab == 0
+        ? selectedFarm.current?.isLocked
+          ? 'Locking funds...'
+          : 'Depositing funds...'
+        : selectedFarm.current?.isLocked
+        ? 'Unlocking funds...'
+        : 'Withdrawing funds...';
+    setIsProcessing(true);
+    await handleCurrentStep();
+  };
+
+  const startClaimRewardsSteps = async () => {
+    let neededSteps: TPossibleStep[] = [];
+
+    const label = seeRewardsAsStable
+      ? rewardsInfo.current?.stableLabel
+      : rewardsInfo.current?.label;
+    const value = seeRewardsAsStable
+      ? rewardsInfo.current?.stableValue
+      : rewardsInfo.current?.value;
+
+    neededSteps.push({
+      ...possibleBoostFarmSteps[0],
+      label: `Claiming ${value} ${label}`,
+      successLabel: `${value} ${label} claimed`,
+    });
+
+    processingTitle.current = 'Claiming rewards...';
+    steps.current = neededSteps;
+
+    await startProcessingSteps();
+  };
+
+  const stopProcessingSteps = async () => {
+    processingTitle.current = undefined;
+    resetProcessing();
+    setDepositValue('');
+    setWithdrawValue('');
+    await updateFarmInfo();
+  };
+
+  // executes the handle for the current step
+  const handleCurrentStep = async () => {
+    setIsHandlingStep(true);
+
+    const step = possibleBoostFarmSteps.find(
+      step => step.id == steps.current[currentStep.current].id,
+    );
+
+    try {
+      switch (step.id) {
+        case 0:
+          await handleApprove();
+          break;
+
+        case 1:
+        case 2: // locked boost
+          await handleDeposit();
+          break;
+
+        case 3:
+          await handleWithdraw();
+          break;
+
+        case 4: // unlock locked boost
+          await handleUnlock();
+          break;
+
+        case 5: // withdraw unlocked from locked boost
+          await handleWithdrawUnlocked();
+          break;
+
+        case 6:
+          await claimRewards();
+          break;
+
+        case 7:
+          await manualUnlock();
+          break;
+        default:
+          throw 'Something went wrong';
+          break;
+      }
+      stepWasSuccessful.current = true;
+    } catch (error) {
+      stepError.current = error;
+      stepWasSuccessful.current = false;
+    }
+    setIsHandlingStep(false);
   };
 
   return {
     walletAccountAtom,
     isCorrectNetworkAtom,
+    selectedTab,
+    setSelectedTab,
     // presentation
     showTabs,
     showHeading,
     showBoostFarmPresentation,
     showLockedBoostFarmPresentation,
     // farm
+    selectedFarm,
+    updateFarmInfo,
     isLoading,
     selectedFarmInfo,
     selectSupportedToken,
     selectedSupportedToken,
+    // interest
+    interest,
+    isLoadingInterest,
     // rewards
     isLoadingRewards,
     rewardsInfo,
     seeRewardsAsStable,
     setSeeRewardsAsStable,
-    claimRewards,
-    isClamingRewards,
     // pending rewards
     isLoadingPendingRewards,
     pendingRewardsInfo,
@@ -929,20 +1351,31 @@ export const useBoostFarm = ({ id }) => {
     depositValue,
     setDepositValue,
     handleApprove,
-    isApproving,
     handleDeposit,
-    isDepositing,
-    showLockedBoostDepositConfirmation,
-    startLockedBoostDepositConfirmation,
-    cancelLockedBoostDepositConfirmation,
+    showLockedBoostLockConfirmation,
+    startLockedBoostLockConfirmation,
     //withdraw
     withdrawValue,
     setWithdrawValue,
     selectedSupportedTokenInfo,
     handleWithdraw,
-    isWithdrawing,
     showBoostWithdrawalConfirmation,
     startBoostWithdrawalConfirmation,
-    cancelBoostWithdrawalConfirmation,
+    showLockedBoostWithdrawalConfirmation,
+    startLockedBoostWithdrawalConfirmation,
+    startLockedBoostManualUnlockSteps,
+    // steps
+    cancelConfirmations,
+    isProcessing,
+    currentStep,
+    isHandlingStep,
+    stepWasSuccessful,
+    stepError,
+    startProcessingSteps,
+    stopProcessingSteps,
+    processingTitle,
+    steps,
+    handleCurrentStep,
+    startClaimRewardsSteps,
   };
 };

@@ -5,12 +5,12 @@ import Countdown, {
   formatTimeDelta
 } from 'react-countdown';
 
-export const UnlockCountdown = (
-  {date,
+export const UnlockCountdown = ({
+  date,
   label,
   onComplete,
-  showReunlockConfirmation,}
-) => {
+  showReunlockConfirmation = false,
+}) => {
   const { isLightMode } = useMode();
 
   const renderer = ({ completed, days, ...timeDelta }) => {
@@ -25,7 +25,7 @@ export const UnlockCountdown = (
       // Render a countdown
       return (
         <Box
-          round={'medium'}
+          round={'16px'}
           width="245px"
           align="start"
           justify="between"
@@ -40,7 +40,9 @@ export const UnlockCountdown = (
                   color: '#F59F31',
                   size: '0.5px',
                 }
-              : isLightMode ? {color: "#EBEBEB", size: "1px"} : {size:"0px"}
+              : isLightMode
+              ? { color: '#EBEBEB', size: '1px' }
+              : { size: '0px' }
           }
           style={
             showReunlockConfirmation

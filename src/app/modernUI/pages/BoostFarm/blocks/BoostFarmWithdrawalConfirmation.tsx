@@ -6,7 +6,7 @@ export const BoostFarmWithdrawalConfirmation = ({
   selectedFarmInfo,
   withdrawValue,
   withdrawTokenLabel,
-  handleWithdraw,
+  startProcessingSteps,
   cancelBoostWithdrawalConfirmation,
   nextHarvestDate,
   losablePendingRewards,
@@ -14,30 +14,30 @@ export const BoostFarmWithdrawalConfirmation = ({
 }) => {
   return (
     <>
-      <Box margin={{ top: '45px' }} align="center">
+      <Box margin={{ top: '70px' }} align="center">
         <img src={exclamation} alt="exclamation" />
-        <Box gap="35px" margin={{ top: '45px' }}>
+        <Box gap="40px" margin={{ top: '73px' }}>
           <Text textAlign="center" weight="bold" size="24px">
             If you withdraw {withdrawValue} {withdrawTokenLabel} now, about
             ${toExactFixed(losablePendingRewards, 6)} in pending rewards won't be realised.
           </Text>
           <Text textAlign="center" weight={400} size="16px">
             Any unrealised rewards will be redistributed amongst the pool. Wait
-            until the next harvest on {nextHarvestDate.format('DD MMM')} to earn
+            until the next harvest on {nextHarvestDate.current.format('DD MMM')} to earn
             all pending rewards.
           </Text>
         </Box>
 
-        <Box gap="30px" margin={{ top: '48px' }}>
+        <Box gap="32px" margin={{ top: '50px' }}>
           <Button
             primary
             label="I still want to withdraw now"
-            onClick={handleWithdraw}
+            onClick={startProcessingSteps}
             style={{ width: '360px' }}
           />
           <Button
             plain
-            label={`Cancel withdraw and come back on ${nextHarvestDate.format(
+            label={`Cancel withdraw and come back on ${nextHarvestDate.current.format(
               'DD MMMM',
             )}`}
             onClick={cancelBoostWithdrawalConfirmation}
