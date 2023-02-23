@@ -241,10 +241,15 @@ export const useMain = () => {
         };
         const rewardsAsNumber = fromLocaleString(updatedRewards.value);
         if (rewardsAsNumber > 0.00001) {
+          const rewardsInUSD = rewardsAsNumber*CVXETHInUSDC;
+          
           const monthProjection =
-            (farm.depositedAmountInLP * (Math.pow(1 + rewardsApy, 1 / 12) -1)) + rewardsAsNumber;
-          const yearProjection = (farm.depositedAmountInLP * (Math.pow(1 + rewardsApy, 1) -1)) + rewardsAsNumber;
-          ri.push({
+            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1 / 12) -1))+rewardsInUSD)/CVXETHInUSDC;
+          
+            const yearProjection = 
+            ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest)/100, 1) -1))+rewardsInUSD)/CVXETHInUSDC;
+          
+            ri.push({
             farmAddress: farm.farmAddress,
             name: farm.name,
             isBoost: farm.isBoost,
