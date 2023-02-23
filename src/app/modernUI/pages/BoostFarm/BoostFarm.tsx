@@ -154,6 +154,11 @@ export const BoostFarm = () => {
                       selectedFarm={selectedFarm}
                       farmName={farmName}
                       isLoadingInterest={isLoadingInterest}
+                      nextHarvestDate={
+                        timerIsFinished(
+                          nextHarvestDate.current,
+                          false,
+                        )}
                       interest={interest.current}
                     />
                   )}
@@ -163,6 +168,7 @@ export const BoostFarm = () => {
                       farmName={selectedFarmInfo.current?.name}
                       isLoadingInterest={isLoadingInterest}
                       interest={interest.current}
+                      nextHarvestDate={nextHarvestDate.current}
                     />
                   )}
                   {showLockedBoostLockConfirmation && (

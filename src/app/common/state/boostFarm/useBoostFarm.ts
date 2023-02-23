@@ -875,16 +875,7 @@ export const useBoostFarm = ({ id }) => {
     }
     const loadFarmInfo = async () => {
       try {
-        heapTrack('farm', {
-          pool: 'boost',
-          currency: selectedFarm.current.name,
-        });
-
-        selectedFarmInfo.current = {
-          ...selectedFarm.current,
-          ...(await getUpdatedFarmInfo(selectedFarm.current)),
-        };
-        setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
+        var startFirstTimer = performance.now()
 
         const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
           selectedFarm.current?.farmAddress,
@@ -895,6 +886,24 @@ export const useBoostFarm = ({ id }) => {
 
         previousHarvestDate.current = moment(lastHarvestDate);
         nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
+
+        var endFirstTimer = performance.now()
+        console.log(`loadFarmInfo() before farmInfo() took ${endFirstTimer - startFirstTimer} milliseconds`)
+        
+        var startSecondTimer = performance.now()
+        selectedFarmInfo.current = {
+          ...selectedFarm.current,
+          ...(await getUpdatedFarmInfo(selectedFarm.current)),
+        };
+        var endSecondTimer = performance.now()
+        console.log(`getUpdatedFarmInfo() took ${endSecondTimer - startSecondTimer} milliseconds`)
+
+        setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
+
+        heapTrack('farm', {
+          pool: 'boost',
+          currency: selectedFarm.current.name,
+        });
 
         setIsLoading(false);
         await updateRewardsInfo();
@@ -951,6 +960,7 @@ export const useBoostFarm = ({ id }) => {
         depositedAmount: 0,
         valueOf1LPinUSDC: valueOf1LPinUSDC,
       };
+
       if (walletAccountAtom) {
         const depositedAmountInLP = await getUserDepositedLPAmount(
           farm.farmAddress,
@@ -982,7 +992,7 @@ export const useBoostFarm = ({ id }) => {
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;
         }
       }
-
+      
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
