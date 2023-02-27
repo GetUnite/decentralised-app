@@ -336,7 +336,7 @@ export const useFarm = ({ id }) => {
 
       if (isUserWaiting) {
         setNotification(
-          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          `You have pending withdrawal requests in the queue. These will be processed shortly`,
           'info',
           undefined,
           undefined,
@@ -463,7 +463,7 @@ export const useFarm = ({ id }) => {
           currentStep.current
         ].successLabel = `Your withdrawal request for ${withdrawValue} ${selectedSupportedToken.label} was added to the queue and will be processed soon`;
         setNotification(
-          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          `You have pending withdrawal requests in the queue. These will be processed shortly`,
           'info',
           undefined,
           undefined,
