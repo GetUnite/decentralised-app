@@ -681,7 +681,7 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
   const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
-  while (looped.length == 0) {
+  do {
     looped = await QueryFilter(
       abi,
       farmAddress,
@@ -694,7 +694,7 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
 
     fromBlock = toBlock;
     toBlock = toBlock + 1000 > lastBlock ? lastBlock : toBlock + 1000;
-  }
+  }while (looped.length == 0 && toBlock != lastBlock);
 
   return looped[0].args[0].toNumber();
 };
