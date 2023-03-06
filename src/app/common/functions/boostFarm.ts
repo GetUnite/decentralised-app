@@ -73,6 +73,7 @@ export const withdrawFromBoostFarm = async (
     ];
 
     const amountInDecimals = toDecimals(amount, decimals);
+    console.log("amount in decimals of withdraw amount:", amountInDecimals)
 
     const tx = await sendTransaction(
       abi,
@@ -681,7 +682,7 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
   const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
-  while (looped.length == 0) {
+  do {
     looped = await QueryFilter(
       abi,
       farmAddress,
@@ -694,9 +695,9 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
 
     fromBlock = toBlock;
     toBlock = toBlock + 1000 > lastBlock ? lastBlock : toBlock + 1000;
-  }
+  }while (looped.length == 0 && toBlock != lastBlock);
 
-  return looped[0].args[0].toNumber();
+  return looped[0]?.args[0]?.toNumber();
 };
 
 export const unlockUserFunds = async (
