@@ -876,7 +876,6 @@ export const useBoostFarm = ({ id }) => {
     const loadFarmInfo = async () => {
       try {
         var startFirstTimer = performance.now()
-
         const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
           selectedFarm.current?.farmAddress,
           selectedFarm.current?.chain,
