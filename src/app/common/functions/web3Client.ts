@@ -19,7 +19,7 @@ import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
 const ethereumMainnetProviderUrl =
-  'https://eth-mainnet.g.alchemy.com/v2/BQ85p2q56v_fKcKachiDuBCdmpyNCWZr';
+  'https://eth.llamarpc.com/';;
 const ethereumProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? ethereumMainnetProviderUrl
@@ -730,9 +730,7 @@ export const approve = async (
 };
 
 export const getReadOnlyProvider = chain => {
-  const providerUrl =
-    chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl;
-  return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
+  return new ethers.providers.JsonRpcProvider(chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl, 'any');
 };
 
 export const callContract = async (
@@ -779,12 +777,10 @@ export const QueryFilter = async (
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
   try {
-    const event = contract.filters[eventSignature].apply(null, params);
-
     const logs = await contract.queryFilter(
-      event,
+      contract.filters[eventSignature].apply(null, params),
       blockNumber,
-      toBlockNumber ? toBlockNumber : blockNumber,
+      toBlockNumber || blockNumber,
     );
 
     return logs;
