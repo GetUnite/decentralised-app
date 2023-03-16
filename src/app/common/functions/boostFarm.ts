@@ -674,14 +674,15 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
   );
 
  let toBlock = block.block + 5000;
-  let fromBlock = block.block;
+ let fromBlock = block.block;
 
   // this is the last block we will check. 
   // swap with toBlock + average amount by day to check from sunday to monday and give up
   const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
-  while (looped.length == 0 && toBlock !== lastBlock) {
+ 
+  do {
     looped = await QueryFilter(
       abi,
       farmAddress,
@@ -691,10 +692,12 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
       chain,
       toBlock,
     );
+
     fromBlock = toBlock;
     toBlock = toBlock + 5000 > lastBlock ? lastBlock : toBlock + 5000;
-  }
-  return looped[0].args[0].toNumber()
+  }while (looped.length == 0 && toBlock != lastBlock);
+
+  return looped[0]?.args[0]?.toNumber()
 };
 
 export const unlockUserFunds = async (
