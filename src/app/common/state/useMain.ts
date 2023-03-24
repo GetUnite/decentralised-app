@@ -32,9 +32,9 @@ import { fromLocaleString, toExactFixed } from '../functions/utils';
 import { useNotification } from './useNotification';
 
 const possibleStableTokens = [
-  'agEUR',
   'DAI',
-  'EURS',
+  // 'agEUR',
+  // 'EURS',
   'EURT',
   'jEUR',
   'PAR',
