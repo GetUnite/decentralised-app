@@ -73,6 +73,7 @@ export const withdrawFromBoostFarm = async (
     ];
 
     const amountInDecimals = toDecimals(amount, decimals);
+    console.log("amount in decimals of withdraw amount:", amountInDecimals)
 
     const tx = await sendTransaction(
       abi,
@@ -661,26 +662,26 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
 
   const EthDater = require('ethereum-block-by-date');
   const provider = getReadOnlyProvider(chain);
-  const dater = new EthDater(
-    provider, // Ethers provider, required.
-  );
 
   // Always start the search at the last sunday at 12pm
   const sunday = moment().startOf('week').set('hour', 12);
-  let block = await dater.getDate(
+  let block = await new EthDater(
+    provider, // Ethers provider, required.
+  ).getDate(
     sunday, // Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
     true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
     false, // Refresh boundaries, optional. Recheck the latest block before request. By default false.
   );
 
-  let toBlock = block.block + 1000;
-  let fromBlock = block.block;
+ let toBlock = block.block + 5000;
+ let fromBlock = block.block;
 
   // this is the last block we will check. 
   // swap with toBlock + average amount by day to check from sunday to monday and give up
   const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
+ 
   do {
     looped = await QueryFilter(
       abi,
@@ -693,10 +694,10 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     );
 
     fromBlock = toBlock;
-    toBlock = toBlock + 1000 > lastBlock ? lastBlock : toBlock + 1000;
+    toBlock = toBlock + 5000 > lastBlock ? lastBlock : toBlock + 5000;
   }while (looped.length == 0 && toBlock != lastBlock);
 
-  return looped[0].args[0].toNumber();
+  return looped[0]?.args[0]?.toNumber()
 };
 
 export const unlockUserFunds = async (

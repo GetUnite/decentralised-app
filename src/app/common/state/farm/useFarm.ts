@@ -66,39 +66,39 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: ['agEUR'],//'EURT', 'EURS', 'jEUR'],
+    icons: ['EURT'],//'agEUR', 'EURS', 'jEUR'],
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EPolygonAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      /*{
-        label: 'EURS',
-        address: EPolygonAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'PAR',
-        address: EPolygonAddresses.PAR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'jEUR',
-        address: EPolygonAddresses.JEUR,
-        decimals: 18,
-        sign: '€',
-      },
+      // {
+      //   label: 'agEUR',
+      //   address: EPolygonAddresses.AGEUR,
+      //   decimals: 18,
+      //   sign: '€',
+      // },
+      // /*{
+      //   label: 'EURS',
+      //   address: EPolygonAddresses.EURS,
+      //   decimals: 2,
+      //   sign: '€',
+      // },
+      // {
+      //   label: 'PAR',
+      //   address: EPolygonAddresses.PAR,
+      //   decimals: 18,
+      //   sign: '€',
+      // },
+      // {
+      //   label: 'jEUR',
+      //   address: EPolygonAddresses.JEUR,
+      //   decimals: 18,
+      //   sign: '€',
+      // },
       {
         label: 'EURT',
         address: EPolygonAddresses.EURT,
         decimals: 6,
         sign: '€',
-      },*/
+      },
     ],
   },
   {
@@ -174,27 +174,27 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT', 'EURS', 'agEUR'],
+    icons: ['EURT'],//, 'EURS', 'agEUR'],
     underlyingTokenAddress: EEthereumAddresses.EURT,
     supportedTokens: [
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
+      // {
+      //   label: 'EURS',
+      //   address: EEthereumAddresses.EURS,
+      //   decimals: 2,
+      //   sign: '€',
+      // },
       {
         label: 'EURT',
         address: EEthereumAddresses.EURT,
         decimals: 6,
         sign: '€',
       },
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
+      // {
+      //   label: 'agEUR',
+      //   address: EEthereumAddresses.AGEUR,
+      //   decimals: 18,
+      //   sign: '€',
+      // },
     ],
   },
   {
@@ -336,7 +336,7 @@ export const useFarm = ({ id }) => {
 
       if (isUserWaiting) {
         setNotification(
-          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          `You have pending withdrawal requests in the queue. These will be processed shortly`,
           'info',
           undefined,
           undefined,
@@ -463,7 +463,7 @@ export const useFarm = ({ id }) => {
           currentStep.current
         ].successLabel = `Your withdrawal request for ${withdrawValue} ${selectedSupportedToken.label} was added to the queue and will be processed soon`;
         setNotification(
-          `You have pending withdrawal requests in queue. These will be processed shortly`,
+          `You have pending withdrawal requests in the queue. These will be processed shortly`,
           'info',
           undefined,
           undefined,
