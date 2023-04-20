@@ -1,6 +1,7 @@
 import { Biconomy } from '@biconomy/mexa';
 import { Framework } from '@superfluid-finance/sdk-core';
-import { Token, ChainId, Fetcher, Route, WETH, Pair, TokenAmount} from '@uniswap/sdk';
+import { computePoolAddress } from '@uniswap/v3-sdk'
+import { SupportedChainId, Token } from '@uniswap/sdk-core'
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
@@ -17,7 +18,7 @@ import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
-import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import { fromDecimals, fromReadableAmount, maximumUint256Value, toDecimals, toReadableAmount } from './utils';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -836,29 +837,57 @@ export const getPrice = async (
   sellDecimals: number,
   buyDecimals: number,
 ): Promise<number> => {
-  const provider = getReadOnlyProvider(EChain.ETHEREUM);
-
-  const sellToken = new Token(ChainId.MAINNET, sellTokenAddress, sellDecimals);
-  const buyToken = new Token(ChainId.MAINNET, buyTokenAddress, buyDecimals);
-  let pair, route;
   try {
-    pair = await Fetcher.fetchPairData(sellToken, buyToken, provider);
-    route = new Route([pair], sellToken);
-  } catch (error) {
-    console.log("entrou aqui");
-    // pair directly from sell to buy failed. 
-    // let's try sell -> eth -> buy
-    try {      
-      const sellToETHPair = await Fetcher.fetchPairData(sellToken, WETH[ChainId.MAINNET], provider);
-      console.log("o sell", sellToETHPair);
-      const ETHtoBuyPair = await Fetcher.fetchPairData(WETH[ChainId.MAINNET], buyToken, provider);
-      console.log(ETHtoBuyPair);
+    const provider = getProvider();
+    const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
 
-      route = new Route([sellToETHPair, ETHtoBuyPair], sellToken);
-    } catch (error) {
-      console.log(sellTokenAddress, buyTokenAddress, WETH[ChainId.MAINNET], error);
-      throw 'Something went wrong while fetching prices. Please try again later';
-    }
+    const quoterContract = new ethers.Contract(
+      quoterAddress,
+      Quoter.abi,
+      provider
+    )
+
+    const factoryAddress = EEthereumAddresses.UNISWAPPOOLFACTORY;
+
+    const sellToken = new Token(SupportedChainId.MAINNET, sellTokenAddress, sellDecimals);
+    const buyToken = new Token(SupportedChainId.MAINNET, buyTokenAddress, buyDecimals);
+
+    const currentPoolAddress = computePoolAddress({
+      factoryAddress: factoryAddress,
+      tokenA: sellToken,
+      tokenB: buyToken,
+      fee: 10000,
+    });
+
+    const poolContract = new ethers.Contract(
+      currentPoolAddress,
+      IUniswapV3PoolABI.abi,
+      provider
+    );
+
+    const [token0, token1, fee] = await Promise.all([
+      poolContract.token0(),
+      poolContract.token1(),
+      poolContract.fee(),
+    ])
+
+    const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
+      sellTokenAddress,
+      buyTokenAddress,
+      fee,
+      toDecimals(1, sellDecimals),
+      0
+    );
+
+    const price = +fromDecimals(quotedAmountOut, buyDecimals);
+    return price;
+
+
+    return 1;
+
+  } catch (error) {
+    console.log(error);
+    throw 'Something went wrong while fetching prices. Please try again later';
   }
 
   return +route.midPrice.toSignificant(buyDecimals);
