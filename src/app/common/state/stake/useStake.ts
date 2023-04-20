@@ -154,7 +154,7 @@ export const useStake = () => {
       let info: TAlluoStakingInfo = {
         balance: await getAlluoBalance(),
         allowance: await getAlluoStakingAllowance(),
-        apr: (await getAlluoStakingAPR()).toLocaleString(),
+        apr: toExactFixed(await getAlluoStakingAPR(), 2),
         totalLocked: toExactFixed(await getTotalAlluoLocked(), 2),
         earned: toExactFixed(await getEarnedAlluo(), 2),
         unlocked: await getUnlockedAlluo(),
@@ -271,8 +271,8 @@ export const useStake = () => {
       processingTitle.current != undefined
         ? processingTitle.current
         : selectedTab == 0
-        ? 'Locking funds...'
-        : 'Unlocking funds...';
+          ? 'Locking funds...'
+          : 'Unlocking funds...';
     setIsProcessing(true);
     await handleCurrentStep();
   };

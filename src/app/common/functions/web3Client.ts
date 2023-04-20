@@ -230,8 +230,8 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-    ? EChain.ETHEREUM
-    : null;
+      ? EChain.ETHEREUM
+      : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -802,7 +802,7 @@ export const binarySearchForBlock = async (
   );
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
-      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
+    Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
   let closestBlock;
 
@@ -830,10 +830,10 @@ export const binarySearchForBlock = async (
 const marketApiURl = 'https://protocol-mainnet.gnosis.io/api';
 
 export const getPrice = async (
-  sellToken,
-  buyToken,
-  sellDecimals,
-  buyDecimals,
+  sellToken: string,
+  buyToken: string,
+  sellDecimals: number,
+  buyDecimals: number,
 ) => {
   const url = marketApiURl + `/v1/quote`;
 
@@ -861,7 +861,7 @@ export const getPrice = async (
     // We multiplied the value by 1000 so now divide it
     return price / 1000;
   } catch (error) {
-    throw 'Something went wrong while fetching data. Please try again later';
+    throw 'Something went wrong while fetching prices. Please try again later';
   }
 };
 

@@ -80,9 +80,6 @@ export const getAlluoStakingRewardPerDistribution = async () => {
 };
 
 export const getAlluoStakingAPR = async () => {
-  const alluoPrice = await getAlluoPrice();
-  if (!alluoPrice) return 0;
-
   const alluoStakingRewardPerDistribution =
     await getAlluoStakingRewardPerDistribution();
 
