@@ -1,7 +1,6 @@
 import { Biconomy } from '@biconomy/mexa';
 import { Framework } from '@superfluid-finance/sdk-core';
-import { computePoolAddress } from '@uniswap/v3-sdk'
-import { SupportedChainId, Token } from '@uniswap/sdk-core'
+import { Token, ChainId, Fetcher, Route } from '@uniswap/sdk';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
@@ -838,53 +837,13 @@ export const getPrice = async (
   buyDecimals: number,
 ): Promise<number> => {
   try {
-    const provider = getProvider();
-    const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
+    const sellToken = new Token(ChainId.MAINNET, sellTokenAddress, sellDecimals);
+    const buyToken = new Token(ChainId.MAINNET, buyTokenAddress, buyDecimals);
 
-    const quoterContract = new ethers.Contract(
-      quoterAddress,
-      Quoter.abi,
-      provider
-    )
+    const pair = await Fetcher.fetchPairData(sellToken, buyToken);
+    const route = new Route([pair], buyToken);
 
-    const factoryAddress = EEthereumAddresses.UNISWAPPOOLFACTORY;
-
-    const sellToken = new Token(SupportedChainId.MAINNET, sellTokenAddress, sellDecimals);
-    const buyToken = new Token(SupportedChainId.MAINNET, buyTokenAddress, buyDecimals);
-
-    const currentPoolAddress = computePoolAddress({
-      factoryAddress: factoryAddress,
-      tokenA: sellToken,
-      tokenB: buyToken,
-      fee: 10000,
-    });
-
-    const poolContract = new ethers.Contract(
-      currentPoolAddress,
-      IUniswapV3PoolABI.abi,
-      provider
-    );
-
-    const [token0, token1, fee] = await Promise.all([
-      poolContract.token0(),
-      poolContract.token1(),
-      poolContract.fee(),
-    ])
-
-    const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
-      sellTokenAddress,
-      buyTokenAddress,
-      fee,
-      toDecimals(1, sellDecimals),
-      0
-    );
-
-    const price = +fromDecimals(quotedAmountOut, buyDecimals);
-    return price;
-
-
-    return 1;
-
+    return +route.midPrice.toSignificant(sellDecimals);
   } catch (error) {
     console.log(error);
     throw 'Something went wrong while fetching prices. Please try again later';
