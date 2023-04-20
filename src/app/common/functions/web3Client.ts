@@ -1,5 +1,6 @@
 import { Biconomy } from '@biconomy/mexa';
 import { Framework } from '@superfluid-finance/sdk-core';
+import { Token, ChainId, Fetcher, Route } from '@uniswap/sdk';
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
@@ -827,39 +828,20 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-const marketApiURl = 'https://protocol-mainnet.gnosis.io/api';
-
 export const getPrice = async (
-  sellToken: string,
-  buyToken: string,
+  sellTokenAddress: string,
+  buyTokenAddress: string,
   sellDecimals: number,
   buyDecimals: number,
-) => {
-  const url = marketApiURl + `/v1/quote`;
-
-  // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
-  const value = toDecimals(1000, sellDecimals);
-
+): Promise<number> => {
   try {
-    const priceResponse = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      body: JSON.stringify({
-        sellToken: sellToken,
-        buyToken: buyToken,
-        sellAmountBeforeFee: value,
-        from: walletAddress,
-        kind: 'sell',
-      }),
-    }).then(res => res.json());
+    const sellToken = new Token(ChainId.MAINNET, sellTokenAddress, sellDecimals);
+    const buyToken = new Token(ChainId.MAINNET, buyTokenAddress, buyDecimals);
 
-    const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
+    const pair = await Fetcher.fetchPairData(sellToken, buyToken);
+    const route = new Route([pair], buyToken);
 
-    // We multiplied the value by 1000 so now divide it
-    return price / 1000;
+    return +route.midPrice.toSignificant(sellDecimals);
   } catch (error) {
     throw 'Something went wrong while fetching prices. Please try again later';
   }
