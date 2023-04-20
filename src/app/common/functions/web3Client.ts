@@ -1,7 +1,5 @@
 import { Biconomy } from '@biconomy/mexa';
 import { Framework } from '@superfluid-finance/sdk-core';
-import { computePoolAddress } from '@uniswap/v3-sdk'
-import { SupportedChainId, Token } from '@uniswap/sdk-core'
 import coinbaseWalletModule from '@web3-onboard/coinbase';
 import Onboard from '@web3-onboard/core';
 import gnosisModule from '@web3-onboard/gnosis';
