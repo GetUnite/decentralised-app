@@ -18,7 +18,8 @@ import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
-import { fromDecimals, fromReadableAmount, maximumUint256Value, toDecimals, toReadableAmount } from './utils';
+import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import { getUniswapPoolAddress } from './uniswap';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -202,7 +203,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xF9AE7A7568BC1d5355462183F5D9B878B49C3686';
+  //return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
   return walletAddress;
 };
 
@@ -847,50 +848,68 @@ export const getPrice = async (
       provider
     )
 
-    const factoryAddress = EEthereumAddresses.UNISWAPPOOLFACTORY;
+    let valueToConvert = toDecimals(1, sellDecimals);
 
-    const sellToken = new Token(SupportedChainId.MAINNET, sellTokenAddress, sellDecimals);
-    const buyToken = new Token(SupportedChainId.MAINNET, buyTokenAddress, buyDecimals);
+    let fee;
 
-    const currentPoolAddress = computePoolAddress({
-      factoryAddress: factoryAddress,
-      tokenA: sellToken,
-      tokenB: buyToken,
-      fee: 10000,
-    });
+    const sellToBuyPoolAddress = getUniswapPoolAddress(sellTokenAddress, buyTokenAddress);
 
-    const poolContract = new ethers.Contract(
-      currentPoolAddress,
-      IUniswapV3PoolABI.abi,
-      provider
-    );
+    if (sellToBuyPoolAddress) {
+      const sellToBuyPoolContract = new ethers.Contract(
+        sellToBuyPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
+      fee = await sellToBuyPoolContract.fee();
+    } else {
+      // there was no direct pool from sell to buy
+      // let's go for sell -> eth -> buy
+      const sellToEthPoolAddress = getUniswapPoolAddress(sellTokenAddress, EEthereumAddresses.WETH);
+      const sellToEthPoolContract = new ethers.Contract(
+        sellToEthPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
 
-    const [token0, token1, fee] = await Promise.all([
-      poolContract.token0(),
-      poolContract.token1(),
-      poolContract.fee(),
-    ])
+      fee = await sellToEthPoolContract.fee();
+
+      const amountInETH = await quoterContract.callStatic.quoteExactInputSingle(
+        sellTokenAddress,
+        EEthereumAddresses.WETH,
+        fee,
+        valueToConvert,
+        0
+      );
+
+      // value to sell becomes the amount in eethereum
+      valueToConvert = amountInETH.toNumber();
+      // the sellTokenAddress becomes eth address
+      sellTokenAddress = EEthereumAddresses.WETH;
+
+      // gets pool to convert eth into buy token
+      const ethToBuyPoolAddress = getUniswapPoolAddress(EEthereumAddresses.WETH, buyTokenAddress);
+      const ethToBuyPoolContract = new ethers.Contract(
+        ethToBuyPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
+
+      fee = await ethToBuyPoolContract.fee();
+    }
 
     const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
       sellTokenAddress,
       buyTokenAddress,
       fee,
-      toDecimals(1, sellDecimals),
+      valueToConvert,
       0
     );
 
     const price = +fromDecimals(quotedAmountOut, buyDecimals);
     return price;
-
-
-    return 1;
-
   } catch (error) {
-    console.log(error);
     throw 'Something went wrong while fetching prices. Please try again later';
   }
-
-  return +route.midPrice.toSignificant(buyDecimals);
 };
 
 const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
