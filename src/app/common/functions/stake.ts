@@ -432,7 +432,6 @@ export const getStakingPendingRewards = async chain => {
     chain,
   );
 
-  console.log(stakerAccruedRewards);
   let pendingRewardsByToken = [];
   for (const pendingRewardsArray of stakerAccruedRewards) {
     for (const pendingRewards of pendingRewardsArray) {
