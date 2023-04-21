@@ -19,8 +19,8 @@ import ScrollToTop from 'scroll-to-top';
 import './reset.css';
 
 export const Router = () => {
-  const [modeAtom] = useRecoilState(mode);
   useWallet();
+  const [modeAtom] = useRecoilState(mode);
 
   return (
     <BrowserRouter>

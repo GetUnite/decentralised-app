@@ -73,7 +73,6 @@ export const withdrawFromBoostFarm = async (
     ];
 
     const amountInDecimals = toDecimals(amount, decimals);
-    console.log("amount in decimals of withdraw amount:", amountInDecimals)
 
     const tx = await sendTransaction(
       abi,
@@ -346,11 +345,11 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
 };
 
 export const getMaximumLPValueAsToken = async (
-  farmAddress,
-  tokenAddress,
-  tokenDecimals,
-  amount,
-  isLocked = false,
+  farmAddress: string,
+  tokenAddress: string,
+  tokenDecimals: number,
+  amount: string | number,
+  isLocked: boolean = false,
 ) => {
   const abi = [
     {
@@ -458,7 +457,7 @@ export const getBoostFarmInterest = async (
   const fee =
     1 -
     (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
-      10000;
+    10000;
 
   const baseApyJsonResult = await fetch(
     boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
@@ -479,9 +478,9 @@ export const getBoostFarmInterest = async (
   return (
     (baseApy +
       baseRewardsAPR *
-        fee *
-        (1 + boostApy) *
-        Math.pow(1 + boostRewardsAPR / 52, 52)) *
+      fee *
+      (1 + boostApy) *
+      Math.pow(1 + boostRewardsAPR / 52, 52)) *
     100
   );
 };
@@ -673,15 +672,15 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     false, // Refresh boundaries, optional. Recheck the latest block before request. By default false.
   );
 
- let toBlock = block.block + 5000;
- let fromBlock = block.block;
+  let toBlock = block.block + 5000;
+  let fromBlock = block.block;
 
   // this is the last block we will check. 
   // swap with toBlock + average amount by day to check from sunday to monday and give up
   const lastBlock = await provider.getBlockNumber();
 
   let looped = [];
- 
+
   do {
     looped = await QueryFilter(
       abi,
@@ -695,7 +694,7 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
 
     fromBlock = toBlock;
     toBlock = toBlock + 5000 > lastBlock ? lastBlock : toBlock + 5000;
-  }while (looped.length == 0 && toBlock != lastBlock);
+  } while (looped.length == 0 && toBlock != lastBlock);
 
   return looped[0]?.args[0]?.toNumber()
 };

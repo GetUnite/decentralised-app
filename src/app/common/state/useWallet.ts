@@ -26,7 +26,7 @@ export const useWallet = () => {
   const [wantedChainId, setWantedChainId] = useState<EChainId>();
   const [currentChainId, setCurrentChainId] = useState<EChain>();
 
-  const handleSafeAppConnection = (walletAddress, isGnosisSafe) => {
+  const handleSafeAppConnection = (walletAddress: string, isGnosisSafe: boolean) => {
     setWalletAccountAtom(walletAddress);
     if (isGnosisSafe) {
       setSafeAppAtom(true);
@@ -37,13 +37,15 @@ export const useWallet = () => {
     tryAutoWalletConnection(handleSafeAppConnection);
   }, []);
 
-  const handleWalletChanged = (chainId, walletAddress) => {
+  const handleWalletChanged = (chainId: EChain, walletAddress: string) => {
     setCurrentChainId(chainId);
     setWalletAccountAtom(walletAddress);
   };
 
   useEffect(() => {
-    onWalletUpdated(handleWalletChanged);
+    if (walletAccountAtom) {
+      onWalletUpdated(handleWalletChanged);
+    }
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export const useWallet = () => {
     }
   };
 
-  const checkCurrentChain = async (chainId?) => {
+  const checkCurrentChain = async (chainId?: EChainId) => {
     const chainToUse = chainId != undefined ? chainId : wantedChainId;
     if (chainToUse != undefined) {
       const isCorrectNetwork = (await getCurrentChainId()) == chainToUse;

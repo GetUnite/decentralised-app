@@ -6,6 +6,8 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
+import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json'
+import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'
 import {
   EEthereumAddresses,
   EPolygonAddresses
@@ -15,6 +17,7 @@ import { ethers } from 'ethers';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import { getUniswapPoolAddress } from './uniswap';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -175,6 +178,7 @@ export const connectToWallet = async (connectOptions?) => {
         wallets[0].provider,
         'any',
       );
+
       walletAddress = wallets[0].accounts[0].address;
       wa.domain = unstoppableUser ? wallets[0].instance.user.sub : null;
       wa.address = wallets[0].accounts[0].address;
@@ -198,7 +202,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xF9AE7A7568BC1d5355462183F5D9B878B49C3686';
+  //return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
   return walletAddress;
 };
 
@@ -230,8 +234,8 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-    ? EChain.ETHEREUM
-    : null;
+      ? EChain.ETHEREUM
+      : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -291,7 +295,7 @@ const waitForBiconomyReady = biconomy =>
       });
   });
 
-export const getProvider = chain => {
+export const getProvider = () => {
   return walletProvider;
 };
 
@@ -758,9 +762,8 @@ export const callContract = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
+      error: error
     });
-    // here do all error handling to readable stuff
-    console.log(error);
   }
 };
 
@@ -802,7 +805,7 @@ export const binarySearchForBlock = async (
   );
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
-      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
+    Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
   let closestBlock;
 
@@ -827,41 +830,86 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-const marketApiURl = 'https://protocol-mainnet.gnosis.io/api';
-
 export const getPrice = async (
-  sellToken,
-  buyToken,
-  sellDecimals,
-  buyDecimals,
-) => {
-  const url = marketApiURl + `/v1/quote`;
-
-  // quote returns the value accounting with fee so using 1000 to prevent the fee being higher than the actual value
-  const value = toDecimals(1000, sellDecimals);
-
+  sellTokenAddress: string,
+  buyTokenAddress: string,
+  sellDecimals: number,
+  buyDecimals: number,
+): Promise<number> => {
   try {
-    const priceResponse = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      body: JSON.stringify({
-        sellToken: sellToken,
-        buyToken: buyToken,
-        sellAmountBeforeFee: value,
-        from: walletAddress,
-        kind: 'sell',
-      }),
-    }).then(res => res.json());
+    const provider = getReadOnlyProvider(EChain.ETHEREUM);
+    const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
 
-    const price = +fromDecimals(priceResponse.quote.buyAmount, buyDecimals);
+    const quoterContract = new ethers.Contract(
+      quoterAddress,
+      Quoter.abi,
+      provider
+    )
 
-    // We multiplied the value by 1000 so now divide it
-    return price / 1000;
+    let valueToConvert = toDecimals(1, sellDecimals);
+
+    let fee;
+
+    const sellToBuyPoolAddress = getUniswapPoolAddress(sellTokenAddress, buyTokenAddress);
+
+    if (sellToBuyPoolAddress) {
+      const sellToBuyPoolContract = new ethers.Contract(
+        sellToBuyPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
+
+      fee = await sellToBuyPoolContract.fee();
+    } else {
+      // there was no direct pool from sell to buy
+      // let's go for sell -> eth -> buy
+      const sellToEthPoolAddress = getUniswapPoolAddress(sellTokenAddress, EEthereumAddresses.WETH);
+
+      const sellToEthPoolContract = new ethers.Contract(
+        sellToEthPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
+
+      fee = await sellToEthPoolContract.fee();
+
+      const amountInETH = await quoterContract.callStatic.quoteExactInputSingle(
+        sellTokenAddress,
+        EEthereumAddresses.WETH,
+        fee,
+        valueToConvert,
+        0
+      );
+
+      // value to sell becomes the amount in eethereum
+      valueToConvert = amountInETH.toNumber();
+      // the sellTokenAddress becomes eth address
+      sellTokenAddress = EEthereumAddresses.WETH;
+
+      // gets pool to convert eth into buy token
+      const ethToBuyPoolAddress = getUniswapPoolAddress(EEthereumAddresses.WETH, buyTokenAddress);
+
+      const ethToBuyPoolContract = new ethers.Contract(
+        ethToBuyPoolAddress,
+        IUniswapV3PoolABI.abi,
+        provider
+      );
+
+      fee = await ethToBuyPoolContract.fee();
+    }
+
+    const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
+      sellTokenAddress,
+      buyTokenAddress,
+      fee,
+      valueToConvert,
+      0
+    );
+
+    const price = +fromDecimals(quotedAmountOut, buyDecimals);
+    return price;
   } catch (error) {
-    throw 'Something went wrong while fetching data. Please try again later';
+    throw 'Something went wrong while fetching prices. Please try again later';
   }
 };
 
