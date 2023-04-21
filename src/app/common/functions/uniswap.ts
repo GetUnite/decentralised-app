@@ -1,16 +1,16 @@
 import { EEthereumAddresses } from "../constants/addresses"
 
-export const getUniswapPoolAddress = (sellTokenAddress: string, buyTokenAddress: string) => {
+export const getUniswapPoolAddress = (sellTokenAddress: string, buyTokenAddress: string): string => {
     // ALLUO/ETH pool
     if ((sellTokenAddress == EEthereumAddresses.ALLUO || sellTokenAddress == EEthereumAddresses.WETH)
         && (buyTokenAddress == EEthereumAddresses.WETH || buyTokenAddress == EEthereumAddresses.ALLUO)) {
         return EEthereumAddresses.ALLUOETHPOOL;
     }
 
-    // EURT/ETH POOL
-    if ((sellTokenAddress == EEthereumAddresses.EURT || sellTokenAddress == EEthereumAddresses.WETH)
-        && (buyTokenAddress == EEthereumAddresses.WETH || buyTokenAddress == EEthereumAddresses.EURT)) {
-        return EEthereumAddresses.EURTETHPOOL;
+    // EURT/USDC
+    if ((sellTokenAddress == EEthereumAddresses.EURT || sellTokenAddress == EEthereumAddresses.USDC)
+        && (buyTokenAddress == EEthereumAddresses.USDC || buyTokenAddress == EEthereumAddresses.EURT)) {
+        return EEthereumAddresses.EURTUSDCPOOL;
     }
 
     // USDC/ETH

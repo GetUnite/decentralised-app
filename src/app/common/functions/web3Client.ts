@@ -837,7 +837,7 @@ export const getPrice = async (
   buyDecimals: number,
 ): Promise<number> => {
   try {
-    const provider = getProvider();
+    const provider = getReadOnlyProvider(EChain.ETHEREUM);
     const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
 
     const quoterContract = new ethers.Contract(
@@ -858,11 +858,13 @@ export const getPrice = async (
         IUniswapV3PoolABI.abi,
         provider
       );
+
       fee = await sellToBuyPoolContract.fee();
     } else {
       // there was no direct pool from sell to buy
       // let's go for sell -> eth -> buy
       const sellToEthPoolAddress = getUniswapPoolAddress(sellTokenAddress, EEthereumAddresses.WETH);
+
       const sellToEthPoolContract = new ethers.Contract(
         sellToEthPoolAddress,
         IUniswapV3PoolABI.abi,
@@ -886,6 +888,7 @@ export const getPrice = async (
 
       // gets pool to convert eth into buy token
       const ethToBuyPoolAddress = getUniswapPoolAddress(EEthereumAddresses.WETH, buyTokenAddress);
+
       const ethToBuyPoolContract = new ethers.Contract(
         ethToBuyPoolAddress,
         IUniswapV3PoolABI.abi,
