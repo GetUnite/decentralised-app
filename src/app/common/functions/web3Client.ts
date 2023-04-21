@@ -178,6 +178,7 @@ export const connectToWallet = async (connectOptions?) => {
         wallets[0].provider,
         'any',
       );
+
       walletAddress = wallets[0].accounts[0].address;
       wa.domain = unstoppableUser ? wallets[0].instance.user.sub : null;
       wa.address = wallets[0].accounts[0].address;
@@ -761,9 +762,8 @@ export const callContract = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
+      error: error
     });
-    // here do all error handling to readable stuff
-    console.log(error);
   }
 };
 
