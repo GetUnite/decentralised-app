@@ -89,7 +89,7 @@ export const FarmDepositTab = ({
           biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
-          showWalletFee={!useBiconomy || selectedFarm.current?.chain == EChain.POLYGON}
+          showWalletFee={!useBiconomy || selectedFarm.current?.chain != EChain.POLYGON}
           disableBiconomy={isLoading}
           isLoading={isLoading}
         />
