@@ -2,7 +2,7 @@ import { Box, Button, Text } from 'grommet';
 import { useCookies } from 'react-cookie';
 
 import { toExactFixed } from 'app/common/functions/utils';
-import booster from 'app/modernUI/images/booster.svg';
+import boost from 'app/modernUI/images/boost.svg';
 import Skeleton from 'react-loading-skeleton';
 
 export const BoostFarmPresentation = ({
@@ -35,7 +35,7 @@ export const BoostFarmPresentation = ({
             <br />
           </Text>
         )}
-        <img src={booster} alt="booster" width={275} />
+        <img src={boost} alt="boost" width={275} />
         <Button
           primary
           label="Deposit to get started"

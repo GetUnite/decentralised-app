@@ -46,7 +46,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 0,
     farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
-    type: 'booster',
+    type: 'boost',
     chain: EChain.ETHEREUM,
     name: 'FRAX/USDC',
     sign: '$',
@@ -141,7 +141,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 1,
     farmAddress: EEthereumAddresses.CVXETHVAULT,
-    type: 'booster',
+    type: 'boost',
     chain: EChain.ETHEREUM,
     name: 'CVX/ETH',
     sign: '$',
@@ -236,7 +236,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 2,
     farmAddress: EEthereumAddresses.STETHETHVAULT,
-    type: 'booster',
+    type: 'boost',
     chain: EChain.ETHEREUM,
     name: 'stETH/ETH',
     sign: '$',
@@ -331,7 +331,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 3,
     farmAddress: EEthereumAddresses.CRVYCRVVAULT,
-    type: 'booster',
+    type: 'boost',
     chain: EChain.ETHEREUM,
     name: 'CRV/yCRV',
     sign: '$',
@@ -427,7 +427,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 4,
     farmAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
-    type: 'booster',
+    type: 'boost',
     chain: EChain.ETHEREUM,
     name: 'DOLA/FRAXBP',
     sign: '$',
@@ -523,7 +523,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 5,
     farmAddress: EEthereumAddresses.FRXETHVAULT,
-    type: 'booster',
+    type: 'boost',
     isLocked: true,
     chain: EChain.ETHEREUM,
     name: 'FrxETH/ETH',
@@ -628,7 +628,7 @@ export const boostFarmOptions: Array<TBoostFarm> = [
   {
     id: 6,
     farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
-    type: 'booster',
+    type: 'boost',
     isLocked: true,
     chain: EChain.ETHEREUM,
     name: 'CVX/FRAXBP',
@@ -790,7 +790,7 @@ export const useBoostFarm = ({ id }) => {
     unlocked: 0,
   });
 
-  // booster farm rewards control
+  // boost farm rewards control
   const rewardsInfo = useRef<any>(defaultRewards);
   const pendingRewardsInfo = useRef<any>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
