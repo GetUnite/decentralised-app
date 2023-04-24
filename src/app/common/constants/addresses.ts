@@ -182,10 +182,36 @@ enum EPolygonAddressesMainnet {
   TWOWAYMARKETIBALLUOUSDBTC = '0xbB5C64B929b1E60c085dcDf88dfe41c6b9dcf65B',
 }
 
+enum EOptimismAddressesMainnet {
+  IBALLUOUSD = '0x6b55495947F3793597C0777562C37C14cb958097',
+  IBALLUOETH = '0x8BF24fea0Cae18DAB02A5b23c409E8E1f04Ff0ba',
+  IBALLUOBTC = '0x253eB6077db17a43Fd7b4f4E6e5a2D8b2F9A244d',
+  BUFFER = '0xf98977e8146386613448668050eFd9D4b880f73F',
+  HANDLER = '0x937F7125994a91d5E2Ce31846b97578131056Bb4',
+
+  USDC = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
+  USDT = '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
+  DAI = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
+
+  WETH = '0x4200000000000000000000000000000000000006',
+
+  WBTC = '0x68f180fcCe6836688e9084f035309E29Bf0A2095',
+
+  SUPERFLUID = '0x567c4B141ED61923967cA25Ef4906C8781069a10',
+  STIBALLUOUSD = '0xd28900Bfa76ec16D47FCd7b4437C27bd7E888db5',
+  STIBALLUOETH = '0x2ad6965Bc5D2b80163B37893d1fe8518aFe196A2',
+  STIBALLUOBTC = '0xf61440f37A30a9624BD0e69ABfcb57A1A5Cf9Fc7',
+}
+
 export const EPolygonAddresses = EPolygonAddressesMainnet;
-/*process.env.REACT_APP_NET === 'mainnet'
+/*process.env.REACT_APP_NET === 'polygon'
     ? EPolygonAddressesMainnet
     : EPolygonAddressesMumbai;*/
+
+export const EOptimismAddresses = EOptimismAddressesMainnet;
+/*process.env.REACT_APP_NET === 'optimisim'
+    ? EOptimismAddressesMainnet
+    : EOptimismAddressesMainnet;*/
 
 export const EEthereumAddresses = EEthereumAddressesMainnet;
 /*process.env.REACT_APP_NET === 'mainnet'

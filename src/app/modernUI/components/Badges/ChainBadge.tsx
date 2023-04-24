@@ -6,10 +6,20 @@ interface IChainBadge extends BoxExtendedProps {
 }
 
 export const ChainBadge = ({ chain, ...rest }: IChainBadge) => {
-  const backgroundColor = chain === EChain.ETHEREUM ? '#BDC5FF' : '';
+  const backgroundColor =
+    chain === EChain.ETHEREUM
+      ? '#BDC5FF'
+      : chain === EChain.OP
+      ? '#FF0420'
+      : '';
   const textColor = chain === EChain.ETHEREUM ? '#5262B2' : '';
-  const chainName = chain === EChain.ETHEREUM ? 'Ethereum' : 'Polygon';
-  
+  const chainName =
+    chain === EChain.ETHEREUM
+      ? 'Ethereum'
+      : chain === EChain.OP
+      ? 'Optimism'
+      : 'Polygon';
+
   return (
     <Box justify="start" align="start">
       <Box

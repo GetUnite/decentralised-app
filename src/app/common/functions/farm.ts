@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { EEthereumAddresses, EPolygonAddresses } from '../constants/addresses';
+import { EEthereumAddresses, EPolygonAddresses, EOptimismAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { toDecimals } from './utils';
 import {
@@ -102,7 +102,9 @@ export const getIfUserHasWithdrawalRequest = async (farmAddress, chain) => {
   const handlerAddress =
     chain == EChain.POLYGON
       ? EPolygonAddresses.HANDLER
-      : EEthereumAddresses.HANDLER;
+      : chain == EChain.ETHEREUM ? 
+      EEthereumAddresses.HANDLER 
+      : EOptimismAddresses.HANDLER;
 
   const isUserWaiting = await callContract(
     abi,
@@ -208,7 +210,9 @@ export const getIfWithdrawalWasAddedToQueue = async (blockNumber, chain) => {
   const handlerAddress =
     chain == EChain.POLYGON
       ? EPolygonAddresses.HANDLER
-      : EEthereumAddresses.HANDLER;
+      : chain == EChain.ETHEREUM 
+      ? EEthereumAddresses.HANDLER
+      : EOptimismAddresses.HANDLER;
 
   let events = await QueryFilter(
     abi,
