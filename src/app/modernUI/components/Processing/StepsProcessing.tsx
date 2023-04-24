@@ -178,7 +178,7 @@ export const StepsProcessing = ({
           })}
         </Box>
       </Box>
-      <Box gap="24px" align="center">
+      <Box align="center">
         {stepWasSuccessful != undefined ? (
           <Box className="fade-in" fill>
             <img src={finalImage} />
