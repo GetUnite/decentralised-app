@@ -1,5 +1,6 @@
 import {
   EEthereumAddresses,
+  EOptimismAddresses,
   EPolygonAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
@@ -13,9 +14,9 @@ import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   approve,
+  getBalance,
   getInterest,
   getTotalAssetSupply,
-  getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
@@ -28,34 +29,204 @@ import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useOptimisedFarmDeposit';
 import { possibleWithdrawSteps } from './useOptimisedFarmWithdrawal';
 
-export const farmOptions: Array<TFarm> = [
+export const optimisedFarmOptions: Array<TFarm> = [
   {
     id: 0,
-    farmAddress: EPolygonAddresses.IBALLUOUSD,
+    farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSDC,
     type: 'optimised',
-    chain: EChain.,
-    name: 'US Dollar',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Beefy Top Vault USD',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
-    underlyingTokenAddress: EPolygonAddresses.USDC,
+    underlyingTokenAddress: EOptimismAddresses.USDC,
     supportedTokens: [
       {
         label: 'DAI',
-        address: EPolygonAddresses.DAI,
+        address: EOptimismAddresses.DAI,
         decimals: 18,
         sign: '$',
       },
       {
         label: 'USDC',
-        address: EPolygonAddresses.USDC,
+        address: EOptimismAddresses.USDC,
         decimals: 6,
         sign: '$',
       },
       {
         label: 'USDT',
-        address: EPolygonAddresses.USDT,
+        address: EOptimismAddresses.USDT,
         decimals: 6,
         sign: '$',
+      },
+    ],
+  },
+  {
+    id: 1,
+    farmAddress: EOptimismAddresses.BEEFYTOP3VAULTUSDC,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Beefy Top 3 Vault USD',
+    sign: '$',
+    icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EOptimismAddresses.USDC,
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: EOptimismAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EOptimismAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: EOptimismAddresses.USDT,
+        decimals: 6,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    id: 2,
+    farmAddress: EOptimismAddresses.BEEFYTOPVAULTETH,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Beefy Top Vault ETH',
+    sign: '$',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    id: 3,
+    farmAddress: EOptimismAddresses.BEEFYTOP3VAULTETH,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Beefy Top 3 Vault ETH',
+    sign: '$',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    id: 4,
+    farmAddress: EOptimismAddresses.YEARNTOPVAULTUSDC,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Yearn Top Vault USD',
+    sign: '$',
+    icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EOptimismAddresses.USDC,
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: EOptimismAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EOptimismAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: EOptimismAddresses.USDT,
+        decimals: 6,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    id: 5,
+    farmAddress: EOptimismAddresses.YEARNTOP3VAULTUSDC,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Yearn Top 3 Vault USD',
+    sign: '$',
+    icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EOptimismAddresses.USDC,
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: EOptimismAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EOptimismAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: EOptimismAddresses.USDT,
+        decimals: 6,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    id: 6,
+    farmAddress: EOptimismAddresses.YEARNTOPVAULTETH,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Yearn Top Vault ETH',
+    sign: '$',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    id: 7,
+    farmAddress: EOptimismAddresses.YEARNTOP3VAULTETH,
+    type: 'optimised',
+    isOptimised: true,
+    chain: EChain.OPTIMISM,
+    name: 'Yearn Top 3 Vault ETH',
+    sign: '$',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
       },
     ],
   },
@@ -77,7 +248,7 @@ export const useOptimisedFarm = ({ id }) => {
 
   // selected farm control
   const selectedFarm = useRef<TFarm>(
-    farmOptions.find(availableFarm => availableFarm.id == id),
+    optimisedFarmOptions.find(availableFarm => availableFarm.id == id),
   );
   const [selectedFarmInfo, setSelectedFarmInfo] = useState<TFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
@@ -121,7 +292,7 @@ export const useOptimisedFarm = ({ id }) => {
   useEffect(() => {
     const selectFarm = async id => {
       try {
-        let farm = farmOptions.find(availableFarm => availableFarm.id == id);
+        let farm = optimisedFarmOptions.find(availableFarm => availableFarm.id == id);
         if (!farm) {
           navigate('/');
           return;
@@ -203,7 +374,7 @@ export const useOptimisedFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        const depositedAmount = await getUserDepositedAmount(
+        const depositedAmount = await getBalance(
           farm.farmAddress,
           farm.chain,
         );

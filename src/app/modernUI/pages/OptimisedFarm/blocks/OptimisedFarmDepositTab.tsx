@@ -1,6 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
-import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -10,6 +9,7 @@ import {
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
+import { useOptimisedFarmDeposit } from 'app/common/state/optimisedFarm';
 
 export const OptimisedFarmDepositTab = ({
   selectedFarm,
@@ -33,7 +33,7 @@ export const OptimisedFarmDepositTab = ({
     depositValueError,
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
-  } = useFarmDeposit({
+  } = useOptimisedFarmDeposit({
     selectedFarmInfo,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
@@ -48,9 +48,8 @@ export const OptimisedFarmDepositTab = ({
         <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
-            label={`Deposit ${
-              selectedSupportedToken ? selectedSupportedToken?.label : ''
-            }`}
+            label={`Deposit ${selectedSupportedToken ? selectedSupportedToken?.label : ''
+              }`}
             tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleDepositValueChange}
             value={depositValue}

@@ -174,6 +174,7 @@ export const FarmsBlock = ({
                 isLoading={isLoading}
                 chain={farm.chain as EChain}
                 isBoost={farm.isBoost}
+                isOptimised={farm.isOptimised}
                 viewType={viewType}
                 isLocked={farm.isLocked}
               />

@@ -13,6 +13,7 @@ export const Main = () => {
     assetsInfo,
     filteredFarms,
     filteredBoostFarms,
+    filteredOptimisedFarms,
     isLoading,
     viewType,
     tokenFilter,
@@ -40,7 +41,8 @@ export const Main = () => {
     useState<boolean>(false);
   const [seeAllBoostFarmsDescription, setSeeAllBoostFarmsDescription] =
     useState<boolean>(false);
-
+  const [seeAllOptimisedFarmsDescription, setSeeAllOptimisedFarmsDescription] =
+    useState<boolean>(false);
   const [seeRewardsAsStable, setSeeRewardsAsStable] = useState<boolean>(false);
 
   const confirmedVoteDay = moment('2022-11-28');
@@ -101,12 +103,33 @@ export const Main = () => {
                     />
                     <Box gap="60px">
                       <FarmsBlock
+                        heading="Optimised farms"
+                        description={`Our Optimised farms allow you to optimise Beefy and Yearn strategies so you're always in the best pool 
+                        for the chosen asset.`}
+                        readMoreDescription="Choose your aggregator and asset, deposit funds, and let the protocol manage from there. 
+                        It automatically creates LPs, stakes in the top farm, and moves funds to maintain your position in the top farm if this changes. 
+                        Rates are variable, and benefits are auto-compounded."
+                        readMoreStatus={seeAllOptimisedFarmsDescription}
+                        onReadMore={() =>
+                          setSeeAllOptimisedFarmsDescription(
+                            !seeAllOptimisedFarmsDescription,
+                          )
+                        }
+                        farms={filteredOptimisedFarms}
+                        viewType={viewType}
+                        sortBy={sortBy}
+                        sortDirectionIsAsc={sortDirectionIsAsc}
+                        isLoading={isLoading}
+                        size={size}
+                        factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
+                      />
+                      <FarmsBlock
                         heading="Fixed-rate farms"
                         description={`Our fixed-rate farms have a guaranteed rate of
                           return for 2 weeks until our next liquidity
                           direction governance vote on ${nextVoteDay.format(
-                            'Do MMMM',
-                          )}.`}
+                          'Do MMMM',
+                        )}.`}
                         readMoreDescription="Once
                             customer funds are deposited they start earning
                             yield immediately. In the background the protocol

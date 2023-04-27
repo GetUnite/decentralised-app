@@ -10,6 +10,7 @@ import {
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
+import { useOptimisedFarmWithdrawal } from 'app/common/state/optimisedFarm';
 
 export const OptimisedFarmWithdrawalTab = ({
   selectedFarm,
@@ -32,7 +33,7 @@ export const OptimisedFarmWithdrawalTab = ({
     withdrawValueError,
     handleWithdrawalFieldChange,
     isWithdrawalRequestsLoading,
-  } = useFarmWithdrawal({
+  } = useOptimisedFarmWithdrawal({
     withdrawValue,
     selectedSupportedToken,
     selectedFarmInfo,
@@ -46,9 +47,8 @@ export const OptimisedFarmWithdrawalTab = ({
         <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
-            label={`Withdraw ${
-              selectedSupportedToken ? selectedSupportedToken?.label : ''
-            }`}
+            label={`Withdraw ${selectedSupportedToken ? selectedSupportedToken?.label : ''
+              }`}
             available={selectedFarmInfo?.depositedAmount}
             tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleWithdrawalFieldChange}

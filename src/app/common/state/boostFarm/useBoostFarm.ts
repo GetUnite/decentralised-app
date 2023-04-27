@@ -20,8 +20,8 @@ import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   approve,
+  getBalanceOf,
   getTotalAssets,
-  getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import {
@@ -962,8 +962,9 @@ export const useBoostFarm = ({ id }) => {
       };
 
       if (walletAccountAtom) {
-        const depositedAmountInLP = await getUserDepositedLPAmount(
+        const depositedAmountInLP = await getBalanceOf(
           farm.farmAddress,
+          undefined,
           farm.chain,
         );
         farmInfo.depositedAmountInLP = depositedAmountInLP;
@@ -1024,7 +1025,7 @@ export const useBoostFarm = ({ id }) => {
 
       // Pending Rewards
       const updatedPendingRewards =
-        selectedFarmInfo.current.totalAssetSupply > 0
+        +selectedFarmInfo.current.totalAssetSupply > 0
           ? await getBoostFarmPendingRewards(
               selectedFarmInfo.current.farmAddress,
               selectedFarmInfo.current.chain,

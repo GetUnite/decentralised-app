@@ -1,5 +1,4 @@
 import { EChain } from 'app/common/constants/chains';
-import { useFarm } from 'app/common/state/farm';
 import {
   Layout,
   Modal,
@@ -11,6 +10,7 @@ import { Box, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { OptimisedFarmDepositTab, OptimisedFarmWithdrawalTab } from './blocks';
+import { useOptimisedFarm } from 'app/common/state/optimisedFarm';
 
 export const OptimisedFarm = () => {
   const { id } = useParams();
@@ -41,7 +41,7 @@ export const OptimisedFarm = () => {
     stopProcessingSteps,
     steps,
     handleCurrentStep,
-  } = useFarm({
+  } = useOptimisedFarm({
     id,
   });
 

@@ -27,18 +27,18 @@ const ethereumProviderUrl =
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
 
-const polygonTestnetProviderUrl = 
+const polygonTestnetProviderUrl =
   'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
-const polygonMainnetProviderUrl = 
+const polygonMainnetProviderUrl =
   'https://polygon-mainnet.g.alchemy.com/v2/rXD0-xC6kL_3_CSI5wHfWfrOI65MJe4A';
 const polygonProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
 
-const optimismMainnetProviderUrl = 
+const optimismMainnetProviderUrl =
   'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
-const optimismTestnetProviderUrl = 
+const optimismTestnetProviderUrl =
   'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
 const optimisimProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
@@ -218,7 +218,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
+  //return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
   return walletAddress;
 };
 
@@ -241,7 +241,7 @@ export const changeNetwork = async (chain: EChain) => {
         : EChainId.POL_MUMBAI;*/
   }
 
-  if (chain === EChain.OP) {
+  if (chain === EChain.OPTIMISM) {
     chainId = EChainId.OP_MAINNET;
     /*process.env.REACT_APP_NET === 'mainnet'
         ? EChainId.OP_MAINNET
@@ -257,10 +257,10 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-    ? EChain.ETHEREUM
-    : chainId === EChainId.OP_MAINNET
-    ? EChain.ETHEREUM
-    : null;
+      ? EChain.ETHEREUM
+      : chainId === EChainId.OP_MAINNET
+        ? EChain.ETHEREUM
+        : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -760,11 +760,11 @@ export const approve = async (
 
 export const getReadOnlyProvider = chain => {
   const providerUrl =
-    chain === EChain.ETHEREUM 
-    ? ethereumProviderUrl 
-    : chain === EChain.POLYGON 
-    ? polygonProviderUrl
-    : optimisimProviderUrl;
+    chain === EChain.ETHEREUM
+      ? ethereumProviderUrl
+      : chain === EChain.POLYGON
+        ? polygonProviderUrl
+        : optimisimProviderUrl;
   return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
 };
 
@@ -956,7 +956,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
       };
       break;
 
-    case EChain.OP:
+    case EChain.OPTIMISM:
       ibAlluoAddresses = {
         usd: EOptimismAddresses.IBALLUOUSD,
         eth: EOptimismAddresses.IBALLUOETH,
@@ -1074,7 +1074,7 @@ const getSignatureParameters = signature => {
 
 export const getBalanceOf = async (
   tokenAddress,
-  tokenDecimals,
+  tokenDecimals = 18,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1100,7 +1100,7 @@ export const getBalanceOf = async (
 
 export const getBalance = async (
   tokenAddress,
-  tokenDecimals,
+  tokenDecimals = 18,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1203,53 +1203,6 @@ export const getSymbol = async (tokenAddress, chain = EChain.POLYGON) => {
   } catch (error) {
     throw error;
   }
-};
-
-export const getUserDepositedAmount = async (
-  address,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
-      name: 'getBalance',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const userDepositedAmount = await callContract(
-    abi,
-    address,
-    'getBalance(address)',
-    [getCurrentWalletAddress()],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedAmount);
-};
-
-export const getUserDepositedLPAmount = async (farmAddress, chain) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'balanceOf',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const userDepositedLPAmount = await callContract(
-    abi,
-    farmAddress,
-    'balanceOf(address)',
-    [getCurrentWalletAddress()],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedLPAmount);
 };
 
 export const getTotalAssetSupply = async (

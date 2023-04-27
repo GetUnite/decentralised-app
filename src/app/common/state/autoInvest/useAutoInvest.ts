@@ -9,7 +9,6 @@ import { fromLocaleString, toExactFixed } from 'app/common/functions/utils';
 import {
   getBalance,
   getBalanceOf,
-  getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
@@ -260,7 +259,7 @@ export const useAutoInvest = () => {
           streamsArray.push({
             from: element.fromLabel,
             // deposited amount to validate stream edition
-            sourceDepositedAmount: await getUserDepositedAmount(
+            sourceDepositedAmount: await getBalance(
               element.fromIbAlluoAddress,
               EChain.POLYGON,
             ),

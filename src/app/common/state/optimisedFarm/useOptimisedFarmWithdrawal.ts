@@ -2,7 +2,6 @@ import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
 import vaultUnlocking from 'app/modernUI/animations/vaultUnlocking.svg';
 import { useEffect, useState } from 'react';
-import { useNotification } from '../useNotification';
 
 export const possibleWithdrawSteps: TPossibleStep[] = [
   {

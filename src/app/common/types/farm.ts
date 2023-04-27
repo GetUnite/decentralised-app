@@ -33,6 +33,7 @@ export type TFarm = {
   farmAddress?: string;
   poolShare?: number;
   isBoost?: boolean;
+  isOptimised?: boolean;
   isNewest?: boolean;
   underlyingTokenAddress?: string;
   // For boost farms but needed here for main page

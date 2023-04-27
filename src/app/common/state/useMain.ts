@@ -1,4 +1,5 @@
 import {
+  getBalance,
   getBalanceOf,
   getChainById,
   getCurrentChainId,
@@ -6,8 +7,6 @@ import {
   getPrice,
   getTotalAssets,
   getTotalAssetSupply,
-  getUserDepositedAmount,
-  getUserDepositedLPAmount,
   getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
@@ -31,9 +30,9 @@ import {
   getBoostFarmInterest,
   getBoostFarmRewards
 } from '../functions/boostFarm';
-import { getRewardsInterest } from '../functions/stake';
 import { fromLocaleString, toExactFixed } from '../functions/utils';
 import { useNotification } from './useNotification';
+import { optimisedFarmOptions } from './optimisedFarm';
 
 const possibleStableTokens = [
   'DAI',
@@ -47,7 +46,7 @@ const possibleStableTokens = [
 ];
 const possibleNonStableTokens = ['CRV', 'CVX', 'FRAX', 'WBTC', 'WETH'];
 const possibleNetworks = ['Polygon', 'Ethereum', 'Optimism'];
-const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Newest farms'];
+const possibleTypes = ['Fixed-rate farms', 'Boost farms', 'Optimised farms', 'Newest farms'];
 const possibleViewTypes = ['View my farms only', 'View all farms'];
 
 export const useMain = () => {
@@ -64,14 +63,17 @@ export const useMain = () => {
 
   // farms
   const [availableFarms, setAvailableFarms] = useState<TFarm[]>([
+    ...optimisedFarmOptions,
     ...boostFarmOptions,
     ...farmOptions,
   ]);
   const [filteredFarms, setFilteredFarms] = useState<TFarm[]>([
+    ...optimisedFarmOptions,
     ...boostFarmOptions,
     ...farmOptions,
   ]);
   const [filteredBoostFarms, setFilteredBoostFarms] = useState<TFarm[]>();
+  const [filteredOptimisedFarms, setFilteredOptimisedFarms] = useState<TFarm[]>();
   const [totalDepositedAmountInUsd, setTotalDepositedAmountInUsd] =
     useState<string>();
   const [rewardsInfo, setRewardsInfo] = useState<TBoostFarmRewards[]>([]);
@@ -131,7 +133,7 @@ export const useMain = () => {
       const supportedTokensWithBalance = new Array<any>();
 
       await Promise.all(
-        [...boostFarmOptions, ...farmOptions].map(async availableFarm => {
+        [...boostFarmOptions, ...optimisedFarmOptions, ...farmOptions].map(async availableFarm => {
           const {
             interest,
             totalAssetSupply,
@@ -142,7 +144,7 @@ export const useMain = () => {
             poolShare,
           } = availableFarm.isBoost
               ? await fetchBoostFarmInfo(availableFarm)
-              : await fetchFarmInfo(availableFarm);
+              : (availableFarm.isOptimised ? await fetchOptimisedFarmInfo(availableFarm) : await fetchFarmInfo(availableFarm));
 
           if (walletAccountAtom) {
             for (let index = 0; index < supportedTokens.length; index++) {
@@ -247,59 +249,39 @@ export const useMain = () => {
             const rewardsInUSD = rewardsAsNumber * CVXETHInUSDC;
 
             const monthProjection =
-              ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest) / 100, 1 / 12) - 1)) + rewardsInUSD) / CVXETHInUSDC;
+              (Number(farm.depositedAmount) *
+                (Math.pow(1 + Number(farm.interest) / 100, 1 / 12) - 1) +
+                rewardsInUSD) /
+              CVXETHInUSDC;
 
             const yearProjection =
-              ((Number(farm.depositedAmount) * (Math.pow(1 + Number(farm.interest) / 100, 1) - 1)) + rewardsInUSD) / CVXETHInUSDC;
+              (Number(farm.depositedAmount) *
+                (Math.pow(1 + Number(farm.interest) / 100, 1) - 1) +
+                rewardsInUSD) /
+              CVXETHInUSDC;
 
-    let ri = [];
-    for (let index = 0; index < availableFarms.length; index++) {
-      const farm = availableFarms[index];
-      if (farm.isBoost) {
-        const updatedRewards = {
-          ...(await getBoostFarmRewards(
-            farm.farmAddress,
-            CVXETHInUSDC,
-            EChain.ETHEREUM,
-          )),
-        };
-        const rewardsAsNumber = fromLocaleString(updatedRewards.value);
-        if (rewardsAsNumber > 0.00001) {
-          const rewardsInUSD = rewardsAsNumber * CVXETHInUSDC;
-
-          const monthProjection =
-            (Number(farm.depositedAmount) *
-              (Math.pow(1 + Number(farm.interest) / 100, 1 / 12) - 1) +
-              rewardsInUSD) /
-            CVXETHInUSDC;
-
-          const yearProjection =
-            (Number(farm.depositedAmount) *
-              (Math.pow(1 + Number(farm.interest) / 100, 1) - 1) +
-              rewardsInUSD) /
-            CVXETHInUSDC;
-
-          ri.push({
-            farmAddress: farm.farmAddress,
-            name: farm.name,
-            isBoost: farm.isBoost,
-            isLocked: farm.isLocked,
-            ...updatedRewards,
-            interest: farm.interest,
-            monthProjection: toExactFixed(monthProjection, 8),
-            yearProjection: toExactFixed(yearProjection, 8),
-            stableMonthProjection: toExactFixed(
-              monthProjection * CVXETHInUSDC,
-              2,
-            ),
-            stableYearProjection: toExactFixed(
-              yearProjection * CVXETHInUSDC,
-              2,
-            ),
-          });
+            ri.push({
+              farmAddress: farm.farmAddress,
+              name: farm.name,
+              isBoost: farm.isBoost,
+              isLocked: farm.isLocked,
+              ...updatedRewards,
+              interest: farm.interest,
+              monthProjection: toExactFixed(monthProjection, 8),
+              yearProjection: toExactFixed(yearProjection, 8),
+              stableMonthProjection: toExactFixed(
+                monthProjection * CVXETHInUSDC,
+                2,
+              ),
+              stableYearProjection: toExactFixed(
+                yearProjection * CVXETHInUSDC,
+                2,
+              ),
+            });
+          }
         }
+        setRewardsInfo(ri);
       }
-      setRewardsInfo(ri);
     }
   };
 
@@ -312,7 +294,7 @@ export const useMain = () => {
       depositedAmount: 0,
     };
     if (walletAccountAtom) {
-      const depositedAmount = await getUserDepositedAmount(
+      const depositedAmount = await getBalance(
         farm.farmAddress,
         farm.chain,
       );
@@ -399,14 +381,89 @@ export const useMain = () => {
       valueOf1LPinUSDC: valueOf1LPinUSDC,
     };
     if (walletAccountAtom) {
-      const depositedAmountInLP = await getUserDepositedLPAmount(
+      const depositedAmountInLP = await getBalanceOf(
         farm.farmAddress,
+        undefined,
         farm.chain,
       );
       farmInfo.depositedAmountInLP = depositedAmountInLP;
       // Let's use the depositedAmount to store the deposited amount in USD(C)
       // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
       farmInfo.depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+
+      farmInfo.poolShare =
+        farmInfo.depositedAmount > 0
+          ? toExactFixed(
+            (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
+            2,
+          )
+          : 0;
+    }
+
+    return farmInfo;
+  };
+
+  const fetchOptimisedFarmInfo = async farm => {
+    let farmInfo;
+    farmInfo = {
+      interest: await getInterest(farm.farmAddress, farm.chain),
+      totalAssetSupply: await getTotalAssetSupply(farm.farmAddress, farm.chain),
+      supportedTokens: farm.supportedTokens,
+      depositedAmount: 0,
+    };
+    if (walletAccountAtom) {
+      const depositedAmount = await getBalanceOf(
+        farm.farmAddress,
+        undefined,
+        farm.chain,
+      );
+      farmInfo.depositedAmount = depositedAmount;
+
+      let valueOfAssetInUSDC;
+      // if the underlying is usdc no need for price
+      if (
+        farm.underlyingTokenAddress == EPolygonAddresses.USDC ||
+        farm.underlyingTokenAddress == EEthereumAddresses.USDC ||
+        farm.underlyingTokenAddress == EOptimismAddresses.USDC
+      ) {
+        valueOfAssetInUSDC = 1;
+      } else {
+        let tokenPriceAddress;
+        let tokenDecimals = 18;
+        // for polygon and OP underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
+        switch (farm.underlyingTokenAddress) {
+          case EPolygonAddresses.WBTC:
+            tokenPriceAddress = EEthereumAddresses.WBTC;
+            tokenDecimals = 8;
+            break;
+          case EPolygonAddresses.WETH:
+            tokenPriceAddress = EEthereumAddresses.WETH;
+            break;
+          case EOptimismAddresses.WBTC:
+            tokenPriceAddress = EEthereumAddresses.WBTC;
+            tokenDecimals = 8;
+            break;
+          case EOptimismAddresses.WETH:
+            tokenPriceAddress = EEthereumAddresses.WETH;
+            break;
+          case EEthereumAddresses.EURT:
+            tokenPriceAddress = EEthereumAddresses.EURT;
+            tokenDecimals = 6;
+            break;
+          default:
+            tokenPriceAddress = farm.underlyingTokenAddress;
+            break;
+        }
+        valueOfAssetInUSDC = await getPrice(
+          tokenPriceAddress,
+          EEthereumAddresses.USDC,
+          tokenDecimals,
+          6,
+        );
+      }
+
+      farmInfo.depositedAmountInUSD =
+        +farmInfo.depositedAmount * valueOfAssetInUSDC;
 
       farmInfo.poolShare =
         farmInfo.depositedAmount > 0
@@ -480,10 +537,10 @@ export const useMain = () => {
         farm.chain == EChain.ETHEREUM
           ? 'Ethereum'
           : farm.chain == EChain.POLYGON
-          ? 'Polygon'
-          : farm.chain == EChain.OP
-          ? 'Optimism'
-          : '',
+            ? 'Polygon'
+            : farm.chain == EChain.OPTIMISM
+              ? 'Optimism'
+              : '',
       );
     });
 
@@ -497,6 +554,9 @@ export const useMain = () => {
       }
       if (typeFilter.includes('Newest farms')) {
         result = result || farm.isNewest;
+      }
+      if (typeFilter.includes('Optimised farms')) {
+        result = result || farm.isOptimised;
       }
       return result;
     });
@@ -551,7 +611,8 @@ export const useMain = () => {
       filteredFarms = filteredFarms.filter(farm => farm.chain == chain);
     }
 
-    setFilteredFarms(filteredFarms.filter(farm => !farm.isBoost));
+    setFilteredFarms(filteredFarms.filter(farm => !farm.isBoost && !farm.isOptimised));
+    setFilteredOptimisedFarms(filteredFarms.filter(farm => farm.isOptimised));
     setFilteredBoostFarms(filteredFarms.filter(farm => farm.isBoost));
   };
 
@@ -586,6 +647,7 @@ export const useMain = () => {
     error,
     filteredFarms,
     filteredBoostFarms,
+    filteredOptimisedFarms,
     assetsInfo,
     viewType,
     tokenFilter,

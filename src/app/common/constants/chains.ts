@@ -1,7 +1,7 @@
 export enum EChain {
   ETHEREUM,
   POLYGON,
-  OP
+  OPTIMISM
 }
 
 export enum EChainId {

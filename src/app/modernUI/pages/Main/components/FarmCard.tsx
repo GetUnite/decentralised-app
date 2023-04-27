@@ -6,6 +6,8 @@ import { walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import swap from 'app/modernUI/images/swap.svg';
+import beefy from 'app/modernUI/images/farmIcons/beefy.svg';
+import yearn from 'app/modernUI/images/farmIcons/yearn.svg';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
@@ -38,6 +40,7 @@ interface IFarmCard {
   disabled: boolean;
   chain: EChain;
   isBoost: boolean;
+  isOptimised: boolean;
   viewType: string;
   balance?: string;
   balanceInUSD?: string;
@@ -59,6 +62,7 @@ export const FarmCard = ({
   disabled,
   chain,
   isBoost = false,
+  isOptimised = false,
   viewType,
   poolShare,
   isLocked = false,
@@ -230,13 +234,14 @@ export const FarmCard = ({
                   <>
                     {viewType != 'View my farms only' ? (
                       <>
-                        <span style={{ fontWeight: 'bold' }}>
+                        <Box style={{ fontWeight: 'bold' }} direction='row' gap="10px" align='center'>
                           {isLocked && <span>🔒</span>}
+                          {isOptimised && <img src={name.includes("Beefy") ? beefy : yearn} />}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
-                        </span>
+                        </Box>
                         <Box direction="row" gap="small" align="center">
                           {icons.length < 4 || seeAllSupportedTokens ? (
                             <>
@@ -312,7 +317,7 @@ export const FarmCard = ({
                         <Box justify="end">
                           {walletAccountAtom ? (
                             <Link
-                              to={(isBoost ? '/boostfarm/' : '/farm/') + id}
+                              to={(isBoost ? '/boostfarm/' : (isOptimised ? '/optimisedfarm/' :  '/farm/')) + id}
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',

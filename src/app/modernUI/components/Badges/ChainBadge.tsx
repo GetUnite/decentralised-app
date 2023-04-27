@@ -9,14 +9,14 @@ export const ChainBadge = ({ chain, ...rest }: IChainBadge) => {
   const backgroundColor =
     chain === EChain.ETHEREUM
       ? '#BDC5FF'
-      : chain === EChain.OP
+      : chain === EChain.OPTIMISM
       ? '#FF0420'
       : '';
   const textColor = chain === EChain.ETHEREUM ? '#5262B2' : '';
   const chainName =
     chain === EChain.ETHEREUM
       ? 'Ethereum'
-      : chain === EChain.OP
+      : chain === EChain.OPTIMISM
       ? 'Optimism'
       : 'Polygon';
 

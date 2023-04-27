@@ -14,9 +14,9 @@ import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   approve,
+  getBalance,
   getInterest,
   getTotalAssetSupply,
-  getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
@@ -28,13 +28,14 @@ import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useFarmDeposit';
 import { possibleWithdrawSteps } from './useFarmWithdrawal';
+import { get } from 'http';
 
 export const farmOptions: Array<TFarm> = [
   {
     id: 0,
     farmAddress: EOptimismAddresses.IBALLUOUSD,
     type: 'usd',
-    chain: EChain.OP,
+    chain: EChain.OPTIMISM,
     name: 'US Dollar',
     sign: '$',
     icons: ['USDC', 'USDT', 'DAI'],
@@ -64,7 +65,7 @@ export const farmOptions: Array<TFarm> = [
     id: 1,
     farmAddress: EOptimismAddresses.IBALLUOETH,
     type: 'eth',
-    chain: EChain.OP,
+    chain: EChain.OPTIMISM,
     name: 'Ethereum',
     sign: 'Ξ',
     icons: ['WETH'],
@@ -82,7 +83,7 @@ export const farmOptions: Array<TFarm> = [
     id: 2,
     farmAddress: EOptimismAddresses.IBALLUOBTC,
     type: 'btc',
-    chain: EChain.OP,
+    chain: EChain.OPTIMISM,
     name: 'Bitcoin',
     sign: '₿',
     icons: ['WBTC'],
@@ -444,7 +445,7 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        const depositedAmount = await getUserDepositedAmount(
+        const depositedAmount = await getBalance(
           farm.farmAddress,
           farm.chain,
         );
