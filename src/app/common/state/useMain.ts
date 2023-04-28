@@ -24,6 +24,7 @@ import {
 } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import {
+  claimAllBoostFarmRewards,
   claimBoostFarmLPRewards,
   claimBoostFarmNonLPRewards,
   claimLockedBoostFarmRewards,
@@ -96,6 +97,10 @@ export const useMain = () => {
   // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  // claim all rewards 
+  const [isClaimingAllRewards, setIsClaimingAllRewards] = useState<boolean>(false);
+  const [claimAllRewardsError, setClaimAllRewardsError] = useState<string>('');
 
   useEffect(() => {
     setWantedChainAtom(undefined);
@@ -642,6 +647,20 @@ export const useMain = () => {
     }
   };
 
+  const claimAllRewards = async (seeRewardsAsStable) => {
+    setIsClaimingAllRewards(true);
+    try {
+      // rewards only exist in ethereum boost farms
+      // the stable option is always usdc 
+      // the other option is CVX/ETH since is the "normal" reward token for locked boost pools.
+      const tx = await claimAllBoostFarmRewards(seeRewardsAsStable
+        ? EEthereumAddresses.USDC : EEthereumAddresses.CVXETH);
+    } catch (error) {
+      setClaimAllRewardsError('An error occured while trying to claim all the rewards. Please try again');
+    }
+    setIsClaimingAllRewards(false);
+  };
+
   return {
     isLoading,
     error,
@@ -670,5 +689,9 @@ export const useMain = () => {
       availableFarms.filter(farm => +farm.depositedAmount > 0.00001).length > 0,
     rewardsInfo,
     claimRewards,
+    // claim all rewards
+    claimAllRewards,
+    isClaimingAllRewards,
+    claimAllRewardsError
   };
 };

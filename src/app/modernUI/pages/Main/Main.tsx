@@ -35,6 +35,10 @@ export const Main = () => {
     isFarming,
     rewardsInfo,
     claimRewards,
+    // claim all rewards
+    claimAllRewards,
+    isClaimingAllRewards,
+    claimAllRewardsError
   } = useMain();
 
   const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] =
@@ -194,41 +198,48 @@ export const Main = () => {
                               claimRewards={claimRewards}
                             />
                             <Box fill="horizontal" justify="start" align="end">
-                              <Box direction="row" margin={{ top: '21px' }} justify="center" gap="4px">
-                                <Text size="16px" >
-                                  Total rewards across farms:{' '}
-                                  {seeRewardsAsStable ? (
-                                    <>{`$${toExactFixed(
-                                      rewardsInfo.reduce(
-                                        (previous, current) =>
-                                          previous +
-                                          fromLocaleString(current.stableValue),
-                                        0,
-                                      ),
-                                      2,
-                                    )}`}</>
-                                  ) : (
-                                    <>{`${toExactFixed(
-                                      rewardsInfo.reduce(
-                                        (previous, current) =>
-                                          previous +
-                                          fromLocaleString(current.value),
-                                        0,
-                                      ),
-                                      8,
-                                    )} CVX/ETH `}</>
-                                  )}
-                                </Text>
-                                <Button
-                                  onClick={() =>
-                                    setSeeRewardsAsStable(!seeRewardsAsStable)
-                                  }
-                                >
-                                  <Box justify="center" fill>
-                                    <img src={swap} />
-                                  </Box>
-                                </Button>
+                              <Box direction='row' gap="20px" margin={{ top: '21px' }}>
+                                <Box direction="row" justify="center" align="center" gap="4px">
+                                  <Text size="16px" >
+                                    Total rewards across farms:{' '}
+                                    {seeRewardsAsStable ? (
+                                      <>{`$${toExactFixed(
+                                        rewardsInfo.reduce(
+                                          (previous, current) =>
+                                            previous +
+                                            fromLocaleString(current.stableValue),
+                                          0,
+                                        ),
+                                        2,
+                                      )}`}</>
+                                    ) : (
+                                      <>{`${toExactFixed(
+                                        rewardsInfo.reduce(
+                                          (previous, current) =>
+                                            previous +
+                                            fromLocaleString(current.value),
+                                          0,
+                                        ),
+                                        8,
+                                      )} CVX/ETH `}</>
+                                    )}
+                                  </Text>
+                                  <Button
+                                    onClick={() =>
+                                      setSeeRewardsAsStable(!seeRewardsAsStable)
+                                    }
+                                  >
+                                    <Box justify="center" fill>
+                                      <img src={swap} />
+                                    </Box>
+                                  </Button>
+
+                                </Box>
+                                <Button primary label={isClaimingAllRewards ? "Claiming rewards" : "Claim all rewards"} disabled={isClaimingAllRewards} onClick={claimAllRewards} />
                               </Box>
+                              {claimAllRewardsError && <Text color="error" size="small">
+                                {claimAllRewardsError}
+                              </Text>}
                             </Box>
                           </>
                         )}

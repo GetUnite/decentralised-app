@@ -519,7 +519,7 @@ export const claimBoostFarmLPRewards = async (
 export const claimBoostFarmNonLPRewards = async (
   farmAddress,
   tokenAddress,
-  chain = EChain.POLYGON,
+  chain = EChain.ETHEREUM,
   useBiconomy = false,
 ) => {
   try {
@@ -553,7 +553,7 @@ export const claimBoostFarmNonLPRewards = async (
 export const claimLockedBoostFarmRewards = async (
   farmAddress,
   tokenAddress,
-  chain = EChain.POLYGON,
+  chain = EChain.ETHEREUM,
   useBiconomy = false,
 ) => {
   try {
@@ -720,6 +720,45 @@ export const unlockUserFunds = async (
       farmAddress,
       'unlockUserFunds()',
       [],
+      chain,
+      useBiconomy,
+    );
+
+    return tx;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const claimAllBoostFarmRewards = async (
+  tokenAddress,
+  chain = EChain.ETHEREUM,
+  useBiconomy = false
+) => {
+  try {
+    const abi = [
+      {
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'exitToken',
+            type: 'address'
+          }
+        ],
+        name: 'claimFromAllPools',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function'
+      },
+    ];
+
+    const rewardsDistributorAddress = EEthereumAddresses.REWARDSDISTRIBUTOR;
+
+    const tx = await sendTransaction(
+      abi,
+      rewardsDistributorAddress,
+      'claimFromAllPools(address)',
+      [tokenAddress],
       chain,
       useBiconomy,
     );
