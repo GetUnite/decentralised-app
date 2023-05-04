@@ -261,6 +261,7 @@ export const useAutoInvest = () => {
             // deposited amount to validate stream edition
             sourceDepositedAmount: await getBalance(
               element.fromIbAlluoAddress,
+              undefined,
               EChain.POLYGON,
             ),
             fromAddress: element.fromIbAlluoAddress,

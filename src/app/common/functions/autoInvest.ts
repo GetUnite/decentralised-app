@@ -5,7 +5,6 @@ import {
   getBalanceOf,
   getCurrentWalletAddress,
   getDecimals,
-  getPrice,
   getReadOnlyProvider,
   getSuperfluidFramework,
   QueryFilter,
@@ -549,53 +548,4 @@ export const stopStream = async (
   );
 
   return tx;
-};
-
-export const convertToUSDC = async (
-  value,
-  tokenAddress,
-  decimals,
-  underlyingTokenAddress,
-  underlyingTokenDecimals,
-) => {
-  const abi = [
-    {
-      inputs: [
-        {
-          internalType: 'uint256',
-          name: '_amountInTokenValue',
-          type: 'uint256',
-        },
-      ],
-      name: 'convertToAssetValue',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const valueInDecimals = toDecimals(value, decimals);
-
-  const underlyingTokenValue = await callContract(
-    abi,
-    tokenAddress,
-    'convertToAssetValue(uint256)',
-    [valueInDecimals],
-    EChain.POLYGON,
-  );
-
-  const tokenPrice =
-    underlyingTokenAddress == EPolygonAddresses.USDC
-      ? 1
-      : await getPrice(
-          underlyingTokenAddress,
-          EPolygonAddresses.USDC,
-          decimals,
-          6,
-        );
-
-  return (
-    +ethers.utils.formatUnits(underlyingTokenValue, underlyingTokenDecimals) *
-    tokenPrice
-  );
 };

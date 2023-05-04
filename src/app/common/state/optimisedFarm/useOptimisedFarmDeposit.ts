@@ -5,12 +5,6 @@ import { useEffect, useState } from 'react';
 
 export const possibleDepositSteps: TPossibleStep[] = [
   {
-    id: 0,
-    label: 'Approve deposit',
-    successLabel: 'Deposit approved',
-    errorLabel: 'Approval failed',
-  },
-  {
     id: 1,
     label: 'Deposit',
     successLabel: '',
@@ -37,7 +31,7 @@ export const useOptimisedFarmDeposit = ({
 
   useEffect(() => {
     if (selectedFarmInfo && selectedSupportedToken) {
-      updateBalanceAndAllowance();
+      updateBalance();
       updateSteps();
     }
   }, [selectedSupportedToken]);
@@ -48,14 +42,8 @@ export const useOptimisedFarmDeposit = ({
     }
   }, [depositValue]);
 
-  const updateBalanceAndAllowance = async () => {
+  const updateBalance = async () => {
     setIsFetchingSupportedTokenInfo(true);
-
-    const allowance = await getAllowance(
-      selectedSupportedToken.address,
-      selectedFarmInfo.farmAddress,
-      selectedFarmInfo.chain,
-    );
 
     const balance = await getBalanceOf(
       selectedSupportedToken.address,
@@ -66,7 +54,6 @@ export const useOptimisedFarmDeposit = ({
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,
       balance: balance,
-      allowance: allowance,
     };
 
     // the inputs might not be ok after this
@@ -78,14 +65,9 @@ export const useOptimisedFarmDeposit = ({
   const updateSteps = async () => {
     let neededSteps: TPossibleStep[] = [];
 
-    // If the allowance is not higher than 0 ask for approval
-    if (!(+selectedSupportedTokenInfo.current?.allowance > 0)) {
-      neededSteps.push(possibleDepositSteps[0]);
-    }
-
     // Deposit step is always there
     neededSteps.push({
-      ...possibleDepositSteps[1],
+      ...possibleDepositSteps[0],
       label: `Deposit ${depositValue} ${selectedSupportedToken.label}`,
       successLabel: `${depositValue} ${selectedSupportedToken.label} deposited`,
     });

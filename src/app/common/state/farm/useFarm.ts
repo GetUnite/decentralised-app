@@ -11,7 +11,7 @@ import {
   withdraw
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
-import { depositDivided } from 'app/common/functions/utils';
+import { depositDivided, roundDown } from 'app/common/functions/utils';
 import {
   approve,
   getBalance,
@@ -445,11 +445,13 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        const depositedAmount = await getBalance(
+        const depositedAmount = roundDown(await getBalance(
           farm.farmAddress,
+          undefined,
           farm.chain,
-        );
+        ), 6);
         farmInfo.depositedAmount = depositedAmount;
+
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 

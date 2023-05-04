@@ -10,7 +10,8 @@ export const useCurrentPath = () => {
   const isFarmPage =
     modernUiPaths.MAIN === location.pathname ||
     location.pathname.includes('farm') ||
-    location.pathname.includes('boostfarm');
+    location.pathname.includes('boostfarm') ||
+    location.pathname.includes('optimisedfarm');
   const isStakePage = modernUiPaths.STAKE === location.pathname;
   const isBuyPage = modernUiPaths.BUY === location.pathname;
   const isTransferPage = modernUiPaths.TRANSFER === location.pathname;

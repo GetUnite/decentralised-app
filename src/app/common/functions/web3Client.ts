@@ -6,10 +6,12 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
-import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json'
-import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'
+import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
+import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json';
 import {
-  EEthereumAddresses, EOptimismAddresses, EPolygonAddresses
+  EEthereumAddresses,
+  EOptimismAddresses,
+  EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
@@ -17,11 +19,11 @@ import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 import { getUniswapPoolAddress } from './uniswap';
+import { EFiatId } from '../constants/utils';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
-const ethereumMainnetProviderUrl =
-  'https://eth.llamarpc.com/';;
+const ethereumMainnetProviderUrl = 'https://eth.llamarpc.com/';
 const ethereumProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? ethereumMainnetProviderUrl
@@ -218,7 +220,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
+  return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
   return walletAddress;
 };
 
@@ -257,10 +259,10 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-      ? EChain.ETHEREUM
-      : chainId === EChainId.OP_MAINNET
-        ? EChain.ETHEREUM
-        : null;
+    ? EChain.ETHEREUM
+    : chainId === EChainId.OP_MAINNET
+    ? EChain.ETHEREUM
+    : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -763,8 +765,8 @@ export const getReadOnlyProvider = chain => {
     chain === EChain.ETHEREUM
       ? ethereumProviderUrl
       : chain === EChain.POLYGON
-        ? polygonProviderUrl
-        : optimisimProviderUrl;
+      ? polygonProviderUrl
+      : optimisimProviderUrl;
   return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
 };
 
@@ -793,7 +795,7 @@ export const callContract = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
-      error: error
+      error: error,
     });
   }
 };
@@ -836,7 +838,7 @@ export const binarySearchForBlock = async (
   );
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
-    Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
+      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
   let closestBlock;
 
@@ -861,7 +863,7 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-export const getPrice = async (
+export const getTokenValueUsingUniswap = async (
   sellTokenAddress: string,
   buyTokenAddress: string,
   sellDecimals: number,
@@ -874,32 +876,38 @@ export const getPrice = async (
     const quoterContract = new ethers.Contract(
       quoterAddress,
       Quoter.abi,
-      provider
-    )
+      provider,
+    );
 
     let valueToConvert = toDecimals(1, sellDecimals);
 
     let fee;
 
-    const sellToBuyPoolAddress = getUniswapPoolAddress(sellTokenAddress, buyTokenAddress);
+    const sellToBuyPoolAddress = getUniswapPoolAddress(
+      sellTokenAddress,
+      buyTokenAddress,
+    );
 
     if (sellToBuyPoolAddress) {
       const sellToBuyPoolContract = new ethers.Contract(
         sellToBuyPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await sellToBuyPoolContract.fee();
     } else {
       // there was no direct pool from sell to buy
       // let's go for sell -> eth -> buy
-      const sellToEthPoolAddress = getUniswapPoolAddress(sellTokenAddress, EEthereumAddresses.WETH);
+      const sellToEthPoolAddress = getUniswapPoolAddress(
+        sellTokenAddress,
+        EEthereumAddresses.WETH,
+      );
 
       const sellToEthPoolContract = new ethers.Contract(
         sellToEthPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await sellToEthPoolContract.fee();
@@ -909,7 +917,7 @@ export const getPrice = async (
         EEthereumAddresses.WETH,
         fee,
         valueToConvert,
-        0
+        0,
       );
 
       // value to sell becomes the amount in eethereum
@@ -918,28 +926,33 @@ export const getPrice = async (
       sellTokenAddress = EEthereumAddresses.WETH;
 
       // gets pool to convert eth into buy token
-      const ethToBuyPoolAddress = getUniswapPoolAddress(EEthereumAddresses.WETH, buyTokenAddress);
+      const ethToBuyPoolAddress = getUniswapPoolAddress(
+        EEthereumAddresses.WETH,
+        buyTokenAddress,
+      );
 
       const ethToBuyPoolContract = new ethers.Contract(
         ethToBuyPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await ethToBuyPoolContract.fee();
     }
 
-    const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
-      sellTokenAddress,
-      buyTokenAddress,
-      fee,
-      valueToConvert,
-      0
-    );
+    const quotedAmountOut =
+      await quoterContract.callStatic.quoteExactInputSingle(
+        sellTokenAddress,
+        buyTokenAddress,
+        fee,
+        valueToConvert,
+        0,
+      );
 
     const price = +fromDecimals(quotedAmountOut, buyDecimals);
     return price;
   } catch (error) {
+    console.log(sellTokenAddress, buyTokenAddress, error);
     throw 'Something went wrong while fetching prices. Please try again later';
   }
 };
@@ -952,7 +965,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
         usd: EPolygonAddresses.IBALLUOUSD,
         eur: EPolygonAddresses.IBALLUOEUR,
         eth: EPolygonAddresses.IBALLUOETH,
-        btc: EPolygonAddresses.IBALLUOBTC
+        btc: EPolygonAddresses.IBALLUOBTC,
       };
       break;
 
@@ -960,7 +973,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
       ibAlluoAddresses = {
         usd: EOptimismAddresses.IBALLUOUSD,
         eth: EOptimismAddresses.IBALLUOETH,
-        btc: EOptimismAddresses.IBALLUOBTC
+        btc: EOptimismAddresses.IBALLUOBTC,
       };
       break;
 
@@ -969,7 +982,7 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
         usd: EEthereumAddresses.IBALLUOUSD,
         eur: EEthereumAddresses.IBALLUOEUR,
         eth: EEthereumAddresses.IBALLUOETH,
-        btc: EEthereumAddresses.IBALLUOBTC
+        btc: EEthereumAddresses.IBALLUOBTC,
       };
       break;
     default:
@@ -1117,7 +1130,7 @@ export const getBalance = async (
     abi,
     tokenAddress,
     'getBalance(address)',
-    [walletAddress],
+    [getCurrentWalletAddress()],
     chain,
   );
 
@@ -1314,7 +1327,15 @@ export const getSuperfluidFramework = async () => {
   }
 };
 
-export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
+// fiatIds:
+// USD: 0
+// EUR: 1
+// ETH: 2
+export const getTokenValueUsingPriceFeedRouter = async (
+  lPTokenAddress: string,
+  fiatId = EFiatId.USD,
+  chain = EChain.ETHEREUM,
+): Promise<number> => {
   const abi = [
     {
       inputs: [
@@ -1331,19 +1352,20 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
     },
   ];
 
-  const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
+  const priceFeedRouter =
+    chain == EChain.ETHEREUM
+      ? EEthereumAddresses.PRICEFEEDROUTER
+      : chain == EChain.POLYGON
+      ? EPolygonAddresses.PRICEFEEDROUTER
+      : EOptimismAddresses.PRICEFEEDROUTER;
 
-  // fiatIds:
-  // USD: 0
-  // EUR: 1
-  // ETH: 2
-  const priceInUSDC = await callContract(
+  const valueInFiat = await callContract(
     abi,
     priceFeedRouter,
     'getPrice(address,uint256)',
-    [lPTokenAddress, 0],
+    [lPTokenAddress, fiatId],
     chain,
   );
 
-  return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
+  return +fromDecimals(valueInFiat.value.toString(), valueInFiat.decimals);
 };

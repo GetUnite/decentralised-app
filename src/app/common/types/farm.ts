@@ -55,3 +55,16 @@ export type TBoostFarm = TFarm & {
   // forced apy when it cant be calculated
   forcedInterest?: string;
 };
+
+export type TOptimisedFarm = TFarm & {
+  apyAddress?: string;
+  lPTokenAddress?: string;
+  valueOf1LPinUSDC?: number;
+  // For locked boost farms
+  unlockingBalance?: string;
+  unlockedBalance?: string;
+  isUnlocking?: boolean;
+  withdrawToken?: TSupportedToken;
+  // forced apy when it cant be calculated
+  forcedInterest?: string;
+};

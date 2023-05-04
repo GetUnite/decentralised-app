@@ -7,7 +7,7 @@ import {
   callContract,
   callStatic,
   getCurrentWalletAddress,
-  getPrice,
+  getTokenValueUsingUniswap,
   getReadOnlyProvider,
   QueryFilter,
   sendTransaction
@@ -281,7 +281,7 @@ export const getBoostFarmPendingRewards = async (farmAddress, chain) => {
 
   const pendingRewardsInUSDC = await Promise.all(
     pendingRewardsByToken.map(async prbt => {
-      const tokenPrice = await getPrice(
+      const tokenPrice = await getTokenValueUsingUniswap(
         prbt.token,
         EEthereumAddresses.USDC,
         18,
@@ -334,7 +334,7 @@ export const convertFromUSDC = async (tokenAddress, decimals, valueInUSDC) => {
   if (tokenAddress == EEthereumAddresses.USDC) {
     return valueInUSDC;
   }
-  const tokenPrice = await getPrice(
+  const tokenPrice = await getTokenValueUsingUniswap(
     EEthereumAddresses.USDC,
     tokenAddress,
     6,
@@ -428,7 +428,7 @@ export const convertToLP = async (
   let usdcPrice = 1;
   // the value already comes as usdc
   if (tokenAddress != EEthereumAddresses.USDC) {
-    usdcPrice = await getPrice(
+    usdcPrice = await getTokenValueUsingUniswap(
       tokenAddress,
       EEthereumAddresses.USDC,
       decimals,

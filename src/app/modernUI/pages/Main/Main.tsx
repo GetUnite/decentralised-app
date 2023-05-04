@@ -38,7 +38,7 @@ export const Main = () => {
     // claim all rewards
     claimAllRewards,
     isClaimingAllRewards,
-    claimAllRewardsError
+    claimAllRewardsError,
   } = useMain();
 
   const [seeAllFixedFarmsDescription, setSeeAllFixedFarmsDescription] =
@@ -104,6 +104,7 @@ export const Main = () => {
                       possibleViewTypes={possibleViewTypes}
                       viewType={viewType}
                       setViewType={setViewType}
+                      isLoading={isLoading}
                     />
                     <Box gap="60px">
                       <FarmsBlock
@@ -132,8 +133,8 @@ export const Main = () => {
                         description={`Our fixed-rate farms have a guaranteed rate of
                           return for 2 weeks until our next liquidity
                           direction governance vote on ${nextVoteDay.format(
-                          'Do MMMM',
-                        )}.`}
+                            'Do MMMM',
+                          )}.`}
                         readMoreDescription="Once
                             customer funds are deposited they start earning
                             yield immediately. In the background the protocol
@@ -198,16 +199,27 @@ export const Main = () => {
                               claimRewards={claimRewards}
                             />
                             <Box fill="horizontal" justify="start" align="end">
-                              <Box direction='row' gap="20px" margin={{ top: '21px' }}>
-                                <Box direction="row" justify="center" align="center" gap="4px">
-                                  <Text size="16px" >
+                              <Box
+                                direction="row"
+                                gap="20px"
+                                margin={{ top: '21px' }}
+                              >
+                                <Box
+                                  direction="row"
+                                  justify="center"
+                                  align="center"
+                                  gap="4px"
+                                >
+                                  <Text size="16px">
                                     Total rewards across farms:{' '}
                                     {seeRewardsAsStable ? (
                                       <>{`$${toExactFixed(
                                         rewardsInfo.reduce(
                                           (previous, current) =>
                                             previous +
-                                            fromLocaleString(current.stableValue),
+                                            fromLocaleString(
+                                              current.stableValue,
+                                            ),
                                           0,
                                         ),
                                         2,
@@ -233,13 +245,23 @@ export const Main = () => {
                                       <img src={swap} />
                                     </Box>
                                   </Button>
-
                                 </Box>
-                                <Button primary label={isClaimingAllRewards ? "Claiming rewards" : "Claim all rewards"} disabled={isClaimingAllRewards} onClick={claimAllRewards} />
+                                <Button
+                                  primary
+                                  label={
+                                    isClaimingAllRewards
+                                      ? 'Claiming rewards'
+                                      : 'Claim all rewards'
+                                  }
+                                  disabled={isClaimingAllRewards}
+                                  onClick={claimAllRewards}
+                                />
                               </Box>
-                              {claimAllRewardsError && <Text color="error" size="small">
-                                {claimAllRewardsError}
-                              </Text>}
+                              {claimAllRewardsError && (
+                                <Text color="error" size="small">
+                                  {claimAllRewardsError}
+                                </Text>
+                              )}
                             </Box>
                           </>
                         )}

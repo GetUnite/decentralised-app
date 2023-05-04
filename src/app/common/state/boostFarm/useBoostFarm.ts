@@ -14,21 +14,21 @@ import {
   unlockFromLockedBoostFarm,
   unlockUserFunds,
   withdrawFromBoostFarm,
-  withdrawFromLockedBoostFarm
+  withdrawFromLockedBoostFarm,
 } from 'app/common/functions/boostFarm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
 import {
   approve,
   getBalanceOf,
+  getTokenValueUsingPriceFeedRouter,
   getTotalAssets,
-  getValueOf1LPinUSDC
 } from 'app/common/functions/web3Client';
 import {
   isCorrectNetwork,
   isSafeApp,
   walletAccount,
-  wantedChain
+  wantedChain,
 } from 'app/common/state/atoms';
 import { TBoostFarm } from 'app/common/types/farm';
 import { TPossibleStep, TSupportedToken } from 'app/common/types/global';
@@ -41,6 +41,7 @@ import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useBoostFarmDeposit';
 import { possibleWithdrawSteps } from './useBoostFarmWithdrawal';
 import { possibleLockedWithdrawSteps } from './useLockedBoostFarmWithdrawal';
+import { EFiatId } from 'app/common/constants/utils';
 
 export const boostFarmOptions: Array<TBoostFarm> = [
   {
@@ -875,7 +876,7 @@ export const useBoostFarm = ({ id }) => {
     }
     const loadFarmInfo = async () => {
       try {
-        var startFirstTimer = performance.now()
+        var startFirstTimer = performance.now();
 
         const lastHarvestDateTimestamp = await getLastHarvestDateTimestamp(
           selectedFarm.current?.farmAddress,
@@ -887,16 +888,24 @@ export const useBoostFarm = ({ id }) => {
         previousHarvestDate.current = moment(lastHarvestDate);
         nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
 
-        var endFirstTimer = performance.now()
-        console.log(`loadFarmInfo() before farmInfo() took ${endFirstTimer - startFirstTimer} milliseconds`)
-        
-        var startSecondTimer = performance.now()
+        var endFirstTimer = performance.now();
+        console.log(
+          `loadFarmInfo() before farmInfo() took ${
+            endFirstTimer - startFirstTimer
+          } milliseconds`,
+        );
+
+        var startSecondTimer = performance.now();
         selectedFarmInfo.current = {
           ...selectedFarm.current,
           ...(await getUpdatedFarmInfo(selectedFarm.current)),
         };
-        var endSecondTimer = performance.now()
-        console.log(`getUpdatedFarmInfo() took ${endSecondTimer - startSecondTimer} milliseconds`)
+        var endSecondTimer = performance.now();
+        console.log(
+          `getUpdatedFarmInfo() took ${
+            endSecondTimer - startSecondTimer
+          } milliseconds`,
+        );
 
         setSelectedSupportedToken(selectedFarmInfo.current.supportedTokens[0]);
 
@@ -949,10 +958,12 @@ export const useBoostFarm = ({ id }) => {
     try {
       let farmInfo;
 
-      const valueOf1LPinUSDC = await getValueOf1LPinUSDC(
+      const valueOf1LPinUSDC = await getTokenValueUsingPriceFeedRouter(
         farm.lPTokenAddress,
+        EFiatId.USD,
         farm.chain,
       );
+
       farmInfo = {
         totalAssetSupply:
           +(await getTotalAssets(farm.farmAddress, farm.chain)) *
@@ -992,7 +1003,7 @@ export const useBoostFarm = ({ id }) => {
           farmInfo.isUnlocking = userWithdrawals.isUnlocking;
         }
       }
-      
+
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
@@ -1007,10 +1018,12 @@ export const useBoostFarm = ({ id }) => {
     setIsLoadingRewards(true);
     setIsLoadingPendingRewards(true);
     try {
-      const CVXETHInUSDC = await getValueOf1LPinUSDC(
+      const CVXETHInUSDC = await getTokenValueUsingPriceFeedRouter(
         EEthereumAddresses.CVXETH,
-        selectedFarmInfo.current.chain,
+        EFiatId.USD,
+        EChain.ETHEREUM,
       );
+      
       // Rewards
       const updatedRewards = {
         ...selectedFarmInfo.current.rewards,

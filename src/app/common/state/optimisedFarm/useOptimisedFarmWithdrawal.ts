@@ -24,10 +24,6 @@ export const useOptimisedFarmWithdrawal = ({
   // inputs
   const [withdrawValueError, setWithdrawValueError] = useState<string>('');
 
-  // loading control
-  const [isWithdrawalRequestsLoading, setIsWithdrawalRequestsLoading] =
-    useState<boolean>(false);
-
   // when the selected token changes, trigger balance update
   useEffect(() => {
     if (selectedFarmInfo) {
@@ -60,7 +56,6 @@ export const useOptimisedFarmWithdrawal = ({
   return {
     withdrawValueError,
     handleWithdrawalFieldChange,
-    isWithdrawalRequestsLoading,
     hasErrors: withdrawValueError != '',
   };
 };

@@ -16,10 +16,9 @@ import {
   lockAlluo,
   unlockAllAlluo,
   unlockAlluo,
-  withdrawAlluo
+  withdrawAlluo,
 } from 'app/common/functions/stake';
 import { toExactFixed } from 'app/common/functions/utils';
-import { getValueOf1LPinUSDC } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
@@ -31,6 +30,8 @@ import { useRecoilState } from 'recoil';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleLockSteps } from './useLock';
 import { possibleUnlockSteps } from './useUnlock';
+import { getTokenValueUsingPriceFeedRouter } from 'app/common/functions/web3Client';
+import { EFiatId } from 'app/common/constants/utils';
 
 export type TAlluoStakingInfo = {
   balance?: string;
@@ -145,7 +146,7 @@ export const useStake = () => {
     setIsLoadingRewardsApy(true);
     rewardsApy.current = await getRewardsInterest();
     setIsLoadingRewardsApy(false);
-  }
+  };
 
   const updateAlluoInfo = async () => {
     setShowReunlockConfirmation(false);
@@ -232,8 +233,9 @@ export const useStake = () => {
     setIsLoadingRewards(true);
     setIsLoadingPendingRewards(true);
     try {
-      const CVXETHInUSDC = await getValueOf1LPinUSDC(
+      const CVXETHInUSDC = await getTokenValueUsingPriceFeedRouter(
         EEthereumAddresses.CVXETH,
+        EFiatId.USD,
         EChain.ETHEREUM,
       );
       // Rewards
@@ -271,8 +273,8 @@ export const useStake = () => {
       processingTitle.current != undefined
         ? processingTitle.current
         : selectedTab == 0
-          ? 'Locking funds...'
-          : 'Unlocking funds...';
+        ? 'Locking funds...'
+        : 'Unlocking funds...';
     setIsProcessing(true);
     await handleCurrentStep();
   };

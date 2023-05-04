@@ -11,7 +11,7 @@ export const TopHeader = ({ selectedFarmInfo, isLoading, ...rest }) => {
       ) : (
         <Text textAlign="center" weight="bold" size="18px">
           Your balance currently earning <br />
-          {+toExactFixed(selectedFarmInfo.interest, 2).toLocaleString()}% APY is{' '}
+          {toExactFixed(selectedFarmInfo.interest, 2)}% APY is{' '}
           {selectedFarmInfo.sign}
           {(+first).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           <Text color="softText" size="18px">

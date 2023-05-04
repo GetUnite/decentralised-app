@@ -1,35 +1,25 @@
 import {
-  EEthereumAddresses,
   EOptimismAddresses,
-  EPolygonAddresses
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
-import {
-  deposit,
-  getIfUserHasWithdrawalRequest,
-  getIfWithdrawalWasAddedToQueue,
-  withdraw
-} from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
-import {
-  approve,
-  getBalance,
-  getInterest,
-  getTotalAssetSupply,
-} from 'app/common/functions/web3Client';
-import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
-import { TFarm } from 'app/common/types/farm';
+import { walletAccount, wantedChain } from 'app/common/state/atoms';
+import { TOptimisedFarm } from 'app/common/types/farm';
 import { TSupportedToken } from 'app/common/types/global';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useOptimisedFarmDeposit';
 import { possibleWithdrawSteps } from './useOptimisedFarmWithdrawal';
+import {
+  depositIntoOptimised,
+  getOptimisedFarmInterest,
+  withdrawFromOptimised,
+} from 'app/common/functions/optimisedFarm';
 
-export const optimisedFarmOptions: Array<TFarm> = [
+export const optimisedFarmOptions: Array<TOptimisedFarm> = [
   {
     id: 0,
     farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSDC,
@@ -60,6 +50,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: '$',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 1,
@@ -91,6 +82,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: '$',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 2,
@@ -99,7 +91,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top Vault ETH',
-    sign: '$',
+    sign: 'Ξ',
     icons: ['WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
@@ -110,6 +102,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: 'Ξ',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 3,
@@ -118,7 +111,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top 3 Vault ETH',
-    sign: '$',
+    sign: 'Ξ',
     icons: ['WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
@@ -129,6 +122,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: 'Ξ',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 4,
@@ -160,6 +154,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: '$',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 5,
@@ -191,6 +186,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: '$',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 6,
@@ -199,7 +195,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Yearn Top Vault ETH',
-    sign: '$',
+    sign: 'Ξ',
     icons: ['WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
@@ -210,6 +206,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: 'Ξ',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
   {
     id: 7,
@@ -218,7 +215,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Yearn Top 3 Vault ETH',
-    sign: '$',
+    sign: 'Ξ',
     icons: ['WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
@@ -229,6 +226,7 @@ export const optimisedFarmOptions: Array<TFarm> = [
         sign: 'Ξ',
       },
     ],
+    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
   },
 ];
 
@@ -239,18 +237,14 @@ export const useOptimisedFarm = ({ id }) => {
   const navigate = useNavigate();
 
   // atoms
-  const [isSafeAppAtom] = useRecoilState(isSafeApp);
   const [walletAccountAtom] = useRecoilState(walletAccount);
   const [, setWantedChainAtom] = useRecoilState(wantedChain);
 
-  // other state control files
-  const { setNotification } = useNotification();
-
   // selected farm control
-  const selectedFarm = useRef<TFarm>(
+  const selectedFarm = useRef<TOptimisedFarm>(
     optimisedFarmOptions.find(availableFarm => availableFarm.id == id),
   );
-  const [selectedFarmInfo, setSelectedFarmInfo] = useState<TFarm>();
+  const [selectedFarmInfo, setSelectedFarmInfo] = useState<TOptimisedFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
     useState<TSupportedToken>();
   // selected supportedTokenInfo
@@ -292,7 +286,9 @@ export const useOptimisedFarm = ({ id }) => {
   useEffect(() => {
     const selectFarm = async id => {
       try {
-        let farm = optimisedFarmOptions.find(availableFarm => availableFarm.id == id);
+        let farm = optimisedFarmOptions.find(
+          availableFarm => availableFarm.id == id,
+        );
         if (!farm) {
           navigate('/');
           return;
@@ -312,38 +308,6 @@ export const useOptimisedFarm = ({ id }) => {
 
     selectFarm(id);
   }, [walletAccountAtom]);
-
-  useEffect(() => {
-    if (selectedFarmInfo) {
-      setUseBiconomy(
-        isSafeAppAtom || EChain.POLYGON != selectedFarmInfo?.chain
-          ? false
-          : true,
-      );
-      fetchIfUserHasWithdrawalRequest();
-    }
-  }, [selectedFarmInfo]);
-
-  const fetchIfUserHasWithdrawalRequest = async () => {
-    try {
-      const isUserWaiting = await getIfUserHasWithdrawalRequest(
-        selectedFarmInfo.farmAddress,
-        selectedFarmInfo.chain,
-      );
-
-      if (isUserWaiting) {
-        setNotification(
-          `You have pending withdrawal requests in the queue. These will be processed shortly`,
-          'info',
-          undefined,
-          undefined,
-          true,
-        );
-      }
-    } catch (error) {
-      setNotification(error, 'error');
-    }
-  };
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
@@ -366,19 +330,23 @@ export const useOptimisedFarm = ({ id }) => {
       let farmInfo;
 
       farmInfo = {
-        interest: await getInterest(farm.farmAddress, farm.chain),
-        totalAssetSupply: await getTotalAssetSupply(
+        interest: await getOptimisedFarmInterest(farm.apyAddress),
+        totalAssetSupply: /*await getOptimisedTotalAssetSupply(
           farm.farmAddress,
+          farm.underlyingTokenAddress,
           farm.chain,
-        ),
+        ),*/ 1,
         depositedAmount: 0,
       };
+
       if (walletAccountAtom) {
-        const depositedAmount = await getBalance(
+        const depositedAmount = 0; /*await getUserOptimisedFarmDepositedAmount(
           farm.farmAddress,
+          farm.underlyingTokenAddress,
           farm.chain,
-        );
+        );*/
         farmInfo.depositedAmount = depositedAmount;
+
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
@@ -392,25 +360,6 @@ export const useOptimisedFarm = ({ id }) => {
     setSelectedsupportedToken(supportedToken);
   };
 
-  const handleApprove = async () => {
-    try {
-      const tx = await approve(
-        selectedFarmInfo.farmAddress,
-        selectedSupportedToken.address,
-        selectedFarmInfo.chain,
-        useBiconomy,
-      );
-      heapTrack('approvedTransactionMined', {
-        pool: 'Ib',
-        currency: selectedSupportedToken.label,
-        amount: depositValue,
-      });
-      successTransactionHash.current = tx.transactionHash;
-    } catch (err) {
-      throw err;
-    }
-  };
-
   const handleDeposit = async () => {
     try {
       heapTrack('startedDepositing', {
@@ -418,7 +367,7 @@ export const useOptimisedFarm = ({ id }) => {
         currency: selectedSupportedToken.label,
         amount: depositValue,
       });
-      const tx = await deposit(
+      const tx = await depositIntoOptimised(
         selectedSupportedToken.address,
         selectedFarmInfo.farmAddress,
         depositValue,
@@ -439,34 +388,19 @@ export const useOptimisedFarm = ({ id }) => {
 
   const handleWithdraw = async () => {
     try {
-      const tx = await withdraw(
+      const withdrawPercentage = +(
+        +withdrawValue / +selectedFarmInfo.depositedAmount
+      ).toFixed(18);
+
+      const tx = await withdrawFromOptimised(
         selectedSupportedToken.address,
         selectedFarmInfo.farmAddress,
-        +withdrawValue,
+        +withdrawPercentage,
         selectedFarmInfo.chain,
         useBiconomy,
       );
-      successTransactionHash.current = tx.transactionHash;
-      const blockNumber = tx.blockNumber;
-      // the withdrawal might be instant or get into a buffer queue.
-      const wasAddedToQueue = await getIfWithdrawalWasAddedToQueue(
-        blockNumber,
-        selectedFarm.current?.chain,
-      );
 
-      if (wasAddedToQueue) {
-        steps.current[currentStep.current].successMessage = 'In progress...';
-        steps.current[
-          currentStep.current
-        ].successLabel = `Your withdrawal request for ${withdrawValue} ${selectedSupportedToken.label} was added to the queue and will be processed soon`;
-        setNotification(
-          `You have pending withdrawal requests in the queue. These will be processed shortly`,
-          'info',
-          undefined,
-          undefined,
-          true,
-        );
-      }
+      successTransactionHash.current = tx.transactionHash;
     } catch (error) {
       throw error;
     }
@@ -494,10 +428,6 @@ export const useOptimisedFarm = ({ id }) => {
 
     try {
       switch (step.id) {
-        case 0:
-          await handleApprove();
-          break;
-
         case 1:
           await handleDeposit();
           break;

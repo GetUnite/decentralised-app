@@ -1,12 +1,11 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
-import { useFarmWithdrawal } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
   NumericInput,
   ProjectedWeeklyInfo,
-  SubmitButton
+  SubmitButton,
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
@@ -28,18 +27,14 @@ export const OptimisedFarmWithdrawalTab = ({
   startProcessingSteps,
   steps,
 }) => {
-  const {
-    hasErrors,
-    withdrawValueError,
-    handleWithdrawalFieldChange,
-    isWithdrawalRequestsLoading,
-  } = useOptimisedFarmWithdrawal({
-    withdrawValue,
-    selectedSupportedToken,
-    selectedFarmInfo,
-    setWithdrawValue,
-    steps,
-  });
+  const { hasErrors, withdrawValueError, handleWithdrawalFieldChange } =
+    useOptimisedFarmWithdrawal({
+      withdrawValue,
+      selectedSupportedToken,
+      selectedFarmInfo,
+      setWithdrawValue,
+      steps,
+    });
 
   return (
     <Box fill>
@@ -47,8 +42,9 @@ export const OptimisedFarmWithdrawalTab = ({
         <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
-            label={`Withdraw ${selectedSupportedToken ? selectedSupportedToken?.label : ''
-              }`}
+            label={`Withdraw ${
+              selectedSupportedToken ? selectedSupportedToken?.label : ''
+            }`}
             available={selectedFarmInfo?.depositedAmount}
             tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleWithdrawalFieldChange}
@@ -100,12 +96,7 @@ export const OptimisedFarmWithdrawalTab = ({
         <SubmitButton
           primary
           label={'Withdraw'}
-          disabled={
-            isLoading ||
-            isWithdrawalRequestsLoading ||
-            withdrawValue == '' ||
-            hasErrors
-          }
+          disabled={isLoading || withdrawValue == '' || hasErrors}
           onClick={startProcessingSteps}
         />
       </Box>
