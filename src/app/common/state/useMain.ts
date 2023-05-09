@@ -108,6 +108,9 @@ export const useMain = () => {
 
   // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingTotalAmountInUSD, setIsLoadingTotalAmountInUSD] =
+    useState<boolean>(true);
+  const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
   // claim all rewards
@@ -222,43 +225,41 @@ export const useMain = () => {
           numberOfChainsWithAssets: chainsWithAssets.size,
         });
         setAvailableFarms(mappedFarms);
+      });
+      
+      // if wallet account is connect do sum of all farms and rewards
+      if (walletAccountAtom) {
+        if (location.search.includes('view_type=my_farms')) {
+          setViewType('View my farms only');
+        }
 
-        // if wallet account is connect do sum of all farms and rewards
-        if (walletAccountAtom) {
-          // set loading to true here since the auto connect is not loading again
-          if (location.search.includes('view_type=my_farms')) {
-            setViewType('View my farms only');
-          }
+        // calculate the total amount in usd
+        setIsLoadingTotalAmountInUSD(true);
+        let totalDepositedAmountInUsd = availableFarms.reduce(
+          (accumulator, farm) =>
+            accumulator +
+            +(farm.isBoost ? farm.depositedAmount : farm.depositedAmountInUSD),
+          0,
+        );
 
-          let tdaiu = 0;
-          const farmsWithDepositedAmount = availableFarms.filter(
-            farm => +farm.depositedAmount > 0,
-          );
-          for (
-            let index = 0;
-            index < farmsWithDepositedAmount.length;
-            index++
-          ) {
-            const farm = farmsWithDepositedAmount[index];
+        setTotalDepositedAmountInUsd(
+          toExactFixed(totalDepositedAmountInUsd, 2),
+        );
+        setIsLoadingTotalAmountInUSD(false);
 
-            if (farm.isBoost) {
-              tdaiu = tdaiu + +farm.depositedAmount;
-            } else {
-              tdaiu = tdaiu + +farm.depositedAmountInUSD;
-            }
-          }
-          setTotalDepositedAmountInUsd(toExactFixed(tdaiu, 2));
+        // load the rewards
+        setIsLoadingRewards(true);
 
-          // Also, check each boost farm rewards to show on the "view your farms" page
-          const CVXETHInUSDC = await getTokenValueUsingPriceFeedRouter(
-            EEthereumAddresses.CVXETH,
-            EFiatId.USD,
-            EChain.ETHEREUM,
-          );
+        // Also, check each boost farm rewards to show on the "view your farms" page
+        const CVXETHInUSDC = await getTokenValueUsingPriceFeedRouter(
+          EEthereumAddresses.CVXETH,
+          EFiatId.USD,
+          EChain.ETHEREUM,
+        );
 
-          let ri = [];
-          for (let index = 0; index < availableFarms.length; index++) {
-            const farm = availableFarms[index];
+        let ri = [];
+        await Promise.all(
+          availableFarms.map(async farm => {
             if (farm.isBoost) {
               const updatedRewards = {
                 ...(await getBoostFarmRewards(
@@ -304,15 +305,16 @@ export const useMain = () => {
               }
             }
             setRewardsInfo(ri);
-          }
-        }
+          }),
+        );
 
-        setIsLoading(false);
-      });
+        setIsLoadingRewards(false);
+      }
     } catch (error) {
       setError(error);
       console.log(error);
     }
+    setIsLoading(false);
   };
 
   const fetchFarmInfo = async farm => {
@@ -441,7 +443,10 @@ export const useMain = () => {
     let farmInfo;
 
     farmInfo = {
-      interest: await getOptimisedFarmInterest(farm.farmAddress, farm.apyAddresses),
+      interest: await getOptimisedFarmInterest(
+        farm.farmAddress,
+        farm.apyAddresses,
+      ),
       totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,
         farm.underlyingTokenAddress,
@@ -651,6 +656,7 @@ export const useMain = () => {
 
   const claimAllRewards = async seeRewardsAsStable => {
     setIsClaimingAllRewards(true);
+    setWantedChainAtom(EChain.ETHEREUM);
     try {
       // rewards only exist in ethereum boost farms
       // the stable option is always usdc
@@ -670,6 +676,8 @@ export const useMain = () => {
 
   return {
     isLoading,
+    isLoadingTotalAmountInUSD,
+    isLoadingRewards,
     error,
     filteredFarms,
     filteredBoostFarms,

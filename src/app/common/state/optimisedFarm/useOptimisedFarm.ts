@@ -55,6 +55,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
       '288e9c6d-d0fe-4606-a970-e0e98893231a',
       '25717654-0ded-413f-9b88-c06b919f04a6',
     ],
+    isNewest: true,
   },
   /*{
     id: 1,

@@ -7,6 +7,7 @@ import moment from 'moment';
 import { useState } from 'react';
 import { Filters } from './blocks/Filters';
 import { FarmsBlock, HeadingText, RewardsBlock } from './components';
+import Skeleton from 'react-loading-skeleton';
 
 export const Main = () => {
   const {
@@ -15,6 +16,8 @@ export const Main = () => {
     filteredBoostFarms,
     filteredOptimisedFarms,
     isLoading,
+    isLoadingTotalAmountInUSD,
+    isLoadingRewards,
     viewType,
     tokenFilter,
     updateTokenFilter,
@@ -185,9 +188,18 @@ export const Main = () => {
                           align="end"
                           height="75px"
                         >
-                          <Text size="16px" margin={{ top: '15px' }}>
-                            Total balance in farms: ${totalDepositedAmountInUsd}
-                          </Text>
+                          {isLoadingRewards ? (
+                            <Skeleton
+                              height="23px"
+                              width="230px"
+                              borderRadius="20px"
+                            />
+                          ) : (
+                            <Text size="16px" margin={{ top: '15px' }}>
+                              Total balance in farms: $
+                              {totalDepositedAmountInUsd}
+                            </Text>
+                          )}
                         </Box>
                         {rewardsInfo.length > 0 && (
                           <>
