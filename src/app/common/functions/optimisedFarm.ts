@@ -175,13 +175,50 @@ export const getUserOptimisedFarmDepositedAmount = async (
 };
 
 const optimisedFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
-export const getOptimisedFarmInterest = async apyAddress => {
-  const apyJsonResult = await fetch(
-    optimisedFarmInterestApiUrl + apyAddress,
-  ).then(res => res.json());
-  const baseApyData = apyJsonResult.data[apyJsonResult.data.length - 1];
+export const getOptimisedFarmInterest = async (
+  farmAddress,
+  apyAddresses,
+  chain = EChain.OPTIMISM,
+) => {
+  const abi = [
+    {
+      inputs: [],
+      name: 'getUnderlyingVaultsPercents',
+      outputs: [
+        {
+          internalType: 'uint256[]',
+          name: '',
+          type: 'uint256[]',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
 
-  return baseApyData.apy;
+  const underlyingVaultsPercents = await callContract(
+    abi,
+    farmAddress,
+    'getUnderlyingVaultsPercents()',
+    [],
+    chain,
+  );
+
+  const underlyingVaultsApys = await Promise.all(
+    underlyingVaultsPercents.map(async (underlyingVaultsPercent, index) => {
+      const apyJsonResult = await fetch(
+        optimisedFarmInterestApiUrl + apyAddresses[index],
+      ).then(res => res.json());
+      const baseApyData = apyJsonResult.data[apyJsonResult.data.length - 1];
+
+      return baseApyData.apy * (underlyingVaultsPercent.toNumber() / 100);
+    }),
+  );
+
+  return underlyingVaultsApys.reduce(
+    (previous, current) => previous + current,
+    0,
+  );
 };
 
 export const getOptimisedTotalAssetSupply = async (

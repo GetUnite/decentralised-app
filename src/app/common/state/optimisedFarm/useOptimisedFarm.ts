@@ -1,6 +1,4 @@
-import {
-  EOptimismAddresses,
-} from 'app/common/constants/addresses';
+import { EOptimismAddresses } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided } from 'app/common/functions/utils';
@@ -16,6 +14,8 @@ import { possibleWithdrawSteps } from './useOptimisedFarmWithdrawal';
 import {
   depositIntoOptimised,
   getOptimisedFarmInterest,
+  getOptimisedTotalAssetSupply,
+  getUserOptimisedFarmDepositedAmount,
   withdrawFromOptimised,
 } from 'app/common/functions/optimisedFarm';
 
@@ -50,9 +50,13 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
+    apyAddresses: [
+      '288e9c6d-d0fe-4606-a970-e0e98893231a',
+      '25717654-0ded-413f-9b88-c06b919f04a6',
+    ],
   },
-  {
+  /*{
     id: 1,
     farmAddress: EOptimismAddresses.BEEFYTOP3VAULTUSDC,
     type: 'optimised',
@@ -227,7 +231,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
       },
     ],
     apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
-  },
+  },*/
 ];
 
 const possibleFarmSteps = [...possibleDepositSteps, ...possibleWithdrawSteps];
@@ -330,21 +334,21 @@ export const useOptimisedFarm = ({ id }) => {
       let farmInfo;
 
       farmInfo = {
-        interest: await getOptimisedFarmInterest(farm.apyAddress),
-        totalAssetSupply: /*await getOptimisedTotalAssetSupply(
+        interest: await getOptimisedFarmInterest(farm.farmAddress, farm.apyAddresses),
+        totalAssetSupply: await getOptimisedTotalAssetSupply(
           farm.farmAddress,
           farm.underlyingTokenAddress,
           farm.chain,
-        ),*/ 1,
+        ),
         depositedAmount: 0,
       };
 
       if (walletAccountAtom) {
-        const depositedAmount = 0; /*await getUserOptimisedFarmDepositedAmount(
+        const depositedAmount = await getUserOptimisedFarmDepositedAmount(
           farm.farmAddress,
           farm.underlyingTokenAddress,
           farm.chain,
-        );*/
+        );
         farmInfo.depositedAmount = depositedAmount;
 
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
@@ -388,9 +392,9 @@ export const useOptimisedFarm = ({ id }) => {
 
   const handleWithdraw = async () => {
     try {
-      const withdrawPercentage = +(
-        +withdrawValue / +selectedFarmInfo.depositedAmount
-      ).toFixed(18);
+      const withdrawPercentage = Math.round(
+        +withdrawValue / +selectedFarmInfo.depositedAmount,
+      );
 
       const tx = await withdrawFromOptimised(
         selectedSupportedToken.address,

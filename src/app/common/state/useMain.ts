@@ -441,20 +441,20 @@ export const useMain = () => {
     let farmInfo;
 
     farmInfo = {
-      interest: await getOptimisedFarmInterest(farm.apyAddress),
-      totalAssetSupply: /*await getOptimisedTotalAssetSupply(
+      interest: await getOptimisedFarmInterest(farm.farmAddress, farm.apyAddresses),
+      totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,
         farm.underlyingTokenAddress,
         farm.chain,
-      ),*/1,
+      ),
       supportedTokens: farm.supportedTokens,
     };
     if (walletAccountAtom) {
-      const depositedAmount = 3; /*await getUserOptimisedFarmDepositedAmount(
+      const depositedAmount = await getUserOptimisedFarmDepositedAmount(
         farm.farmAddress,
         farm.underlyingTokenAddress,
         farm.chain,
-      );*/
+      );
       farmInfo.depositedAmount = depositedAmount;
       farmInfo.depositedAmountInUSD = depositedAmount;
 
