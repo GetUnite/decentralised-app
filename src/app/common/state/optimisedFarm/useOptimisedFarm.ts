@@ -18,6 +18,7 @@ import {
   getUserOptimisedFarmDepositedAmount,
   withdrawFromOptimised,
 } from 'app/common/functions/optimisedFarm';
+import { approve } from 'app/common/functions/web3Client';
 
 export const optimisedFarmOptions: Array<TOptimisedFarm> = [
   {
@@ -343,15 +344,15 @@ export const useOptimisedFarm = ({ id }) => {
         ),
         depositedAmount: 0,
       };
-
       if (walletAccountAtom) {
         const depositedAmount = await getUserOptimisedFarmDepositedAmount(
           farm.farmAddress,
           farm.underlyingTokenAddress,
           farm.chain,
         );
-        farmInfo.depositedAmount = depositedAmount;
 
+        farmInfo.depositedAmount = depositedAmount;
+  
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
@@ -363,6 +364,25 @@ export const useOptimisedFarm = ({ id }) => {
 
   const selectSupportedToken = supportedToken => {
     setSelectedsupportedToken(supportedToken);
+  };
+
+  const handleApprove = async () => {
+    try {
+      const tx = await approve(
+        selectedFarmInfo.farmAddress,
+        selectedSupportedToken.address,
+        selectedFarmInfo.chain,
+        useBiconomy,
+      );
+      heapTrack('approvedTransactionMined', {
+        pool: 'Ib',
+        currency: selectedSupportedToken.label,
+        amount: depositValue,
+      });
+      successTransactionHash.current = tx.transactionHash;
+    } catch (err) {
+      throw err;
+    }
   };
 
   const handleDeposit = async () => {
@@ -433,6 +453,10 @@ export const useOptimisedFarm = ({ id }) => {
 
     try {
       switch (step.id) {
+        case 0:
+          await handleApprove();
+          break;
+
         case 1:
           await handleDeposit();
           break;

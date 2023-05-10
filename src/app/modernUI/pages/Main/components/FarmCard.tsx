@@ -121,13 +121,13 @@ export const FarmCard = ({
               <Box fill direction="row" justify="between">
                 <Box>
                   <Box direction="column" gap="small">
-                    <Box direction='row' gap="small">
+                    <Box direction="row" gap="small">
                       {icons.slice(0, 6).map((icon, i) => (
                         <TokenIcon key={i} label={icon} />
                       ))}
                     </Box>
                     {icons.length > 6 && (
-                      <Box direction='row' gap="small">
+                      <Box direction="row" gap="small">
                         {icons.slice(6, icons.length - 1).map((icon, i) => (
                           <TokenIcon key={i} label={icon} />
                         ))}
@@ -196,8 +196,8 @@ export const FarmCard = ({
                   viewType != 'View my farms only'
                     ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                     : [
-                        '220px',
-                        '155px',
+                        '240px',
+                        '135px',
                         '155px',
                         '155px',
                         '145px',
@@ -234,9 +234,16 @@ export const FarmCard = ({
                   <>
                     {viewType != 'View my farms only' ? (
                       <>
-                        <Box style={{ fontWeight: 'bold' }} direction='row' gap="10px" align='center'>
+                        <Box
+                          style={{ fontWeight: 'bold' }}
+                          direction="row"
+                          gap="10px"
+                          align="center"
+                        >
                           {isLocked && <span>🔒</span>}
-                          {isOptimised && <img src={name.includes("Beefy") ? beefy : yearn} />}
+                          {isOptimised && (
+                            <img src={name.includes('Beefy') ? beefy : yearn} />
+                          )}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
@@ -317,7 +324,13 @@ export const FarmCard = ({
                         <Box justify="end">
                           {walletAccountAtom ? (
                             <Link
-                              to={(isBoost ? '/boostfarm/' : (isOptimised ? '/optimisedfarm/' :  '/farm/')) + id}
+                              to={
+                                (isBoost
+                                  ? '/boostfarm/'
+                                  : isOptimised
+                                  ? '/optimisedfarm/'
+                                  : '/farm/') + id
+                              }
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
@@ -339,13 +352,21 @@ export const FarmCard = ({
                       </>
                     ) : (
                       <>
-                        <span style={{ fontWeight: 'bold' }}>
+                        <Box
+                          style={{ fontWeight: 'bold' }}
+                          direction="row"
+                          gap="10px"
+                          align="center"
+                        >
                           {isLocked && <span>🔒</span>}
+                          {isOptimised && (
+                            <img src={name.includes('Beefy') ? beefy : yearn} />
+                          )}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
-                        </span>
+                        </Box>
                         <ChainBadge chain={chain} />
                         <span>{poolShare}%</span>
                         <span>{tvl}</span>
@@ -370,7 +391,13 @@ export const FarmCard = ({
                         <span>{toExactFixed(interest, 2)}%</span>
                         <Box justify="end" fill>
                           <Link
-                            to={(isBoost ? '/boostfarm/' : '/farm/') + id}
+                            to={
+                              (isBoost
+                                ? '/boostfarm/'
+                                : isOptimised
+                                ? '/optimisedfarm/'
+                                : '/farm/') + id
+                            }
                             style={{
                               display: 'flex',
                               justifyContent: 'end',

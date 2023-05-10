@@ -704,7 +704,7 @@ export const approve = async (
 ) => {
   let tx;
   try {
-    if (chain == EChain.ETHEREUM || !useBiconomy) {
+    if (chain != EChain.POLYGON || !useBiconomy) {
       const abi = [
         {
           inputs: [

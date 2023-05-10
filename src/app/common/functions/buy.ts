@@ -129,7 +129,7 @@ export const getWETHAllowance = async () => {
   const wEthAddress = EEthereumAddresses.WETH;
   const vaultAddress = EEthereumAddresses.VAULT;
 
-  const balance = await callContract(
+  const allowance = await callContract(
     abi,
     wEthAddress,
     'allowance(address,address)',
@@ -137,7 +137,7 @@ export const getWETHAllowance = async () => {
     EChain.ETHEREUM,
   );
 
-  return ethers.utils.formatEther(balance);
+  return ethers.utils.formatEther(allowance);
 };
 
 export const approveAlluoPurchaseInWETH = async () => {
