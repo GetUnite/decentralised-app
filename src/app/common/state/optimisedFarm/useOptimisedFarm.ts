@@ -414,7 +414,7 @@ export const useOptimisedFarm = ({ id }) => {
   const handleWithdraw = async () => {
     try {
       const withdrawPercentage = Math.round(
-        +withdrawValue / +selectedFarmInfo.depositedAmount,
+        (+withdrawValue / +selectedFarmInfo.depositedAmount) * 100,
       );
 
       const tx = await withdrawFromOptimised(

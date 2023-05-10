@@ -394,6 +394,11 @@ export const sendTransaction = async (
 
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
     let receipt = await provider.waitForTransaction(transactionHash);
+
+    // status 0 means it failed
+    if(receipt.status == 0){
+      throw '';
+    }
     return receipt;
   } catch (error) {
     console.log(error);
