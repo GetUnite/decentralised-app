@@ -104,6 +104,8 @@ export enum EEthereumAddressesMainnet {
   CVX = '0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B',
 
   LDO = '0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32',
+
+  FXS = '0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0',
   
   // Uniswap addresses for price discovery
   UNISWAPPOOLFACTORY = '0x1F98431c8aD98523631AE4a59f267346ea31F984',
@@ -115,6 +117,7 @@ export enum EEthereumAddressesMainnet {
   CRVUSDCPOOL = '0x9445bd19767f73dcae6f2de90e6cd31192f62589',
   CVXUSDCPOOL = '0x575e96f61656b275ca1e0a67d9b68387abc1d09c',
   LDOUSDCPOOL = '0x33e71cacbb6b596bc006aac3eeaa2817e8212264',
+  FXSUSDCPOOL = '0x1bc5d5ce644ba9be1af92be47d2132b7aca66ab1',
 }
 
 enum EPolygonAddressesMumbai {

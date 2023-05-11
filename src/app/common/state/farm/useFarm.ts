@@ -1,14 +1,14 @@
 import {
   EEthereumAddresses,
   EPolygonAddresses,
-  EOptimismAddresses
+  EOptimismAddresses,
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   deposit,
   getIfUserHasWithdrawalRequest,
   getIfWithdrawalWasAddedToQueue,
-  withdraw
+  withdraw,
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
 import { depositDivided, roundDown } from 'app/common/functions/utils';
@@ -134,7 +134,7 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT'],//'agEUR', 'EURS', 'jEUR'],
+    icons: ['EURT'], //'agEUR', 'EURS', 'jEUR'],
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       // {
@@ -242,7 +242,7 @@ export const farmOptions: Array<TFarm> = [
     chain: EChain.ETHEREUM,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT'],//, 'EURS', 'agEUR'],
+    icons: ['EURT'], //, 'EURS', 'agEUR'],
     underlyingTokenAddress: EEthereumAddresses.EURT,
     supportedTokens: [
       // {
@@ -445,20 +445,24 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        const depositedAmount = roundDown(await getBalance(
-          farm.farmAddress,
-          undefined,
-          farm.chain,
-        ), 6);
-        farmInfo.depositedAmount = depositedAmount;
-
-        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
+        farmInfo = { ...farmInfo, ...(await getDepositedAmount(farm)) };
       }
 
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getDepositedAmount = async (farm = selectedFarmInfo) => {
+    const depositedAmount = roundDown(
+      await getBalance(farm.farmAddress, undefined, farm.chain),
+      6,
+    );
+    return {
+      depositedAmount: depositedAmount,
+      depositDividedAmount: depositDivided(depositedAmount),
+    };
   };
 
   const selectSupportedToken = supportedToken => {
