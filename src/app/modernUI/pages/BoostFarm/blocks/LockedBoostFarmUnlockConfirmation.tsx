@@ -22,7 +22,7 @@ export const LockedBoostFarmUnlockConfirmation = ({
           <Text textAlign="center" weight="bold" size="24px">
             {lessThanHalfHourToHarvest
               ? `Unlock requests made less than 30 minutes before harvest could miss today’s harvest cycle`
-              : `Just a reminder that funds in locked boost pools are harvested every Sunday after 12 PM UTC`}
+              : `Just a reminder that funds in locked boost pools are harvested every Sunday after 11 PM UTC`}
           </Text>
           <Text
             textAlign="center"
@@ -32,9 +32,7 @@ export const LockedBoostFarmUnlockConfirmation = ({
           >
             {lessThanHalfHourToHarvest
               ? `Missed requests will will be harvested next Sunday`
-              : `Unlocked funds will be available for withdrawal from ${nextHarvestDate.format(
-                  'DD MMMM YYYY',
-                )}`}
+              : `Unlocked funds will be available for withdrawal from for withdrawal from Sunday at 11 PM UTC`}
           </Text>
         </Box>
         <Box gap="30px" margin={{ top: '45px' }}>
