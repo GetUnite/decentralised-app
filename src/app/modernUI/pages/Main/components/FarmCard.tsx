@@ -77,7 +77,7 @@ export const FarmCard = ({
 
   const tvl = isLoading
     ? 'Loading...'
-    : sign + toExactFixed(totalAssetSupply, 2);
+    : sign + toExactFixed(totalAssetSupply, sign == '$' || sign == '€' ? 2 : 4);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 

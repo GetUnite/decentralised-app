@@ -112,16 +112,11 @@ export const Main = () => {
                     <Box gap="60px">
                       <FarmsBlock
                         heading="Optimised farms"
-                        description={`Our Optimised farms allow you to optimise Beefy and Yearn strategies so you're always in the best pool 
-                        for the chosen asset.`}
-                        readMoreDescription="Choose your aggregator and asset, deposit funds, and let the protocol manage from there. 
-                        It automatically creates LPs, stakes in the top farm, and moves funds to maintain your position in the top farm if this changes. 
-                        Rates are variable, and benefits are auto-compounded."
+                        description={`Maximize yield farming with Optimised Farms. Alluo's platform auto-manages Beefy and Yearn strategies, so you're always in the best pool for the chosen asset with minimum $1M liquidity,  a steady $0.99-$1.01 peg and 80%+ safety score. Choose your aggregator and asset, deposit funds, and let the protocol manage from there.`}
+                        readMoreDescription="placeholder"
                         readMoreStatus={seeAllOptimisedFarmsDescription}
                         onReadMore={() =>
-                          setSeeAllOptimisedFarmsDescription(
-                            !seeAllOptimisedFarmsDescription,
-                          )
+                          window.open("https://medium.com/@alastairpreacher/new-optimism-top-vaults-for-optimised-beefy-yearn-yield-farming-f0c3179449b8", "_blank")
                         }
                         farms={filteredOptimisedFarms}
                         viewType={viewType}

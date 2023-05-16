@@ -23,8 +23,8 @@ import { approve } from 'app/common/functions/web3Client';
 export const optimisedFarmOptions: Array<TOptimisedFarm> = [
   {
     id: 0,
-    farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSDC,
-    type: 'optimised',
+    farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSD,
+    type: 'beefy',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top Vault USD',
@@ -53,15 +53,14 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     ],
     // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
     apyAddresses: [
-      '288e9c6d-d0fe-4606-a970-e0e98893231a',
-      '25717654-0ded-413f-9b88-c06b919f04a6',
+      '72d0ef83-fa27-44ba-b9a6-efb0a43f2a3c', // USD+-DOLA
     ],
     isNewest: true,
   },
-  /*{
+  {
     id: 1,
-    farmAddress: EOptimismAddresses.BEEFYTOP3VAULTUSDC,
-    type: 'optimised',
+    farmAddress: EOptimismAddresses.BEEFYTOP3VAULTUSD,
+    type: 'beefy',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top 3 Vault USD',
@@ -88,12 +87,18 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
+    apyAddresses: [
+      '72d0ef83-fa27-44ba-b9a6-efb0a43f2a3c', // USD+-DOLA
+      'd643c61d-bfcb-429e-9bac-b3b0a2f18561', // MIM-DAI-USDC-USDT
+      '25717654-0ded-413f-9b88-c06b919f04a6' // DOLA-MAI
+    ],
+    isNewest: true,
   },
   {
     id: 2,
     farmAddress: EOptimismAddresses.BEEFYTOPVAULTETH,
-    type: 'optimised',
+    type: 'beefy',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top Vault ETH',
@@ -108,12 +113,16 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: 'Ξ',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
+    apyAddresses: [
+      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8' // ETH-frxETH
+    ],
+    isNewest: true,
   },
   {
     id: 3,
     farmAddress: EOptimismAddresses.BEEFYTOP3VAULTETH,
-    type: 'optimised',
+    type: 'beefy',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Beefy Top 3 Vault ETH',
@@ -128,12 +137,18 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: 'Ξ',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
+    apyAddresses: [
+      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8', // ETH-frxETH
+      '249f4209-98d2-4aa5-8596-8fb2d2867426', // alETH-ETH
+      '0bd59ec7-6389-4a92-93fb-aa4ee6b2705b', // sfrxETH-frxETH
+    ],
+    isNewest: true,
   },
   {
     id: 4,
-    farmAddress: EOptimismAddresses.YEARNTOPVAULTUSDC,
-    type: 'optimised',
+    farmAddress: EOptimismAddresses.YEARNTOPVAULTUSD,
+    type: 'yearn',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Yearn Top Vault USD',
@@ -160,12 +175,12 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    isNewest: true,
   },
   {
     id: 5,
-    farmAddress: EOptimismAddresses.YEARNTOP3VAULTUSDC,
-    type: 'optimised',
+    farmAddress: EOptimismAddresses.YEARNTOP3VAULTUSD,
+    type: 'yearn',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Yearn Top 3 Vault USD',
@@ -192,12 +207,12 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    isNewest: true,
   },
   {
     id: 6,
     farmAddress: EOptimismAddresses.YEARNTOPVAULTETH,
-    type: 'optimised',
+    type: 'yearn',
     isOptimised: true,
     chain: EChain.OPTIMISM,
     name: 'Yearn Top Vault ETH',
@@ -212,9 +227,9 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: 'Ξ',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    isNewest: true,
   },
-  {
+  /*{
     id: 7,
     farmAddress: EOptimismAddresses.YEARNTOP3VAULTETH,
     type: 'optimised',
@@ -232,7 +247,12 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: 'Ξ',
       },
     ],
-    apyAddress: '7bd19e35-94bb-43fd-83f9-6613a3710d7b',
+    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
+    apyAddresses: [
+      '288e9c6d-d0fe-4606-a970-e0e98893231a',
+      '25717654-0ded-413f-9b88-c06b919f04a6',
+    ],
+    isNewest: true,
   },*/
 ];
 
@@ -336,7 +356,11 @@ export const useOptimisedFarm = ({ id }) => {
       let farmInfo;
 
       farmInfo = {
-        interest: await getOptimisedFarmInterest(farm.farmAddress, farm.apyAddresses),
+        interest: await getOptimisedFarmInterest(
+          farm.farmAddress,
+          farm.type,
+          farm.apyAddresses,
+        ),
         totalAssetSupply: await getOptimisedTotalAssetSupply(
           farm.farmAddress,
           farm.underlyingTokenAddress,
@@ -352,7 +376,7 @@ export const useOptimisedFarm = ({ id }) => {
         );
 
         farmInfo.depositedAmount = depositedAmount;
-  
+
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 

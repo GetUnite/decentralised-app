@@ -73,7 +73,7 @@ export const OptimisedFarmDepositTab = ({
         />
         <Info
           label="APY"
-          value={toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'}
+          value={toExactFixed(selectedFarmInfo?.interest, 2) + '%'}
           isLoading={isLoading}
         />
         <Info

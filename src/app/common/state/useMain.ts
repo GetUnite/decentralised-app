@@ -445,6 +445,7 @@ export const useMain = () => {
     farmInfo = {
       interest: await getOptimisedFarmInterest(
         farm.farmAddress,
+        farm.type,
         farm.apyAddresses,
       ),
       totalAssetSupply: await getOptimisedTotalAssetSupply(

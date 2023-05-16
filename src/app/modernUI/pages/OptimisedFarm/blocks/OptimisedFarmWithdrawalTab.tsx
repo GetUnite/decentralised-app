@@ -70,7 +70,7 @@ export const OptimisedFarmWithdrawalTab = ({
         <Info
           label="APY"
           value={
-            toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'
+            toExactFixed(selectedFarmInfo?.interest, 2) + '%'
           }
           isLoading={isLoading}
         />

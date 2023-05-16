@@ -115,8 +115,9 @@ export const OptimisedFarm = () => {
                     />
                   </Tab>
                 </Tabs>
-                <Box margin={{ top: '26px' }} justify="center" direction="row">
-                  <Text size="12px">
+                <Box margin={{ top: '26px' }} justify="center" direction="row" height="18px" >
+                  {/*TODO: remove display none and update link*/}
+                  <Text size="12px" style={{display: "none"}}>
                     Find out where these funds are being invested{' '}
                     <a
                       target="_blank"
@@ -127,7 +128,7 @@ export const OptimisedFarm = () => {
                     >
                       here
                     </a>
-                  </Text>
+                    </Text>
                 </Box>
               </>
             )}
