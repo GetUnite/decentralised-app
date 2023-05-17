@@ -118,9 +118,14 @@ export const useMain = () => {
     useState<boolean>(false);
   const [claimAllRewardsError, setClaimAllRewardsError] = useState<string>('');
 
+  const fetchFarmsInfoSemaphore = useRef<boolean>(false); // use this to control the loading when wallet auto connects
+
+  const shouldStop = () => fetchFarmsInfoSemaphore.current;
+
   useEffect(() => {
     setWantedChainAtom(undefined);
     fetchFarmsInfo();
+    filterFarms();
     const today = new Date();
     if (today.getDay() === 0) {
       setNotification(
@@ -131,6 +136,9 @@ export const useMain = () => {
         true,
       );
     }
+    return () => {
+      fetchFarmsInfoSemaphore.current = true;
+    };
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -138,7 +146,6 @@ export const useMain = () => {
     filterFarms();
     //}
   }, [
-    availableFarms,
     viewType,
     sortField,
     sortDirectionIsAsc,
@@ -153,7 +160,7 @@ export const useMain = () => {
     try {
       const supportedTokensWithBalance = new Array<any>();
 
-      await Promise.all(
+      const mappedFarms = await Promise.all(
         [...boostFarmOptions, ...optimisedFarmOptions, ...farmOptions].map(
           async availableFarm => {
             const {
@@ -170,6 +177,14 @@ export const useMain = () => {
               ? await fetchOptimisedFarmInfo(availableFarm)
               : await fetchFarmInfo(availableFarm);
 
+            availableFarm.interest = interest;
+            availableFarm.totalAssetSupply = totalAssetSupply;
+            availableFarm.supportedTokens = supportedTokens;
+            availableFarm.depositedAmount = depositedAmount;
+            availableFarm.depositedAmountInLP = depositedAmountInLP;
+            availableFarm.depositedAmountInUSD = depositedAmountInUSD;
+            availableFarm.poolShare = poolShare;
+
             if (walletAccountAtom) {
               for (let index = 0; index < supportedTokens.length; index++) {
                 supportedTokensWithBalance.push({
@@ -179,54 +194,65 @@ export const useMain = () => {
               }
             }
 
-            availableFarm.interest = interest;
-            availableFarm.totalAssetSupply = totalAssetSupply;
-            availableFarm.supportedTokens = supportedTokens;
-            availableFarm.depositedAmount = depositedAmount;
-            availableFarm.depositedAmountInLP = depositedAmountInLP;
-            availableFarm.depositedAmountInUSD = depositedAmountInUSD;
-            availableFarm.poolShare = poolShare;
-
             return availableFarm;
           },
         ),
-      ).then(async mappedFarms => {
-        let numberOfAssets = 0;
-        let chainsWithAssets = new Set();
+      );
 
-        if (walletAccountAtom) {
-          const uniqueSupportedTokensWithBalance =
-            supportedTokensWithBalance.filter(
-              (value, index, self) =>
-                index ===
-                self.findIndex(
-                  t => t.address === value.address && t.chain === value.chain,
-                ),
+      // if wallet wasn't connected and it is now, stop the current function
+      if (shouldStop()) {
+        fetchFarmsInfoSemaphore.current = false;
+        return;
+      }
+
+      await Promise.all(
+        mappedFarms.map(async () => {
+          let numberOfAssets = 0;
+          let chainsWithAssets = new Set();
+
+          if (walletAccountAtom) {
+            const uniqueSupportedTokensWithBalance =
+              supportedTokensWithBalance.filter(
+                (value, index, self) =>
+                  index ===
+                  self.findIndex(
+                    t => t.address === value.address && t.chain === value.chain,
+                  ),
+              );
+
+            await Promise.all(
+              uniqueSupportedTokensWithBalance.map(
+                async supportedTokenWithBalance => {
+                  const balance = await getBalanceOf(
+                    supportedTokenWithBalance.address,
+                    supportedTokenWithBalance.decimals,
+                    supportedTokenWithBalance.chain,
+                  );
+                  if (+balance > 0) {
+                    numberOfAssets++;
+                    chainsWithAssets.add(supportedTokenWithBalance.chain);
+                  }
+                },
+              ),
             );
+          }
+          setAssetsInfo({
+            numberOfAssets: numberOfAssets,
+            numberOfChainsWithAssets: chainsWithAssets.size,
+          });
+        }),
+      );
 
-          await Promise.all(
-            uniqueSupportedTokensWithBalance.map(
-              async supportedTokenWithBalance => {
-                const balance = await getBalanceOf(
-                  supportedTokenWithBalance.address,
-                  supportedTokenWithBalance.decimals,
-                  supportedTokenWithBalance.chain,
-                );
-                if (+balance > 0) {
-                  numberOfAssets++;
-                  chainsWithAssets.add(supportedTokenWithBalance.chain);
-                }
-              },
-            ),
-          );
-        }
-        setAssetsInfo({
-          numberOfAssets: numberOfAssets,
-          numberOfChainsWithAssets: chainsWithAssets.size,
-        });
-        setAvailableFarms(mappedFarms);
-      });
-      
+      // if wallet wasn't connected and it is now, stop the current function
+      if (shouldStop()) {
+        fetchFarmsInfoSemaphore.current = false;
+        return;
+      }
+
+      setAvailableFarms(mappedFarms);
+
+      setIsLoading(false);
+
       // if wallet account is connect do sum of all farms and rewards
       if (walletAccountAtom) {
         if (location.search.includes('view_type=my_farms')) {
@@ -314,7 +340,6 @@ export const useMain = () => {
       setError(error);
       console.log(error);
     }
-    setIsLoading(false);
   };
 
   const fetchFarmInfo = async farm => {
@@ -525,22 +550,26 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'View my farms only'
-        ? availableFarms.filter(farm => +farm.depositedAmount > 0.00001)
+        ? availableFarms.filter(farm => farm != undefined && +farm.depositedAmount > 0.00001)
         : availableFarms;
 
     filteredFarms = filteredFarms.filter(farm => {
-      const supportedTokensLabels = farm.supportedTokens.map(
-        supportedToken => supportedToken.label,
-      );
+      if (farm != undefined) {
+        const supportedTokensLabels =
+          farm.supportedTokens != undefined &&
+          Array.isArray(farm.supportedTokens)
+            ? farm.supportedTokens.map(supportedToken => supportedToken.label)
+            : [];
 
-      for (let index = 0; index < supportedTokensLabels.length; index++) {
-        const label = supportedTokensLabels[index];
+        for (let index = 0; index < supportedTokensLabels.length; index++) {
+          const label = supportedTokensLabels[index];
 
-        if (tokenFilter.includes(label)) {
-          return true;
+          if (tokenFilter.includes(label)) {
+            return true;
+          }
         }
+        return false;
       }
-      return false;
     });
 
     filteredFarms = filteredFarms.filter(farm => {
@@ -558,7 +587,7 @@ export const useMain = () => {
     filteredFarms = filteredFarms.filter(farm => {
       let result = false;
       if (typeFilter.includes('Fixed-rate farms')) {
-        result = result || !farm.isBoost;
+        result = result || (!farm.isBoost && !farm.isOptimised);
       }
       if (typeFilter.includes('Boost farms')) {
         result = result || farm.isBoost;
@@ -702,7 +731,7 @@ export const useMain = () => {
     setViewType,
     totalDepositedAmountInUsd,
     isFarming:
-      availableFarms?.filter(farm => +farm.depositedAmount > 0.00001).length >
+      availableFarms?.filter(farm => +farm?.depositedAmount > 0.00001).length >
       0,
     rewardsInfo,
     claimRewards,

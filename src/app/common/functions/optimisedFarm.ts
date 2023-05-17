@@ -162,9 +162,12 @@ export const getUserOptimisedFarmDepositedAmount = async (
         EChain.OPTIMISM,
       );
 
+      const vaultDecimals = await getDecimals(vault, EChain.OPTIMISM);
       return (
-        +fromDecimals(balanceOf.vaultBalances[index].toString(), 18) *
-        tokenPrice
+        +fromDecimals(
+          balanceOf.vaultBalances[index].toString(),
+          vaultDecimals,
+        ) * tokenPrice
       );
     }),
   );
@@ -283,10 +286,18 @@ export const getOptimisedFarmInterest = async (
     );
 
     // for each underlying vault get apy from the json return on the apy call * the vault percentage
-    underlyingVaultsApys = activeUnderlyingVaults.map((activeUnderlyingVault, index) => {
-      const apy = apyJsonResult.find(ajr => ajr.address == activeUnderlyingVault).apy;
-      return (apy != undefined ? apy.net_apy : 0) * underlyingVaultsPercents[index].toNumber() * fee;
-    });
+    underlyingVaultsApys = activeUnderlyingVaults.map(
+      (activeUnderlyingVault, index) => {
+        const apy = apyJsonResult.find(
+          ajr => ajr.address == activeUnderlyingVault,
+        ).apy;
+        return (
+          (apy != undefined ? apy.net_apy : 0) *
+          underlyingVaultsPercents[index].toNumber() *
+          fee
+        );
+      },
+    );
   }
 
   return underlyingVaultsApys.reduce(
@@ -365,8 +376,14 @@ export const getOptimisedTotalAssetSupply = async (
           EChain.OPTIMISM,
         );
 
-        const underlyingVaultDecimals = await getDecimals(underlyingVault, EChain.OPTIMISM);
-        return +fromDecimals(vaultBalanceOf.toString(), underlyingVaultDecimals) * tokenValue;
+        const underlyingVaultDecimals = await getDecimals(
+          underlyingVault,
+          EChain.OPTIMISM,
+        );
+        return (
+          +fromDecimals(vaultBalanceOf.toString(), underlyingVaultDecimals) *
+          tokenValue
+        );
       }),
     );
 
