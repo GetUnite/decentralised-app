@@ -181,6 +181,17 @@ export const getUserOptimisedFarmDepositedAmount = async (
 const optimisedFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 const optimisedYearnFarmInterestApiUrl =
   'https://api.yearn.finance/v1/chains/10/vaults/all';
+const compoundingApy = (baseApy, rewardApy, fee, vaultPercentage) => {
+  const apy =
+    Math.pow(
+      1 + fee * (Math.pow(1 + baseApy, 1 / 365) - 1 + rewardApy / 365),
+      365,
+    ) - 1;
+  // the 100 cancel each other but it's just to make clear that
+  // the first expression needs to be converted into % so * 100
+  // the second expressions needs to be converted into decimal so / 100
+  return apy * 100 * (vaultPercentage / 100);
+};
 export const getOptimisedFarmInterest = async (
   farmAddress,
   farmType,
@@ -251,21 +262,21 @@ export const getOptimisedFarmInterest = async (
           optimisedFarmInterestApiUrl + apyAddresses[index],
         ).then(res => res.json());
         const baseApyData = apyJsonResult.data[apyJsonResult.data.length - 1];
-        let apy = baseApyData.apy * fee;
+
         // if there are rewards use the base + rewards to calculate apy
         if (baseApyData.apyReward != null) {
           const base = baseApyData.apyBase / 100;
           const reward = baseApyData.apyReward / 100;
 
-          apy =
-            (Math.pow(
-              1 + fee * (Math.pow(1 + base, 1 / 365) - 1 + reward / 365),
-              365,
-            ) -
-              1) *
-            100;
+          return compoundingApy(
+            base,
+            reward,
+            fee,
+            underlyingVaultsPercent.toNumber(),
+          );
         }
-        return apy * (underlyingVaultsPercent.toNumber() / 100);
+
+        return baseApyData.apy * (underlyingVaultsPercent.toNumber() / 100) * fee;
       }),
     );
   }
@@ -288,13 +299,25 @@ export const getOptimisedFarmInterest = async (
     // for each underlying vault get apy from the json return on the apy call * the vault percentage
     underlyingVaultsApys = activeUnderlyingVaults.map(
       (activeUnderlyingVault, index) => {
-        const apy = apyJsonResult.find(
+        const activeUnderlyingVaultApy = apyJsonResult.find(
           ajr => ajr.address == activeUnderlyingVault,
         ).apy;
-        return (
-          (apy != undefined ? apy.net_apy : 0) *
-          underlyingVaultsPercents[index].toNumber() *
-          fee
+
+        const base =
+          activeUnderlyingVaultApy != undefined
+            ? activeUnderlyingVaultApy.net_apy
+            : 0;
+        const reward =
+          activeUnderlyingVaultApy != undefined
+            ? activeUnderlyingVaultApy.staking_rewards_apr
+            : 0;
+
+        console.log(activeUnderlyingVaultApy);
+        return compoundingApy(
+          base,
+          reward,
+          fee,
+          underlyingVaultsPercents[index].toNumber(),
         );
       },
     );

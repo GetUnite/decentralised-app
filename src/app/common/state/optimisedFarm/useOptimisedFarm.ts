@@ -91,7 +91,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     apyAddresses: [
       '72d0ef83-fa27-44ba-b9a6-efb0a43f2a3c', // USD+-DOLA
       'd643c61d-bfcb-429e-9bac-b3b0a2f18561', // MIM-DAI-USDC-USDT
-      '25717654-0ded-413f-9b88-c06b919f04a6' // DOLA-MAI
+      '25717654-0ded-413f-9b88-c06b919f04a6', // DOLA-MAI
     ],
     isNewest: true,
   },
@@ -103,9 +103,18 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Beefy Top Vault ETH',
     sign: 'Ξ',
-    icons: ['WETH'],
+    icons: [
+      //'ETH',
+      'WETH',
+    ],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
+      /*{
+        label: 'ETH',
+        address: EOptimismAddresses.ETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },*/
       {
         label: 'WETH',
         address: EOptimismAddresses.WETH,
@@ -115,7 +124,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     ],
     // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
     apyAddresses: [
-      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8' // ETH-frxETH
+      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8', // ETH-frxETH
     ],
     isNewest: true,
   },
@@ -217,9 +226,18 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Yearn Top Vault ETH',
     sign: 'Ξ',
-    icons: ['WETH'],
+    icons: [
+      //'ETH',
+      'WETH',
+    ],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
+      /*{
+        label: 'ETH',
+        address: EOptimismAddresses.ETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },*/
       {
         label: 'WETH',
         address: EOptimismAddresses.WETH,
