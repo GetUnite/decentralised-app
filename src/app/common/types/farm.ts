@@ -31,7 +31,7 @@ export type TFarm = {
   depositedAmountInUSD?: string;
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;
-  poolShare?: number;
+  poolShare?: string | number;
   isBoost?: boolean;
   isOptimised?: boolean;
   isNewest?: boolean;
