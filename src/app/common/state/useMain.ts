@@ -201,7 +201,6 @@ export const useMain = () => {
 
       // if wallet wasn't connected and it is now, stop the current function
       if (shouldStop()) {
-        console.log('primeiro should stop, entrar 1 vez');
         fetchFarmsInfoSemaphore.current = false;
         return;
       }
@@ -246,7 +245,6 @@ export const useMain = () => {
 
       // if wallet wasn't connected and it is now, stop the current function
       if (shouldStop()) {
-        console.log('segundo should stop');
         fetchFarmsInfoSemaphore.current = false;
         return;
       }

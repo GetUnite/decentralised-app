@@ -176,7 +176,6 @@ export const tryAutoWalletConnection = async callback => {
       const connection = await connectToWallet({
         autoSelect: { label: walletLabel, disableModals: true },
       });
-      console.log(connection);
       callback(connection.address, isGnosisSafe);
     } catch (error) {
       console.log(error);
@@ -191,7 +190,6 @@ export const connectToWallet = async (connectOptions?) => {
   try {
     wallets = await onboard.connectWallet(connectOptions);
 
-    console.log({allWallets: wallets, chosenWallet:wallets[0], chosenAccount: wallets[0].accounts[0]});
     if (wallets[0]) {
       const unstoppableUser = wallets[0].label === 'Unstoppable' ? true : false;
       walletProvider = new ethers.providers.Web3Provider(
