@@ -201,6 +201,7 @@ export const useMain = () => {
 
       // if wallet wasn't connected and it is now, stop the current function
       if (shouldStop()) {
+        console.log('primeiro should stop, entrar 1 vez');
         fetchFarmsInfoSemaphore.current = false;
         return;
       }
@@ -245,10 +246,10 @@ export const useMain = () => {
 
       // if wallet wasn't connected and it is now, stop the current function
       if (shouldStop()) {
+        console.log('segundo should stop');
         fetchFarmsInfoSemaphore.current = false;
         return;
       }
-
       setAvailableFarms(mappedFarms);
 
       setIsLoading(false);
@@ -550,7 +551,9 @@ export const useMain = () => {
 
     filteredFarms =
       viewType == 'View my farms only'
-        ? availableFarms.filter(farm => farm != undefined && +farm.depositedAmount > 0.00001)
+        ? availableFarms.filter(
+            farm => farm != undefined && +farm.depositedAmount > 0.00001,
+          )
         : availableFarms;
 
     filteredFarms = filteredFarms.filter(farm => {
