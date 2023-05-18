@@ -396,7 +396,7 @@ export const sendTransaction = async (
     let receipt = await provider.waitForTransaction(transactionHash);
 
     // status 0 means it failed
-    if(receipt.status == 0){
+    if (receipt.status == 0) {
       throw '';
     }
     return receipt;
@@ -825,6 +825,28 @@ export const QueryFilter = async (
     );
 
     return logs;
+  } catch (error) {
+    console.log(abi, address, eventSignature, params);
+    // here do all error handling to readable stuff
+    console.log(error);
+  }
+};
+
+export const QueryFilterWithoutBlock = async (
+  abi,
+  address,
+  eventSignature,
+  params,
+  chain,
+) => {
+  const readOnlyProvider = getReadOnlyProvider(chain);
+  const contract = new ethers.Contract(address, abi, readOnlyProvider);
+
+  try {
+    const filter = contract.filters[eventSignature].apply(null, params);
+    const results = await contract.queryFilter(filter);
+
+    return results;
   } catch (error) {
     console.log(abi, address, eventSignature, params);
     // here do all error handling to readable stuff

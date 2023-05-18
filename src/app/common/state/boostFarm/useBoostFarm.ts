@@ -886,7 +886,11 @@ export const useBoostFarm = ({ id }) => {
         lastHarvestDate.setSeconds(lastHarvestDateTimestamp);
 
         previousHarvestDate.current = moment(lastHarvestDate);
-        nextHarvestDate.current = moment(lastHarvestDate).add(9792, 'minutes'); // add the equivalent to 6.8 days in min
+        // if the difference between today and the last harvest date is less then the 7 days between harvests, set the next date
+        nextHarvestDate.current =
+          moment().diff(previousHarvestDate.current, 'days') <= 7
+            ? moment(lastHarvestDate).add(9792, 'minutes') // add the equivalent to 6.8 days in min
+            : moment(null);
 
         var endFirstTimer = performance.now();
         console.log(
@@ -1023,7 +1027,7 @@ export const useBoostFarm = ({ id }) => {
         EFiatId.USD,
         EChain.ETHEREUM,
       );
-      
+
       // Rewards
       const updatedRewards = {
         ...selectedFarmInfo.current.rewards,

@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import moment from 'moment';
 import { EEthereumAddresses } from '../constants/addresses';
 import { EChain } from '../constants/chains';
 import { fromDecimals, toDecimals, toExactFixed } from './utils';
@@ -8,9 +7,8 @@ import {
   callStatic,
   getCurrentWalletAddress,
   getTokenValueUsingUniswap,
-  getReadOnlyProvider,
-  QueryFilter,
-  sendTransaction
+  sendTransaction,
+  QueryFilterWithoutBlock,
 } from './web3Client';
 
 export const depositIntoBoostFarm = async (
@@ -457,7 +455,7 @@ export const getBoostFarmInterest = async (
   const fee =
     1 -
     (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
-    10000;
+      10000;
 
   const baseApyJsonResult = await fetch(
     boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
@@ -478,9 +476,9 @@ export const getBoostFarmInterest = async (
   return (
     (baseApy +
       baseRewardsAPR *
-      fee *
-      (1 + boostApy) *
-      Math.pow(1 + boostRewardsAPR / 52, 52)) *
+        fee *
+        (1 + boostApy) *
+        Math.pow(1 + boostRewardsAPR / 52, 52)) *
     100
   );
 };
@@ -659,44 +657,9 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     },
   ];
 
-  const EthDater = require('ethereum-block-by-date');
-  const provider = getReadOnlyProvider(chain);
+  const looped = await QueryFilterWithoutBlock(abi, farmAddress, 'Looped', [], chain);
 
-  // Always start the search at the last sunday at 12pm
-  const sunday = moment().startOf('week').set('hour', 12);
-  let block = await new EthDater(
-    provider, // Ethers provider, required.
-  ).getDate(
-    sunday, // Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
-    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
-    false, // Refresh boundaries, optional. Recheck the latest block before request. By default false.
-  );
-
-  let toBlock = block.block + 5000;
-  let fromBlock = block.block;
-
-  // this is the last block we will check. 
-  // swap with toBlock + average amount by day to check from sunday to monday and give up
-  const lastBlock = await provider.getBlockNumber();
-
-  let looped = [];
-
-  do {
-    looped = await QueryFilter(
-      abi,
-      farmAddress,
-      'Looped',
-      [],
-      fromBlock,
-      chain,
-      toBlock,
-    );
-
-    fromBlock = toBlock;
-    toBlock = toBlock + 5000 > lastBlock ? lastBlock : toBlock + 5000;
-  } while (looped.length == 0 && toBlock != lastBlock);
-
-  return looped[0]?.args[0]?.toNumber()
+  return looped[looped.length - 1]?.args[0]?.toNumber();
 };
 
 export const unlockUserFunds = async (
@@ -733,7 +696,7 @@ export const unlockUserFunds = async (
 export const claimAllBoostFarmRewards = async (
   tokenAddress,
   chain = EChain.ETHEREUM,
-  useBiconomy = false
+  useBiconomy = false,
 ) => {
   try {
     const abi = [
@@ -742,13 +705,13 @@ export const claimAllBoostFarmRewards = async (
           {
             internalType: 'address',
             name: 'exitToken',
-            type: 'address'
-          }
+            type: 'address',
+          },
         ],
         name: 'claimFromAllPools',
         outputs: [],
         stateMutability: 'nonpayable',
-        type: 'function'
+        type: 'function',
       },
     ];
 

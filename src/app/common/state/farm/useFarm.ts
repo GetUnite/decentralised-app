@@ -31,7 +31,7 @@ import { possibleWithdrawSteps } from './useFarmWithdrawal';
 import { get } from 'http';
 
 export const farmOptions: Array<TFarm> = [
-  {
+  /*{
     id: 0,
     farmAddress: EOptimismAddresses.IBALLUOUSD,
     type: 'usd',
@@ -96,7 +96,7 @@ export const farmOptions: Array<TFarm> = [
         sign: '₿',
       },
     ],
-  },
+  },*/
   {
     id: 3,
     farmAddress: EPolygonAddresses.IBALLUOUSD,
