@@ -255,8 +255,6 @@ export const getOptimisedFarmInterest = async (
   // beefy uses defillama pool addresses (which are part of the farm type) to get the apy data
   // yearn uses it's own api to get the apy foreach of the active underlying vaults (which we get from chain)
   let underlyingVaultsApys;
-  let totalBaseApy = 0;
-  let totalRewardApy = 0;
   if (farmType == 'beefy') {
     underlyingVaultsApys = await Promise.all(
       underlyingVaultsPercents.map(async (underlyingVaultsPercent, index) => {
@@ -278,9 +276,7 @@ export const getOptimisedFarmInterest = async (
           );
         }
 
-        return (
-          baseApyData.apy * (underlyingVaultsPercent.toNumber() / 100) * fee
-        );
+        return baseApyData.apy * (underlyingVaultsPercent.toNumber() / 100) * fee;
       }),
     );
   }
@@ -316,14 +312,16 @@ export const getOptimisedFarmInterest = async (
             ? activeUnderlyingVaultApy.staking_rewards_apr
             : 0;
 
-        totalBaseApy += base * underlyingVaultsPercents[index].toNumber();
-        totalRewardApy = reward * underlyingVaultsPercents[index].toNumber();
+        console.log(activeUnderlyingVaultApy);
+        return compoundingApy(
+          base,
+          reward,
+          fee,
+          underlyingVaultsPercents[index].toNumber(),
+        );
       },
     );
   }
-
-  console.log(totalBaseApy, totalRewardApy);
-  return compoundingApy(totalBaseApy / 100, totalRewardApy / 100, fee, 100);
 
   return underlyingVaultsApys.reduce(
     (previous, current) => previous + current,
