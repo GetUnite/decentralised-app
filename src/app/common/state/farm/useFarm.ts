@@ -1,21 +1,22 @@
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EPolygonAddresses,
+  EOptimismAddresses,
 } from 'app/common/constants/addresses';
 import { EChain } from 'app/common/constants/chains';
 import {
   deposit,
   getIfUserHasWithdrawalRequest,
   getIfWithdrawalWasAddedToQueue,
-  withdraw
+  withdraw,
 } from 'app/common/functions/farm';
 import { heapTrack } from 'app/common/functions/heapClient';
-import { depositDivided } from 'app/common/functions/utils';
+import { depositDivided, roundDown } from 'app/common/functions/utils';
 import {
   approve,
+  getBalance,
   getInterest,
   getTotalAssetSupply,
-  getUserDepositedAmount
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { TFarm } from 'app/common/types/farm';
@@ -27,10 +28,77 @@ import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useFarmDeposit';
 import { possibleWithdrawSteps } from './useFarmWithdrawal';
+import { get } from 'http';
 
 export const farmOptions: Array<TFarm> = [
-  {
+  /*{
     id: 0,
+    farmAddress: EOptimismAddresses.IBALLUOUSD,
+    type: 'usd',
+    chain: EChain.OPTIMISM,
+    name: 'US Dollar',
+    sign: '$',
+    icons: ['USDC', 'USDT', 'DAI'],
+    underlyingTokenAddress: EOptimismAddresses.USDC,
+    supportedTokens: [
+      {
+        label: 'DAI',
+        address: EOptimismAddresses.DAI,
+        decimals: 18,
+        sign: '$',
+      },
+      {
+        label: 'USDC',
+        address: EOptimismAddresses.USDC,
+        decimals: 6,
+        sign: '$',
+      },
+      {
+        label: 'USDT',
+        address: EOptimismAddresses.USDT,
+        decimals: 6,
+        sign: '$',
+      },
+    ],
+  },
+  {
+    id: 1,
+    farmAddress: EOptimismAddresses.IBALLUOETH,
+    type: 'eth',
+    chain: EChain.OPTIMISM,
+    name: 'Ethereum',
+    sign: 'Ξ',
+    icons: ['WETH'],
+    underlyingTokenAddress: EOptimismAddresses.WETH,
+    supportedTokens: [
+      {
+        label: 'WETH',
+        address: EOptimismAddresses.WETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
+    ],
+  },
+  {
+    id: 2,
+    farmAddress: EOptimismAddresses.IBALLUOBTC,
+    type: 'btc',
+    chain: EChain.OPTIMISM,
+    name: 'Bitcoin',
+    sign: '₿',
+    icons: ['WBTC'],
+    underlyingTokenAddress: EOptimismAddresses.WBTC,
+    supportedTokens: [
+      {
+        label: 'WBTC',
+        address: EOptimismAddresses.WBTC,
+        decimals: 8,
+        sign: '₿',
+      },
+    ],
+  },*/
+  {
+    id: 3,
     farmAddress: EPolygonAddresses.IBALLUOUSD,
     type: 'usd',
     chain: EChain.POLYGON,
@@ -60,13 +128,13 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 1,
+    id: 4,
     farmAddress: EPolygonAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.POLYGON,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT'],//'agEUR', 'EURS', 'jEUR'],
+    icons: ['EURT'], //'agEUR', 'EURS', 'jEUR'],
     underlyingTokenAddress: EPolygonAddresses.EURT,
     supportedTokens: [
       // {
@@ -102,7 +170,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 2,
+    id: 5,
     farmAddress: EPolygonAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.POLYGON,
@@ -120,7 +188,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 3,
+    id: 6,
     farmAddress: EPolygonAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.POLYGON,
@@ -168,13 +236,13 @@ export const farmOptions: Array<TFarm> = [
     ],
   },*/
   {
-    id: 5,
+    id: 7,
     farmAddress: EEthereumAddresses.IBALLUOEUR,
     type: 'eur',
     chain: EChain.ETHEREUM,
     name: 'Euro',
     sign: '€',
-    icons: ['EURT'],//, 'EURS', 'agEUR'],
+    icons: ['EURT'], //, 'EURS', 'agEUR'],
     underlyingTokenAddress: EEthereumAddresses.EURT,
     supportedTokens: [
       // {
@@ -198,7 +266,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 6,
+    id: 8,
     farmAddress: EEthereumAddresses.IBALLUOETH,
     type: 'eth',
     chain: EChain.ETHEREUM,
@@ -216,7 +284,7 @@ export const farmOptions: Array<TFarm> = [
     ],
   },
   {
-    id: 7,
+    id: 9,
     farmAddress: EEthereumAddresses.IBALLUOBTC,
     type: 'btc',
     chain: EChain.ETHEREUM,
@@ -377,18 +445,24 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        const depositedAmount = await getUserDepositedAmount(
-          farm.farmAddress,
-          farm.chain,
-        );
-        farmInfo.depositedAmount = depositedAmount;
-        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
+        farmInfo = { ...farmInfo, ...(await getDepositedAmount(farm)) };
       }
 
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const getDepositedAmount = async (farm = selectedFarmInfo) => {
+    const depositedAmount = roundDown(
+      await getBalance(farm.farmAddress, undefined, farm.chain),
+      6,
+    );
+    return {
+      depositedAmount: depositedAmount,
+      depositDividedAmount: depositDivided(depositedAmount),
+    };
   };
 
   const selectSupportedToken = supportedToken => {

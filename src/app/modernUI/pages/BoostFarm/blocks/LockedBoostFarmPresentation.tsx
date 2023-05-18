@@ -43,7 +43,7 @@ export const LockedBoostFarmPresentation = ({
           <Text textAlign="center" margin={{ top: '23px' }}>
             {/*TODO: make this date dynamic with loadFarmInfo() once its optimised*/}
             Locked BOOST farms have a weekly lock-in period. Deposits and
-            withdrawal requests are actioned every Sunday at 11pm {/*nextHarvestDate == null ? 'Loading...' : nextHarvestDate.format('dddd [at] h a')*/}.
+            withdrawal requests are actioned every Sunday at 11 PM UTC {/*nextHarvestDate == null ? 'Loading...' : nextHarvestDate.format('dddd [at] h a')*/}.
           </Text>
         </Box>
         <Button

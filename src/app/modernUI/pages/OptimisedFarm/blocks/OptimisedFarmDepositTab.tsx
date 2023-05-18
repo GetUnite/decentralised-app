@@ -1,6 +1,5 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
-import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
@@ -10,8 +9,9 @@ import {
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
+import { useOptimisedFarmDeposit } from 'app/common/state/optimisedFarm';
 
-export const FarmDepositTab = ({
+export const OptimisedFarmDepositTab = ({
   selectedFarm,
   isLoading,
   selectedFarmInfo,
@@ -33,7 +33,7 @@ export const FarmDepositTab = ({
     depositValueError,
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
-  } = useFarmDeposit({
+  } = useOptimisedFarmDeposit({
     selectedFarmInfo,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
@@ -48,9 +48,8 @@ export const FarmDepositTab = ({
         <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
-            label={`Deposit ${
-              selectedSupportedToken ? selectedSupportedToken?.label : ''
-            }`}
+            label={`Deposit ${selectedSupportedToken ? selectedSupportedToken?.label : ''
+              }`}
             tokenSign={selectedFarmInfo?.sign}
             onValueChange={handleDepositValueChange}
             value={depositValue}
@@ -74,7 +73,7 @@ export const FarmDepositTab = ({
         />
         <Info
           label="APY"
-          value={toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'}
+          value={toExactFixed(selectedFarmInfo?.interest, 2) + '%'}
           isLoading={isLoading}
         />
         <Info
@@ -89,7 +88,7 @@ export const FarmDepositTab = ({
           biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
-          showWalletFee={!useBiconomy || selectedFarm.current?.chain != EChain.POLYGON}
+          showWalletFee={!useBiconomy || selectedFarm.current?.chain == EChain.POLYGON}
           disableBiconomy={isLoading}
           isLoading={isLoading}
         />

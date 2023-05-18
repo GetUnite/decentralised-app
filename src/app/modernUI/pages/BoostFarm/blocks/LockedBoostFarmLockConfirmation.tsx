@@ -30,7 +30,7 @@ export const LockedBoostFarmLockConfirmation = ({
           {lessThanHalfHourToHarvest
             /*TODO: make this date dynamic with loadFarmInfo() once its optimised*/
             ? `Deposits made less than 30 minutes before harvest could miss today’s harvest cycle`
-            : `Don’t forget, your deposit will only be available for withdrawal from Sunday at 11pm - after unlocking`}
+            : `Don’t forget, your deposit will only be available for withdrawal from Sunday at 11 OM UTC - after unlocking`}
         </Text>
         <Text
           textAlign="center"
@@ -43,7 +43,7 @@ export const LockedBoostFarmLockConfirmation = ({
           {lessThanHalfHourToHarvest
             /*TODO: make this date dynamic with loadFarmInfo() once its optimised*/
             ? `If your deposit misses today’s harvest, this will be actioned next Sunday`
-            : `Deposits and withdrawal requests are actioned every Sunday at 11pm`}
+            : `Deposits and withdrawal requests are actioned every Sunday at 11 PM UTC`}
         </Text>
 
         <Box gap="30px" margin={{ top: '40px' }}>

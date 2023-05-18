@@ -9,7 +9,7 @@ import {
   Tab,
   Tabs,
   TokenIcon,
-  Tooltip
+  Tooltip,
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
@@ -176,7 +176,10 @@ export const Stake = ({ ...rest }) => {
                       />
                     )}
                     {showStakePresentation && (
-                      <StakePresentation rewardsApy={rewardsApy.current} isLoadingRewardsApy={isLoadingRewardsApy} />
+                      <StakePresentation
+                        rewardsApy={rewardsApy.current}
+                        isLoadingRewardsApy={isLoadingRewardsApy}
+                      />
                     )}
                     {!showReunlockConfirmation && !showStakePresentation && (
                       <Tabs

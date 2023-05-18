@@ -2,7 +2,7 @@ import { EChain } from 'app/common/constants/chains';
 import {
   callContract,
   getCurrentWalletAddress,
-  getPrice, sendTransaction
+  getTokenValueUsingUniswap, sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
 import { EEthereumAddresses, EEthereumAddressesMainnet } from '../constants/addresses';
@@ -10,7 +10,7 @@ import { maximumUint256Value } from './utils';
 
 export const getAlluoPriceInWETH = async ()=> {
   try {
-    return getPrice(EEthereumAddressesMainnet.WETH, EEthereumAddressesMainnet.ALLUO, 18, 18);
+    return getTokenValueUsingUniswap(EEthereumAddressesMainnet.WETH, EEthereumAddressesMainnet.ALLUO, 18, 18);
   } catch (error) {
     throw error;
   }
@@ -129,7 +129,7 @@ export const getWETHAllowance = async () => {
   const wEthAddress = EEthereumAddresses.WETH;
   const vaultAddress = EEthereumAddresses.VAULT;
 
-  const balance = await callContract(
+  const allowance = await callContract(
     abi,
     wEthAddress,
     'allowance(address,address)',
@@ -137,7 +137,7 @@ export const getWETHAllowance = async () => {
     EChain.ETHEREUM,
   );
 
-  return ethers.utils.formatEther(balance);
+  return ethers.utils.formatEther(allowance);
 };
 
 export const approveAlluoPurchaseInWETH = async () => {

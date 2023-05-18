@@ -100,7 +100,15 @@ export const FarmsBlock = ({
             columns={
               viewType != 'View my farms only'
                 ? ['250px', '200px', '155px', '155px', '105px', 'auto']
-                : ['220px', '155px', '155px', '155px', '145px', '105px', 'auto']
+                : [
+                  '240px',
+                  '135px',
+                  '155px',
+                  '155px',
+                  '145px',
+                  '105px',
+                  'auto',
+                ]
             }
             pad="none"
             style={{ fontSize: '16px' }}
@@ -174,6 +182,7 @@ export const FarmsBlock = ({
                 isLoading={isLoading}
                 chain={farm.chain as EChain}
                 isBoost={farm.isBoost}
+                isOptimised={farm.isOptimised}
                 viewType={viewType}
                 isLocked={farm.isLocked}
               />

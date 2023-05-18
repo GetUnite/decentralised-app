@@ -37,5 +37,17 @@ export const getUniswapPoolAddress = (sellTokenAddress: string, buyTokenAddress:
         return EEthereumAddresses.CVXUSDCPOOL;
     }
 
+    // LDO/USDC
+    if ((sellTokenAddress == EEthereumAddresses.LDO || sellTokenAddress == EEthereumAddresses.USDC)
+        && (buyTokenAddress == EEthereumAddresses.USDC || buyTokenAddress == EEthereumAddresses.LDO)) {
+        return EEthereumAddresses.LDOUSDCPOOL;
+    }
+
+    // FXS/USDC
+    if ((sellTokenAddress == EEthereumAddresses.FXS || sellTokenAddress == EEthereumAddresses.USDC)
+        && (buyTokenAddress == EEthereumAddresses.USDC || buyTokenAddress == EEthereumAddresses.FXS)) {
+        return EEthereumAddresses.FXSUSDCPOOL;
+    }
+
     return null;
 }

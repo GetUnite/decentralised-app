@@ -17,6 +17,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import ScrollToTop from 'scroll-to-top';
 import './reset.css';
+import { OptimisedFarm } from 'app/modernUI/pages/OptimisedFarm';
 
 export const Router = () => {
   useWallet();
@@ -36,6 +37,7 @@ export const Router = () => {
             <Route path="/stake" element={<Stake />} />
             <Route path="/farm/:id" element={<Farm />} />
             <Route path="/boostfarm/:id" element={<BoostFarm />} />
+            <Route path="/optimisedfarm/:id" element={<OptimisedFarm />} />
             <Route path="/autoinvest/*" element={<AutoInvestRoutes />} />
             <Route path="*" element={<Main />} />
           </Routes>

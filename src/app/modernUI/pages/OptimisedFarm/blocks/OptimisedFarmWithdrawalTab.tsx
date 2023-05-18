@@ -1,46 +1,40 @@
 import { EChain } from 'app/common/constants/chains';
 import { toExactFixed } from 'app/common/functions/utils';
-import { useFarmDeposit } from 'app/common/state/farm';
 import {
   FeeInfo,
   Info,
   NumericInput,
   ProjectedWeeklyInfo,
-  SubmitButton
+  SubmitButton,
 } from 'app/modernUI/components';
 import { Box } from 'grommet';
 import { TopHeader } from '../components';
+import { useOptimisedFarmWithdrawal } from 'app/common/state/optimisedFarm';
 
-export const FarmDepositTab = ({
+export const OptimisedFarmWithdrawalTab = ({
   selectedFarm,
-  isLoading,
   selectedFarmInfo,
+  isLoading,
   selectSupportedToken,
   selectedSupportedToken,
-  selectedSupportedTokenInfo,
-  // deposit
-  depositValue,
-  setDepositValue,
+  // withdraw
+  withdrawValue,
+  setWithdrawValue,
   // biconomy
   useBiconomy,
   setUseBiconomy,
-  // steps   
+  // steps
+  startProcessingSteps,
   steps,
-  startProcessingSteps
 }) => {
-  const {
-    hasErrors,
-    depositValueError,
-    handleDepositValueChange,
-    isFetchingSupportedTokenInfo,
-  } = useFarmDeposit({
-    selectedFarmInfo,
-    selectedSupportedToken,
-    selectedSupportedTokenInfo,
-    steps,
-    depositValue,
-    setDepositValue,
-  });
+  const { hasErrors, withdrawValueError, handleWithdrawalFieldChange } =
+    useOptimisedFarmWithdrawal({
+      withdrawValue,
+      selectedSupportedToken,
+      selectedFarmInfo,
+      setWithdrawValue,
+      steps,
+    });
 
   return (
     <Box fill>
@@ -48,18 +42,19 @@ export const FarmDepositTab = ({
         <TopHeader selectedFarmInfo={selectedFarmInfo} isLoading={isLoading} />
         <Box margin={{ top: 'medium' }}>
           <NumericInput
-            label={`Deposit ${
+            label={`Withdraw ${
               selectedSupportedToken ? selectedSupportedToken?.label : ''
             }`}
+            available={selectedFarmInfo?.depositedAmount}
             tokenSign={selectedFarmInfo?.sign}
-            onValueChange={handleDepositValueChange}
-            value={depositValue}
-            maxValue={selectedSupportedTokenInfo.current?.balance}
+            onValueChange={handleWithdrawalFieldChange}
+            value={withdrawValue}
             maxButton={true}
+            maxValue={selectedFarmInfo?.depositedAmount}
             tokenOptions={selectedFarmInfo?.supportedTokens || []}
             selectedToken={selectedSupportedToken}
             setSelectedToken={selectSupportedToken}
-            error={depositValueError}
+            error={withdrawValueError}
             disabled={isLoading}
           />
         </Box>
@@ -67,14 +62,16 @@ export const FarmDepositTab = ({
       <Box margin={{ top: '11px' }}>
         <ProjectedWeeklyInfo
           depositedAmount={selectedFarmInfo?.depositedAmount}
-          inputValue={depositValue}
+          inputValue={-1 * +withdrawValue}
           interest={selectedFarmInfo?.interest}
           sign={selectedFarmInfo?.sign}
           isLoading={isLoading}
         />
         <Info
           label="APY"
-          value={toExactFixed(selectedFarmInfo?.interest, 2).toLocaleString() + '%'}
+          value={
+            toExactFixed(selectedFarmInfo?.interest, 2) + '%'
+          }
           isLoading={isLoading}
         />
         <Info
@@ -89,25 +86,17 @@ export const FarmDepositTab = ({
           biconomyToggle={selectedFarm.current?.chain == EChain.POLYGON}
           useBiconomy={useBiconomy}
           setUseBiconomy={setUseBiconomy}
-          showWalletFee={!useBiconomy || selectedFarm.current?.chain != EChain.POLYGON}
-          disableBiconomy={isLoading}
+          showWalletFee={
+            !useBiconomy || selectedFarm.current?.chain != EChain.POLYGON
+          }
           isLoading={isLoading}
         />
       </Box>
       <Box margin={{ top: 'medium' }}>
         <SubmitButton
           primary
-          disabled={
-            isLoading ||
-            !(+depositValue > 0) ||
-            isFetchingSupportedTokenInfo ||
-            hasErrors
-          }
-          label={
-            isFetchingSupportedTokenInfo
-              ? 'Loading...'
-              : 'Deposit'
-          }
+          label={'Withdraw'}
+          disabled={isLoading || withdrawValue == '' || hasErrors}
           onClick={startProcessingSteps}
         />
       </Box>

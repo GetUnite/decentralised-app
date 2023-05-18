@@ -3,7 +3,7 @@ import {
   approve,
   callContract,
   getCurrentWalletAddress,
-  getPrice,
+  getTokenValueUsingUniswap,
   sendTransaction
 } from 'app/common/functions/web3Client';
 import { ethers } from 'ethers';
@@ -15,7 +15,7 @@ import { fromDecimals, toExactFixed } from './utils';
 
 export const getAlluoPrice = async () => {
   try {
-    return getPrice(
+    return getTokenValueUsingUniswap(
       EEthereumAddressesMainnet.ALLUO,
       EEthereumAddressesMainnet.USDC,
       18,
@@ -451,7 +451,7 @@ export const getStakingPendingRewards = async chain => {
 
   const pendingRewardsInUSDC = await Promise.all(
     pendingRewardsByToken.map(async prbt => {
-      const tokenPrice = await getPrice(
+      const tokenPrice = await getTokenValueUsingUniswap(
         prbt.token,
         EEthereumAddresses.USDC,
         18,

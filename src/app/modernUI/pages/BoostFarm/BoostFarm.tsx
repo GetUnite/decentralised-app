@@ -7,7 +7,7 @@ import {
   StepsProcessing,
   Tab,
   Tabs,
-  TokenIcon
+  TokenIcon,
 } from 'app/modernUI/components';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Heading, ResponsiveContext, Text } from 'grommet';
@@ -22,9 +22,10 @@ import {
   LockedBoostFarmLockConfirmation,
   LockedBoostFarmPresentation,
   LockedBoostFarmUnlockConfirmation,
-  LockedBoostFarmWithdrawUnlockedConfirmation
+  LockedBoostFarmWithdrawUnlockedConfirmation,
 } from './blocks';
-import { } from './blocks/BoostFarmWithdrawalConfirmation';
+import {} from './blocks/BoostFarmWithdrawalConfirmation';
+import { bottom } from '@xstyled/styled-components';
 
 export const BoostFarm = () => {
   const { id } = useParams();
@@ -154,11 +155,10 @@ export const BoostFarm = () => {
                       selectedFarm={selectedFarm}
                       farmName={farmName}
                       isLoadingInterest={isLoadingInterest}
-                      nextHarvestDate={
-                        timerIsFinished(
-                          nextHarvestDate.current,
-                          false,
-                        )}
+                      nextHarvestDate={timerIsFinished(
+                        nextHarvestDate.current,
+                        false,
+                      )}
                       interest={interest.current}
                     />
                   )}
@@ -597,11 +597,12 @@ export const BoostFarm = () => {
                         {isLoading || isLoadingPendingRewards ? (
                           <Skeleton borderRadius="20px" />
                         ) : (
-                          <Box direction="row" justify="between">
+                          <Box >
                             {isLoading || isLoadingRewards ? (
                               <Skeleton height="16px" borderRadius="20px" />
                             ) : (
-                              <>
+                              <Box direction="row" justify="between" margin={{bottom: !nextHarvestDate.current.isValid() ? "-12px" : "0px"}}>
+                                {/* margin -12px when the harvest date fails to load and thus we need to remove the extra gap (kinda hacky but yeah) */}
                                 <Text weight="bold" size="16px">
                                   {rewardsInfo.current?.stableLabel}
                                 </Text>
@@ -610,19 +611,22 @@ export const BoostFarm = () => {
                                   {'$' +
                                     toExactFixed(pendingRewardsInfo.current, 4)}
                                 </Text>
-                              </>
+                              </Box>
                             )}
                           </Box>
                         )}
                         {isLoading || isLoadingPendingRewards ? (
                           <Skeleton height="8px" borderRadius="20px" />
                         ) : (
-                          <Text size="8px" weight={400}>
-                            Available{' '}
-                            {nextHarvestDate.current?.format('DD MMM')} · Last
-                            harvested{' '}
-                            {previousHarvestDate.current?.format('DD MMM')}
-                          </Text>
+                          <>
+                            {nextHarvestDate.current.isValid() && (
+                              <Text size="8px" weight={400}>
+                                Available {nextHarvestDate.current.format('DD MMM')} ·
+                                Last harvested{' '}
+                                {previousHarvestDate.current.format('DD MMM')}
+                              </Text>
+                            )}
+                          </>
                         )}
                       </Box>
                     </Box>

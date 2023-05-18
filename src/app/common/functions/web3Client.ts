@@ -6,11 +6,12 @@ import gnosisModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import uauthModule from '@web3-onboard/uauth';
 import walletConnectModule from '@web3-onboard/walletconnect';
-import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json'
-import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json'
+import IUniswapV3PoolABI from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
+import Quoter from '@uniswap/v3-periphery/artifacts/contracts/lens/Quoter.sol/Quoter.json';
 import {
   EEthereumAddresses,
-  EPolygonAddresses
+  EOptimismAddresses,
+  EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
@@ -18,22 +19,33 @@ import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
 import { getUniswapPoolAddress } from './uniswap';
+import { EFiatId } from '../constants/utils';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
-const ethereumMainnetProviderUrl =
-  'https://eth.llamarpc.com/';;
+const ethereumMainnetProviderUrl = 'https://eth.llamarpc.com/';
 const ethereumProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
 
-const polygonTestnetProviderUrl = 'https://polygon-rpc.com/';
-const polygonMainnetProviderUrl = 'https://polygon-rpc.com/';
+const polygonTestnetProviderUrl =
+  'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
+const polygonMainnetProviderUrl =
+  'https://polygon-mainnet.g.alchemy.com/v2/rXD0-xC6kL_3_CSI5wHfWfrOI65MJe4A';
 const polygonProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? polygonMainnetProviderUrl
     : polygonTestnetProviderUrl;
+
+const optimismMainnetProviderUrl =
+  'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
+const optimismTestnetProviderUrl =
+  'https://opt-mainnet.g.alchemy.com/v2/bulnCy9Shi1gl0WeTmDIlUC3vxOYzxLy';
+const optimisimProviderUrl =
+  process.env.REACT_APP_NET === 'mainnet'
+    ? optimismMainnetProviderUrl
+    : optimismTestnetProviderUrl;
 
 const injected = injectedModule();
 const walletConnect = walletConnectModule({
@@ -79,6 +91,12 @@ const chains = [
     token: 'MATIC',
     label: 'Polygon Mumbai',
     rpcUrl: polygonTestnetProviderUrl,
+  },
+  {
+    id: EChainId.OP_MAINNET,
+    token: 'ETH',
+    label: 'Optimisim Mainnet',
+    rpcUrl: optimismMainnetProviderUrl,
   },
 ];
 
@@ -225,6 +243,13 @@ export const changeNetwork = async (chain: EChain) => {
         : EChainId.POL_MUMBAI;*/
   }
 
+  if (chain === EChain.OPTIMISM) {
+    chainId = EChainId.OP_MAINNET;
+    /*process.env.REACT_APP_NET === 'mainnet'
+        ? EChainId.OP_MAINNET
+        : EChainId.OP_TESTNET;*/
+  }
+
   await onboard.setChain({ chainId: chainId });
 
   return chainId;
@@ -234,8 +259,10 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-      ? EChain.ETHEREUM
-      : null;
+    ? EChain.ETHEREUM
+    : chainId === EChainId.OP_MAINNET
+    ? EChain.ETHEREUM
+    : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -367,6 +394,11 @@ export const sendTransaction = async (
 
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
     let receipt = await provider.waitForTransaction(transactionHash);
+
+    // status 0 means it failed
+    if (receipt.status == 0) {
+      throw '';
+    }
     return receipt;
   } catch (error) {
     console.log(error);
@@ -677,7 +709,7 @@ export const approve = async (
 ) => {
   let tx;
   try {
-    if (chain == EChain.ETHEREUM || !useBiconomy) {
+    if (chain != EChain.POLYGON || !useBiconomy) {
       const abi = [
         {
           inputs: [
@@ -734,7 +766,13 @@ export const approve = async (
 };
 
 export const getReadOnlyProvider = chain => {
-  return new ethers.providers.JsonRpcProvider(chain === EChain.ETHEREUM ? ethereumProviderUrl : polygonProviderUrl, 'any');
+  const providerUrl =
+    chain === EChain.ETHEREUM
+      ? ethereumProviderUrl
+      : chain === EChain.POLYGON
+      ? polygonProviderUrl
+      : optimisimProviderUrl;
+  return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
 };
 
 export const callContract = async (
@@ -762,7 +800,7 @@ export const callContract = async (
       address: address,
       functionSignature: functionSignature,
       params: params,
-      error: error
+      error: error,
     });
   }
 };
@@ -794,6 +832,28 @@ export const QueryFilter = async (
   }
 };
 
+export const QueryFilterWithoutBlock = async (
+  abi,
+  address,
+  eventSignature,
+  params,
+  chain,
+) => {
+  const readOnlyProvider = getReadOnlyProvider(chain);
+  const contract = new ethers.Contract(address, abi, readOnlyProvider);
+
+  try {
+    const filter = contract.filters[eventSignature].apply(null, params);
+    const results = await contract.queryFilter(filter);
+
+    return results;
+  } catch (error) {
+    console.log(abi, address, eventSignature, params);
+    // here do all error handling to readable stuff
+    console.log(error);
+  }
+};
+
 export const binarySearchForBlock = async (
   startTimestamp: number,
   chain: EChain,
@@ -805,7 +865,7 @@ export const binarySearchForBlock = async (
   );
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
-    Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
+      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
   let closestBlock;
 
@@ -830,7 +890,7 @@ export const binarySearchForBlock = async (
   return null;
 };
 
-export const getPrice = async (
+export const getTokenValueUsingUniswap = async (
   sellTokenAddress: string,
   buyTokenAddress: string,
   sellDecimals: number,
@@ -843,32 +903,38 @@ export const getPrice = async (
     const quoterContract = new ethers.Contract(
       quoterAddress,
       Quoter.abi,
-      provider
-    )
+      provider,
+    );
 
     let valueToConvert = toDecimals(1, sellDecimals);
 
     let fee;
 
-    const sellToBuyPoolAddress = getUniswapPoolAddress(sellTokenAddress, buyTokenAddress);
+    const sellToBuyPoolAddress = getUniswapPoolAddress(
+      sellTokenAddress,
+      buyTokenAddress,
+    );
 
     if (sellToBuyPoolAddress) {
       const sellToBuyPoolContract = new ethers.Contract(
         sellToBuyPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await sellToBuyPoolContract.fee();
     } else {
       // there was no direct pool from sell to buy
       // let's go for sell -> eth -> buy
-      const sellToEthPoolAddress = getUniswapPoolAddress(sellTokenAddress, EEthereumAddresses.WETH);
+      const sellToEthPoolAddress = getUniswapPoolAddress(
+        sellTokenAddress,
+        EEthereumAddresses.WETH,
+      );
 
       const sellToEthPoolContract = new ethers.Contract(
         sellToEthPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await sellToEthPoolContract.fee();
@@ -878,7 +944,7 @@ export const getPrice = async (
         EEthereumAddresses.WETH,
         fee,
         valueToConvert,
-        0
+        0,
       );
 
       // value to sell becomes the amount in eethereum
@@ -887,28 +953,33 @@ export const getPrice = async (
       sellTokenAddress = EEthereumAddresses.WETH;
 
       // gets pool to convert eth into buy token
-      const ethToBuyPoolAddress = getUniswapPoolAddress(EEthereumAddresses.WETH, buyTokenAddress);
+      const ethToBuyPoolAddress = getUniswapPoolAddress(
+        EEthereumAddresses.WETH,
+        buyTokenAddress,
+      );
 
       const ethToBuyPoolContract = new ethers.Contract(
         ethToBuyPoolAddress,
         IUniswapV3PoolABI.abi,
-        provider
+        provider,
       );
 
       fee = await ethToBuyPoolContract.fee();
     }
 
-    const quotedAmountOut = await quoterContract.callStatic.quoteExactInputSingle(
-      sellTokenAddress,
-      buyTokenAddress,
-      fee,
-      valueToConvert,
-      0
-    );
+    const quotedAmountOut =
+      await quoterContract.callStatic.quoteExactInputSingle(
+        sellTokenAddress,
+        buyTokenAddress,
+        fee,
+        valueToConvert,
+        0,
+      );
 
     const price = +fromDecimals(quotedAmountOut, buyDecimals);
     return price;
   } catch (error) {
+    console.log(sellTokenAddress, buyTokenAddress, error);
     throw 'Something went wrong while fetching prices. Please try again later';
   }
 };
@@ -922,6 +993,14 @@ const getIbAlluoAddress = (type, chain = EChain.POLYGON) => {
         eur: EPolygonAddresses.IBALLUOEUR,
         eth: EPolygonAddresses.IBALLUOETH,
         btc: EPolygonAddresses.IBALLUOBTC,
+      };
+      break;
+
+    case EChain.OPTIMISM:
+      ibAlluoAddresses = {
+        usd: EOptimismAddresses.IBALLUOUSD,
+        eth: EOptimismAddresses.IBALLUOETH,
+        btc: EOptimismAddresses.IBALLUOBTC,
       };
       break;
 
@@ -1035,7 +1114,7 @@ const getSignatureParameters = signature => {
 
 export const getBalanceOf = async (
   tokenAddress,
-  tokenDecimals,
+  tokenDecimals = 18,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1061,7 +1140,7 @@ export const getBalanceOf = async (
 
 export const getBalance = async (
   tokenAddress,
-  tokenDecimals,
+  tokenDecimals = 18,
   chain = EChain.POLYGON,
 ) => {
   const abi = [
@@ -1078,7 +1157,7 @@ export const getBalance = async (
     abi,
     tokenAddress,
     'getBalance(address)',
-    [walletAddress],
+    [getCurrentWalletAddress()],
     chain,
   );
 
@@ -1164,53 +1243,6 @@ export const getSymbol = async (tokenAddress, chain = EChain.POLYGON) => {
   } catch (error) {
     throw error;
   }
-};
-
-export const getUserDepositedAmount = async (
-  address,
-  chain = EChain.POLYGON,
-) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
-      name: 'getBalance',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const userDepositedAmount = await callContract(
-    abi,
-    address,
-    'getBalance(address)',
-    [getCurrentWalletAddress()],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedAmount);
-};
-
-export const getUserDepositedLPAmount = async (farmAddress, chain) => {
-  const abi = [
-    {
-      inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-      name: 'balanceOf',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
-
-  const userDepositedLPAmount = await callContract(
-    abi,
-    farmAddress,
-    'balanceOf(address)',
-    [getCurrentWalletAddress()],
-    chain,
-  );
-
-  return ethers.utils.formatEther(userDepositedLPAmount);
 };
 
 export const getTotalAssetSupply = async (
@@ -1322,7 +1354,15 @@ export const getSuperfluidFramework = async () => {
   }
 };
 
-export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
+// fiatIds:
+// USD: 0
+// EUR: 1
+// ETH: 2
+export const getTokenValueUsingPriceFeedRouter = async (
+  lPTokenAddress: string,
+  fiatId = EFiatId.USD,
+  chain = EChain.ETHEREUM,
+): Promise<number> => {
   const abi = [
     {
       inputs: [
@@ -1339,19 +1379,20 @@ export const getValueOf1LPinUSDC = async (lPTokenAddress, chain) => {
     },
   ];
 
-  const priceFeedRouter = EEthereumAddresses.PRICEFEEDROUTER;
+  const priceFeedRouter =
+    chain == EChain.ETHEREUM
+      ? EEthereumAddresses.PRICEFEEDROUTER
+      : chain == EChain.POLYGON
+      ? EPolygonAddresses.PRICEFEEDROUTER
+      : EOptimismAddresses.PRICEFEEDROUTER;
 
-  // fiatIds:
-  // USD: 0
-  // EUR: 1
-  // ETH: 2
-  const priceInUSDC = await callContract(
+  const valueInFiat = await callContract(
     abi,
     priceFeedRouter,
     'getPrice(address,uint256)',
-    [lPTokenAddress, 0],
+    [lPTokenAddress, fiatId],
     chain,
   );
 
-  return +fromDecimals(priceInUSDC.value.toString(), priceInUSDC.decimals);
+  return +fromDecimals(valueInFiat.value.toString(), valueInFiat.decimals);
 };

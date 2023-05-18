@@ -33,6 +33,7 @@ export type TFarm = {
   farmAddress?: string;
   poolShare?: number;
   isBoost?: boolean;
+  isOptimised?: boolean;
   isNewest?: boolean;
   underlyingTokenAddress?: string;
   // For boost farms but needed here for main page
@@ -53,4 +54,15 @@ export type TBoostFarm = TFarm & {
   withdrawToken?: TSupportedToken;
   // forced apy when it cant be calculated
   forcedInterest?: string;
+};
+
+export type TOptimisedFarm = TFarm & {
+  apyAddresses?: string[];
+  lPTokenAddress?: string;
+  valueOf1LPinUSDC?: number;
+  // For locked boost farms
+  unlockingBalance?: string;
+  unlockedBalance?: string;
+  isUnlocking?: boolean;
+  withdrawToken?: TSupportedToken;
 };

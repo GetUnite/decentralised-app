@@ -6,6 +6,8 @@ import { walletAccount } from 'app/common/state/atoms';
 import { useConnectionButton } from 'app/common/state/components';
 import { ChainBadge, TokenIcon } from 'app/modernUI/components';
 import swap from 'app/modernUI/images/swap.svg';
+import beefy from 'app/modernUI/images/farmIcons/beefy.svg';
+import yearn from 'app/modernUI/images/farmIcons/yearn.svg';
 import { isSmall } from 'app/modernUI/theme';
 import { Box, Button, Grid, ResponsiveContext, Text } from 'grommet';
 import { useState } from 'react';
@@ -38,6 +40,7 @@ interface IFarmCard {
   disabled: boolean;
   chain: EChain;
   isBoost: boolean;
+  isOptimised: boolean;
   viewType: string;
   balance?: string;
   balanceInUSD?: string;
@@ -59,6 +62,7 @@ export const FarmCard = ({
   disabled,
   chain,
   isBoost = false,
+  isOptimised = false,
   viewType,
   poolShare,
   isLocked = false,
@@ -73,7 +77,7 @@ export const FarmCard = ({
 
   const tvl = isLoading
     ? 'Loading...'
-    : sign + toExactFixed(totalAssetSupply, 2);
+    : sign + toExactFixed(totalAssetSupply, sign == '$' || sign == '€' ? 2 : 4);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
@@ -117,13 +121,13 @@ export const FarmCard = ({
               <Box fill direction="row" justify="between">
                 <Box>
                   <Box direction="column" gap="small">
-                    <Box direction='row' gap="small">
+                    <Box direction="row" gap="small">
                       {icons.slice(0, 6).map((icon, i) => (
                         <TokenIcon key={i} label={icon} />
                       ))}
                     </Box>
                     {icons.length > 6 && (
-                      <Box direction='row' gap="small">
+                      <Box direction="row" gap="small">
                         {icons.slice(6, icons.length - 1).map((icon, i) => (
                           <TokenIcon key={i} label={icon} />
                         ))}
@@ -192,8 +196,8 @@ export const FarmCard = ({
                   viewType != 'View my farms only'
                     ? ['250px', '200px', '155px', '155px', '105px', 'auto']
                     : [
-                        '220px',
-                        '155px',
+                        '240px',
+                        '135px',
                         '155px',
                         '155px',
                         '145px',
@@ -230,13 +234,21 @@ export const FarmCard = ({
                   <>
                     {viewType != 'View my farms only' ? (
                       <>
-                        <span style={{ fontWeight: 'bold' }}>
+                        <Box
+                          style={{ fontWeight: 'bold' }}
+                          direction="row"
+                          gap="10px"
+                          align="center"
+                        >
                           {isLocked && <span>🔒</span>}
+                          {isOptimised && (
+                            <img src={name.includes('Beefy') ? beefy : yearn} />
+                          )}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
-                        </span>
+                        </Box>
                         <Box direction="row" gap="small" align="center">
                           {icons.length < 4 || seeAllSupportedTokens ? (
                             <>
@@ -312,7 +324,13 @@ export const FarmCard = ({
                         <Box justify="end">
                           {walletAccountAtom ? (
                             <Link
-                              to={(isBoost ? '/boostfarm/' : '/farm/') + id}
+                              to={
+                                (isBoost
+                                  ? '/boostfarm/'
+                                  : isOptimised
+                                  ? '/optimisedfarm/'
+                                  : '/farm/') + id
+                              }
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
@@ -334,13 +352,21 @@ export const FarmCard = ({
                       </>
                     ) : (
                       <>
-                        <span style={{ fontWeight: 'bold' }}>
+                        <Box
+                          style={{ fontWeight: 'bold' }}
+                          direction="row"
+                          gap="10px"
+                          align="center"
+                        >
                           {isLocked && <span>🔒</span>}
+                          {isOptimised && (
+                            <img src={name.includes('Beefy') ? beefy : yearn} />
+                          )}
                           {name}
                           {isBoost && (
                             <span style={{ color: '#1C1CFF' }}> BOOST</span>
                           )}
-                        </span>
+                        </Box>
                         <ChainBadge chain={chain} />
                         <span>{poolShare}%</span>
                         <span>{tvl}</span>
@@ -365,7 +391,13 @@ export const FarmCard = ({
                         <span>{toExactFixed(interest, 2)}%</span>
                         <Box justify="end" fill>
                           <Link
-                            to={(isBoost ? '/boostfarm/' : '/farm/') + id}
+                            to={
+                              (isBoost
+                                ? '/boostfarm/'
+                                : isOptimised
+                                ? '/optimisedfarm/'
+                                : '/farm/') + id
+                            }
                             style={{
                               display: 'flex',
                               justifyContent: 'end',
