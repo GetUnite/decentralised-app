@@ -312,7 +312,6 @@ export const getOptimisedFarmInterest = async (
             ? activeUnderlyingVaultApy.staking_rewards_apr
             : 0;
 
-        console.log(activeUnderlyingVaultApy);
         return compoundingApy(
           base,
           reward,
