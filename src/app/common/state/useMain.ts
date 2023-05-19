@@ -121,7 +121,6 @@ export const useMain = () => {
   useEffect(() => {
     setWantedChainAtom(undefined);
     fetchFarmsInfo();
-    filterFarms();
     const today = new Date();
     if (today.getDay() === 0) {
       setNotification(
@@ -139,6 +138,7 @@ export const useMain = () => {
     filterFarms();
     //}
   }, [
+    availableFarms,
     viewType,
     sortField,
     sortDirectionIsAsc,
