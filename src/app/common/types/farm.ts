@@ -57,7 +57,6 @@ export type TBoostFarm = TFarm & {
 };
 
 export type TOptimisedFarm = TFarm & {
-  apyAddresses?: string[];
   lPTokenAddress?: string;
   valueOf1LPinUSDC?: number;
   // For locked boost farms

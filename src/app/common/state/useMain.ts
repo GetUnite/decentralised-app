@@ -470,7 +470,6 @@ export const useMain = () => {
       interest: await getOptimisedFarmInterest(
         farm.farmAddress,
         farm.type,
-        farm.apyAddresses,
       ),
       totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,

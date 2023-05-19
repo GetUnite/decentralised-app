@@ -51,10 +51,6 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
-    apyAddresses: [
-      '72d0ef83-fa27-44ba-b9a6-efb0a43f2a3c', // USD+-DOLA
-    ],
     isNewest: true,
   },
   {
@@ -87,12 +83,6 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: '$',
       },
     ],
-    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
-    apyAddresses: [
-      '72d0ef83-fa27-44ba-b9a6-efb0a43f2a3c', // USD+-DOLA
-      'd643c61d-bfcb-429e-9bac-b3b0a2f18561', // MIM-DAI-USDC-USDT
-      '25717654-0ded-413f-9b88-c06b919f04a6', // DOLA-MAI
-    ],
     isNewest: true,
   },
   {
@@ -122,10 +112,6 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         sign: 'Ξ',
       },
     ],
-    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
-    apyAddresses: [
-      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8', // ETH-frxETH
-    ],
     isNewest: true,
   },
   {
@@ -145,12 +131,6 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
         decimals: 18,
         sign: 'Ξ',
       },
-    ],
-    // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
-    apyAddresses: [
-      'e6281e9b-c308-4bb1-a59e-e53fe511ecf8', // ETH-frxETH
-      '249f4209-98d2-4aa5-8596-8fb2d2867426', // alETH-ETH
-      '0bd59ec7-6389-4a92-93fb-aa4ee6b2705b', // sfrxETH-frxETH
     ],
     isNewest: true,
   },
@@ -266,10 +246,6 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
       },
     ],
     // apy addresses order needs to match underlying vaults. So the first apy address needs to be according to the first underlying vault and so on
-    apyAddresses: [
-      '288e9c6d-d0fe-4606-a970-e0e98893231a',
-      '25717654-0ded-413f-9b88-c06b919f04a6',
-    ],
     isNewest: true,
   },*/
 ];
@@ -377,7 +353,6 @@ export const useOptimisedFarm = ({ id }) => {
         interest: await getOptimisedFarmInterest(
           farm.farmAddress,
           farm.type,
-          farm.apyAddresses,
         ),
         totalAssetSupply: await getOptimisedTotalAssetSupply(
           farm.farmAddress,
