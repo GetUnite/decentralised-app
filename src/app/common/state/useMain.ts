@@ -118,10 +118,6 @@ export const useMain = () => {
     useState<boolean>(false);
   const [claimAllRewardsError, setClaimAllRewardsError] = useState<string>('');
 
-  const fetchFarmsInfoSemaphore = useRef<boolean>(false); // use this to control the loading when wallet auto connects
-
-  const shouldStop = () => fetchFarmsInfoSemaphore.current;
-
   useEffect(() => {
     setWantedChainAtom(undefined);
     fetchFarmsInfo();
@@ -136,9 +132,6 @@ export const useMain = () => {
         true,
       );
     }
-    return () => {
-      fetchFarmsInfoSemaphore.current = true;
-    };
   }, [walletAccountAtom]);
 
   useEffect(() => {
@@ -199,12 +192,6 @@ export const useMain = () => {
         ),
       );
 
-      // if wallet wasn't connected and it is now, stop the current function
-      if (shouldStop()) {
-        fetchFarmsInfoSemaphore.current = false;
-        return;
-      }
-
       await Promise.all(
         mappedFarms.map(async () => {
           let numberOfAssets = 0;
@@ -243,11 +230,6 @@ export const useMain = () => {
         }),
       );
 
-      // if wallet wasn't connected and it is now, stop the current function
-      if (shouldStop()) {
-        fetchFarmsInfoSemaphore.current = false;
-        return;
-      }
       setAvailableFarms(mappedFarms);
 
       setIsLoading(false);
@@ -467,10 +449,7 @@ export const useMain = () => {
     let farmInfo;
 
     farmInfo = {
-      interest: await getOptimisedFarmInterest(
-        farm.farmAddress,
-        farm.type,
-      ),
+      interest: await getOptimisedFarmInterest(farm.farmAddress, farm.type),
       totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,
         farm.underlyingTokenAddress,
