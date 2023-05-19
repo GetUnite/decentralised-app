@@ -127,6 +127,7 @@ export const Main = () => {
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />
@@ -153,6 +154,7 @@ export const Main = () => {
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/26j9j8se4vrfu2wh"
                       />
@@ -175,6 +177,7 @@ export const Main = () => {
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />

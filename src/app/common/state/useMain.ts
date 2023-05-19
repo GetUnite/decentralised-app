@@ -99,7 +99,7 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>('View all farms');
+  const [viewType, setViewType] = useState<string>(location.search.includes('view_type=my_farms') ? 'View my farms only' : 'View all farms');
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -119,10 +119,6 @@ export const useMain = () => {
     useState<boolean>(false);
   const [claimAllRewardsError, setClaimAllRewardsError] = useState<string>('');
 
-  const fetchFarmsInfoSemaphore = useRef<boolean>(false); // use this to control the loading when wallet auto connects
-
-  const shouldStop = () => fetchFarmsInfoSemaphore.current;
-
   useEffect(() => {
     setWantedChainAtom(undefined);
     fetchFarmsInfo();
@@ -136,9 +132,6 @@ export const useMain = () => {
         true,
       );
     }
-    return () => {
-      fetchFarmsInfoSemaphore.current = true;
-    };
   }, []);
 
   useEffect(() => {
@@ -165,6 +158,7 @@ export const useMain = () => {
     networkFilter,
     typeFilter,
     tokenFilter,
+    isConnectedLoading,
   ]);
 
   const fetchFarmsInfo = async () => {
@@ -202,6 +196,7 @@ export const useMain = () => {
 
   const fetchConnectedFarmsInfo = async () => {
     setIsConnectedLoading(true);
+    
     try {
       const supportedTokensWithBalance = new Array<any>();
 
@@ -276,10 +271,6 @@ export const useMain = () => {
 
         // connected basic info loaded
         setIsConnectedLoading(false);
-
-        if (location.search.includes('view_type=my_farms')) {
-          setViewType('View my farms only');
-        }
 
         // calculate the total amount in usd
         setIsLoadingTotalAmountInUSD(true);
@@ -583,7 +574,7 @@ export const useMain = () => {
     let filteredFarms;
 
     filteredFarms =
-      viewType == 'View my farms only'
+      viewType == 'View my farms only' && !isConnectedLoading && !isLoading
         ? availableFarms.filter(
             farm => farm != undefined && +farm.depositedAmount > 0.00001,
           )
