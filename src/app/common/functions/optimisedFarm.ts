@@ -7,6 +7,7 @@ import {
   sendTransaction,
   getTokenValueUsingPriceFeedRouter,
   getDecimals,
+  getTokenAmountValueUsingPriceFeedRouter,
 } from './web3Client';
 import { EFiatId } from '../constants/utils';
 
@@ -154,21 +155,19 @@ export const getUserOptimisedFarmDepositedAmount = async (
 
   const balancesInUnderlying = await Promise.all(
     balanceOf.vaults.map(async (vault, index) => {
-      let tokenPrice;
+      const amountInDecimals = balanceOf.vaultBalances[index].toString();
 
-      tokenPrice = await getTokenValueUsingPriceFeedRouter(
-        vault,
-        fiatId,
-        EChain.OPTIMISM,
-      );
+      const tokenAmountValue =
+        +amountInDecimals > 0
+          ? await getTokenAmountValueUsingPriceFeedRouter(
+              vault,
+              balanceOf.vaultBalances[index].toString(),
+              fiatId,
+              EChain.OPTIMISM,
+            )
+          : 0;
 
-      const vaultDecimals = await getDecimals(vault, EChain.OPTIMISM);
-      return (
-        +fromDecimals(
-          balanceOf.vaultBalances[index].toString(),
-          vaultDecimals,
-        ) * tokenPrice
-      );
+      return tokenAmountValue;
     }),
   );
 
@@ -396,21 +395,20 @@ export const getOptimisedTotalAssetSupply = async (
           chain,
         );
 
-        const tokenValue = await getTokenValueUsingPriceFeedRouter(
-          underlyingVault,
-          fiatId,
-          EChain.OPTIMISM,
-        );
+        const amountInDecimals = vaultBalanceOf.toString();
 
-        const underlyingVaultDecimals = await getDecimals(
-          underlyingVault,
-          EChain.OPTIMISM,
-        );
-        
-        return (
-          +fromDecimals(vaultBalanceOf.toString(), underlyingVaultDecimals) *
-          tokenValue
-        );
+        const tokenAmountValue =
+          +amountInDecimals > 0
+            ? await getTokenAmountValueUsingPriceFeedRouter(
+                underlyingVault,
+                amountInDecimals,
+                fiatId,
+                EChain.OPTIMISM,
+              )
+            : 0;
+
+        console.log(tokenAmountValue);
+        return tokenAmountValue;
       }),
     );
 
