@@ -14,6 +14,7 @@ export const FarmsBlock = ({
   sortDirectionIsAsc,
   sortBy,
   isLoading,
+  isConnectedLoading,
   farms,
   readMoreDescription = null,
   readMoreStatus = false,
@@ -180,6 +181,7 @@ export const FarmsBlock = ({
                 sign={farm.sign}
                 icons={farm.icons}
                 isLoading={isLoading}
+                isConnectedLoading={isConnectedLoading}
                 chain={farm.chain as EChain}
                 isBoost={farm.isBoost}
                 isOptimised={farm.isOptimised}
