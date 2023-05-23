@@ -50,7 +50,6 @@ export const withdrawFromBoostFarm = async (
   farmAddress,
   tokenAddress,
   amount,
-  decimals,
   chain = EChain.POLYGON,
   useBiconomy = false,
 ) => {
@@ -70,7 +69,8 @@ export const withdrawFromBoostFarm = async (
       },
     ];
 
-    const amountInDecimals = toDecimals(amount, decimals);
+    // all boost lps are 18 decimals so turn the value into it
+    const amountInDecimals = toDecimals(amount, 18);
 
     const tx = await sendTransaction(
       abi,

@@ -7,6 +7,7 @@ import {
   sendTransaction,
   getTokenValueUsingPriceFeedRouter,
   getDecimals,
+  getTokenAmountValueUsingPriceFeedRouter,
 } from './web3Client';
 import { EFiatId } from '../constants/utils';
 
@@ -154,21 +155,19 @@ export const getUserOptimisedFarmDepositedAmount = async (
 
   const balancesInUnderlying = await Promise.all(
     balanceOf.vaults.map(async (vault, index) => {
-      let tokenPrice;
+      const amountInDecimals = balanceOf.vaultBalances[index].toString();
 
-      tokenPrice = await getTokenValueUsingPriceFeedRouter(
-        vault,
-        fiatId,
-        EChain.OPTIMISM,
-      );
+      const tokenAmountValue =
+        +amountInDecimals > 0
+          ? await getTokenAmountValueUsingPriceFeedRouter(
+              vault,
+              balanceOf.vaultBalances[index].toString(),
+              fiatId,
+              EChain.OPTIMISM,
+            )
+          : 0;
 
-      const vaultDecimals = await getDecimals(vault, EChain.OPTIMISM);
-      return (
-        +fromDecimals(
-          balanceOf.vaultBalances[index].toString(),
-          vaultDecimals,
-        ) * tokenPrice
-      );
+      return tokenAmountValue;
     }),
   );
 
@@ -178,9 +177,10 @@ export const getUserOptimisedFarmDepositedAmount = async (
   );
 };
 
-const optimisedFarmInterestApiUrl = 'https://yields.llama.fi/chart/';
 const optimisedYearnFarmInterestApiUrl =
   'https://api.yearn.finance/v1/chains/10/vaults/all';
+const optimisedBeefyFarmInterestApiUrl = 'https://api.beefy.finance/';
+
 const compoundingApy = (baseApy, rewardApy, fee, vaultPercentage) => {
   const apy =
     Math.pow(
@@ -192,10 +192,10 @@ const compoundingApy = (baseApy, rewardApy, fee, vaultPercentage) => {
   // the second expressions needs to be converted into decimal so / 100
   return apy * 100 * (vaultPercentage / 100);
 };
+
 export const getOptimisedFarmInterest = async (
   farmAddress,
   farmType,
-  apyAddresses,
   chain = EChain.OPTIMISM,
 ) => {
   const abi = [
@@ -252,75 +252,78 @@ export const getOptimisedFarmInterest = async (
     chain,
   );
 
-  // beefy uses defillama pool addresses (which are part of the farm type) to get the apy data
-  // yearn uses it's own api to get the apy foreach of the active underlying vaults (which we get from chain)
-  let underlyingVaultsApys;
+  // gets underlying vaults addresses
+  const activeUnderlyingVaults = await callContract(
+    abi,
+    farmAddress,
+    'getActiveUnderlyingVaults()',
+    [],
+    chain,
+  );
+
+  let beefyVaults = [];
+  let yearnVaults = [];
+  let beefyVaultsApys = [];
+
+  const vaultsJsonResult = await fetch(
+    farmType == 'beefy'
+      ? optimisedBeefyFarmInterestApiUrl + 'vaults'
+      : optimisedYearnFarmInterestApiUrl,
+  ).then(res => res.json());
+
   if (farmType == 'beefy') {
-    underlyingVaultsApys = await Promise.all(
-      underlyingVaultsPercents.map(async (underlyingVaultsPercent, index) => {
-        const apyJsonResult = await fetch(
-          optimisedFarmInterestApiUrl + apyAddresses[index],
-        ).then(res => res.json());
-        const baseApyData = apyJsonResult.data[apyJsonResult.data.length - 1];
+    beefyVaults = vaultsJsonResult;
 
-        // if there are rewards use the base + rewards to calculate apy
-        if (baseApyData.apyReward != null) {
-          const base = baseApyData.apyBase / 100;
-          const reward = baseApyData.apyReward / 100;
+    const beefyVaultsApysJsonResult = await fetch(
+      optimisedBeefyFarmInterestApiUrl + 'apy',
+    ).then(res => res.json());
 
-          return compoundingApy(
-            base,
-            reward,
-            fee,
-            underlyingVaultsPercent.toNumber(),
-          );
-        }
-
-        return baseApyData.apy * (underlyingVaultsPercent.toNumber() / 100) * fee;
-      }),
-    );
+    beefyVaultsApys = beefyVaultsApysJsonResult;
+  } else {
+    yearnVaults = vaultsJsonResult;
   }
-  //yearn
-  else {
-    // gets underlying vaults addresses
-    const activeUnderlyingVaults = await callContract(
-      abi,
-      farmAddress,
-      'getActiveUnderlyingVaults()',
-      [],
-      chain,
-    );
 
-    // calls yearn api which returns all vaults at once
-    const apyJsonResult = await fetch(optimisedYearnFarmInterestApiUrl).then(
-      res => res.json(),
-    );
-
-    // for each underlying vault get apy from the json return on the apy call * the vault percentage
-    underlyingVaultsApys = activeUnderlyingVaults.map(
-      (activeUnderlyingVault, index) => {
-        const activeUnderlyingVaultApy = apyJsonResult.find(
-          ajr => ajr.address == activeUnderlyingVault,
-        ).apy;
-
-        const base =
-          activeUnderlyingVaultApy != undefined
-            ? activeUnderlyingVaultApy.net_apy
-            : 0;
-        const reward =
-          activeUnderlyingVaultApy != undefined
-            ? activeUnderlyingVaultApy.staking_rewards_apr
-            : 0;
-
-        return compoundingApy(
-          base,
-          reward,
-          fee,
-          underlyingVaultsPercents[index].toNumber(),
+  // for each underlying vault get apy from the json return on the apy call * the vault percentage
+  const underlyingVaultsApys = await Promise.all(
+    activeUnderlyingVaults.map(async (activeUnderlyingVault, index) => {
+      let activeUnderlyingVaultInfo;
+      let baseApy;
+      let rewardsApy;
+      if (farmType == 'beefy') {
+        activeUnderlyingVaultInfo = beefyVaults.find(
+          ajr => ajr.earnedTokenAddress == activeUnderlyingVault,
         );
-      },
-    );
-  }
+
+        const vaultId = activeUnderlyingVaultInfo.id;
+
+        return (
+          beefyVaultsApys[vaultId] *
+          fee *
+          underlyingVaultsPercents[index].toNumber()
+        );
+        // These lines will be for compounding when we figure out how to get boost % from beefy
+        const activeUnderlyingVaultApyBreakdown = beefyVaultsApys[vaultId];
+
+        baseApy = activeUnderlyingVaultApyBreakdown.net_apy;
+        rewardsApy = activeUnderlyingVaultApyBreakdown.staking_rewards_apr;
+      } else {
+        activeUnderlyingVaultInfo = yearnVaults.find(
+          ajr => ajr.address == activeUnderlyingVault,
+        );
+
+        const activeUnderlyingVaultApy = activeUnderlyingVaultInfo.apy;
+        baseApy = activeUnderlyingVaultApy.net_apy;
+        rewardsApy = activeUnderlyingVaultApy.staking_rewards_apr;
+      }
+
+      return compoundingApy(
+        baseApy,
+        rewardsApy,
+        fee,
+        underlyingVaultsPercents[index].toNumber(),
+      );
+    }),
+  );
 
   return underlyingVaultsApys.reduce(
     (previous, current) => previous + current,
@@ -392,20 +395,20 @@ export const getOptimisedTotalAssetSupply = async (
           chain,
         );
 
-        const tokenValue = await getTokenValueUsingPriceFeedRouter(
-          underlyingVault,
-          fiatId,
-          EChain.OPTIMISM,
-        );
+        const amountInDecimals = vaultBalanceOf.toString();
 
-        const underlyingVaultDecimals = await getDecimals(
-          underlyingVault,
-          EChain.OPTIMISM,
-        );
-        return (
-          +fromDecimals(vaultBalanceOf.toString(), underlyingVaultDecimals) *
-          tokenValue
-        );
+        const tokenAmountValue =
+          +amountInDecimals > 0
+            ? await getTokenAmountValueUsingPriceFeedRouter(
+                underlyingVault,
+                amountInDecimals,
+                fiatId,
+                EChain.OPTIMISM,
+              )
+            : 0;
+
+        console.log(tokenAmountValue);
+        return tokenAmountValue;
       }),
     );
 
