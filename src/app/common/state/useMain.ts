@@ -99,7 +99,11 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>(location.search.includes('view_type=my_farms') ? 'View my farms only' : 'View all farms');
+  const [viewType, setViewType] = useState<string>(
+    location.search.includes('view_type=my_farms')
+      ? 'View my farms only'
+      : 'View all farms',
+  );
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -196,7 +200,7 @@ export const useMain = () => {
 
   const fetchConnectedFarmsInfo = async () => {
     setIsConnectedLoading(true);
-    
+
     try {
       const supportedTokensWithBalance = new Array<any>();
 
