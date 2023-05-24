@@ -1138,27 +1138,16 @@ export const useBoostFarm = ({ id }) => {
       +withdrawValue / +selectedSupportedTokenInfo.current.boostDepositedAmount
     ).toFixed(18);
 
-    console.log({
-      depositedAmount: selectedSupportedTokenInfo.current.boostDepositedAmount,
-      withdrawPercentage: withdrawPercentage,
-    });
     const valueToWithdraw =
       withdrawPercentage == 1
         ? selectedFarmInfo.current.depositedAmountInLP
         : selectedFarmInfo.current.depositedAmountInLP * withdrawPercentage;
 
-    console.log({
-      farmAddress: selectedFarmInfo.current.farmAddress,
-      tokenAddress: selectedSupportedToken.address,
-      valueToWithdraw: valueToWithdraw,
-      tokenDecimals: selectedSupportedToken.decimals,
-    });
     try {
       const tx = await withdrawFromBoostFarm(
         selectedFarmInfo.current.farmAddress,
         selectedSupportedToken.address,
         valueToWithdraw,
-        selectedSupportedToken.decimals,
         selectedFarmInfo.current.chain,
         useBiconomy,
       );

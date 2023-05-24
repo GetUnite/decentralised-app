@@ -34,7 +34,8 @@ interface IFarmCard {
   name: string;
   totalAssetSupply: string | number;
   interest: string | number;
-  isLoading: any;
+  isLoading: boolean;
+  isConnectedLoading: boolean;
   sign: string;
   icons: string[];
   disabled: boolean;
@@ -57,6 +58,7 @@ export const FarmCard = ({
   balance,
   balanceInUSD,
   isLoading,
+  isConnectedLoading,
   sign,
   icons,
   disabled,
@@ -208,7 +210,8 @@ export const FarmCard = ({
                 pad={{ top: '10px', bottom: '10px' }}
                 style={{ fontSize: '16px' }}
               >
-                {isLoading ? (
+                {isLoading ||
+                (viewType == 'View my farms only' && isConnectedLoading) ? (
                   <>
                     <Skeleton height="14px" width="76px" borderRadius="20px" />
                     <Skeleton height="14px" width="76px" borderRadius="20px" />

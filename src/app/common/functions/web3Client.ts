@@ -175,7 +175,6 @@ export const tryAutoWalletConnection = async callback => {
       const connection = await connectToWallet({
         autoSelect: { label: walletLabel, disableModals: true },
       });
-
       callback(connection.address, isGnosisSafe);
     } catch (error) {
       console.log(error);
@@ -220,7 +219,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  //return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
+  // return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
   return walletAddress;
 };
 
@@ -1391,6 +1390,67 @@ export const getTokenValueUsingPriceFeedRouter = async (
     priceFeedRouter,
     'getPrice(address,uint256)',
     [lPTokenAddress, fiatId],
+    chain,
+  );
+
+  return +fromDecimals(valueInFiat.value.toString(), valueInFiat.decimals);
+};
+
+export const getTokenAmountValueUsingPriceFeedRouter = async (
+  tokenAddress: string,
+  amountInDecimals,
+  fiatId = EFiatId.USD,
+  chain = EChain.ETHEREUM,
+): Promise<number> => {
+  const abi = [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'token',
+          type: 'address',
+        },
+        {
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint256',
+          name: 'fiatId',
+          type: 'uint256',
+        },
+      ],
+      name: 'getPriceOfAmount',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'value',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint8',
+          name: 'decimals',
+          type: 'uint8',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ];
+
+  const priceFeedRouter =
+    chain == EChain.ETHEREUM
+      ? EEthereumAddresses.PRICEFEEDROUTER
+      : chain == EChain.POLYGON
+      ? EPolygonAddresses.PRICEFEEDROUTER
+      : EOptimismAddresses.PRICEFEEDROUTER;
+
+  const valueInFiat = await callContract(
+    abi,
+    priceFeedRouter,
+    'getPriceOfAmount(address,uint256,uint256)',
+    [tokenAddress, amountInDecimals, fiatId],
     chain,
   );
 

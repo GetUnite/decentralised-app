@@ -31,7 +31,7 @@ export type TFarm = {
   depositedAmountInUSD?: string;
   depositDividedAmount?: { first: any; second: any };
   farmAddress?: string;
-  poolShare?: number;
+  poolShare?: string | number;
   isBoost?: boolean;
   isOptimised?: boolean;
   isNewest?: boolean;
@@ -57,7 +57,6 @@ export type TBoostFarm = TFarm & {
 };
 
 export type TOptimisedFarm = TFarm & {
-  apyAddresses?: string[];
   lPTokenAddress?: string;
   valueOf1LPinUSDC?: number;
   // For locked boost farms
