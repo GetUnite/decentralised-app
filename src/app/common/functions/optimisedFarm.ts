@@ -5,8 +5,6 @@ import {
   callContract,
   getCurrentWalletAddress,
   sendTransaction,
-  getTokenValueUsingPriceFeedRouter,
-  getDecimals,
   getTokenAmountValueUsingPriceFeedRouter,
 } from './web3Client';
 import { EFiatId } from '../constants/utils';
@@ -407,7 +405,6 @@ export const getOptimisedTotalAssetSupply = async (
               )
             : 0;
 
-        console.log(tokenAmountValue);
         return tokenAmountValue;
       }),
     );
