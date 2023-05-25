@@ -54,7 +54,7 @@ export const depositIntoOptimised = async (
       ],
       chain,
       useBiconomy,
-      tokenAddress == EOptimismAddresses.ETH ? +amountInDecimals : null,
+      tokenAddress == EOptimismAddresses.ETH ? +amountInDecimals : undefined,
     );
 
     return tx;
