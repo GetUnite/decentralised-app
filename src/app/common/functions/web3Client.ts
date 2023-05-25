@@ -25,7 +25,6 @@ import {
 } from './utils';
 import { getUniswapPoolAddress } from './uniswap';
 import { EFiatId } from '../constants/utils';
-import { wantedChain } from '../state/atoms';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -388,6 +387,7 @@ export const sendTransaction = async (
       to: address,
       data: data,
       from: getCurrentWalletAddress(),
+      value: toHexString(txValue),
     };
 
     let finalTx;
@@ -396,10 +396,9 @@ export const sendTransaction = async (
       finalTx = {
         ...rawTx,
         gasLimit: 5000000,
-        value: toHexString(txValue),
       };
     } else {
-      finalTx = { ...rawTx, value: toHexString(txValue) };
+      finalTx = rawTx;
     }
 
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
