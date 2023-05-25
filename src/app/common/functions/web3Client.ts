@@ -1174,23 +1174,12 @@ export const getBalance = async (
   return fromDecimals(balance, tokenDecimals);
 };
 
-export const signerGetBalance = async (
-  tokenDecimals = 18,
-  wantedChainId
-) => {
-  const currentChainId = await getCurrentChainId();
-const readOnlyProvider = await getReadOnlyProvider(EChain.POLYGON);
+export const getNativeTokenBalance = async (tokenDecimals = 18, chain) => {
+  const readOnlyProvider = await getReadOnlyProvider(chain);
 
-const a =(await readOnlyProvider.getBalance(getCurrentWalletAddress())).toString();
-  console.log(fromDecimals(a, tokenDecimals));
-  // if the chain is not what we expect, return 0
-  if (currentChainId != wantedChainId) {
-    return 0;
-  }
-
-  const signer = await getProvider().getSigner();
-
-  const balance = (await signer.getBalance()).toString();
+  const balance = (
+    await readOnlyProvider.getBalance(getCurrentWalletAddress())
+  ).toString();
 
   return fromDecimals(balance, tokenDecimals);
 };
