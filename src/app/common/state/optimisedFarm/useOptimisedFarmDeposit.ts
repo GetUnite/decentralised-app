@@ -3,15 +3,12 @@ import { maximumUint256Value } from 'app/common/functions/utils';
 import {
   getAllowance,
   getBalanceOf,
-  signerGetBalance,
+  getNativeTokenBalance,
 } from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
 import { useEffect, useState } from 'react';
-import { walletAccount } from '../atoms';
-import { useRecoilState } from 'recoil';
-import { EChainId } from 'app/common/constants/chains';
-import { isCorrectNetwork } from '../atoms';
+import { EChain } from 'app/common/constants/chains';
 
 export const possibleDepositSteps: TPossibleStep[] = [
   {
@@ -38,9 +35,6 @@ export const useOptimisedFarmDeposit = ({
   depositValue,
   setDepositValue,
 }) => {
-  // atoms
-  const [isCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
-
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
 
@@ -53,7 +47,7 @@ export const useOptimisedFarmDeposit = ({
       updateBalanceAndAllowance();
       updateSteps();
     }
-  }, [selectedSupportedToken, isCorrectNetworkAtom]);
+  }, [selectedSupportedToken]);
 
   useEffect(() => {
     if (selectedSupportedToken && depositValue != '') {
@@ -80,9 +74,9 @@ export const useOptimisedFarmDeposit = ({
       );
     } else {
       allowance = maximumUint256Value;
-      balance = await signerGetBalance(
+      balance = await getNativeTokenBalance(
         selectedSupportedToken.decimals,
-        EChainId.OP_MAINNET,
+        EChain.OPTIMISM,
       );
     }
 

@@ -25,7 +25,6 @@ import {
 } from './utils';
 import { getUniswapPoolAddress } from './uniswap';
 import { EFiatId } from '../constants/utils';
-import { wantedChain } from '../state/atoms';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -388,6 +387,7 @@ export const sendTransaction = async (
       to: address,
       data: data,
       from: getCurrentWalletAddress(),
+      value: toHexString(txValue),
     };
 
     let finalTx;
@@ -396,10 +396,9 @@ export const sendTransaction = async (
       finalTx = {
         ...rawTx,
         gasLimit: 5000000,
-        value: toHexString(txValue),
       };
     } else {
-      finalTx = { ...rawTx, value: toHexString(txValue) };
+      finalTx = rawTx;
     }
 
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
@@ -1174,23 +1173,12 @@ export const getBalance = async (
   return fromDecimals(balance, tokenDecimals);
 };
 
-export const signerGetBalance = async (
-  tokenDecimals = 18,
-  wantedChainId
-) => {
-  const currentChainId = await getCurrentChainId();
-const readOnlyProvider = await getReadOnlyProvider(EChain.POLYGON);
+export const getNativeTokenBalance = async (tokenDecimals = 18, chain) => {
+  const readOnlyProvider = await getReadOnlyProvider(chain);
 
-const a =(await readOnlyProvider.getBalance(getCurrentWalletAddress())).toString();
-  console.log(fromDecimals(a, tokenDecimals));
-  // if the chain is not what we expect, return 0
-  if (currentChainId != wantedChainId) {
-    return 0;
-  }
-
-  const signer = await getProvider().getSigner();
-
-  const balance = (await signer.getBalance()).toString();
+  const balance = (
+    await readOnlyProvider.getBalance(getCurrentWalletAddress())
+  ).toString();
 
   return fromDecimals(balance, tokenDecimals);
 };

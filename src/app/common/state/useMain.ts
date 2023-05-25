@@ -4,11 +4,11 @@ import {
   getChainById,
   getCurrentChainId,
   getInterest,
+  getNativeTokenBalance,
   getTokenValueUsingPriceFeedRouter,
   getTokenValueUsingUniswap,
   getTotalAssets,
   getTotalAssetSupply,
-  signerGetBalance,
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
@@ -23,7 +23,7 @@ import {
   EOptimismAddresses,
   EPolygonAddresses,
 } from '../constants/addresses';
-import { EChain, EChainId } from '../constants/chains';
+import { EChain } from '../constants/chains';
 import {
   claimAllBoostFarmRewards,
   claimBoostFarmLPRewards,
@@ -258,9 +258,9 @@ export const useMain = () => {
               async supportedTokenWithBalance => {
                 const balance =
                   supportedTokenWithBalance.address == EOptimismAddresses.ETH
-                    ? await signerGetBalance(
+                    ? await getNativeTokenBalance(
                         supportedTokenWithBalance.decimals,
-                        EChainId.OP_MAINNET // only optimism uses native for now 
+                        EChain.OPTIMISM, // only optimism uses native for now
                       )
                     : await getBalanceOf(
                         supportedTokenWithBalance.address,
