@@ -57,8 +57,6 @@ export const useOptimisedFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    console.log(selectedSupportedToken);
-
     let allowance;
     let balance;
     if (selectedSupportedToken.address != EOptimismAddresses.ETH) {

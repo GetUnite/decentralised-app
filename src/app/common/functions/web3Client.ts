@@ -14,7 +14,7 @@ import {
   EPolygonAddresses,
 } from 'app/common/constants/addresses';
 import logo from 'app/modernUI/images/logo.svg';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
 import {
