@@ -5,6 +5,7 @@ export type TSupportedToken = {
   balance?: string;
   allowance?: string;
   sign?: string;
+  icon?: string;
   // To store boost farm deposited amount converted to the supported token value to improve ui and functionality
   boostDepositedAmount?: number;
 };

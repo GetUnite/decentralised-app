@@ -23,7 +23,7 @@ import {
   EOptimismAddresses,
   EPolygonAddresses,
 } from '../constants/addresses';
-import { EChain } from '../constants/chains';
+import { EChain, EChainId } from '../constants/chains';
 import {
   claimAllBoostFarmRewards,
   claimBoostFarmLPRewards,
@@ -258,7 +258,10 @@ export const useMain = () => {
               async supportedTokenWithBalance => {
                 const balance =
                   supportedTokenWithBalance.address == EOptimismAddresses.ETH
-                    ? await signerGetBalance(supportedTokenWithBalance.decimals)
+                    ? await signerGetBalance(
+                        supportedTokenWithBalance.decimals,
+                        EChainId.OP_MAINNET // only optimism uses native for now 
+                      )
                     : await getBalanceOf(
                         supportedTokenWithBalance.address,
                         supportedTokenWithBalance.decimals,
@@ -501,7 +504,6 @@ export const useMain = () => {
       interest: await getOptimisedFarmInterest(farm.farmAddress, farm.type),
       totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,
-        farm.underlyingTokenAddress,
         EFiatId.USD,
         farm.chain,
       ),

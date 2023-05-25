@@ -5,4 +5,5 @@ export type TIbAlluoInfo = {
   decimals?: number;
   label?: string;
   sign?: string;
+  icon?: string;
 };

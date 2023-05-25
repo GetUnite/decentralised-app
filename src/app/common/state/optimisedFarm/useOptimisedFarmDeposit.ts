@@ -8,6 +8,10 @@ import {
 import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
 import { useEffect, useState } from 'react';
+import { walletAccount } from '../atoms';
+import { useRecoilState } from 'recoil';
+import { EChainId } from 'app/common/constants/chains';
+import { isCorrectNetwork } from '../atoms';
 
 export const possibleDepositSteps: TPossibleStep[] = [
   {
@@ -34,6 +38,9 @@ export const useOptimisedFarmDeposit = ({
   depositValue,
   setDepositValue,
 }) => {
+  // atoms
+  const [isCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
+
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
 
@@ -46,7 +53,7 @@ export const useOptimisedFarmDeposit = ({
       updateBalanceAndAllowance();
       updateSteps();
     }
-  }, [selectedSupportedToken]);
+  }, [selectedSupportedToken, isCorrectNetworkAtom]);
 
   useEffect(() => {
     if (selectedSupportedToken && depositValue != '') {
@@ -73,7 +80,10 @@ export const useOptimisedFarmDeposit = ({
       );
     } else {
       allowance = maximumUint256Value;
-      balance = await signerGetBalance(selectedSupportedToken.decimals);
+      balance = await signerGetBalance(
+        selectedSupportedToken.decimals,
+        EChainId.OP_MAINNET,
+      );
     }
 
     selectedSupportedTokenInfo.current = {

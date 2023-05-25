@@ -25,6 +25,7 @@ import {
 } from './utils';
 import { getUniswapPoolAddress } from './uniswap';
 import { EFiatId } from '../constants/utils';
+import { wantedChain } from '../state/atoms';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -224,7 +225,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  // return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
+   return '0xec3e9c6769ff576da3889071c639a0e488815926';
   return walletAddress;
 };
 
@@ -1173,7 +1174,16 @@ export const getBalance = async (
   return fromDecimals(balance, tokenDecimals);
 };
 
-export const signerGetBalance = async (tokenDecimals = 18) => {
+export const signerGetBalance = async (
+  tokenDecimals = 18,
+  wantedChainId
+) => {
+  const currentChainId = await getCurrentChainId();
+  // if the chain is not what we expect, return 0
+  if (currentChainId != wantedChainId) {
+    return 0;
+  }
+
   const signer = await getProvider().getSigner();
 
   const balance = (await signer.getBalance()).toString();

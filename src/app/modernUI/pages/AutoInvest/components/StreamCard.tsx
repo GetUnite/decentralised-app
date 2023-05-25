@@ -38,6 +38,8 @@ interface IStreamCard {
   isLoading?: boolean;
   updateAutoInvestInfo?: any;
   sourceDepositedAmount?: string;
+  fromIcon?:string;
+  toIcon?:string;
 }
 
 export const StreamCard = ({
@@ -58,6 +60,8 @@ export const StreamCard = ({
   sign,
   isLoading = false,
   updateAutoInvestInfo,
+  fromIcon,
+  toIcon,
 }: IStreamCard) => {
   const {
     // errors
@@ -151,11 +155,11 @@ export const StreamCard = ({
               ) : (
                 <>
                   <Box direction="row" gap="5px">
-                    <TokenIcon label={from} />{' '}
+                    <TokenIcon label={fromIcon? fromIcon : from} />{' '}
                     <span style={{ fontWeight: '500' }}>{from} Farm</span>
                   </Box>
                   <Box direction="row" gap="5px">
-                    <TokenIcon label={to} />{' '}
+                    <TokenIcon label={toIcon ? toIcon : to} />{' '}
                     <span style={{ fontWeight: '500' }}>{to} Farm</span>
                   </Box>
                   <Box direction="row" gap="5px">

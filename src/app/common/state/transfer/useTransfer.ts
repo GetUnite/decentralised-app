@@ -129,6 +129,7 @@ export const useTransfer = () => {
       },
       {
         label: 'ETH',
+        icon: 'ibETH',
         address: eth.address,
         balance: eth.balance,
         decimals: eth.decimals,

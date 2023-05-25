@@ -5,7 +5,7 @@ import {
   depositIntoAlluo,
   getStreamFlow,
   getUnapprovedSuperfluidSubscriptions,
-  startStream
+  startStream,
 } from 'app/common/functions/autoInvest';
 import { heapTrack } from 'app/common/functions/heapClient';
 import {
@@ -14,12 +14,12 @@ import {
   getBalance,
   getBalanceOf,
   getInterest,
-  getTotalAssetSupply
+  getTotalAssetSupply,
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   TStreamOption,
-  TSupportedStreamToken
+  TSupportedStreamToken,
 } from 'app/common/types/autoInvest';
 import { TFarm } from 'app/common/types/farm';
 import { TPossibleStep, TSupportedToken } from 'app/common/types/global';
@@ -207,6 +207,7 @@ const streamFromOptions: TSupportedStreamToken[] = [
       },
       {
         label: 'ETH',
+        icon: 'ibETH',
         address: EPolygonAddresses.IBALLUOETH,
         sign: 'Ξ',
       },
@@ -225,6 +226,7 @@ const streamFromOptions: TSupportedStreamToken[] = [
       },
       {
         label: 'ETH',
+        icon: 'ibETH',
         address: EPolygonAddresses.IBALLUOETH,
         sign: 'Ξ',
       },
@@ -243,6 +245,7 @@ const streamFromOptions: TSupportedStreamToken[] = [
       },
       {
         label: 'ETH',
+        icon: 'ibETH',
         address: EPolygonAddresses.IBALLUOETH,
         sign: 'Ξ',
       },
@@ -261,6 +264,7 @@ const streamFromOptions: TSupportedStreamToken[] = [
       },
       {
         label: 'ETH',
+        icon: 'ibETH',
         address: EPolygonAddresses.IBALLUOETH,
         sign: 'Ξ',
       },

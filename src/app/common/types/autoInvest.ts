@@ -17,6 +17,9 @@ export type TStreamOption = {
   toStIbAlluoAddress: string;
   ricochetMarketAddress: string;
   underlyingTokenAddress: string;
+  // force certain icons even tho label is generic
+  toIcon?: string;
+  fromIcon?:string;
 };
 
 export type TSupportedStreamToken = TSupportedToken & {

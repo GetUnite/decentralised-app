@@ -120,7 +120,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Beefy Top 3 Vault ETH',
     sign: 'Ξ',
-    icons: ['EHT', 'WETH'],
+    icons: ['ETH', 'WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
       {
@@ -333,7 +333,6 @@ export const useOptimisedFarm = ({ id }) => {
         interest: await getOptimisedFarmInterest(farm.farmAddress, farm.type),
         totalAssetSupply: await getOptimisedTotalAssetSupply(
           farm.farmAddress,
-          farm.underlyingTokenAddress,
           farm.underlyingTokenAddress == EOptimismAddresses.USDC
             ? EFiatId.USD
             : EFiatId.ETH,

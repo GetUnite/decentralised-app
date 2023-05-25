@@ -102,7 +102,12 @@ export const withdrawFromOptimised = async (
       abi,
       farmAddress,
       'withdraw(address,uint256)',
-      [tokenAddress == EOptimismAddresses.ETH ? ethers.constants.AddressZero : tokenAddress, percentage],
+      [
+        tokenAddress == EOptimismAddresses.ETH
+          ? ethers.constants.AddressZero
+          : tokenAddress,
+        percentage,
+      ],
       chain,
       useBiconomy,
     );
@@ -338,7 +343,6 @@ export const getOptimisedFarmInterest = async (
 
 export const getOptimisedTotalAssetSupply = async (
   farmAddress,
-  underlyingTokenAddress,
   fiatId,
   chain = EChain.OPTIMISM,
 ) => {
