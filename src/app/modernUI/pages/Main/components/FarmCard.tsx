@@ -75,9 +75,10 @@ export const FarmCard = ({
 
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
+  const tvlSign = isOptimised ? '$' : sign;
   const tvl = isLoading
     ? 'Loading...'
-    : sign + toExactFixed(totalAssetSupply, sign == '$' || sign == '€' ? 2 : 4);
+    : tvlSign + toExactFixed(totalAssetSupply, tvlSign == '$' || tvlSign == '€' ? 2 : 4);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 

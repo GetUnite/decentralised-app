@@ -8,6 +8,7 @@ import {
   getTokenAmountValueUsingPriceFeedRouter,
 } from './web3Client';
 import { EFiatId } from '../constants/utils';
+import { ethers } from 'ethers';
 
 export const depositIntoOptimised = async (
   tokenAddress,
@@ -34,7 +35,7 @@ export const depositIntoOptimised = async (
         ],
         name: 'deposit',
         outputs: [],
-        stateMutability: 'nonpayable',
+        stateMutability: 'payable',
         type: 'function',
       },
     ];
@@ -45,9 +46,15 @@ export const depositIntoOptimised = async (
       abi,
       farmAddress,
       'deposit(address,uint256)',
-      [tokenAddress, amountInDecimals],
+      [
+        tokenAddress == EOptimismAddresses.ETH
+          ? ethers.constants.AddressZero // this is native
+          : tokenAddress,
+        amountInDecimals,
+      ],
       chain,
       useBiconomy,
+      tokenAddress == EOptimismAddresses.ETH ? +amountInDecimals : null,
     );
 
     return tx;
@@ -332,6 +339,7 @@ export const getOptimisedFarmInterest = async (
 export const getOptimisedTotalAssetSupply = async (
   farmAddress,
   underlyingTokenAddress,
+  fiatId,
   chain = EChain.OPTIMISM,
 ) => {
   try {
@@ -377,11 +385,6 @@ export const getOptimisedTotalAssetSupply = async (
       [],
       chain,
     );
-
-    const fiatId =
-      underlyingTokenAddress == EOptimismAddresses.USDC
-        ? EFiatId.USD
-        : EFiatId.ETH;
 
     const underlyingVaultsTVL = await Promise.all(
       activeUnderlyingVaults.map(async underlyingVault => {

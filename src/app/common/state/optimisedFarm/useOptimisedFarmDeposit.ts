@@ -1,4 +1,10 @@
-import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
+import { EOptimismAddresses } from 'app/common/constants/addresses';
+import { maximumUint256Value } from 'app/common/functions/utils';
+import {
+  getAllowance,
+  getBalanceOf,
+  signerGetBalance,
+} from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
 import { useEffect, useState } from 'react';
@@ -51,17 +57,24 @@ export const useOptimisedFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    const allowance = await getAllowance(
-      selectedSupportedToken.address,
-      selectedFarmInfo.farmAddress,
-      selectedFarmInfo.chain,
-    );
+    let allowance;
+    let balance;
+    if (selectedSupportedToken.address != EOptimismAddresses.ETH) {
+      allowance = await getAllowance(
+        selectedSupportedToken.address,
+        selectedFarmInfo.farmAddress,
+        selectedFarmInfo.chain,
+      );
 
-    const balance = await getBalanceOf(
-      selectedSupportedToken.address,
-      selectedSupportedToken.decimals,
-      selectedFarmInfo.chain,
-    );
+      balance = await getBalanceOf(
+        selectedSupportedToken.address,
+        selectedSupportedToken.decimals,
+        selectedFarmInfo.chain,
+      );
+    } else {
+      allowance = maximumUint256Value;
+      balance = await signerGetBalance(selectedSupportedToken.decimals);
+    }
 
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,
