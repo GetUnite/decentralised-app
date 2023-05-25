@@ -225,7 +225,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-   return '0xec3e9c6769ff576da3889071c639a0e488815926';
+  // return '0xec3e9c6769ff576da3889071c639a0e488815926';
   return walletAddress;
 };
 
@@ -1179,6 +1179,10 @@ export const signerGetBalance = async (
   wantedChainId
 ) => {
   const currentChainId = await getCurrentChainId();
+const readOnlyProvider = await getReadOnlyProvider(EChain.POLYGON);
+
+const a =(await readOnlyProvider.getBalance(getCurrentWalletAddress())).toString();
+  console.log(fromDecimals(a, tokenDecimals));
   // if the chain is not what we expect, return 0
   if (currentChainId != wantedChainId) {
     return 0;
