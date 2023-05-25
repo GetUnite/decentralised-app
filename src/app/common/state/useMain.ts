@@ -100,7 +100,11 @@ export const useMain = () => {
     ...possibleNonStableTokens,
   ]);
   const [typeFilter, setTypeFilter] = useState<any>(possibleTypes);
-  const [viewType, setViewType] = useState<string>('View all farms');
+  const [viewType, setViewType] = useState<string>(
+    location.search.includes('view_type=my_farms')
+      ? 'View my farms only'
+      : 'View all farms',
+  );
   const [sortField, setSortField] = useState<string>(null);
   const [sortDirectionIsAsc, setSortDirectionIsAsc] = useState<boolean>(null);
 
@@ -109,6 +113,7 @@ export const useMain = () => {
 
   // loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isConnectedLoading, setIsConnectedLoading] = useState<boolean>(false);
   const [isLoadingTotalAmountInUSD, setIsLoadingTotalAmountInUSD] =
     useState<boolean>(true);
   const [isLoadingRewards, setIsLoadingRewards] = useState<boolean>(true);
@@ -132,7 +137,18 @@ export const useMain = () => {
         true,
       );
     }
-  }, [walletAccountAtom]);
+  }, []);
+
+  useEffect(() => {
+    if (walletAccountAtom) {
+      // enable connected loading
+      setIsConnectedLoading(true);
+      // it needs to wait for normal data to load first tho so lets do it like this
+      if (!isLoading) {
+        fetchConnectedFarmsInfo();
+      }
+    }
+  }, [walletAccountAtom, isLoading]);
 
   useEffect(() => {
     //if (shouldFilter.current == true) {
@@ -147,111 +163,129 @@ export const useMain = () => {
     networkFilter,
     typeFilter,
     tokenFilter,
+    isConnectedLoading,
   ]);
 
   const fetchFarmsInfo = async () => {
     setIsLoading(true);
     try {
-      const supportedTokensWithBalance = new Array<any>();
-
       const mappedFarms = await Promise.all(
         [...boostFarmOptions, ...optimisedFarmOptions, ...farmOptions].map(
           async availableFarm => {
-            const {
-              interest,
-              totalAssetSupply,
-              supportedTokens,
-              depositedAmount,
-              depositedAmountInLP,
-              depositedAmountInUSD,
-              poolShare,
-            } = availableFarm.isBoost
-              ? await fetchBoostFarmInfo(availableFarm)
-              : availableFarm.isOptimised
-              ? await fetchOptimisedFarmInfo(availableFarm)
-              : await fetchFarmInfo(availableFarm);
+            const { supportedTokens, interest, totalAssetSupply } =
+              availableFarm.isBoost
+                ? await fetchBoostFarmInfo(availableFarm)
+                : availableFarm.isOptimised
+                ? await fetchOptimisedFarmInfo(availableFarm)
+                : await fetchFarmInfo(availableFarm);
 
+            availableFarm.supportedTokens = supportedTokens;
             availableFarm.interest = interest;
             availableFarm.totalAssetSupply = totalAssetSupply;
-            availableFarm.supportedTokens = supportedTokens;
-            availableFarm.depositedAmount = depositedAmount;
-            availableFarm.depositedAmountInLP = depositedAmountInLP;
-            availableFarm.depositedAmountInUSD = depositedAmountInUSD;
-            availableFarm.poolShare = poolShare;
-
-            if (walletAccountAtom) {
-              for (let index = 0; index < supportedTokens.length; index++) {
-                supportedTokensWithBalance.push({
-                  ...supportedTokens[index],
-                  chain: availableFarm.chain,
-                });
-              }
-            }
 
             return availableFarm;
           },
         ),
       );
 
-      await Promise.all(
-        mappedFarms.map(async () => {
-          let numberOfAssets = 0;
-          let chainsWithAssets = new Set();
-
-          if (walletAccountAtom) {
-            const uniqueSupportedTokensWithBalance =
-              supportedTokensWithBalance.filter(
-                (value, index, self) =>
-                  index ===
-                  self.findIndex(
-                    t => t.address === value.address && t.chain === value.chain,
-                  ),
-              );
-
-            await Promise.all(
-              uniqueSupportedTokensWithBalance.map(
-                async supportedTokenWithBalance => {
-                  const balance =
-                    supportedTokenWithBalance.address == EOptimismAddresses.ETH
-                      ? await signerGetBalance(
-                          supportedTokenWithBalance.decimals,
-                        )
-                      : await getBalanceOf(
-                          supportedTokenWithBalance.address,
-                          supportedTokenWithBalance.decimals,
-                          supportedTokenWithBalance.chain,
-                        );
-                  if (+balance > 0) {
-                    numberOfAssets++;
-                    chainsWithAssets.add(supportedTokenWithBalance.chain);
-                  }
-                },
-              ),
-            );
-          }
-          setAssetsInfo({
-            numberOfAssets: numberOfAssets,
-            numberOfChainsWithAssets: chainsWithAssets.size,
-          });
-        }),
-      );
-
+      // normal data for farms is loaded
       setAvailableFarms(mappedFarms);
-
       setIsLoading(false);
 
-      // if wallet account is connect do sum of all farms and rewards
-      if (walletAccountAtom) {
-        if (location.search.includes('view_type=my_farms')) {
-          setViewType('View my farms only');
+      return mappedFarms;
+    } catch (error) {
+      setError(error);
+      console.log(error);
+    }
+  };
+
+  const fetchConnectedFarmsInfo = async () => {
+    setIsConnectedLoading(true);
+
+    try {
+      const supportedTokensWithBalance = new Array<any>();
+
+      await Promise.all(
+        availableFarms.map(async availableFarm => {
+          const {
+            depositedAmount,
+            depositedAmountInUSD,
+            depositedAmountInLP,
+            poolShare,
+          } = availableFarm.isBoost
+            ? await fetchConnectedBoostFarmInfo(availableFarm)
+            : availableFarm.isOptimised
+            ? await fetchConnectedOptimisedFarmInfo(availableFarm)
+            : await fetchConnectedFarmInfo(availableFarm);
+
+          availableFarm.depositedAmount = depositedAmount;
+          availableFarm.depositedAmountInLP = depositedAmountInLP;
+          availableFarm.depositedAmountInUSD = depositedAmountInUSD;
+          availableFarm.poolShare = poolShare;
+
+          for (
+            let index = 0;
+            index < availableFarm.supportedTokens.length;
+            index++
+          ) {
+            supportedTokensWithBalance.push({
+              ...availableFarm.supportedTokens[index],
+              chain: availableFarm.chain,
+            });
+          }
+
+          return availableFarm;
+        }),
+      ).then(async mappedFarms => {
+        // sets it once with the rest of the data
+        setAvailableFarms(mappedFarms);
+
+        let numberOfAssets = 0;
+        let chainsWithAssets = new Set();
+
+        if (walletAccountAtom) {
+          const uniqueSupportedTokensWithBalance =
+            supportedTokensWithBalance.filter(
+              (value, index, self) =>
+                index ===
+                self.findIndex(
+                  t => t.address === value.address && t.chain === value.chain,
+                ),
+            );
+
+          await Promise.all(
+            uniqueSupportedTokensWithBalance.map(
+              async supportedTokenWithBalance => {
+                const balance = await getBalanceOf(
+                  supportedTokenWithBalance.address,
+                  supportedTokenWithBalance.decimals,
+                  supportedTokenWithBalance.chain,
+                );
+                if (+balance > 0) {
+                  numberOfAssets++;
+                  chainsWithAssets.add(supportedTokenWithBalance.chain);
+                }
+              },
+            ),
+          );
         }
+        setAssetsInfo({
+          numberOfAssets: numberOfAssets,
+          numberOfChainsWithAssets: chainsWithAssets.size,
+        });
+
+        // connected basic info loaded
+        setIsConnectedLoading(false);
 
         // calculate the total amount in usd
         setIsLoadingTotalAmountInUSD(true);
-        let totalDepositedAmountInUsd = availableFarms.reduce(
-          (accumulator, farm) =>
-            accumulator +
-            +(farm.isBoost ? farm.depositedAmount : farm.depositedAmountInUSD),
+        let totalDepositedAmountInUsd = mappedFarms.reduce(
+          (accumulator, farm) => {
+            return (
+              accumulator +
+              +(farm.isBoost ? farm.depositedAmount : farm.depositedAmountInUSD)
+            );
+          },
           0,
         );
 
@@ -272,7 +306,7 @@ export const useMain = () => {
 
         let ri = [];
         await Promise.all(
-          availableFarms.map(async farm => {
+          mappedFarms.map(async farm => {
             if (farm.isBoost) {
               const updatedRewards = {
                 ...(await getBoostFarmRewards(
@@ -322,7 +356,7 @@ export const useMain = () => {
         );
 
         setIsLoadingRewards(false);
-      }
+      });
     } catch (error) {
       setError(error);
       console.log(error);
@@ -337,11 +371,52 @@ export const useMain = () => {
       supportedTokens: farm.supportedTokens,
       depositedAmount: 0,
     };
-    if (walletAccountAtom) {
-      const depositedAmount = await getBalance(
-        farm.farmAddress,
-        undefined,
-        farm.chain,
+
+    return farmInfo;
+  };
+
+  const fetchConnectedFarmInfo = async farm => {
+    const depositedAmount = await getBalance(
+      farm.farmAddress,
+      undefined,
+      farm.chain,
+    );
+
+    let valueOfAssetInUSDC;
+    // if the underlying is usdc no need for price
+    if (
+      farm.underlyingTokenAddress == EPolygonAddresses.USDC ||
+      farm.underlyingTokenAddress == EEthereumAddresses.USDC ||
+      farm.underlyingTokenAddress == EOptimismAddresses.USDC
+    ) {
+      valueOfAssetInUSDC = 1;
+    } else {
+      let tokenPriceAddress;
+      let tokenDecimals = 18;
+      // for polygon and OP underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
+      switch (farm.underlyingTokenAddress) {
+        case EPolygonAddresses.WBTC:
+        case EOptimismAddresses.WBTC:
+          tokenPriceAddress = EEthereumAddresses.WBTC;
+          tokenDecimals = 8;
+          break;
+        case EPolygonAddresses.WETH:
+        case EOptimismAddresses.WETH:
+          tokenPriceAddress = EEthereumAddresses.WETH;
+          break;
+        case EPolygonAddresses.EURT:
+          tokenPriceAddress = EEthereumAddresses.EURT;
+          tokenDecimals = 6;
+          break;
+        default:
+          tokenPriceAddress = farm.underlyingTokenAddress;
+          break;
+      }
+      valueOfAssetInUSDC = await getTokenValueUsingUniswap(
+        tokenPriceAddress,
+        EEthereumAddresses.USDC,
+        tokenDecimals,
+        6,
       );
       farmInfo.depositedAmount = depositedAmount;
 
@@ -388,21 +463,17 @@ export const useMain = () => {
           EFiatId.USD,
           farm.chain,
         );*/
-      }
-
-      farmInfo.depositedAmountInUSD =
-        +farmInfo.depositedAmount * valueOfAssetInUSDC;
-
-      farmInfo.poolShare =
-        farmInfo.depositedAmount > 0
-          ? toExactFixed(
-              (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
-              2,
-            )
-          : 0;
     }
 
-    return farmInfo;
+    return {
+      depositedAmount: depositedAmount,
+      depositedAmountInUSD: +depositedAmount * valueOfAssetInUSDC,
+      depositedAmountInLP: undefined,
+      poolShare:
+        +depositedAmount > 0
+          ? toExactFixed((+depositedAmount / +farm.totalAssetSupply) * 100, 2)
+          : '0',
+    };
   };
 
   const fetchBoostFarmInfo = async farm => {
@@ -426,29 +497,37 @@ export const useMain = () => {
         +(await getTotalAssets(farm.farmAddress, farm.chain)) *
         valueOf1LPinUSDC,
       supportedTokens: farm.supportedTokens,
-      valueOf1LPinUSDC: valueOf1LPinUSDC,
     };
-    if (walletAccountAtom) {
-      const depositedAmountInLP = await getBalanceOf(
-        farm.farmAddress,
-        undefined,
-        farm.chain,
-      );
-      farmInfo.depositedAmountInLP = depositedAmountInLP;
-      // Let's use the depositedAmount to store the deposited amount in USD(C)
-      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
-      farmInfo.depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
-
-      farmInfo.poolShare =
-        farmInfo.depositedAmount > 0
-          ? toExactFixed(
-              (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
-              2,
-            )
-          : 0;
-    }
 
     return farmInfo;
+  };
+
+  const fetchConnectedBoostFarmInfo = async farm => {
+    const depositedAmountInLP = await getBalanceOf(
+      farm.farmAddress,
+      undefined,
+      farm.chain,
+    );
+
+    const valueOf1LPinUSDC = await getTokenValueUsingPriceFeedRouter(
+      farm.lPTokenAddress,
+      EFiatId.USD,
+      farm.chain,
+    );
+
+    const depositedAmount = +depositedAmountInLP * valueOf1LPinUSDC;
+
+    return {
+      // Let's use the depositedAmount to store the deposited amount in USD(C)
+      // The amount deposited is (the amount deposited in LP) * (LP to USDC conversion rate)
+      depositedAmount: depositedAmount,
+      depositedAmountInUSD: undefined,
+      depositedAmountInLP: depositedAmountInLP,
+      poolShare:
+        +depositedAmount > 0
+          ? toExactFixed((+depositedAmount / +farm.totalAssetSupply) * 100, 2)
+          : '0',
+    };
   };
 
   const fetchOptimisedFarmInfo = async farm => {
@@ -464,37 +543,39 @@ export const useMain = () => {
       ),
       supportedTokens: farm.supportedTokens,
     };
-    if (walletAccountAtom) {
-      const depositedAmount = await getUserOptimisedFarmDepositedAmount(
-        farm.farmAddress,
-        farm.underlyingTokenAddress,
-        farm.chain,
-      );
-      farmInfo.depositedAmount = depositedAmount;
-      farmInfo.depositedAmountInUSD = depositedAmount;
-
-      // if the underlying is eth get the usdc value aswell to show
-      if (farm.underlyingTokenAddress == EOptimismAddresses.WETH) {
-        const valueOfETHinUSDC = await getTokenValueUsingUniswap(
-          EEthereumAddresses.WETH,
-          EEthereumAddresses.USDC,
-          18,
-          6,
-        );
-
-        farmInfo.depositedAmountInUSD = depositedAmount * valueOfETHinUSDC;
-      }
-
-      farmInfo.poolShare =
-        farmInfo.depositedAmount > 0
-          ? toExactFixed(
-              (+farmInfo.depositedAmount / +farmInfo.totalAssetSupply) * 100,
-              2,
-            )
-          : 0;
-    }
 
     return farmInfo;
+  };
+
+  const fetchConnectedOptimisedFarmInfo = async farm => {
+    const depositedAmount = await getUserOptimisedFarmDepositedAmount(
+      farm.farmAddress,
+      farm.underlyingTokenAddress,
+      farm.chain,
+    );
+    let depositedAmountInUSD = depositedAmount;
+
+    // if the underlying is eth get the usdc value aswell to show
+    if (farm.underlyingTokenAddress == EOptimismAddresses.WETH) {
+      const valueOfETHinUSDC = await getTokenValueUsingUniswap(
+        EEthereumAddresses.WETH,
+        EEthereumAddresses.USDC,
+        18,
+        6,
+      );
+
+      depositedAmountInUSD = depositedAmount * valueOfETHinUSDC;
+    }
+
+    return {
+      depositedAmount: depositedAmount,
+      depositedAmountInUSD: depositedAmountInUSD,
+      depositedAmountInLP: undefined,
+      poolShare:
+        +depositedAmount > 0
+          ? toExactFixed((+depositedAmount / +farm.totalAssetSupply) * 100, 2)
+          : '0',
+    };
   };
 
   const sortBy = (field, isAsc) => {
@@ -533,7 +614,7 @@ export const useMain = () => {
     let filteredFarms;
 
     filteredFarms =
-      viewType == 'View my farms only'
+      viewType == 'View my farms only' && !isConnectedLoading && !isLoading
         ? availableFarms.filter(
             farm => farm != undefined && +farm.depositedAmount > 0.00001,
           )
@@ -693,6 +774,7 @@ export const useMain = () => {
   return {
     isLoading,
     isLoadingTotalAmountInUSD,
+    isConnectedLoading,
     isLoadingRewards,
     error,
     filteredFarms,

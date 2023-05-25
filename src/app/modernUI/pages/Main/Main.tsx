@@ -16,6 +16,7 @@ export const Main = () => {
     filteredBoostFarms,
     filteredOptimisedFarms,
     isLoading,
+    isConnectedLoading,
     isLoadingTotalAmountInUSD,
     isLoadingRewards,
     viewType,
@@ -73,7 +74,7 @@ export const Main = () => {
             >
               <Box justify="center" fill direction="column">
                 <HeadingText
-                  isLoading={isLoading}
+                  isLoading={isConnectedLoading || isLoading}
                   numberOfAssets={assetsInfo?.numberOfAssets}
                   numberOfChainsWithAssets={
                     assetsInfo?.numberOfChainsWithAssets
@@ -116,13 +117,17 @@ export const Main = () => {
                         readMoreDescription="placeholder"
                         readMoreStatus={seeAllOptimisedFarmsDescription}
                         onReadMore={() =>
-                          window.open("https://medium.com/@alastairpreacher/new-optimism-top-vaults-for-optimised-beefy-yearn-yield-farming-f0c3179449b8", "_blank")
+                          window.open(
+                            'https://medium.com/@alastairpreacher/new-optimism-top-vaults-for-optimised-beefy-yearn-yield-farming-f0c3179449b8',
+                            '_blank',
+                          )
                         }
                         farms={filteredOptimisedFarms}
                         viewType={viewType}
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />
@@ -149,6 +154,7 @@ export const Main = () => {
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/26j9j8se4vrfu2wh"
                       />
@@ -171,6 +177,7 @@ export const Main = () => {
                         sortBy={sortBy}
                         sortDirectionIsAsc={sortDirectionIsAsc}
                         isLoading={isLoading}
+                        isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
                       />
@@ -183,7 +190,7 @@ export const Main = () => {
                           align="end"
                           height="75px"
                         >
-                          {isLoadingRewards ? (
+                          {isLoadingTotalAmountInUSD ? (
                             <Skeleton
                               height="23px"
                               width="230px"
