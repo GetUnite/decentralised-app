@@ -102,7 +102,7 @@ export const withdrawFromOptimised = async (
       abi,
       farmAddress,
       'withdraw(address,uint256)',
-      [tokenAddress, percentage],
+      [tokenAddress == EOptimismAddresses.ETH ? ethers.constants.AddressZero : tokenAddress, percentage],
       chain,
       useBiconomy,
     );

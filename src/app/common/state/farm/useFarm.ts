@@ -28,7 +28,6 @@ import { useNotification } from '../useNotification';
 import { useProcessingSteps } from '../useProcessingSteps';
 import { possibleDepositSteps } from './useFarmDeposit';
 import { possibleWithdrawSteps } from './useFarmWithdrawal';
-import { get } from 'http';
 
 export const farmOptions: Array<TFarm> = [
   /*{
@@ -323,7 +322,7 @@ export const useFarm = ({ id }) => {
   );
   const [selectedFarmInfo, setSelectedFarmInfo] = useState<TFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
-    useState<TSupportedToken>();
+    useState<TSupportedToken>(selectedFarm.current.supportedTokens[0]);
   // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     balance: 0,
@@ -352,54 +351,32 @@ export const useFarm = ({ id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // biconomy
-  const [useBiconomy, setUseBiconomy] = useState(false);
+  const [useBiconomy, setUseBiconomy] = useState(
+    isSafeAppAtom || EChain.POLYGON != selectedFarm.current?.chain
+      ? false
+      : true
+  );
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarmInfo) {
-      setWantedChainAtom(selectedFarmInfo.chain);
+    if (!selectedFarm.current) {
+      navigate('/');
+      return;
     }
-  }, [walletAccountAtom, selectedFarmInfo]);
 
-  useEffect(() => {
-    const selectFarm = async id => {
-      try {
-        let farm = farmOptions.find(availableFarm => availableFarm.id == id);
-        if (!farm) {
-          navigate('/');
-          return;
-        }
+    if (walletAccountAtom) {
+      setWantedChainAtom(selectedFarm.current.chain);
 
-        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+      updateFarmInfo();
 
-        heapTrack('farm', { pool: 'Ib', currency: farm.type });
-        setSelectedFarmInfo(farm);
-        setSelectedsupportedToken(farm.supportedTokens[0]);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setIsLoading(false);
-    };
-
-    selectFarm(id);
+      heapTrack('farm', { pool: 'Ib', currency: selectedFarm.current.type });
+    }
   }, [walletAccountAtom]);
-
-  useEffect(() => {
-    if (selectedFarmInfo) {
-      setUseBiconomy(
-        isSafeAppAtom || EChain.POLYGON != selectedFarmInfo?.chain
-          ? false
-          : true,
-      );
-      fetchIfUserHasWithdrawalRequest();
-    }
-  }, [selectedFarmInfo]);
 
   const fetchIfUserHasWithdrawalRequest = async () => {
     try {
       const isUserWaiting = await getIfUserHasWithdrawalRequest(
-        selectedFarmInfo.farmAddress,
-        selectedFarmInfo.chain,
+        selectedFarm.current.farmAddress,
+        selectedFarm.current.chain,
       );
 
       if (isUserWaiting) {
@@ -419,20 +396,18 @@ export const useFarm = ({ id }) => {
   const updateFarmInfo = async () => {
     setIsLoading(true);
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.find(
-          st => st?.address == selectedSupportedToken?.address,
-        ),
-      );
+      const farm = await getUpdatedFarmInfo(selectedFarm.current);
+
       setSelectedFarmInfo(farm);
+
+      fetchIfUserHasWithdrawalRequest();
     } catch (error) {
       console.log(error);
     }
     setIsLoading(false);
   };
 
-  const getUpdatedFarmInfo = async (farm = selectedFarmInfo) => {
+  const getUpdatedFarmInfo = async farm => {
     try {
       let farmInfo;
 
@@ -445,24 +420,20 @@ export const useFarm = ({ id }) => {
         depositedAmount: 0,
       };
       if (walletAccountAtom) {
-        farmInfo = { ...farmInfo, ...(await getDepositedAmount(farm)) };
+        const depositedAmount = roundDown(
+          await getBalance(farm.farmAddress, undefined, farm.chain),
+          6,
+        );
+
+        farmInfo.depositedAmount = depositedAmount;
+
+        farmInfo.depositDividedAmount = depositDivided(depositedAmount);
       }
 
       return { ...farm, ...farmInfo };
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const getDepositedAmount = async (farm = selectedFarmInfo) => {
-    const depositedAmount = roundDown(
-      await getBalance(farm.farmAddress, undefined, farm.chain),
-      6,
-    );
-    return {
-      depositedAmount: depositedAmount,
-      depositDividedAmount: depositDivided(depositedAmount),
-    };
   };
 
   const selectSupportedToken = supportedToken => {

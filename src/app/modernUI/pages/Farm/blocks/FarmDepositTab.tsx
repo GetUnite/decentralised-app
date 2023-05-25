@@ -34,7 +34,7 @@ export const FarmDepositTab = ({
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
   } = useFarmDeposit({
-    selectedFarmInfo,
+    selectedFarm,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
     steps,

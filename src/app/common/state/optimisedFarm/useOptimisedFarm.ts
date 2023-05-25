@@ -265,13 +265,9 @@ export const useOptimisedFarm = ({ id }) => {
   const selectedFarm = useRef<TOptimisedFarm>(
     optimisedFarmOptions.find(availableFarm => availableFarm.id == id),
   );
-  if (!selectedFarm) {
-    navigate('/');
-    return;
-  }
   const [selectedFarmInfo, setSelectedFarmInfo] = useState<TOptimisedFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
-    useState<TSupportedToken>();
+    useState<TSupportedToken>(selectedFarm.current.supportedTokens[0]);
   // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     balance: 0,
@@ -303,46 +299,25 @@ export const useOptimisedFarm = ({ id }) => {
   const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarmInfo) {
-      setWantedChainAtom(selectedFarmInfo.chain);
+    if (!selectedFarm.current) {
+      navigate('/');
+      return;
     }
-  }, [walletAccountAtom, selectedFarmInfo]);
 
-  useEffect(() => {
-    const selectFarm = async id => {
-      try {
-        let farm = optimisedFarmOptions.find(
-          availableFarm => availableFarm.id == id,
-        );
-        if (!farm) {
-          navigate('/');
-          return;
-        }
+    if (walletAccountAtom) {
+      setWantedChainAtom(selectedFarm.current.chain);
 
-        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+      updateFarmInfo();
 
-        heapTrack('farm', { pool: 'Ib', currency: farm.type });
-        setSelectedFarmInfo(farm);
-        setSelectedsupportedToken(farm.supportedTokens[0]);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setIsLoading(false);
-    };
-
-    selectFarm(id);
-  }, []);
+      heapTrack('farm', { pool: 'Op', currency: selectedFarm.current.type });
+    }
+  }, [walletAccountAtom]);
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.find(
-          st => st?.address == selectedSupportedToken?.address,
-        ),
-      );
+      const farm = await getUpdatedFarmInfo(selectedFarm.current);
+
       setSelectedFarmInfo(farm);
     } catch (error) {
       console.log(error);
@@ -350,7 +325,7 @@ export const useOptimisedFarm = ({ id }) => {
     setIsLoading(false);
   };
 
-  const getUpdatedFarmInfo = async (farm = selectedFarmInfo) => {
+  const getUpdatedFarmInfo = async farm => {
     try {
       let farmInfo;
 

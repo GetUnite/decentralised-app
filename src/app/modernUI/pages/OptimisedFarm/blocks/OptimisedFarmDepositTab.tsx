@@ -34,7 +34,7 @@ export const OptimisedFarmDepositTab = ({
     handleDepositValueChange,
     isFetchingSupportedTokenInfo,
   } = useOptimisedFarmDeposit({
-    selectedFarmInfo,
+    selectedFarm,
     selectedSupportedToken,
     selectedSupportedTokenInfo,
     steps,

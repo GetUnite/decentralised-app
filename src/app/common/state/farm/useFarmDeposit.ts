@@ -20,7 +20,7 @@ export const possibleDepositSteps: TPossibleStep[] = [
 ];
 
 export const useFarmDeposit = ({
-  selectedFarmInfo,
+  selectedFarm,
   selectedSupportedToken,
   selectedSupportedTokenInfo,
   steps,
@@ -36,14 +36,14 @@ export const useFarmDeposit = ({
     useState(true);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken) {
+    if (selectedSupportedToken) {
       updateBalanceAndAllowance();
       updateSteps();
     }
   }, [selectedSupportedToken]);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken && depositValue != '') {
+    if (selectedSupportedToken && depositValue != '') {
       updateSteps();
     }
   }, [depositValue]);
@@ -53,14 +53,14 @@ export const useFarmDeposit = ({
 
     const allowance = await getAllowance(
       selectedSupportedToken.address,
-      selectedFarmInfo.farmAddress,
-      selectedFarmInfo.chain,
+      selectedFarm.current.farmAddress,
+      selectedFarm.current.chain,
     );
 
     const balance = await getBalanceOf(
       selectedSupportedToken.address,
       selectedSupportedToken.decimals,
-      selectedFarmInfo.chain,
+      selectedFarm.current.chain,
     );
 
     selectedSupportedTokenInfo.current = {

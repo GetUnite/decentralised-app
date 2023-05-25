@@ -26,7 +26,7 @@ export const possibleDepositSteps: TPossibleStep[] = [
 ];
 
 export const useOptimisedFarmDeposit = ({
-  selectedFarmInfo,
+  selectedFarm,
   selectedSupportedToken,
   selectedSupportedTokenInfo,
   steps,
@@ -42,14 +42,14 @@ export const useOptimisedFarmDeposit = ({
     useState(true);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken) {
+    if (selectedSupportedToken) {
       updateBalanceAndAllowance();
       updateSteps();
     }
   }, [selectedSupportedToken]);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken && depositValue != '') {
+    if (selectedSupportedToken && depositValue != '') {
       updateSteps();
     }
   }, [depositValue]);
@@ -57,19 +57,21 @@ export const useOptimisedFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
+    console.log(selectedSupportedToken);
+
     let allowance;
     let balance;
     if (selectedSupportedToken.address != EOptimismAddresses.ETH) {
       allowance = await getAllowance(
         selectedSupportedToken.address,
-        selectedFarmInfo.farmAddress,
-        selectedFarmInfo.chain,
+        selectedFarm.current.farmAddress,
+        selectedFarm.current.chain,
       );
 
       balance = await getBalanceOf(
         selectedSupportedToken.address,
         selectedSupportedToken.decimals,
-        selectedFarmInfo.chain,
+        selectedFarm.current.chain,
       );
     } else {
       allowance = maximumUint256Value;

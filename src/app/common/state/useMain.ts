@@ -256,11 +256,14 @@ export const useMain = () => {
           await Promise.all(
             uniqueSupportedTokensWithBalance.map(
               async supportedTokenWithBalance => {
-                const balance = await getBalanceOf(
-                  supportedTokenWithBalance.address,
-                  supportedTokenWithBalance.decimals,
-                  supportedTokenWithBalance.chain,
-                );
+                const balance =
+                  supportedTokenWithBalance.address == EOptimismAddresses.ETH
+                    ? await signerGetBalance(supportedTokenWithBalance.decimals)
+                    : await getBalanceOf(
+                        supportedTokenWithBalance.address,
+                        supportedTokenWithBalance.decimals,
+                        supportedTokenWithBalance.chain,
+                      );
                 if (+balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
@@ -418,47 +421,8 @@ export const useMain = () => {
         tokenDecimals,
         6,
       );
-      farmInfo.depositedAmount = depositedAmount;
-
-      let valueOfAssetInUSDC;
-      // if the underlying is usdc no need for price
-      if (
-        farm.underlyingTokenAddress == EPolygonAddresses.USDC ||
-        farm.underlyingTokenAddress == EEthereumAddresses.USDC ||
-        farm.underlyingTokenAddress == EOptimismAddresses.USDC
-      ) {
-        valueOfAssetInUSDC = 1;
-      } else {
-        let tokenPriceAddress;
-        let tokenDecimals = 18;
-        // for polygon and OP underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
-        switch (farm.underlyingTokenAddress) {
-          case EPolygonAddresses.WBTC:
-          case EOptimismAddresses.WBTC:
-            tokenPriceAddress = EEthereumAddresses.WBTC;
-            tokenDecimals = 8;
-            break;
-          case EPolygonAddresses.WETH:
-          case EOptimismAddresses.WETH:
-            tokenPriceAddress = EEthereumAddresses.WETH;
-            break;
-          case EPolygonAddresses.EURT:
-            tokenPriceAddress = EEthereumAddresses.EURT;
-            tokenDecimals = 6;
-            break;
-          default:
-            tokenPriceAddress = farm.underlyingTokenAddress;
-            break;
-        }
-        valueOfAssetInUSDC = await getTokenValueUsingUniswap(
-          tokenPriceAddress,
-          EEthereumAddresses.USDC,
-          tokenDecimals,
-          6,
-        );
-
-        //this will work if every price route is setuped for all chains
-        /*valueOfAssetInUSDC = await getTokenValueUsingPriceFeedRouter(
+      //this will work if every price route is setuped for all chains
+      /*valueOfAssetInUSDC = await getTokenValueUsingPriceFeedRouter(
           farm.underlyingTokenAddress,
           EFiatId.USD,
           farm.chain,
