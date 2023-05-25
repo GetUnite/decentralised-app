@@ -1,4 +1,5 @@
 import cvx from 'app/modernUI/images/cvx.svg';
+import eth from 'app/modernUI/images/eth.svg';
 import dai from 'app/modernUI/images/dai.svg';
 import eurs from 'app/modernUI/images/eurs.png';
 import eurt from 'app/modernUI/images/eurt.svg';
@@ -22,6 +23,10 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
   let src;
 
   switch (label) {
+    case 'ETH':
+      src = eth;
+      break;
+
     case 'USDC':
     case 'tUSDC':
       src = usdc;
@@ -95,7 +100,7 @@ export const TokenIcon = ({ label, size = 24, ...rest }) => {
       break;
 
     case 'Your ETH farm':
-    case 'ETH':
+    case 'ibETH':
       src = iballuoeth;
       break;
 

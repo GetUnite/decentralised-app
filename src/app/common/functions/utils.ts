@@ -165,3 +165,7 @@ export const fromLocaleString = string => {
     .replace(decimalSeparator, '.');
   return +formattedString;
 };
+
+export const toHexString = number => {
+  return '0x' + number.toString(16);
+};

@@ -77,9 +77,11 @@ export const FarmCard = ({
 
   const [walletAccountAtom] = useRecoilState(walletAccount);
 
+  const tvlSign = isOptimised ? '$' : sign;
   const tvl = isLoading
     ? 'Loading...'
-    : sign + toExactFixed(totalAssetSupply, sign == '$' || sign == '€' ? 2 : 4);
+    : tvlSign +
+      toExactFixed(totalAssetSupply, tvlSign == '$' || tvlSign == '€' ? 2 : 4);
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
@@ -105,7 +107,14 @@ export const FarmCard = ({
           {isSmall(size) ? (
             <Box
               onClick={() => {
-                if (!disabled && !!walletAccountAtom) navigate('/farm/' + id);
+                if (!disabled && !!walletAccountAtom)
+                  navigate(
+                    (isBoost
+                      ? '/boostfarm/'
+                      : isOptimised
+                      ? '/optimisedfarm/'
+                      : '/farm/') + id,
+                  );
                 else setNotification('Connect your wallet', 'error');
               }}
               style={{

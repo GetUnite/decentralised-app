@@ -18,7 +18,7 @@ export const AutoInvest = () => {
     isStoppingStream,
     handleStopStream,
     canStartStreams,
-    updateAutoInvestInfo
+    updateAutoInvestInfo,
   } = useAutoInvest();
 
   const { isLightMode } = useMode();
@@ -140,10 +140,14 @@ export const AutoInvest = () => {
                                       <StreamCard
                                         key={index}
                                         from={stream.from}
-                                        sourceDepositedAmount={stream.sourceDepositedAmount}
+                                        fromIcon={stream.fromIcon}
+                                        sourceDepositedAmount={
+                                          stream.sourceDepositedAmount
+                                        }
                                         fromAddress={stream.fromAddress}
                                         fromStAddress={stream.fromStAddress}
                                         to={stream.to}
+                                        toIcon={stream.toIcon}
                                         toAddress={stream.toAddress}
                                         toStAddress={stream.toStAddress}
                                         tvs={stream.tvs}
@@ -160,7 +164,9 @@ export const AutoInvest = () => {
                                         sign={stream.sign}
                                         handleStopStream={handleStopStream}
                                         isStoppingStream={isStoppingStream}
-                                        updateAutoInvestInfo={updateAutoInvestInfo}
+                                        updateAutoInvestInfo={
+                                          updateAutoInvestInfo
+                                        }
                                       />
                                     );
                                   })}

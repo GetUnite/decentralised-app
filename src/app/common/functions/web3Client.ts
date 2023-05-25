@@ -17,9 +17,15 @@ import logo from 'app/modernUI/images/logo.svg';
 import { ethers } from 'ethers';
 import { EChain, EChainId } from '../constants/chains';
 import { heapTrack } from './heapClient';
-import { fromDecimals, maximumUint256Value, toDecimals } from './utils';
+import {
+  fromDecimals,
+  maximumUint256Value,
+  toDecimals,
+  toHexString,
+} from './utils';
 import { getUniswapPoolAddress } from './uniswap';
 import { EFiatId } from '../constants/utils';
+import { wantedChain } from '../state/atoms';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
@@ -219,7 +225,7 @@ export const connectToWallet = async (connectOptions?) => {
 
 export const getCurrentWalletAddress = () => {
   // Use this line to force "get" methods for a specific wallet address
-  // return '0xfb7A51c6f6A5116Ac748C1aDF4D4682c3D50889E';
+   return '0xec3e9c6769ff576da3889071c639a0e488815926';
   return walletAddress;
 };
 
@@ -354,6 +360,7 @@ export const sendTransaction = async (
   params = [],
   chain,
   useBiconomy = false,
+  txValue = 0,
 ) => {
   let provider;
 
@@ -386,9 +393,13 @@ export const sendTransaction = async (
     let finalTx;
     if (useBiconomy) {
       // Adding 5.000.000 as the internal gas limit because biconomy is awkward that way
-      finalTx = { ...rawTx, gasLimit: 5000000 };
+      finalTx = {
+        ...rawTx,
+        gasLimit: 5000000,
+        value: toHexString(txValue),
+      };
     } else {
-      finalTx = rawTx;
+      finalTx = { ...rawTx, value: toHexString(txValue) };
     }
 
     let transactionHash = await provider.send('eth_sendTransaction', [finalTx]);
@@ -1159,6 +1170,23 @@ export const getBalance = async (
     [getCurrentWalletAddress()],
     chain,
   );
+
+  return fromDecimals(balance, tokenDecimals);
+};
+
+export const signerGetBalance = async (
+  tokenDecimals = 18,
+  wantedChainId
+) => {
+  const currentChainId = await getCurrentChainId();
+  // if the chain is not what we expect, return 0
+  if (currentChainId != wantedChainId) {
+    return 0;
+  }
+
+  const signer = await getProvider().getSigner();
+
+  const balance = (await signer.getBalance()).toString();
 
   return fromDecimals(balance, tokenDecimals);
 };

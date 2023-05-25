@@ -1,7 +1,17 @@
-import { getAllowance, getBalanceOf } from 'app/common/functions/web3Client';
+import { EOptimismAddresses } from 'app/common/constants/addresses';
+import { maximumUint256Value } from 'app/common/functions/utils';
+import {
+  getAllowance,
+  getBalanceOf,
+  signerGetBalance,
+} from 'app/common/functions/web3Client';
 import { TPossibleStep } from 'app/common/types/global';
 import openVault from 'app/modernUI/animations/openVault.svg';
 import { useEffect, useState } from 'react';
+import { walletAccount } from '../atoms';
+import { useRecoilState } from 'recoil';
+import { EChainId } from 'app/common/constants/chains';
+import { isCorrectNetwork } from '../atoms';
 
 export const possibleDepositSteps: TPossibleStep[] = [
   {
@@ -20,7 +30,7 @@ export const possibleDepositSteps: TPossibleStep[] = [
 ];
 
 export const useOptimisedFarmDeposit = ({
-  selectedFarmInfo,
+  selectedFarm,
   selectedSupportedToken,
   selectedSupportedTokenInfo,
   steps,
@@ -28,6 +38,9 @@ export const useOptimisedFarmDeposit = ({
   depositValue,
   setDepositValue,
 }) => {
+  // atoms
+  const [isCorrectNetworkAtom] = useRecoilState(isCorrectNetwork);
+
   // inputs
   const [depositValueError, setDepositValueError] = useState<string>('');
 
@@ -36,14 +49,14 @@ export const useOptimisedFarmDeposit = ({
     useState(true);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken) {
+    if (selectedSupportedToken) {
       updateBalanceAndAllowance();
       updateSteps();
     }
-  }, [selectedSupportedToken]);
+  }, [selectedSupportedToken, isCorrectNetworkAtom]);
 
   useEffect(() => {
-    if (selectedFarmInfo && selectedSupportedToken && depositValue != '') {
+    if (selectedSupportedToken && depositValue != '') {
       updateSteps();
     }
   }, [depositValue]);
@@ -51,17 +64,27 @@ export const useOptimisedFarmDeposit = ({
   const updateBalanceAndAllowance = async () => {
     setIsFetchingSupportedTokenInfo(true);
 
-    const allowance = await getAllowance(
-      selectedSupportedToken.address,
-      selectedFarmInfo.farmAddress,
-      selectedFarmInfo.chain,
-    );
+    let allowance;
+    let balance;
+    if (selectedSupportedToken.address != EOptimismAddresses.ETH) {
+      allowance = await getAllowance(
+        selectedSupportedToken.address,
+        selectedFarm.current.farmAddress,
+        selectedFarm.current.chain,
+      );
 
-    const balance = await getBalanceOf(
-      selectedSupportedToken.address,
-      selectedSupportedToken.decimals,
-      selectedFarmInfo.chain,
-    );
+      balance = await getBalanceOf(
+        selectedSupportedToken.address,
+        selectedSupportedToken.decimals,
+        selectedFarm.current.chain,
+      );
+    } else {
+      allowance = maximumUint256Value;
+      balance = await signerGetBalance(
+        selectedSupportedToken.decimals,
+        EChainId.OP_MAINNET,
+      );
+    }
 
     selectedSupportedTokenInfo.current = {
       ...selectedSupportedTokenInfo.current,

@@ -19,9 +19,10 @@ import {
   withdrawFromOptimised,
 } from 'app/common/functions/optimisedFarm';
 import { approve } from 'app/common/functions/web3Client';
+import { EFiatId } from 'app/common/constants/utils';
 
 export const optimisedFarmOptions: Array<TOptimisedFarm> = [
-  {
+  /*{
     id: 0,
     farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSD,
     type: 'beefy',
@@ -93,18 +94,15 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Beefy Top Vault ETH',
     sign: 'Ξ',
-    icons: [
-      //'ETH',
-      'WETH',
-    ],
+    icons: ['ETH', 'WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
-      /*{
+      {
         label: 'ETH',
         address: EOptimismAddresses.ETH,
         decimals: 18,
         sign: 'Ξ',
-      },*/
+      },
       {
         label: 'WETH',
         address: EOptimismAddresses.WETH,
@@ -122,9 +120,15 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Beefy Top 3 Vault ETH',
     sign: 'Ξ',
-    icons: ['WETH'],
+    icons: ['ETH', 'WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
+      {
+        label: 'ETH',
+        address: EOptimismAddresses.ETH,
+        decimals: 18,
+        sign: 'Ξ',
+      },
       {
         label: 'WETH',
         address: EOptimismAddresses.WETH,
@@ -133,7 +137,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
       },
     ],
     isNewest: true,
-  },
+  },*/
   {
     id: 4,
     farmAddress: EOptimismAddresses.YEARNTOPVAULTUSD,
@@ -206,18 +210,15 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
     chain: EChain.OPTIMISM,
     name: 'Yearn Top Vault ETH',
     sign: 'Ξ',
-    icons: [
-      //'ETH',
-      'WETH',
-    ],
+    icons: ['ETH', 'WETH'],
     underlyingTokenAddress: EOptimismAddresses.WETH,
     supportedTokens: [
-      /*{
+      {
         label: 'ETH',
         address: EOptimismAddresses.ETH,
         decimals: 18,
         sign: 'Ξ',
-      },*/
+      },
       {
         label: 'WETH',
         address: EOptimismAddresses.WETH,
@@ -266,7 +267,7 @@ export const useOptimisedFarm = ({ id }) => {
   );
   const [selectedFarmInfo, setSelectedFarmInfo] = useState<TOptimisedFarm>();
   const [selectedSupportedToken, setSelectedsupportedToken] =
-    useState<TSupportedToken>();
+    useState<TSupportedToken>(selectedFarm.current.supportedTokens[0]);
   // selected supportedTokenInfo
   const selectedSupportedTokenInfo = useRef<any>({
     balance: 0,
@@ -298,46 +299,25 @@ export const useOptimisedFarm = ({ id }) => {
   const [useBiconomy, setUseBiconomy] = useState(false);
 
   useEffect(() => {
-    if (walletAccountAtom && selectedFarmInfo) {
-      setWantedChainAtom(selectedFarmInfo.chain);
+    if (!selectedFarm.current) {
+      navigate('/');
+      return;
     }
-  }, [walletAccountAtom, selectedFarmInfo]);
 
-  useEffect(() => {
-    const selectFarm = async id => {
-      try {
-        let farm = optimisedFarmOptions.find(
-          availableFarm => availableFarm.id == id,
-        );
-        if (!farm) {
-          navigate('/');
-          return;
-        }
+    if (walletAccountAtom) {
+      setWantedChainAtom(selectedFarm.current.chain);
 
-        farm = { ...farm, ...(await getUpdatedFarmInfo(farm)) };
+      updateFarmInfo();
 
-        heapTrack('farm', { pool: 'Ib', currency: farm.type });
-        setSelectedFarmInfo(farm);
-        setSelectedsupportedToken(farm.supportedTokens[0]);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setIsLoading(false);
-    };
-
-    selectFarm(id);
+      heapTrack('farm', { pool: 'Op', currency: selectedFarm.current.type });
+    }
   }, [walletAccountAtom]);
 
   const updateFarmInfo = async () => {
     setIsLoading(true);
     try {
-      const farm = await getUpdatedFarmInfo(selectedFarmInfo);
-      setSelectedsupportedToken(
-        farm.supportedTokens?.find(
-          st => st?.address == selectedSupportedToken?.address,
-        ),
-      );
+      const farm = await getUpdatedFarmInfo(selectedFarm.current);
+
       setSelectedFarmInfo(farm);
     } catch (error) {
       console.log(error);
@@ -345,18 +325,17 @@ export const useOptimisedFarm = ({ id }) => {
     setIsLoading(false);
   };
 
-  const getUpdatedFarmInfo = async (farm = selectedFarmInfo) => {
+  const getUpdatedFarmInfo = async farm => {
     try {
       let farmInfo;
 
       farmInfo = {
-        interest: await getOptimisedFarmInterest(
-          farm.farmAddress,
-          farm.type,
-        ),
+        interest: await getOptimisedFarmInterest(farm.farmAddress, farm.type),
         totalAssetSupply: await getOptimisedTotalAssetSupply(
           farm.farmAddress,
-          farm.underlyingTokenAddress,
+          farm.underlyingTokenAddress == EOptimismAddresses.USDC
+            ? EFiatId.USD
+            : EFiatId.ETH,
           farm.chain,
         ),
         depositedAmount: 0,

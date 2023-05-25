@@ -27,6 +27,7 @@ const streamOptions: TStreamOption[] = [
     fromLabel: 'USD',
     fromSign: '$',
     toLabel: 'ETH',
+    toIcon: 'ibETH',
     fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
     fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
     toIbAlluoAddress: EPolygonAddresses.IBALLUOETH,
@@ -63,7 +64,8 @@ const streamOptions: TStreamOption[] = [
   // from ETH options
   {
     // WETH to USD
-    fromLabel: 'BTC',
+    fromLabel: 'ETH',
+    fromIcon: 'ibETH',
     fromSign: 'Ξ',
     toLabel: 'USD',
     fromAddress: EPolygonAddresses.WETH,
@@ -258,6 +260,7 @@ export const useAutoInvest = () => {
           endDate.setSeconds(endDateTimestamp);
           streamsArray.push({
             from: element.fromLabel,
+            fromIcon: element.fromIcon,
             // deposited amount to validate stream edition
             sourceDepositedAmount: await getBalance(
               element.fromIbAlluoAddress,
@@ -267,6 +270,7 @@ export const useAutoInvest = () => {
             fromAddress: element.fromIbAlluoAddress,
             fromStAddress: element.fromStIbAlluoAddress,
             to: element.toLabel,
+            toIcon: element.toIcon,
             toAddress: element.ricochetMarketAddress,
             toStAddress: element.toStIbAlluoAddress,
             flowPerSecond: flowPerSecond,

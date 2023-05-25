@@ -8,6 +8,7 @@ import {
   getTokenValueUsingUniswap,
   getTotalAssets,
   getTotalAssetSupply,
+  signerGetBalance,
 } from 'app/common/functions/web3Client';
 import { isSafeApp, walletAccount, wantedChain } from 'app/common/state/atoms';
 import { boostFarmOptions } from 'app/common/state/boostFarm';
@@ -22,7 +23,7 @@ import {
   EOptimismAddresses,
   EPolygonAddresses,
 } from '../constants/addresses';
-import { EChain } from '../constants/chains';
+import { EChain, EChainId } from '../constants/chains';
 import {
   claimAllBoostFarmRewards,
   claimBoostFarmLPRewards,
@@ -255,11 +256,17 @@ export const useMain = () => {
           await Promise.all(
             uniqueSupportedTokensWithBalance.map(
               async supportedTokenWithBalance => {
-                const balance = await getBalanceOf(
-                  supportedTokenWithBalance.address,
-                  supportedTokenWithBalance.decimals,
-                  supportedTokenWithBalance.chain,
-                );
+                const balance =
+                  supportedTokenWithBalance.address == EOptimismAddresses.ETH
+                    ? await signerGetBalance(
+                        supportedTokenWithBalance.decimals,
+                        EChainId.OP_MAINNET // only optimism uses native for now 
+                      )
+                    : await getBalanceOf(
+                        supportedTokenWithBalance.address,
+                        supportedTokenWithBalance.decimals,
+                        supportedTokenWithBalance.chain,
+                      );
                 if (+balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
@@ -417,9 +424,8 @@ export const useMain = () => {
         tokenDecimals,
         6,
       );
-      /*
-        this will work if every price route is setuped for all chains
-        valueOfAssetInUSDC = await getTokenValueUsingPriceFeedRouter(
+      //this will work if every price route is setuped for all chains
+      /*valueOfAssetInUSDC = await getTokenValueUsingPriceFeedRouter(
           farm.underlyingTokenAddress,
           EFiatId.USD,
           farm.chain,
@@ -498,7 +504,7 @@ export const useMain = () => {
       interest: await getOptimisedFarmInterest(farm.farmAddress, farm.type),
       totalAssetSupply: await getOptimisedTotalAssetSupply(
         farm.farmAddress,
-        farm.underlyingTokenAddress,
+        EFiatId.USD,
         farm.chain,
       ),
       supportedTokens: farm.supportedTokens,

@@ -40,7 +40,7 @@ export const TokenSelector = ({
               align="center"
               margin={{ right: '16px' }}
             >
-              <TokenIcon label={selectedToken?.label} />
+              <TokenIcon label={selectedToken?.icon ? selectedToken?.icon : selectedToken?.label} />
               {tokenOptions.length > 1 && (
                 <Down size="small" color={textColor} />
               )}
@@ -77,7 +77,7 @@ export const TokenSelector = ({
                       gap="6px"
                       pad={{ horizontal: '12px', vertical: '4px' }}
                     >
-                      <TokenIcon label={tokenOption?.label} />
+                      <TokenIcon label={tokenOption?.icon ? tokenOption?.icon : tokenOption?.label} />
                       <Text size="16px">{tokenOption?.label}</Text>
                     </Box>
                   </Button>
