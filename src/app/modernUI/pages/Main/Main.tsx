@@ -108,7 +108,6 @@ export const Main = () => {
                       possibleViewTypes={possibleViewTypes}
                       viewType={viewType}
                       setViewType={setViewType}
-                      isLoading={isLoading}
                     />
                     <Box gap="60px">
                       <FarmsBlock

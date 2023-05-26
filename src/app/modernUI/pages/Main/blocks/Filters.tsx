@@ -26,7 +26,6 @@ export const Filters = ({
   possibleViewTypes,
   setViewType,
   viewType,
-  isLoading,
   ...rest
 }) => {
   const { isLightMode } = useMode();
@@ -611,7 +610,7 @@ export const Filters = ({
               </Filter>
             </Box>
           </Box>
-          {walletAccountAtom && !isSmall(size) && !isLoading && (
+          {walletAccountAtom && !isSmall(size) && (
             <Box direction="row" gap="9px" align="center">
               <Text size="14px">View my farms only</Text>
               <Switch
