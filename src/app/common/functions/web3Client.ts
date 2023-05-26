@@ -28,7 +28,7 @@ import { EFiatId } from '../constants/utils';
 
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
-const ethereumMainnetProviderUrl = 'https://eth.llamarpc.com/';
+const ethereumMainnetProviderUrl = 'https://eth-mainnet.g.alchemy.com/v2/AfSYOkHGqZ1rmhZ-_8XphSD_rB7Spaih';
 const ethereumProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? ethereumMainnetProviderUrl
