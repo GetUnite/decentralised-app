@@ -783,7 +783,6 @@ const ethersJsonProviderPromise = async providerUrl => {
       await provider.getNetwork();
       return provider;
     } catch (error) {
-      console.error('Error running method');
       return Promise.reject(error);
     }
 };
