@@ -539,7 +539,7 @@ export const useMain = () => {
       depositedAmountInLP: undefined,
       poolShare:
         +depositedAmount > 0
-          ? toExactFixed((+depositedAmount / +farm.totalAssetSupply) * 100, 2)
+          ? toExactFixed((depositedAmountInUSD / +farm.totalAssetSupply) * 100, 2)
           : '0',
     };
   };
