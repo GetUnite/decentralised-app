@@ -26,13 +26,16 @@ import {
 import { getUniswapPoolAddress } from './uniswap';
 import { EFiatId } from '../constants/utils';
 
+// Ethereum rpcs
 const ethereumTestnetProviderUrl =
   'https://rpc.tenderly.co/fork/6e7b39bd-7219-4b05-8f65-8ab837da4f11';
-const ethereumMainnetProviderUrl = 'https://eth-mainnet.g.alchemy.com/v2/AfSYOkHGqZ1rmhZ-_8XphSD_rB7Spaih';
+const ethereumMainnetProviderUrl = 'https://eth.llamarpc.com/';
 const ethereumProviderUrl =
   process.env.REACT_APP_NET === 'mainnet'
     ? ethereumMainnetProviderUrl
     : ethereumTestnetProviderUrl;
+const EEthereumBackupProviderUrl =
+  'https://eth-mainnet.g.alchemy.com/v2/AfSYOkHGqZ1rmhZ-_8XphSD_rB7Spaih'; // backup for when main one fails;
 
 const polygonTestnetProviderUrl =
   'https://polygon-mumbai.g.alchemy.com/v2/AyoeA90j3ZUTAePwtDKNWP24P7F67LzM';
@@ -366,7 +369,7 @@ export const sendTransaction = async (
   try {
     // uses tenderly on ethereum
     if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
-      provider = getReadOnlyProvider(chain);
+      provider = await getReadOnlyProvider(chain);
     } else {
       if (useBiconomy) {
         const biconomy = await startBiconomy(chain, walletProvider);
@@ -432,7 +435,7 @@ export const callStatic = async (
   try {
     let provider;
     if (process.env.REACT_APP_NET === 'testnet' && chain == EChain.ETHEREUM) {
-      provider = getReadOnlyProvider(chain);
+      provider = await getReadOnlyProvider(chain);
     } else {
       provider = walletProvider;
     }
@@ -774,14 +777,49 @@ export const approve = async (
   return tx;
 };
 
-export const getReadOnlyProvider = chain => {
-  const providerUrl =
-    chain === EChain.ETHEREUM
-      ? ethereumProviderUrl
-      : chain === EChain.POLYGON
-      ? polygonProviderUrl
-      : optimisimProviderUrl;
-  return new ethers.providers.JsonRpcProvider(providerUrl, 'any');
+const ethersJsonProviderPromise = async providerUrl => {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(providerUrl, 'any');
+      await provider.getNetwork();
+      return provider;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+};
+
+export const getReadOnlyProvider = async chain => {
+  let mainProviderUrl;
+  let backupProviderUrl;
+
+  switch (chain) {
+    case EChain.ETHEREUM:
+      mainProviderUrl = ethereumProviderUrl;
+      backupProviderUrl = EEthereumBackupProviderUrl;
+      break;
+
+    case EChain.POLYGON:
+      mainProviderUrl = polygonProviderUrl;
+      break;
+
+    case EChain.OPTIMISM:
+      mainProviderUrl = optimisimProviderUrl;
+      break;
+    default:
+      break;
+  }
+
+  const promiseArray = [];
+  const mainRpcPromise = ethersJsonProviderPromise(mainProviderUrl);
+  promiseArray.push(mainRpcPromise);
+
+  if (backupProviderUrl) {
+    const backupRpcPromise = ethersJsonProviderPromise(backupProviderUrl);
+    promiseArray.push(backupRpcPromise);
+  }
+
+  const readOnlyProvider = await Promise.any(promiseArray);
+
+  return readOnlyProvider;
 };
 
 export const callContract = async (
@@ -791,7 +829,7 @@ export const callContract = async (
   params,
   chain,
 ) => {
-  const readOnlyProvider = getReadOnlyProvider(chain);
+  const readOnlyProvider = await getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
   try {
@@ -823,7 +861,7 @@ export const QueryFilter = async (
   chain,
   toBlockNumber = undefined,
 ) => {
-  const readOnlyProvider = getReadOnlyProvider(chain);
+  const readOnlyProvider = await getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
   try {
@@ -848,7 +886,7 @@ export const QueryFilterWithoutBlock = async (
   params,
   chain,
 ) => {
-  const readOnlyProvider = getReadOnlyProvider(chain);
+  const readOnlyProvider = await getReadOnlyProvider(chain);
   const contract = new ethers.Contract(address, abi, readOnlyProvider);
 
   try {
@@ -867,7 +905,7 @@ export const binarySearchForBlock = async (
   startTimestamp: number,
   chain: EChain,
 ): Promise<number> => {
-  const provider = getReadOnlyProvider(chain);
+  const provider = await getReadOnlyProvider(chain);
   let highestEstimatedBlockNumber = await provider.getBlockNumber();
   let highestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlockNumber,
@@ -906,7 +944,7 @@ export const getTokenValueUsingUniswap = async (
   buyDecimals: number,
 ): Promise<number> => {
   try {
-    const provider = getReadOnlyProvider(EChain.ETHEREUM);
+    const provider = await getReadOnlyProvider(EChain.ETHEREUM);
     const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
 
     const quoterContract = new ethers.Contract(

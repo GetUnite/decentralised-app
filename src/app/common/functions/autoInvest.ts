@@ -223,7 +223,7 @@ export const getUnapprovedSuperfluidSubscriptions = async (
   ricochetMarketAddress,
 ) => {
   try {
-    const provider = getReadOnlyProvider(EChain.POLYGON);
+    const provider = await getReadOnlyProvider(EChain.POLYGON);
     const walletAddress = getCurrentWalletAddress();
 
     const superfluidFramework = await getSuperfluidFramework();
