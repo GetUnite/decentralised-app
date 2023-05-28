@@ -6,7 +6,7 @@ import {
   Modal,
   StepsProcessing,
   StreamInput,
-  TokenIcon
+  TokenIcon,
 } from 'app/modernUI/components';
 import pencilDark from 'app/modernUI/images/pencil-dark.svg';
 import pencil from 'app/modernUI/images/pencil.svg';
@@ -19,6 +19,8 @@ import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { AddFundsConfirmation } from '../blocks/AddFundsConfirmation';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
+import { isSmall } from 'app/modernUI/theme';
+import { Next } from 'grommet-icons';
 
 interface IStreamCard {
   from?: string;
@@ -38,8 +40,8 @@ interface IStreamCard {
   isLoading?: boolean;
   updateAutoInvestInfo?: any;
   sourceDepositedAmount?: string;
-  fromIcon?:string;
-  toIcon?:string;
+  fromIcon?: string;
+  toIcon?: string;
 }
 
 export const StreamCard = ({
@@ -114,161 +116,283 @@ export const StreamCard = ({
     <ResponsiveContext.Consumer>
       {size => (
         <>
-          <Box
-            pad={{ horizontal: 'medium', vertical: 'none' }}
-            height="120px"
-            style={{ borderTop: `0.5px solid ${dividerColor}` }}
-            background={isHover ? hoverColor : ''}
-            align="center"
-            justify="center"
-            fill="horizontal"
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
-          >
-            <Grid
+          {isSmall(size) ? (
+            <Box
+              style={{
+                position: 'relative',
+                borderTop: `0.5px solid ${dividerColor}`,
+              }}
+              pad="large"
+              height="fit"
+              background="card"
               fill="horizontal"
-              rows="xxsmall"
-              align="center"
-              justify="start"
-              columns={[
-                '150px',
-                '150px',
-                '150px',
-                '150px',
-                '130px',
-                '150px',
-                'auto',
-              ]}
-              pad={{ top: '10px', bottom: '10px' }}
-              style={{ fontSize: '16px' }}
             >
-              {isLoading ? (
-                <>
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                  <Skeleton height="14px" width="76px" borderRadius="20px" />
-                </>
-              ) : (
-                <>
-                  <Box direction="row" gap="5px">
-                    <TokenIcon label={fromIcon? fromIcon : from} />{' '}
-                    <span style={{ fontWeight: '500' }}>{from} Farm</span>
+              <Box direction="row" justify="between">
+                <Box>
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text>From</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <Box direction="row" gap="5px">
+                          <TokenIcon label={fromIcon ? fromIcon : from} />{' '}
+                          <span style={{ fontWeight: '500' }}>{from} Farm</span>
+                        </Box>
+                      )}
+                    </Text>
                   </Box>
-                  <Box direction="row" gap="5px">
-                    <TokenIcon label={toIcon ? toIcon : to} />{' '}
-                    <span style={{ fontWeight: '500' }}>{to} Farm</span>
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text margin="none">To</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <Box direction="row" gap="5px">
+                          <TokenIcon label={toIcon ? toIcon : to} />{' '}
+                          <span style={{ fontWeight: '500' }}>{to} Farm</span>
+                        </Box>
+                      )}
+                    </Text>
                   </Box>
-                  <Box direction="row" gap="5px">
-                    <span>
-                      {sign}
-                      {tvs}
-                    </span>
+                </Box>
+                <Box>
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text>TVS</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <span>
+                          {sign}
+                          {tvs}
+                        </span>
+                      )}
+                    </Text>
                   </Box>
-                  <Box direction="row" gap="5px">
-                    {!isEditMode ? (
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text margin="none">flow rate</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <span>
+                          {sign}
+                          {flowPerMonth}/m
+                        </span>
+                      )}
+                    </Text>
+                  </Box>
+                </Box>
+                <Box>
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text>end date</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <span>{endDate || '∞'}</span>
+                      )}
+                    </Text>
+                  </Box>
+                  <Box pad="none" margin={{ top: 'medium' }} align="start">
+                    <Text margin="none">funded until</Text>
+                    <Text>
+                      {isLoading ? (
+                        <Skeleton
+                          height="14px"
+                          width="106px"
+                          borderRadius="20px"
+                        />
+                      ) : (
+                        <span>{fundedUntilDate}</span>
+                      )}
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          ) : (
+            <Box
+              pad={{ horizontal: 'medium', vertical: 'none' }}
+              height="120px"
+              style={{ borderTop: `0.5px solid ${dividerColor}` }}
+              background={isHover ? hoverColor : ''}
+              align="center"
+              justify="center"
+              fill="horizontal"
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+            >
+              <Grid
+                fill="horizontal"
+                rows="xxsmall"
+                align="center"
+                justify="start"
+                columns={[
+                  '150px',
+                  '150px',
+                  '150px',
+                  '150px',
+                  '130px',
+                  '150px',
+                  'auto',
+                ]}
+                pad={{ top: '10px', bottom: '10px' }}
+                style={{ fontSize: '16px' }}
+              >
+                {isLoading ? (
+                  <>
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                    <Skeleton height="14px" width="76px" borderRadius="20px" />
+                  </>
+                ) : (
+                  <>
+                    <Box direction="row" gap="5px">
+                      <TokenIcon label={fromIcon ? fromIcon : from} />{' '}
+                      <span style={{ fontWeight: '500' }}>{from} Farm</span>
+                    </Box>
+                    <Box direction="row" gap="5px">
+                      <TokenIcon label={toIcon ? toIcon : to} />{' '}
+                      <span style={{ fontWeight: '500' }}>{to} Farm</span>
+                    </Box>
+                    <Box direction="row" gap="5px">
                       <span>
                         {sign}
-                        {flowPerMonth}/m
+                        {tvs}
                       </span>
-                    ) : (
-                      <StreamInput
-                        tokenSign={sign}
-                        value={streamValue}
-                        onValueChange={validateInputs}
-                        isSmall={true}
-                        style={{ width: '80%' }}
-                      />
-                    )}
-                  </Box>
-                  <span>{startDate}</span>
-                  <Box>
-                    {!isEditMode ? (
-                      <Text size="16px">{endDate || '∞'}</Text>
-                    ) : (
-                      <DateInput
-                        date={newEndDate}
-                        setDate={setNewEndDate}
-                        style={{ width: '80%' }}
-                      />
-                    )}
-                  </Box>
-                  <Box direction="row" justify="between" align="center" fill>
-                    <span>{fundedUntilDate}</span>
-                    <Box direction="row">
+                    </Box>
+                    <Box direction="row" gap="5px">
                       {!isEditMode ? (
-                        <>
-                          <Button plain onClick={() => setIsEditMode(true)}>
-                            <img
-                              src={isLightMode ? pencil : pencilDark}
-                              height={22}
-                              width={22}
-                            />
-                          </Button>
-                          <StopStreamConfirmation
-                            stopStreamConfirmation={stopStreamConfirmation}
-                            setStopStreamConfirmation={
-                              setStopStreamConfirmation
-                            }
-                            fromAddress={fromAddress}
-                            toAddress={toAddress}
-                            handleStopStream={handleStopStream}
-                            isStoppingStream={isStoppingStream}
-                          />
-                        </>
+                        <span>
+                          {sign}
+                          {flowPerMonth}/m
+                        </span>
                       ) : (
-                        <>
-                          <Button plain onClick={() => setIsEditMode(false)}>
-                            <img
-                              src={isLightMode ? stopStream : stopStreamDark}
-                            />
-                          </Button>
-                          <Button
-                            plain
-                            disabled={hasErrors || streamValue == ''}
-                            onClick={() => startProcessingSteps()}
-                          >
-                            <img
-                              src={isLightMode ? saveStream : saveStreamDark}
-                            />
-                          </Button>
-                          {isProcessing && (
-                            <Layer>
-                              <Modal
-                                chain={EChain.POLYGON}
-                                heading={''}
-                                noHeading={isProcessing}
-                                closeAction={
-                                  isProcessing ? stopProcessingSteps : undefined
-                                }
-                              >
-                                <StepsProcessing
-                                  title="Editing stream..."
-                                  steps={steps.current}
-                                  currentStep={currentStep}
-                                  isHandlingStep={isHandlingStep}
-                                  stepWasSuccessful={stepWasSuccessful.current}
-                                  stepError={stepError.current}
-                                  stopProcessingSteps={stopProcessingSteps}
-                                  handleCurrentStep={handleCurrentStep}
-                                  minHeight={'627px'}
-                                  allFinishedLabel="Go to autoInvest"
-                                  allFinishedLink="/autoinvest"
-                                />
-                              </Modal>
-                            </Layer>
-                          )}
-                        </>
+                        <StreamInput
+                          tokenSign={sign}
+                          value={streamValue}
+                          onValueChange={validateInputs}
+                          isSmall={true}
+                          style={{ width: '80%' }}
+                        />
                       )}
                     </Box>
-                  </Box>
-                </>
-              )}
-            </Grid>
-          </Box>{' '}
+                    <span>{startDate}</span>
+                    <Box>
+                      {!isEditMode ? (
+                        <Text size="16px">{endDate || '∞'}</Text>
+                      ) : (
+                        <DateInput
+                          date={newEndDate}
+                          setDate={setNewEndDate}
+                          style={{ width: '80%' }}
+                        />
+                      )}
+                    </Box>
+                    <Box direction="row" justify="between" align="center" fill>
+                      <span>{fundedUntilDate}</span>
+                      <Box direction="row">
+                        {!isEditMode ? (
+                          <>
+                            <Button plain onClick={() => setIsEditMode(true)}>
+                              <img
+                                src={isLightMode ? pencil : pencilDark}
+                                height={22}
+                                width={22}
+                              />
+                            </Button>
+                            <StopStreamConfirmation
+                              stopStreamConfirmation={stopStreamConfirmation}
+                              setStopStreamConfirmation={
+                                setStopStreamConfirmation
+                              }
+                              fromAddress={fromAddress}
+                              toAddress={toAddress}
+                              handleStopStream={handleStopStream}
+                              isStoppingStream={isStoppingStream}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Button plain onClick={() => setIsEditMode(false)}>
+                              <img
+                                src={isLightMode ? stopStream : stopStreamDark}
+                              />
+                            </Button>
+                            <Button
+                              plain
+                              disabled={hasErrors || streamValue == ''}
+                              onClick={() => startProcessingSteps()}
+                            >
+                              <img
+                                src={isLightMode ? saveStream : saveStreamDark}
+                              />
+                            </Button>
+                            {isProcessing && (
+                              <Layer>
+                                <Modal
+                                  chain={EChain.POLYGON}
+                                  heading={''}
+                                  noHeading={isProcessing}
+                                  closeAction={
+                                    isProcessing
+                                      ? stopProcessingSteps
+                                      : undefined
+                                  }
+                                >
+                                  <StepsProcessing
+                                    title="Editing stream..."
+                                    steps={steps.current}
+                                    currentStep={currentStep}
+                                    isHandlingStep={isHandlingStep}
+                                    stepWasSuccessful={
+                                      stepWasSuccessful.current
+                                    }
+                                    stepError={stepError.current}
+                                    stopProcessingSteps={stopProcessingSteps}
+                                    handleCurrentStep={handleCurrentStep}
+                                    minHeight={'627px'}
+                                    allFinishedLabel="Go to autoInvest"
+                                    allFinishedLink="/autoinvest"
+                                  />
+                                </Modal>
+                              </Layer>
+                            )}
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+                  </>
+                )}
+              </Grid>
+            </Box>
+          )}
           {isEditMode && (
             <Box
               fill="horizontal"
