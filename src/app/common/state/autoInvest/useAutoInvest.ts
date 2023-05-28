@@ -3,17 +3,14 @@ import { EChain } from 'app/common/constants/chains';
 import {
   getStreamEndDate,
   getStreamFlow,
-  stopStream
+  stopStream,
 } from 'app/common/functions/autoInvest';
 import { fromLocaleString, toExactFixed } from 'app/common/functions/utils';
-import {
-  getBalance,
-  getBalanceOf,
-} from 'app/common/functions/web3Client';
+import { getBalance, getBalanceOf } from 'app/common/functions/web3Client';
 import { walletAccount, wantedChain } from 'app/common/state/atoms';
 import {
   TStreamOption,
-  TSupportedStreamToken
+  TSupportedStreamToken,
 } from 'app/common/types/autoInvest';
 import { TAssetsInfo } from 'app/common/types/heading';
 import { useEffect, useState } from 'react';
@@ -230,98 +227,99 @@ export const useAutoInvest = () => {
     const streamsArray = [];
 
     try {
-      for (let index = 0; index < streamOptions.length; index++) {
-        const element = streamOptions[index];
-        const streamFlow = await getStreamFlow(
-          element.fromStIbAlluoAddress,
-          element.ricochetMarketAddress,
-        );
-        if (+streamFlow.flowPerSecond > 0) {
-          ricochetMarketAddressesWithStreams.push(
-            element.ricochetMarketAddress,
+      return await Promise.all(
+        streamOptions.map(async streamOtion => {
+          const streamFlow = await getStreamFlow(
+            streamOtion.fromStIbAlluoAddress,
+            streamOtion.ricochetMarketAddress,
           );
+          if (+streamFlow.flowPerSecond > 0) {
+            ricochetMarketAddressesWithStreams.push(
+              streamOtion.ricochetMarketAddress,
+            );
 
-          const ibAlluoBalance = await getBalance(
-            element.fromIbAlluoAddress,
-            18,
-            EChain.POLYGON,
-          );
-          const flowPerSecond = +streamFlow.flowPerSecond;
-          const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
-          const tvs =
-            (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond;
-
-          const endDateTimestamp = await getStreamEndDate(
-            element.fromIbAlluoAddress,
-            element.ricochetMarketAddress,
-            streamFlow.timestamp,
-          );
-          const endDate = new Date(0);
-          endDate.setSeconds(endDateTimestamp);
-          streamsArray.push({
-            from: element.fromLabel,
-            fromIcon: element.fromIcon,
-            // deposited amount to validate stream edition
-            sourceDepositedAmount: await getBalance(
-              element.fromIbAlluoAddress,
-              undefined,
+            const ibAlluoBalance = await getBalance(
+              streamOtion.fromIbAlluoAddress,
+              18,
               EChain.POLYGON,
-            ),
-            fromAddress: element.fromIbAlluoAddress,
-            fromStAddress: element.fromStIbAlluoAddress,
-            to: element.toLabel,
-            toIcon: element.toIcon,
-            toAddress: element.ricochetMarketAddress,
-            toStAddress: element.toStIbAlluoAddress,
-            flowPerSecond: flowPerSecond,
-            flowPerMonth: toExactFixed(flowPerMonth, 6),
-            startDate: new Date(
-              streamFlow.timestamp * 1000,
-            ).toLocaleDateString(),
-            endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
-            tvs: toExactFixed(tvs, 6),
-            sign: element.fromSign,
-          });
+            );
+            const flowPerSecond = +streamFlow.flowPerSecond;
+            const flowPerMonth = (flowPerSecond * 60 * 60 * 24 * 365) / 12;
+            const tvs =
+              (currentTime / 1000 - streamFlow.timestamp) * flowPerSecond;
 
-          let fundedUntil = fundedUntilArray.find(
-            fundedUntil => fundedUntil.from == element.fromLabel,
-          );
-
-          if (fundedUntil) {
-            fundedUntil.flowPerSecond =
-              fundedUntil.flowPerSecond + flowPerSecond;
-            const remainingFundedMiliseconds =
-              (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
-            fundedUntil.fundedUntilDate = new Date(
-              currentTime + remainingFundedMiliseconds,
-            ).toLocaleDateString();
-          } else {
-            const remainingFundedMiliseconds =
-              (+ibAlluoBalance / flowPerSecond) * 1000;
-
-            fundedUntilArray.push({
-              from: element.fromLabel,
+            const endDateTimestamp = await getStreamEndDate(
+              streamOtion.fromIbAlluoAddress,
+              streamOtion.ricochetMarketAddress,
+              streamFlow.timestamp,
+            );
+            const endDate = new Date(0);
+            endDate.setSeconds(endDateTimestamp);
+            streamsArray.push({
+              from: streamOtion.fromLabel,
+              fromIcon: streamOtion.fromIcon,
+              // deposited amount to validate stream edition
+              sourceDepositedAmount: await getBalance(
+                streamOtion.fromIbAlluoAddress,
+                undefined,
+                EChain.POLYGON,
+              ),
+              fromAddress: streamOtion.fromIbAlluoAddress,
+              fromStAddress: streamOtion.fromStIbAlluoAddress,
+              to: streamOtion.toLabel,
+              toIcon: streamOtion.toIcon,
+              toAddress: streamOtion.ricochetMarketAddress,
+              toStAddress: streamOtion.toStIbAlluoAddress,
               flowPerSecond: flowPerSecond,
-              fundedUntilDate: new Date(
-                currentTime + remainingFundedMiliseconds,
+              flowPerMonth: toExactFixed(flowPerMonth, 6),
+              startDate: new Date(
+                streamFlow.timestamp * 1000,
               ).toLocaleDateString(),
+              endDate: endDateTimestamp ? endDate.toLocaleDateString() : null,
+              tvs: toExactFixed(tvs, 6),
+              sign: streamOtion.fromSign,
             });
+
+            let fundedUntil = fundedUntilArray.find(
+              fundedUntil => fundedUntil.from == streamOtion.fromLabel,
+            );
+
+            if (fundedUntil) {
+              fundedUntil.flowPerSecond =
+                fundedUntil.flowPerSecond + flowPerSecond;
+              const remainingFundedMiliseconds =
+                (+ibAlluoBalance / fundedUntil.flowPerSecond) * 1000;
+              fundedUntil.fundedUntilDate = new Date(
+                currentTime + remainingFundedMiliseconds,
+              ).toLocaleDateString();
+            } else {
+              const remainingFundedMiliseconds =
+                (+ibAlluoBalance / flowPerSecond) * 1000;
+
+              fundedUntilArray.push({
+                from: streamOtion.fromLabel,
+                flowPerSecond: flowPerSecond,
+                fundedUntilDate: new Date(
+                  currentTime + remainingFundedMiliseconds,
+                ).toLocaleDateString(),
+              });
+            }
           }
+        }),
+      ).then(() => {
+        if (
+          ricochetMarketAddressesWithStreams.length >=
+          ricochetMarketAddressOptions.length
+        ) {
+          setCanStartStreams(false);
+        } else {
+          setCanStartStreams(true);
         }
-      }
+        setFundedUntilByStreamOptions(fundedUntilArray);
+        setStreams(streamsArray);
 
-      if (
-        ricochetMarketAddressesWithStreams.length >=
-        ricochetMarketAddressOptions.length
-      ) {
-        setCanStartStreams(false);
-      } else {
-        setCanStartStreams(true);
-      }
-      setFundedUntilByStreamOptions(fundedUntilArray);
-      setStreams(streamsArray);
-
-      return ricochetMarketAddressesWithStreams.length;
+        return ricochetMarketAddressesWithStreams.length;
+      });
     } catch (error) {
       console.log(error);
       setNotification(
