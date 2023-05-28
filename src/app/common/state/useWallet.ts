@@ -3,14 +3,14 @@ import {
   getChainNameById,
   getCurrentChainId,
   onWalletUpdated,
-  tryAutoWalletConnection
+  tryAutoWalletConnection,
 } from 'app/common/functions/web3Client';
 import { useNotification } from 'app/common/state';
 import {
   isCorrectNetwork,
   isSafeApp,
   walletAccount,
-  wantedChain
+  wantedChain,
 } from 'app/common/state/atoms';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -26,7 +26,10 @@ export const useWallet = () => {
   const [wantedChainId, setWantedChainId] = useState<EChainId>();
   const [currentChainId, setCurrentChainId] = useState<EChain>();
 
-  const handleSafeAppConnection = (walletAddress: string, isGnosisSafe: boolean) => {
+  const handleSafeAppConnection = (
+    walletAddress: string,
+    isGnosisSafe: boolean,
+  ) => {
     setWalletAccountAtom(walletAddress);
     if (isGnosisSafe) {
       setSafeAppAtom(true);
@@ -50,15 +53,15 @@ export const useWallet = () => {
 
   useEffect(() => {
     if (walletAccountAtom) {
-      checkCurrentChain();
-    }
-  }, [currentChainId, wantedChainId]);
-
-  useEffect(() => {
-    if (walletAccountAtom) {
       networkChange();
     }
   }, [wantedChainAtom]);
+
+  useEffect(() => {
+    if (walletAccountAtom) {
+      checkCurrentChain();
+    }
+  }, [currentChainId, wantedChainId]);
 
   const networkChange = async () => {
     if (wantedChainAtom != undefined) {
@@ -69,8 +72,7 @@ export const useWallet = () => {
         setWantedChainId(chainId);
       }
     } else {
-      setIsCorrectNetworkAtom(undefined);
-      resetNotification();
+      setWantedChainId(undefined);
     }
   };
 
