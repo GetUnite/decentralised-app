@@ -22,7 +22,7 @@ import { approve } from 'app/common/functions/web3Client';
 import { EFiatId } from 'app/common/constants/utils';
 
 export const optimisedFarmOptions: Array<TOptimisedFarm> = [
-  /*{
+  {
     id: 0,
     farmAddress: EOptimismAddresses.BEEFYTOPVAULTUSD,
     type: 'beefy',
@@ -137,7 +137,7 @@ export const optimisedFarmOptions: Array<TOptimisedFarm> = [
       },
     ],
     isNewest: true,
-  },*/
+  },
   {
     id: 4,
     farmAddress: EOptimismAddresses.YEARNTOPVAULTUSD,
