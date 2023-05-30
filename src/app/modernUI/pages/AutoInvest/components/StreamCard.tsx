@@ -20,7 +20,6 @@ import Skeleton from 'react-loading-skeleton';
 import { AddFundsConfirmation } from '../blocks/AddFundsConfirmation';
 import { StopStreamConfirmation } from '../blocks/StopStreamConfirmation';
 import { isSmall } from 'app/modernUI/theme';
-import { Next } from 'grommet-icons';
 
 interface IStreamCard {
   from?: string;
@@ -134,15 +133,14 @@ export const StreamCard = ({
                     <Text>
                       {isLoading ? (
                         <Skeleton
-                          height="14px"
-                          width="106px"
+                          height="12px"
+                          width="96px"
                           borderRadius="20px"
                         />
                       ) : (
-                        <Box direction="row" gap="5px">
-                          <TokenIcon label={fromIcon ? fromIcon : from} />{' '}
-                          <span style={{ fontWeight: '500' }}>{from} Farm</span>
-                        </Box>
+                        <span style={{ fontWeight: '500', fontSize: '12px' }}>
+                          {from} Farm
+                        </span>
                       )}
                     </Text>
                   </Box>
@@ -151,15 +149,14 @@ export const StreamCard = ({
                     <Text>
                       {isLoading ? (
                         <Skeleton
-                          height="14px"
-                          width="106px"
+                          height="12px"
+                          width="96px"
                           borderRadius="20px"
                         />
                       ) : (
-                        <Box direction="row" gap="5px">
-                          <TokenIcon label={toIcon ? toIcon : to} />{' '}
-                          <span style={{ fontWeight: '500' }}>{to} Farm</span>
-                        </Box>
+                        <span style={{ fontWeight: '500', fontSize: '12px' }}>
+                          {to} Farm
+                        </span>
                       )}
                     </Text>
                   </Box>
@@ -175,7 +172,7 @@ export const StreamCard = ({
                           borderRadius="20px"
                         />
                       ) : (
-                        <span>
+                        <span style={{ fontSize: '12px' }}>
                           {sign}
                           {tvs}
                         </span>
@@ -192,7 +189,7 @@ export const StreamCard = ({
                           borderRadius="20px"
                         />
                       ) : (
-                        <span>
+                        <span style={{ fontSize: '12px' }}>
                           {sign}
                           {flowPerMonth}/m
                         </span>
@@ -206,12 +203,14 @@ export const StreamCard = ({
                     <Text>
                       {isLoading ? (
                         <Skeleton
-                          height="14px"
-                          width="106px"
+                          height="12px"
+                          width="96px"
                           borderRadius="20px"
                         />
                       ) : (
-                        <span>{endDate || '∞'}</span>
+                        <span style={{ fontSize: '12px' }}>
+                          {endDate || '∞'}
+                        </span>
                       )}
                     </Text>
                   </Box>
@@ -220,12 +219,12 @@ export const StreamCard = ({
                     <Text>
                       {isLoading ? (
                         <Skeleton
-                          height="14px"
-                          width="106px"
+                          height="12px"
+                          width="96px"
                           borderRadius="20px"
                         />
                       ) : (
-                        <span>{fundedUntilDate}</span>
+                        <span style={{ fontSize: '12px' }}>{fundedUntilDate}</span>
                       )}
                     </Text>
                   </Box>
