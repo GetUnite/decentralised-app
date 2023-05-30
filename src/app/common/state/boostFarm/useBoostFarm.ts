@@ -931,13 +931,18 @@ export const useBoostFarm = ({ id }) => {
 
   const updateInterest = async () => {
     setIsLoadingInterest(true);
-    interest.current = selectedFarm.current?.forcedInterest
-      ? selectedFarm.current?.forcedInterest
-      : await getBoostFarmInterest(
-          selectedFarm.current?.farmAddress,
-          selectedFarm.current?.apyFarmAddresses,
-          selectedFarm.current?.chain,
-        );
+    try {
+      interest.current = selectedFarm.current?.forcedInterest
+        ? selectedFarm.current?.forcedInterest
+        : await getBoostFarmInterest(
+            selectedFarm.current?.farmAddress,
+            selectedFarm.current?.apyFarmAddresses,
+            selectedFarm.current?.chain,
+          );
+    } catch (error) {
+      //We can't get apy from llama, navigate to main page for now
+      navigate('/');
+    }
     setIsLoadingInterest(false);
   };
 
@@ -1010,7 +1015,7 @@ export const useBoostFarm = ({ id }) => {
 
       return { ...farm, ...farmInfo };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 

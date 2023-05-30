@@ -442,45 +442,50 @@ export const getBoostFarmInterest = async (
   apyFarmAddresses,
   chain,
 ) => {
-  const abi = [
-    {
-      inputs: [],
-      name: 'adminFee',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function',
-    },
-  ];
+  try {
+    const abi = [
+      {
+        inputs: [],
+        name: 'adminFee',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        stateMutability: 'view',
+        type: 'function',
+      },
+    ];
 
-  const fee =
-    1 -
-    (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
-      10000;
+    const fee =
+      1 -
+      (await callContract(abi, farmVaultAddress, 'adminFee()', null, chain)) /
+        10000;
 
-  const baseApyJsonResult = await fetch(
-    boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
-  ).then(res => res.json());
-  const baseApyData = baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
+    const baseApyJsonResult = await fetch(
+      boostFarmInterestApiUrl + apyFarmAddresses.baseApyAddress,
+    ).then(res => res.json());
+    const baseApyData =
+      baseApyJsonResult.data[baseApyJsonResult.data.length - 1];
 
-  const boostApyJsonResult = await fetch(
-    boostFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
-  ).then(res => res.json());
-  const boostApyData =
-    boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
+    const boostApyJsonResult = await fetch(
+      boostFarmInterestApiUrl + apyFarmAddresses.boostApyAddress,
+    ).then(res => res.json());
+    const boostApyData =
+      boostApyJsonResult.data[boostApyJsonResult.data.length - 1];
 
-  const baseApy = baseApyData.apyBase / 100;
-  const boostApy = boostApyData.apyBase / 100;
-  const baseRewardsAPR = baseApyData.apyReward / 100;
-  const boostRewardsAPR = boostApyData.apyReward / 100;
+    const baseApy = baseApyData.apyBase / 100;
+    const boostApy = boostApyData.apyBase / 100;
+    const baseRewardsAPR = baseApyData.apyReward / 100;
+    const boostRewardsAPR = boostApyData.apyReward / 100;
 
-  return (
-    (baseApy +
-      baseRewardsAPR *
-        fee *
-        (1 + boostApy) *
-        Math.pow(1 + boostRewardsAPR / 52, 52)) *
-    100
-  );
+    return (
+      (baseApy +
+        baseRewardsAPR *
+          fee *
+          (1 + boostApy) *
+          Math.pow(1 + boostRewardsAPR / 52, 52)) *
+      100
+    );
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const claimBoostFarmLPRewards = async (
@@ -657,7 +662,13 @@ export const getLastHarvestDateTimestamp = async (farmAddress, chain) => {
     },
   ];
 
-  const looped = await QueryFilterWithoutBlock(abi, farmAddress, 'Looped', [], chain);
+  const looped = await QueryFilterWithoutBlock(
+    abi,
+    farmAddress,
+    'Looped',
+    [],
+    chain,
+  );
 
   return looped[looped.length - 1]?.args[0]?.toNumber();
 };
