@@ -172,24 +172,29 @@ export const useMain = () => {
       const mappedFarms = await Promise.all(
         [...boostFarmOptions, ...optimisedFarmOptions, ...farmOptions].map(
           async availableFarm => {
-            const { supportedTokens, interest, totalAssetSupply } =
-              availableFarm.isBoost
-                ? await fetchBoostFarmInfo(availableFarm)
-                : availableFarm.isOptimised
-                ? await fetchOptimisedFarmInfo(availableFarm)
-                : await fetchFarmInfo(availableFarm);
+            try {
+              const { supportedTokens, interest, totalAssetSupply } =
+                availableFarm.isBoost
+                  ? await fetchBoostFarmInfo(availableFarm)
+                  : availableFarm.isOptimised
+                  ? await fetchOptimisedFarmInfo(availableFarm)
+                  : await fetchFarmInfo(availableFarm);
 
-            availableFarm.supportedTokens = supportedTokens;
-            availableFarm.interest = interest;
-            availableFarm.totalAssetSupply = totalAssetSupply;
+              availableFarm.supportedTokens = supportedTokens;
+              availableFarm.interest = interest;
+              availableFarm.totalAssetSupply = totalAssetSupply;
 
-            return availableFarm;
+              return availableFarm;
+            } catch (err) {
+              console.log('Failed fetching farm info', err);
+            }
           },
         ),
       );
 
       // normal data for farms is loaded
-      setAvailableFarms(mappedFarms);
+      // farms that failed to load will just not appear till it's fixed
+      setAvailableFarms(mappedFarms.filter(mf => mf != undefined));
       setIsLoading(false);
 
       return mappedFarms;
@@ -539,7 +544,10 @@ export const useMain = () => {
       depositedAmountInLP: undefined,
       poolShare:
         +depositedAmount > 0
-          ? toExactFixed((depositedAmountInUSD / +farm.totalAssetSupply) * 100, 2)
+          ? toExactFixed(
+              (depositedAmountInUSD / +farm.totalAssetSupply) * 100,
+              2,
+            )
           : '0',
     };
   };
