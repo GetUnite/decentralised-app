@@ -408,6 +408,7 @@ export const useMain = () => {
       switch (farm.underlyingTokenAddress) {
         case EPolygonAddresses.WBTC:
         case EOptimismAddresses.WBTC:
+        case EEthereumAddresses.WBTC:
           tokenPriceAddress = EEthereumAddresses.WBTC;
           tokenDecimals = 8;
           break;
