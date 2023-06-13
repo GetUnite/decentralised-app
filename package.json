@@ -13,6 +13,7 @@
     "@biconomy/mexa": "2.0.35",
     "@ramp-network/ramp-instant-sdk": "^3.0.0",
     "@superfluid-finance/sdk-core": "^0.5.6",
+    "@types/recoil": "^0.0.9",
     "@uniswap/sdk-core": "^3.2.2",
     "@uniswap/v3-sdk": "^3.9.0",
     "@unstoppabledomains/resolution": "^8.3.3",
