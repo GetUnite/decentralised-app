@@ -177,8 +177,8 @@ export const useMain = () => {
                 availableFarm.isBoost
                   ? await fetchBoostFarmInfo(availableFarm)
                   : availableFarm.isOptimised
-                  ? await fetchOptimisedFarmInfo(availableFarm)
-                  : await fetchFarmInfo(availableFarm);
+                    ? await fetchOptimisedFarmInfo(availableFarm)
+                    : await fetchFarmInfo(availableFarm);
 
               availableFarm.supportedTokens = supportedTokens;
               availableFarm.interest = interest;
@@ -218,10 +218,10 @@ export const useMain = () => {
             depositedAmountInLP,
             poolShare,
           } = availableFarm.isBoost
-            ? await fetchConnectedBoostFarmInfo(availableFarm)
-            : availableFarm.isOptimised
-            ? await fetchConnectedOptimisedFarmInfo(availableFarm)
-            : await fetchConnectedFarmInfo(availableFarm);
+              ? await fetchConnectedBoostFarmInfo(availableFarm)
+              : availableFarm.isOptimised
+                ? await fetchConnectedOptimisedFarmInfo(availableFarm)
+                : await fetchConnectedFarmInfo(availableFarm);
 
           availableFarm.depositedAmount = depositedAmount;
           availableFarm.depositedAmountInLP = depositedAmountInLP;
@@ -264,14 +264,14 @@ export const useMain = () => {
                 const balance =
                   supportedTokenWithBalance.address == EOptimismAddresses.ETH
                     ? await getNativeTokenBalance(
-                        supportedTokenWithBalance.decimals,
-                        EChain.OPTIMISM, // only optimism uses native for now
-                      )
+                      supportedTokenWithBalance.decimals,
+                      EChain.OPTIMISM, // only optimism uses native for now
+                    )
                     : await getBalanceOf(
-                        supportedTokenWithBalance.address,
-                        supportedTokenWithBalance.decimals,
-                        supportedTokenWithBalance.chain,
-                      );
+                      supportedTokenWithBalance.address,
+                      supportedTokenWithBalance.decimals,
+                      supportedTokenWithBalance.chain,
+                    );
                 if (+balance > 0) {
                   numberOfAssets++;
                   chainsWithAssets.add(supportedTokenWithBalance.chain);
@@ -404,6 +404,7 @@ export const useMain = () => {
     } else {
       let tokenPriceAddress;
       let tokenDecimals = 18;
+      let targetTokenAddress = EEthereumAddresses.USDC
       // for polygon and OP underlying tokens just use the equivalent ethereum addresses to get the price. It should always be equal.
       switch (farm.underlyingTokenAddress) {
         case EPolygonAddresses.WBTC:
@@ -416,9 +417,15 @@ export const useMain = () => {
         case EOptimismAddresses.WETH:
           tokenPriceAddress = EEthereumAddresses.WETH;
           break;
+        case EEthereumAddresses.EURT:
+          tokenPriceAddress = EEthereumAddresses.EURT;
+          tokenDecimals = 6;
+          targetTokenAddress = EEthereumAddresses.USDT
+          break;
         case EPolygonAddresses.EURT:
           tokenPriceAddress = EEthereumAddresses.EURT;
           tokenDecimals = 6;
+          targetTokenAddress = EEthereumAddresses.USDT
           break;
         default:
           tokenPriceAddress = farm.underlyingTokenAddress;
@@ -426,7 +433,7 @@ export const useMain = () => {
       }
       valueOfAssetInUSDC = await getTokenValueUsingUniswap(
         tokenPriceAddress,
-        EEthereumAddresses.USDC,
+        targetTokenAddress,
         tokenDecimals,
         6,
       );
@@ -462,10 +469,10 @@ export const useMain = () => {
       interest: farm.forcedInterest
         ? farm.forcedInterest
         : await getBoostFarmInterest(
-            farm.farmAddress,
-            farm.apyFarmAddresses,
-            farm.chain,
-          ),
+          farm.farmAddress,
+          farm.apyFarmAddresses,
+          farm.chain,
+        ),
       totalAssetSupply:
         +(await getTotalAssets(farm.farmAddress, farm.chain)) *
         valueOf1LPinUSDC,
@@ -546,9 +553,9 @@ export const useMain = () => {
       poolShare:
         +depositedAmount > 0
           ? toExactFixed(
-              (depositedAmountInUSD / +farm.totalAssetSupply) * 100,
-              2,
-            )
+            (depositedAmountInUSD / +farm.totalAssetSupply) * 100,
+            2,
+          )
           : '0',
     };
   };
@@ -591,15 +598,15 @@ export const useMain = () => {
     filteredFarms =
       viewType == 'View my farms only' && !isConnectedLoading && !isLoading
         ? availableFarms.filter(
-            farm => farm != undefined && +farm.depositedAmount > 0.00001,
-          )
+          farm => farm != undefined && +farm.depositedAmount > 0.00001,
+        )
         : availableFarms;
 
     filteredFarms = filteredFarms.filter(farm => {
       if (farm != undefined) {
         const supportedTokensLabels =
           farm.supportedTokens != undefined &&
-          Array.isArray(farm.supportedTokens)
+            Array.isArray(farm.supportedTokens)
             ? farm.supportedTokens.map(supportedToken => supportedToken.label)
             : [];
 
@@ -619,10 +626,10 @@ export const useMain = () => {
         farm.chain == EChain.ETHEREUM
           ? 'Ethereum'
           : farm.chain == EChain.POLYGON
-          ? 'Polygon'
-          : farm.chain == EChain.OPTIMISM
-          ? 'Optimism'
-          : '',
+            ? 'Polygon'
+            : farm.chain == EChain.OPTIMISM
+              ? 'Optimism'
+              : '',
       );
     });
 
@@ -652,8 +659,8 @@ export const useMain = () => {
                 ? 1
                 : -1
               : +a.interest > +b.interest
-              ? 1
-              : -1;
+                ? 1
+                : -1;
           });
           break;
 
@@ -664,8 +671,8 @@ export const useMain = () => {
                 ? 1
                 : -1
               : +a.poolShare > +b.poolShare
-              ? 1
-              : -1;
+                ? 1
+                : -1;
           });
           break;
 
@@ -676,8 +683,8 @@ export const useMain = () => {
                 ? 1
                 : -1
               : +a.depositedAmount > +b.depositedAmount
-              ? 1
-              : -1;
+                ? 1
+                : -1;
           });
           break;
 
@@ -708,19 +715,19 @@ export const useMain = () => {
     try {
       const tx = farm.isLocked
         ? await claimLockedBoostFarmRewards(
-            farmAddress,
-            seeRewardsAsStable
-              ? farm.rewards.stableAddress
-              : farm.rewards.address,
-            farm.chain,
-          )
+          farmAddress,
+          seeRewardsAsStable
+            ? farm.rewards.stableAddress
+            : farm.rewards.address,
+          farm.chain,
+        )
         : seeRewardsAsStable
-        ? await claimBoostFarmNonLPRewards(
+          ? await claimBoostFarmNonLPRewards(
             farm.farmAddress,
             farm.rewards.stableAddress,
             farm.chain,
           )
-        : await claimBoostFarmLPRewards(farm.farmAddress, farm.chain);
+          : await claimBoostFarmLPRewards(farm.farmAddress, farm.chain);
     } catch (error) {
       throw error;
     }

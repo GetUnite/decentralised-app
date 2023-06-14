@@ -13,6 +13,11 @@ export const getUniswapPoolAddress = (sellTokenAddress: string, buyTokenAddress:
         return EEthereumAddresses.EURTUSDCPOOL;
     }
 
+    if ((sellTokenAddress == EEthereumAddresses.EURT || sellTokenAddress == EEthereumAddresses.USDT)
+        && (buyTokenAddress == EEthereumAddresses.USDT || buyTokenAddress == EEthereumAddresses.EURT)) {
+        return EEthereumAddresses.EURTUSDTPOOL;
+    }
+
     // USDC/ETH
     if ((sellTokenAddress == EEthereumAddresses.USDC || sellTokenAddress == EEthereumAddresses.WETH)
         && (buyTokenAddress == EEthereumAddresses.WETH || buyTokenAddress == EEthereumAddresses.USDC)) {
