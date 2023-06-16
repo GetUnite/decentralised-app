@@ -45,19 +45,19 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  {
-    // USD Farm to BTC
-    fromLabel: 'USD',
-    fromSign: '$',
-    toLabel: 'BTC',
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    fromAddress: EPolygonAddresses.IBALLUOUSD,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.USDC,
-  },
+  // {
+  //   // USD Farm to BTC
+  //   fromLabel: 'USD',
+  //   fromSign: '$',
+  //   toLabel: 'BTC',
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   fromAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.USDC,
+  // },
   {
     // USDC to ETH
     fromLabel: 'USD',
@@ -71,19 +71,19 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  {
-    // USDC to BTC
-    fromLabel: 'USD',
-    fromSign: '$',
-    toLabel: 'BTC',
-    fromAddress: EPolygonAddresses.USDC,
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.USDC,
-  },
+  // {
+  //   // USDC to BTC
+  //   fromLabel: 'USD',
+  //   fromSign: '$',
+  //   toLabel: 'BTC',
+  //   fromAddress: EPolygonAddresses.USDC,
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.USDC,
+  // },
   {
     // DAI to ETH
     fromLabel: 'USD',
@@ -97,19 +97,19 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  {
-    // DAI to BTC
-    fromLabel: 'USD',
-    fromSign: '$',
-    toLabel: 'BTC',
-    fromAddress: EPolygonAddresses.DAI,
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.USDC,
-  },
+  // {
+  //   // DAI to BTC
+  //   fromLabel: 'USD',
+  //   fromSign: '$',
+  //   toLabel: 'BTC',
+  //   fromAddress: EPolygonAddresses.DAI,
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.USDC,
+  // },
   {
     // USDT to ETH
     fromLabel: 'USD',
@@ -123,46 +123,46 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  {
-    // USDT to BTC
-    fromLabel: 'USD',
-    fromSign: '$',
-    toLabel: 'BTC',
-    fromAddress: EPolygonAddresses.USDT,
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.USDC,
-  },
+  // {
+  //   // USDT to BTC
+  //   fromLabel: 'USD',
+  //   fromSign: '$',
+  //   toLabel: 'BTC',
+  //   fromAddress: EPolygonAddresses.USDT,
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.USDC,
+  // },
   // from BTC options
-  {
-    // BTC Farm to USD
-    fromLabel: 'BTC',
-    fromSign: '₿',
-    toLabel: 'USD',
-    fromAddress: EPolygonAddresses.IBALLUOBTC,
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.WBTC,
-  },
-  {
-    // WBTC to USD
-    fromLabel: 'BTC',
-    fromSign: '₿',
-    toLabel: 'USD',
-    fromAddress: EPolygonAddresses.WBTC,
-    fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-    fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-    toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-    toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-    ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-    underlyingTokenAddress: EPolygonAddresses.WBTC,
-  },
+  // {
+  //   // BTC Farm to USD
+  //   fromLabel: 'BTC',
+  //   fromSign: '₿',
+  //   toLabel: 'USD',
+  //   fromAddress: EPolygonAddresses.IBALLUOBTC,
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.WBTC,
+  // },
+  // {
+  //   // WBTC to USD
+  //   fromLabel: 'BTC',
+  //   fromSign: '₿',
+  //   toLabel: 'USD',
+  //   fromAddress: EPolygonAddresses.WBTC,
+  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+  //   underlyingTokenAddress: EPolygonAddresses.WBTC,
+  // },
   // from ETH options
   {
     // ETH Farm to USD
@@ -200,11 +200,11 @@ const streamFromOptions: TSupportedStreamToken[] = [
     sign: '$',
     isStreamable: true,
     canStreamTo: [
-      {
-        label: 'BTC',
-        address: EPolygonAddresses.IBALLUOBTC,
-        sign: '₿',
-      },
+      // {
+      //   label: 'BTC',
+      //   address: EPolygonAddresses.IBALLUOBTC,
+      //   sign: '₿',
+      // },
       {
         label: 'ETH',
         icon: 'ibETH',
@@ -219,11 +219,11 @@ const streamFromOptions: TSupportedStreamToken[] = [
     decimals: 6,
     sign: '$',
     canStreamTo: [
-      {
-        label: 'BTC',
-        address: EPolygonAddresses.IBALLUOBTC,
-        sign: '₿',
-      },
+      // {
+      //   label: 'BTC',
+      //   address: EPolygonAddresses.IBALLUOBTC,
+      //   sign: '₿',
+      // },
       {
         label: 'ETH',
         icon: 'ibETH',
@@ -238,11 +238,11 @@ const streamFromOptions: TSupportedStreamToken[] = [
     decimals: 18,
     sign: '$',
     canStreamTo: [
-      {
-        label: 'BTC',
-        address: EPolygonAddresses.IBALLUOBTC,
-        sign: '₿',
-      },
+      // {
+      //   label: 'BTC',
+      //   address: EPolygonAddresses.IBALLUOBTC,
+      //   sign: '₿',
+      // },
       {
         label: 'ETH',
         icon: 'ibETH',
@@ -257,11 +257,11 @@ const streamFromOptions: TSupportedStreamToken[] = [
     decimals: 6,
     sign: '$',
     canStreamTo: [
-      {
-        label: 'BTC',
-        address: EPolygonAddresses.IBALLUOBTC,
-        sign: '₿',
-      },
+      // {
+      //   label: 'BTC',
+      //   address: EPolygonAddresses.IBALLUOBTC,
+      //   sign: '₿',
+      // },
       {
         label: 'ETH',
         icon: 'ibETH',
@@ -527,13 +527,13 @@ export const useStartStream = () => {
             ...streamFromOption,
             balance: streamFromOption.isStreamable
               ? await getBalance(
-                  streamFromOption.address,
-                  streamFromOption.decimals,
-                )
+                streamFromOption.address,
+                streamFromOption.decimals,
+              )
               : await getBalanceOf(
-                  streamFromOption.address,
-                  streamFromOption.decimals,
-                ),
+                streamFromOption.address,
+                streamFromOption.decimals,
+              ),
             canStreamTo: streamFromOption.canStreamTo.filter(cst =>
               possibleStreamOptionsArrayAddresses.find(
                 psoata => psoata.toAddress == cst.address,
