@@ -20,6 +20,7 @@ export const FarmsBlock = ({
   readMoreStatus = false,
   onReadMore = null,
   factsheetLink,
+  isDeprecated = false
 }) => {
   const { isLightMode } = useMode();
 
@@ -192,14 +193,33 @@ export const FarmsBlock = ({
           })
         ) : (
           <Box direction="row" justify="center" height="90px" align="center">
-            <Box justify="center">
+            {!isDeprecated ? (<Box justify="center">
+
+
               <Text size="16px" weight={600} textAlign="center">
                 No farms matching your filters
               </Text>
               <Text size="13px" textAlign="center" weight={400}>
                 Try clearing your filters to see results
               </Text>
-            </Box>
+
+
+            </Box>) : (
+
+              <Box justify="center">
+
+
+                <Text size="16px" weight={600} textAlign="center">
+                  Boost farms have been retired
+                </Text>
+                <Text size="13px" textAlign="center" weight={400}>
+                  Please contact support@alluo.com if you have any questions or concerns regarding previous deposits.
+                </Text>
+
+
+              </Box>
+            )}
+
           </Box>
         )}
       </Box>

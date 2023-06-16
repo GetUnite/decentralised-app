@@ -266,10 +266,10 @@ export const getChainById = chainId => {
   return chainId === EChainId.POL_MAINNET || chainId === EChainId.POL_MUMBAI
     ? EChain.POLYGON
     : chainId === EChainId.ETH_MAINNET || chainId === EChainId.ETH_SEPOLIA
-    ? EChain.ETHEREUM
-    : chainId === EChainId.OP_MAINNET
-    ? EChain.ETHEREUM
-    : null;
+      ? EChain.ETHEREUM
+      : chainId === EChainId.OP_MAINNET
+        ? EChain.ETHEREUM
+        : null;
 };
 
 export const onWalletUpdated = async callback => {
@@ -778,13 +778,13 @@ export const approve = async (
 };
 
 const ethersJsonProviderPromise = async providerUrl => {
-    try {
-      const provider = new ethers.providers.JsonRpcProvider(providerUrl, 'any');
-      await provider.getNetwork();
-      return provider;
-    } catch (error) {
-      return Promise.reject(error);
-    }
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(providerUrl, 'any');
+    await provider.getNetwork();
+    return provider;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
 
 export const getReadOnlyProvider = async chain => {
@@ -912,7 +912,7 @@ export const binarySearchForBlock = async (
   );
   let lowestEstimatedBlock = await provider.getBlock(
     highestEstimatedBlock?.number -
-      Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
+    Math.floor(highestEstimatedBlock?.timestamp - startTimestamp),
   );
   let closestBlock;
 
@@ -946,7 +946,6 @@ export const getTokenValueUsingUniswap = async (
   try {
     const provider = await getReadOnlyProvider(EChain.ETHEREUM);
     const quoterAddress = EEthereumAddresses.UNISWAPQUOTER;
-
     const quoterContract = new ethers.Contract(
       quoterAddress,
       Quoter.abi,
@@ -1440,8 +1439,8 @@ export const getTokenValueUsingPriceFeedRouter = async (
     chain == EChain.ETHEREUM
       ? EEthereumAddresses.PRICEFEEDROUTER
       : chain == EChain.POLYGON
-      ? EPolygonAddresses.PRICEFEEDROUTER
-      : EOptimismAddresses.PRICEFEEDROUTER;
+        ? EPolygonAddresses.PRICEFEEDROUTER
+        : EOptimismAddresses.PRICEFEEDROUTER;
 
   const valueInFiat = await callContract(
     abi,
@@ -1501,8 +1500,8 @@ export const getTokenAmountValueUsingPriceFeedRouter = async (
     chain == EChain.ETHEREUM
       ? EEthereumAddresses.PRICEFEEDROUTER
       : chain == EChain.POLYGON
-      ? EPolygonAddresses.PRICEFEEDROUTER
-      : EOptimismAddresses.PRICEFEEDROUTER;
+        ? EPolygonAddresses.PRICEFEEDROUTER
+        : EOptimismAddresses.PRICEFEEDROUTER;
 
   const valueInFiat = await callContract(
     abi,
