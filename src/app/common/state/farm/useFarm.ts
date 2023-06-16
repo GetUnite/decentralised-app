@@ -234,72 +234,72 @@ export const farmOptions: Array<TFarm> = [
       },
     ],
   },*/
-  {
-    id: 7,
-    farmAddress: EEthereumAddresses.IBALLUOEUR,
-    type: 'eur',
-    chain: EChain.ETHEREUM,
-    name: 'Euro',
-    sign: '€',
-    icons: ['EURT'], //, 'EURS', 'agEUR'],
-    underlyingTokenAddress: EEthereumAddresses.EURT,
-    supportedTokens: [
-      // {
-      //   label: 'EURS',
-      //   address: EEthereumAddresses.EURS,
-      //   decimals: 2,
-      //   sign: '€',
-      // },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      // {
-      //   label: 'agEUR',
-      //   address: EEthereumAddresses.AGEUR,
-      //   decimals: 18,
-      //   sign: '€',
-      // },
-    ],
-  },
-  {
-    id: 8,
-    farmAddress: EEthereumAddresses.IBALLUOETH,
-    type: 'eth',
-    chain: EChain.ETHEREUM,
-    name: 'Ethereum',
-    sign: 'Ξ',
-    icons: ['WETH'],
-    underlyingTokenAddress: EEthereumAddresses.WETH,
-    supportedTokens: [
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-    ],
-  },
-  {
-    id: 9,
-    farmAddress: EEthereumAddresses.IBALLUOBTC,
-    type: 'btc',
-    chain: EChain.ETHEREUM,
-    name: 'Bitcoin',
-    sign: '₿',
-    icons: ['WBTC'],
-    underlyingTokenAddress: EEthereumAddresses.WBTC,
-    supportedTokens: [
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-  },
+  // {
+  //   id: 7,
+  //   farmAddress: EEthereumAddresses.IBALLUOEUR,
+  //   type: 'eur',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'Euro',
+  //   sign: '€',
+  //   icons: ['EURT'], //, 'EURS', 'agEUR'],
+  //   underlyingTokenAddress: EEthereumAddresses.EURT,
+  //   supportedTokens: [
+  //     // {
+  //     //   label: 'EURS',
+  //     //   address: EEthereumAddresses.EURS,
+  //     //   decimals: 2,
+  //     //   sign: '€',
+  //     // },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     // {
+  //     //   label: 'agEUR',
+  //     //   address: EEthereumAddresses.AGEUR,
+  //     //   decimals: 18,
+  //     //   sign: '€',
+  //     // },
+  //   ],
+  // },
+  // {
+  //   id: 8,
+  //   farmAddress: EEthereumAddresses.IBALLUOETH,
+  //   type: 'eth',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'Ethereum',
+  //   sign: 'Ξ',
+  //   icons: ['WETH'],
+  //   underlyingTokenAddress: EEthereumAddresses.WETH,
+  //   supportedTokens: [
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 9,
+  //   farmAddress: EEthereumAddresses.IBALLUOBTC,
+  //   type: 'btc',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'Bitcoin',
+  //   sign: '₿',
+  //   icons: ['WBTC'],
+  //   underlyingTokenAddress: EEthereumAddresses.WBTC,
+  //   supportedTokens: [
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  // },
 ];
 
 const possibleFarmSteps = [...possibleDepositSteps, ...possibleWithdrawSteps];
