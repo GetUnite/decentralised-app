@@ -159,8 +159,7 @@ export const Main = () => {
                       />
                       <FarmsBlock
                         heading="Boost farms"
-                        description={`Boost farms have been retired and all customer funds have been returned.
-                        Please contact support@alluo.com if you have any questions or concerns regarding previous deposits.`}
+                        description={`Boost farms have been retired. Please contact support@alluo.com if you have any questions or concerns regarding previous deposits`}
                         readMoreDescription=""
                         readMoreStatus={seeAllBoostFarmsDescription}
                         onReadMore={() =>
