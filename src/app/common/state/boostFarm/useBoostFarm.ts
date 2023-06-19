@@ -44,693 +44,693 @@ import { possibleLockedWithdrawSteps } from './useLockedBoostFarmWithdrawal';
 import { EFiatId } from 'app/common/constants/utils';
 
 export const boostFarmOptions: Array<TBoostFarm> = [
-  {
-    id: 0,
-    farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
-    type: 'boost',
-    chain: EChain.ETHEREUM,
-    name: 'FRAX/USDC',
-    sign: '$',
-    icons: [
-      'FRAX',
-      'USDC',
-      'CRV',
-      'CVX',
-      'DAI',
-      'agEUR',
-      'EURS',
-      'EURT',
-      'WETH',
-      'WBTC',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.FRAXUSDC,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['FRAX', 'USDC'],
-    apyFarmAddresses: {
-      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-  },
-  {
-    id: 1,
-    farmAddress: EEthereumAddresses.CVXETHVAULT,
-    type: 'boost',
-    chain: EChain.ETHEREUM,
-    name: 'CVX/ETH',
-    sign: '$',
-    icons: [
-      'CVX',
-      'WETH',
-      'EURS',
-      'agEUR',
-      'CRV',
-      'EURT',
-      'FRAX',
-      'USDC',
-      'WBTC',
-      'DAI',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.CVXETH,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['CVX', 'WETH'],
-    apyFarmAddresses: {
-      baseApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-  },
-  {
-    id: 2,
-    farmAddress: EEthereumAddresses.STETHETHVAULT,
-    type: 'boost',
-    chain: EChain.ETHEREUM,
-    name: 'stETH/ETH',
-    sign: '$',
-    icons: [
-      'WETH',
-      'USDC',
-      'DAI',
-      'EURS',
-      'EURT',
-      'FRAX',
-      'WBTC',
-      'agEUR',
-      'CRV',
-      'CVX',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.STETHETH,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['wETH'],
-    apyFarmAddresses: {
-      baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-  },
-  {
-    id: 3,
-    farmAddress: EEthereumAddresses.CRVYCRVVAULT,
-    type: 'boost',
-    chain: EChain.ETHEREUM,
-    name: 'CRV/yCRV',
-    sign: '$',
-    icons: [
-      'WETH',
-      'USDC',
-      'DAI',
-      'agEUR',
-      'EURS',
-      'EURT',
-      'FRAX',
-      'WBTC',
-      'CRV',
-      'CVX',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.CRVYCRV,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['CRV'],
-    apyFarmAddresses: {
-      baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-    isNewest: true,
-  },
-  {
-    id: 4,
-    farmAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
-    type: 'boost',
-    chain: EChain.ETHEREUM,
-    name: 'DOLA/FRAXBP',
-    sign: '$',
-    icons: [
-      'WETH',
-      'USDC',
-      'DAI',
-      'EURS',
-      'EURT',
-      'FRAX',
-      'WBTC',
-      'agEUR',
-      'CRV',
-      'CVX',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.DOLAFRAXBP,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['FRAX', 'USDC'],
-    apyFarmAddresses: {
-      baseApyAddress: 'd05cb04d-f1e5-451d-95a2-6a3a9da001ad',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-    isNewest: true,
-  },
-  {
-    id: 5,
-    farmAddress: EEthereumAddresses.FRXETHVAULT,
-    type: 'boost',
-    isLocked: true,
-    chain: EChain.ETHEREUM,
-    name: 'FrxETH/ETH',
-    sign: '$',
-    icons: [
-      'FRAX',
-      'USDC',
-      'agEUR',
-      'CRV',
-      'CVX',
-      'DAI',
-      'EURS',
-      'EURT',
-      'WETH',
-      'WBTC',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      address: EEthereumAddresses.CVXETH,
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.FRXETH,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['FRAX', 'ETH'],
-    apyFarmAddresses: {
-      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-    forcedInterest: '9.50',
-    withdrawToken: {
-      label: 'FrxETH/ETH',
-      address: EEthereumAddresses.FRXETH,
-      decimals: 18,
-      sign: '',
-    },
-    isNewest: true,
-  },
-  {
-    id: 6,
-    farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
-    type: 'boost',
-    isLocked: true,
-    chain: EChain.ETHEREUM,
-    name: 'CVX/FRAXBP',
-    sign: '$',
-    icons: [
-      'FRAX',
-      'USDC',
-      'agEUR',
-      'CRV',
-      'CVX',
-      'DAI',
-      'EURS',
-      'EURT',
-      'WETH',
-      'WBTC',
-    ],
-    isBoost: true,
-    rewards: {
-      label: 'CVX-ETH',
-      icons: ['CVX', 'ETH'],
-      stableLabel: 'USDC',
-      address: EEthereumAddresses.CVXETH,
-      stableAddress: EEthereumAddresses.USDC,
-    },
-    lPTokenAddress: EEthereumAddresses.CVXFRAXBP,
-    supportedTokens: [
-      {
-        label: 'agEUR',
-        address: EEthereumAddresses.AGEUR,
-        decimals: 18,
-        sign: '€',
-      },
-      {
-        label: 'CRV',
-        address: EEthereumAddresses.CRV,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'CVX',
-        address: EEthereumAddresses.CVX,
-        decimals: 18,
-        sign: '',
-      },
-      {
-        label: 'DAI',
-        address: EEthereumAddresses.DAI,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'EURS',
-        address: EEthereumAddresses.EURS,
-        decimals: 2,
-        sign: '€',
-      },
-      {
-        label: 'EURT',
-        address: EEthereumAddresses.EURT,
-        decimals: 6,
-        sign: '€',
-      },
-      {
-        label: 'FRAX',
-        address: EEthereumAddresses.FRAX,
-        decimals: 18,
-        sign: '$',
-      },
-      {
-        label: 'USDC',
-        address: EEthereumAddresses.USDC,
-        decimals: 6,
-        sign: '$',
-      },
-      {
-        label: 'WETH',
-        address: EEthereumAddresses.WETH,
-        decimals: 18,
-        sign: 'Ξ',
-      },
-      {
-        label: 'WBTC',
-        address: EEthereumAddresses.WBTC,
-        decimals: 8,
-        sign: '₿',
-      },
-    ],
-    lowSlippageTokenLabels: ['FRAX', 'CVX'],
-    apyFarmAddresses: {
-      baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
-      boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
-    },
-    forcedInterest: '9.50',
-    withdrawToken: {
-      label: 'CVX/FRAXBP',
-      address: EEthereumAddresses.CVXFRAXBP,
-      decimals: 18,
-      sign: '',
-    },
-    isNewest: true,
-  },
+  // {
+  //   id: 0,
+  //   farmAddress: EEthereumAddresses.FRAXUSDCVAULT,
+  //   type: 'boost',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'FRAX/USDC',
+  //   sign: '$',
+  //   icons: [
+  //     'FRAX',
+  //     'USDC',
+  //     'CRV',
+  //     'CVX',
+  //     'DAI',
+  //     'agEUR',
+  //     'EURS',
+  //     'EURT',
+  //     'WETH',
+  //     'WBTC',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.FRAXUSDC,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['FRAX', 'USDC'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  // },
+  // {
+  //   id: 1,
+  //   farmAddress: EEthereumAddresses.CVXETHVAULT,
+  //   type: 'boost',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'CVX/ETH',
+  //   sign: '$',
+  //   icons: [
+  //     'CVX',
+  //     'WETH',
+  //     'EURS',
+  //     'agEUR',
+  //     'CRV',
+  //     'EURT',
+  //     'FRAX',
+  //     'USDC',
+  //     'WBTC',
+  //     'DAI',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.CVXETH,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['CVX', 'WETH'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  // },
+  // {
+  //   id: 2,
+  //   farmAddress: EEthereumAddresses.STETHETHVAULT,
+  //   type: 'boost',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'stETH/ETH',
+  //   sign: '$',
+  //   icons: [
+  //     'WETH',
+  //     'USDC',
+  //     'DAI',
+  //     'EURS',
+  //     'EURT',
+  //     'FRAX',
+  //     'WBTC',
+  //     'agEUR',
+  //     'CRV',
+  //     'CVX',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.STETHETH,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['wETH'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: '5ce23e7e-3800-4c9c-ad30-6db3db0515a1',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  // },
+  // {
+  //   id: 3,
+  //   farmAddress: EEthereumAddresses.CRVYCRVVAULT,
+  //   type: 'boost',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'CRV/yCRV',
+  //   sign: '$',
+  //   icons: [
+  //     'WETH',
+  //     'USDC',
+  //     'DAI',
+  //     'agEUR',
+  //     'EURS',
+  //     'EURT',
+  //     'FRAX',
+  //     'WBTC',
+  //     'CRV',
+  //     'CVX',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.CRVYCRV,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['CRV'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: '1fbe7e03-75f3-4d65-8423-2cc023f786d7',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  //   isNewest: true,
+  // },
+  // {
+  //   id: 4,
+  //   farmAddress: EEthereumAddresses.DOLAFRAXBPVAULT,
+  //   type: 'boost',
+  //   chain: EChain.ETHEREUM,
+  //   name: 'DOLA/FRAXBP',
+  //   sign: '$',
+  //   icons: [
+  //     'WETH',
+  //     'USDC',
+  //     'DAI',
+  //     'EURS',
+  //     'EURT',
+  //     'FRAX',
+  //     'WBTC',
+  //     'agEUR',
+  //     'CRV',
+  //     'CVX',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.DOLAFRAXBP,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['FRAX', 'USDC'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: 'd05cb04d-f1e5-451d-95a2-6a3a9da001ad',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  //   isNewest: true,
+  // },
+  // {
+  //   id: 5,
+  //   farmAddress: EEthereumAddresses.FRXETHVAULT,
+  //   type: 'boost',
+  //   isLocked: true,
+  //   chain: EChain.ETHEREUM,
+  //   name: 'FrxETH/ETH',
+  //   sign: '$',
+  //   icons: [
+  //     'FRAX',
+  //     'USDC',
+  //     'agEUR',
+  //     'CRV',
+  //     'CVX',
+  //     'DAI',
+  //     'EURS',
+  //     'EURT',
+  //     'WETH',
+  //     'WBTC',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     address: EEthereumAddresses.CVXETH,
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.FRXETH,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['FRAX', 'ETH'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  //   forcedInterest: '9.50',
+  //   withdrawToken: {
+  //     label: 'FrxETH/ETH',
+  //     address: EEthereumAddresses.FRXETH,
+  //     decimals: 18,
+  //     sign: '',
+  //   },
+  //   isNewest: true,
+  // },
+  // {
+  //   id: 6,
+  //   farmAddress: EEthereumAddresses.CVXFRAXBPVAULT,
+  //   type: 'boost',
+  //   isLocked: true,
+  //   chain: EChain.ETHEREUM,
+  //   name: 'CVX/FRAXBP',
+  //   sign: '$',
+  //   icons: [
+  //     'FRAX',
+  //     'USDC',
+  //     'agEUR',
+  //     'CRV',
+  //     'CVX',
+  //     'DAI',
+  //     'EURS',
+  //     'EURT',
+  //     'WETH',
+  //     'WBTC',
+  //   ],
+  //   isBoost: true,
+  //   rewards: {
+  //     label: 'CVX-ETH',
+  //     icons: ['CVX', 'ETH'],
+  //     stableLabel: 'USDC',
+  //     address: EEthereumAddresses.CVXETH,
+  //     stableAddress: EEthereumAddresses.USDC,
+  //   },
+  //   lPTokenAddress: EEthereumAddresses.CVXFRAXBP,
+  //   supportedTokens: [
+  //     {
+  //       label: 'agEUR',
+  //       address: EEthereumAddresses.AGEUR,
+  //       decimals: 18,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'CRV',
+  //       address: EEthereumAddresses.CRV,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'CVX',
+  //       address: EEthereumAddresses.CVX,
+  //       decimals: 18,
+  //       sign: '',
+  //     },
+  //     {
+  //       label: 'DAI',
+  //       address: EEthereumAddresses.DAI,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'EURS',
+  //       address: EEthereumAddresses.EURS,
+  //       decimals: 2,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'EURT',
+  //       address: EEthereumAddresses.EURT,
+  //       decimals: 6,
+  //       sign: '€',
+  //     },
+  //     {
+  //       label: 'FRAX',
+  //       address: EEthereumAddresses.FRAX,
+  //       decimals: 18,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'USDC',
+  //       address: EEthereumAddresses.USDC,
+  //       decimals: 6,
+  //       sign: '$',
+  //     },
+  //     {
+  //       label: 'WETH',
+  //       address: EEthereumAddresses.WETH,
+  //       decimals: 18,
+  //       sign: 'Ξ',
+  //     },
+  //     {
+  //       label: 'WBTC',
+  //       address: EEthereumAddresses.WBTC,
+  //       decimals: 8,
+  //       sign: '₿',
+  //     },
+  //   ],
+  //   lowSlippageTokenLabels: ['FRAX', 'CVX'],
+  //   apyFarmAddresses: {
+  //     baseApyAddress: 'bd072651-d99c-4154-aeae-51f12109c054',
+  //     boostApyAddress: '25d9dc49-3182-493a-bda4-0db53b25f457',
+  //   },
+  //   forcedInterest: '9.50',
+  //   withdrawToken: {
+  //     label: 'CVX/FRAXBP',
+  //     address: EEthereumAddresses.CVXFRAXBP,
+  //     decimals: 18,
+  //     sign: '',
+  //   },
+  //   isNewest: true,
+  // },
 ];
 
 const defaultRewards = {
@@ -894,8 +894,7 @@ export const useBoostFarm = ({ id }) => {
 
         var endFirstTimer = performance.now();
         console.log(
-          `loadFarmInfo() before farmInfo() took ${
-            endFirstTimer - startFirstTimer
+          `loadFarmInfo() before farmInfo() took ${endFirstTimer - startFirstTimer
           } milliseconds`,
         );
 
@@ -906,8 +905,7 @@ export const useBoostFarm = ({ id }) => {
         };
         var endSecondTimer = performance.now();
         console.log(
-          `getUpdatedFarmInfo() took ${
-            endSecondTimer - startSecondTimer
+          `getUpdatedFarmInfo() took ${endSecondTimer - startSecondTimer
           } milliseconds`,
         );
 
@@ -935,10 +933,10 @@ export const useBoostFarm = ({ id }) => {
       interest.current = selectedFarm.current?.forcedInterest
         ? selectedFarm.current?.forcedInterest
         : await getBoostFarmInterest(
-            selectedFarm.current?.farmAddress,
-            selectedFarm.current?.apyFarmAddresses,
-            selectedFarm.current?.chain,
-          );
+          selectedFarm.current?.farmAddress,
+          selectedFarm.current?.apyFarmAddresses,
+          selectedFarm.current?.chain,
+        );
     } catch (error) {
       //We can't get apy from llama, navigate to main page for now
       navigate('/');
@@ -993,13 +991,13 @@ export const useBoostFarm = ({ id }) => {
         const depositedAmount = farm.isLocked
           ? +depositedAmountInLP * valueOf1LPinUSDC
           : +depositedAmountInLP > 0 && isCorrectNetworkAtom == true
-          ? await getMaximumLPValueAsToken(
+            ? await getMaximumLPValueAsToken(
               farm.farmAddress,
               EEthereumAddresses.USDC,
               6,
               depositedAmountInLP,
             )
-          : 0;
+            : 0;
         farmInfo.depositedAmount = depositedAmount;
         farmInfo.depositDividedAmount = depositDivided(depositedAmount);
         if (farm.isLocked) {
@@ -1049,9 +1047,9 @@ export const useBoostFarm = ({ id }) => {
       const updatedPendingRewards =
         +selectedFarmInfo.current.totalAssetSupply > 0
           ? await getBoostFarmPendingRewards(
-              selectedFarmInfo.current.farmAddress,
-              selectedFarmInfo.current.chain,
-            )
+            selectedFarmInfo.current.farmAddress,
+            selectedFarmInfo.current.chain,
+          )
           : 0;
       pendingRewardsInfo.current = updatedPendingRewards;
       setIsLoadingPendingRewards(false);
@@ -1064,19 +1062,19 @@ export const useBoostFarm = ({ id }) => {
     try {
       const tx = selectedFarm.current?.isLocked
         ? await claimLockedBoostFarmRewards(
-            selectedFarmInfo.current.farmAddress,
-            seeRewardsAsStable
-              ? selectedFarm.current?.rewards.stableAddress
-              : selectedFarm.current?.rewards.address,
-            selectedFarmInfo.current.chain,
-          )
+          selectedFarmInfo.current.farmAddress,
+          seeRewardsAsStable
+            ? selectedFarm.current?.rewards.stableAddress
+            : selectedFarm.current?.rewards.address,
+          selectedFarmInfo.current.chain,
+        )
         : seeRewardsAsStable
-        ? await claimBoostFarmNonLPRewards(
+          ? await claimBoostFarmNonLPRewards(
             selectedFarmInfo.current.farmAddress,
             selectedFarmInfo.current.rewards.stableAddress,
             selectedFarmInfo.current.chain,
           )
-        : await claimBoostFarmLPRewards(
+          : await claimBoostFarmLPRewards(
             selectedFarmInfo.current.farmAddress,
             selectedFarmInfo.current.chain,
           );
@@ -1245,12 +1243,12 @@ export const useBoostFarm = ({ id }) => {
       processingTitle.current != undefined
         ? processingTitle.current
         : selectedTab == 0
-        ? selectedFarm.current?.isLocked
-          ? 'Locking funds...'
-          : 'Depositing funds...'
-        : selectedFarm.current?.isLocked
-        ? 'Unlocking funds...'
-        : 'Withdrawing funds...';
+          ? selectedFarm.current?.isLocked
+            ? 'Locking funds...'
+            : 'Depositing funds...'
+          : selectedFarm.current?.isLocked
+            ? 'Unlocking funds...'
+            : 'Withdrawing funds...';
     setIsProcessing(true);
     await handleCurrentStep();
   };

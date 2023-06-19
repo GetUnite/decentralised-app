@@ -135,8 +135,8 @@ export const Main = () => {
                         description={`Our fixed-rate farms have a guaranteed rate of
                           return for 2 weeks until our next liquidity
                           direction governance vote on ${nextVoteDay.format(
-                            'Do MMMM',
-                          )}.`}
+                          'Do MMMM',
+                        )}.`}
                         readMoreDescription="Once
                             customer funds are deposited they start earning
                             yield immediately. In the background the protocol
@@ -159,12 +159,8 @@ export const Main = () => {
                       />
                       <FarmsBlock
                         heading="Boost farms"
-                        description={`Our Boost farms are multi-pool auto-compounding
-                          strategies that give access to more complex
-                          boosted yields.`}
-                        readMoreDescription="Rates are variable, and depositors
-                          earn CVX/ETH rewards, which can be claimed in
-                          USDC. Rewards are harvested weekly."
+                        description={`Boost farms have been retired. Please contact support@alluo.com if you have any questions or concerns regarding previous deposits`}
+                        readMoreDescription=""
                         readMoreStatus={seeAllBoostFarmsDescription}
                         onReadMore={() =>
                           setSeeAllBoostFarmsDescription(
@@ -179,6 +175,7 @@ export const Main = () => {
                         isConnectedLoading={isConnectedLoading}
                         size={size}
                         factsheetLink="https://docsend.com/view/np9ypdn38jajb9zj"
+                        isDeprecated={true}
                       />
                     </Box>
                     {viewType == 'View my farms only' && (
