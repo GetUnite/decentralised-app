@@ -319,13 +319,13 @@ export const StreamCard = ({
                       <Box direction="row">
                         {!isEditMode ? (
                           <>
-                            <Button plain onClick={() => setIsEditMode(true)}>
+                            {/*<Button plain /*onClick={() => setIsEditMode(true)}>
                               <img
                                 src={isLightMode ? pencil : pencilDark}
                                 height={22}
                                 width={22}
                               />
-                            </Button>
+                            </Button>*/}
                             <StopStreamConfirmation
                               stopStreamConfirmation={stopStreamConfirmation}
                               setStopStreamConfirmation={
@@ -339,7 +339,7 @@ export const StreamCard = ({
                           </>
                         ) : (
                           <>
-                            <Button plain onClick={() => setIsEditMode(false)}>
+                            <Button plain /*onClick={() => setIsEditMode(false)}*/>
                               <img
                                 src={isLightMode ? stopStream : stopStreamDark}
                               />
@@ -392,7 +392,7 @@ export const StreamCard = ({
               </Grid>
             </Box>
           )}
-          {isEditMode && (
+          {false && isEditMode && (
             <Box
               fill="horizontal"
               justify="start"

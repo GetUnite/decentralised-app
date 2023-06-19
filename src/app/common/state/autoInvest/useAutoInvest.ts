@@ -32,32 +32,32 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  // {
-  //   // USD Farm to BTC
-  //   fromLabel: 'USD',
-  //   fromSign: '$',
-  //   toLabel: 'BTC',
-  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-  //   underlyingTokenAddress: EPolygonAddresses.USDC,
-  // },
-  // from BTC options
-  // {
-  //   // WBTC to USD
-  //   fromLabel: 'BTC',
-  //   fromSign: '₿',
-  //   toLabel: 'USD',
-  //   fromAddress: EPolygonAddresses.WBTC,
-  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-  //   underlyingTokenAddress: EPolygonAddresses.WBTC,
-  // },
+   {
+     // USD Farm to BTC
+     fromLabel: 'USD',
+     fromSign: '$',
+     toLabel: 'BTC',
+     fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+     fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+     toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+     toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+     underlyingTokenAddress: EPolygonAddresses.USDC,
+   },
+   // from BTC options
+   {
+     // WBTC to USD
+     fromLabel: 'BTC',
+     fromSign: '₿',
+     toLabel: 'USD',
+     fromAddress: EPolygonAddresses.WBTC,
+     fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+     fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+     toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+     toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+     underlyingTokenAddress: EPolygonAddresses.WBTC,
+   },
   // from ETH options
   {
     // WETH to USD
