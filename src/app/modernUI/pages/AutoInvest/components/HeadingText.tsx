@@ -14,7 +14,7 @@ export const HeadingText = ({
 
   const headingText = (
     <>
-      {!canStartStreams ? (
+      {/*!canStartStreams ? (
         <span>
           Great job, you are streaming the maximum number of concurrent streams
           available.
@@ -36,7 +36,8 @@ export const HeadingText = ({
             </>
           )}
         </>
-      )}
+              )*/}
+      <span>AutoInvest streams have been retired</span>
     </>
   );
 
@@ -58,9 +59,12 @@ export const HeadingText = ({
           </Box>
         ) : (
           <Text size="18px">
-            AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC
+            AutoInvest streams have been retired, you can only close streams.
+            You are unable to create new streams or edit a stream. Please
+            contact support@alluo.com if you have any questions or concerns.
+            {/*AutoInvest lets you stream dollar-pegged stablecoins to ETH and BTC
             and ETH and BTC to dollar-pegged stablecoins (one way at a time)
-            whilst earning yield on all assets you stream.
+        whilst earning yield on all assets you stream.*/}
           </Text>
         )}
       </Box>

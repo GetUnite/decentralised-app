@@ -53,14 +53,14 @@ export const AutoInvest = () => {
                       <Text size="24px" weight={700}>
                         Active Streams
                       </Text>
-                      {walletAccountAtom && canStartStreams && (
+                      {/*walletAccountAtom && canStartStreams && (
                         <Link to={'/autoinvest/start'}>
                           <Button
                             label="Start new stream"
                             style={{ width: '170px' }}
                           />
                         </Link>
-                      )}
+                      )*/}
                     </Box>
                   )}
                   <Box

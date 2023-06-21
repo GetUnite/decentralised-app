@@ -32,32 +32,32 @@ const streamOptions: TStreamOption[] = [
     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDETH,
     underlyingTokenAddress: EPolygonAddresses.USDC,
   },
-  // {
-  //   // USD Farm to BTC
-  //   fromLabel: 'USD',
-  //   fromSign: '$',
-  //   toLabel: 'BTC',
-  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-  //   underlyingTokenAddress: EPolygonAddresses.USDC,
-  // },
-  // from BTC options
-  // {
-  //   // WBTC to USD
-  //   fromLabel: 'BTC',
-  //   fromSign: '₿',
-  //   toLabel: 'USD',
-  //   fromAddress: EPolygonAddresses.WBTC,
-  //   fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
-  //   fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
-  //   toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
-  //   toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
-  //   ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
-  //   underlyingTokenAddress: EPolygonAddresses.WBTC,
-  // },
+   {
+     // USD Farm to BTC
+     fromLabel: 'USD',
+     fromSign: '$',
+     toLabel: 'BTC',
+     fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+     fromIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+     toIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+     toStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+     underlyingTokenAddress: EPolygonAddresses.USDC,
+   },
+   // from BTC options
+   {
+     // WBTC to USD
+     fromLabel: 'BTC',
+     fromSign: '₿',
+     toLabel: 'USD',
+     fromAddress: EPolygonAddresses.WBTC,
+     fromStIbAlluoAddress: EPolygonAddresses.STIBALLUOBTC,
+     fromIbAlluoAddress: EPolygonAddresses.IBALLUOBTC,
+     toIbAlluoAddress: EPolygonAddresses.IBALLUOUSD,
+     toStIbAlluoAddress: EPolygonAddresses.STIBALLUOUSD,
+     ricochetMarketAddress: EPolygonAddresses.TWOWAYMARKETIBALLUOUSDBTC,
+     underlyingTokenAddress: EPolygonAddresses.WBTC,
+   },
   // from ETH options
   {
     // WETH to USD
@@ -169,9 +169,9 @@ export const useAutoInvest = () => {
     if (walletAccountAtom) {
       const numberOfStreams = await fetchStreamsInfo();
       // if all streams options are being used there is no need to get the assets
-      if (!(numberOfStreams > 1)) {
+      /*if (!(numberOfStreams > 1)) {
         await fetchAssetsInfo();
-      }
+      }*/
     }
 
     setIsLoading(false);
@@ -234,9 +234,9 @@ export const useAutoInvest = () => {
             streamOtion.ricochetMarketAddress,
           );
           if (+streamFlow.flowPerSecond > 0) {
-            ricochetMarketAddressesWithStreams.push(
+            /*ricochetMarketAddressesWithStreams.push(
               streamOtion.ricochetMarketAddress,
-            );
+            );*/
 
             const ibAlluoBalance = await getBalance(
               streamOtion.fromIbAlluoAddress,
@@ -306,7 +306,7 @@ export const useAutoInvest = () => {
             }
           }
         }),
-      ).then(() => {
+      );/*.then(() => {
         if (
           ricochetMarketAddressesWithStreams.length >=
           ricochetMarketAddressOptions.length
@@ -319,7 +319,7 @@ export const useAutoInvest = () => {
         setStreams(streamsArray);
 
         return ricochetMarketAddressesWithStreams.length;
-      });
+      });*/
     } catch (error) {
       console.log(error);
       setNotification(
