@@ -410,8 +410,9 @@ export const useOptimisedFarm = ({ id }) => {
   const handleWithdraw = async () => {
     try {
       const withdrawPercentage = Math.round(
-        (+withdrawValue / +selectedFarmInfo.depositedAmount) * 100,
+        (+withdrawValue / +selectedFarmInfo.depositedAmount) * 10000,
       );
+      console.log("The withdraw percentage", withdrawPercentage);
 
       const tx = await withdrawFromOptimised(
         selectedSupportedToken.address,
