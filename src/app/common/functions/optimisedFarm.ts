@@ -170,11 +170,11 @@ export const getUserOptimisedFarmDepositedAmount = async (
       const tokenAmountValue =
         +amountInDecimals > 0
           ? await getTokenAmountValueUsingPriceFeedRouter(
-              vault,
-              balanceOf.vaultBalances[index].toString(),
-              fiatId,
-              EChain.OPTIMISM,
-            )
+            vault,
+            balanceOf.vaultBalances[index].toString(),
+            fiatId,
+            EChain.OPTIMISM,
+          )
           : 0;
 
       return tokenAmountValue;
@@ -200,7 +200,7 @@ const compoundingApy = (baseApy, rewardApy, fee, vaultPercentage) => {
   // the 100 cancel each other but it's just to make clear that
   // the first expression needs to be converted into % so * 100
   // the second expressions needs to be converted into decimal so / 100
-  return apy * 100 * (vaultPercentage / 100);
+  return apy * 100 * (vaultPercentage / 10000);
 };
 
 export const getOptimisedFarmInterest = async (
@@ -309,7 +309,7 @@ export const getOptimisedFarmInterest = async (
         return (
           beefyVaultsApys[vaultId] *
           fee *
-          underlyingVaultsPercents[index].toNumber()
+          underlyingVaultsPercents[index].toNumber() / 100
         );
         // These lines will be for compounding when we figure out how to get boost % from beefy
         const activeUnderlyingVaultApyBreakdown = beefyVaultsApys[vaultId];
@@ -405,11 +405,11 @@ export const getOptimisedTotalAssetSupply = async (
         const tokenAmountValue =
           +amountInDecimals > 0
             ? await getTokenAmountValueUsingPriceFeedRouter(
-                underlyingVault,
-                amountInDecimals,
-                fiatId,
-                EChain.OPTIMISM,
-              )
+              underlyingVault,
+              amountInDecimals,
+              fiatId,
+              EChain.OPTIMISM,
+            )
             : 0;
 
         return tokenAmountValue;
