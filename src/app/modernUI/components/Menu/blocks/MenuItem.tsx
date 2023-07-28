@@ -66,7 +66,7 @@ export const MenuItem = ({ ...rest }) => {
       />
 
       <Anchor
-        label="strategy dashboard"
+        label="dashboard"
         size="medium"
         weight={isStrategyDashboardPage ? 700 : 'normal'}
         style={isStrategyDashboardPage ? selectedStyle : {}}

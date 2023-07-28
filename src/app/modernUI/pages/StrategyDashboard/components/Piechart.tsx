@@ -1,7 +1,7 @@
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend, Label } from 'recharts';
 import { Spinner } from 'grommet';
 const tempData = [
-    { name: 'Loading...', value: 0 },
+    { name: 'Loading...', value: 0, apy: 0 },
 
 ];
 
@@ -28,16 +28,36 @@ const renderCustomizedLabel = ({
         </text>
     );
 };
+const renderLegend = (props) => {
+    const { payload } = props;
+
+    return (
+        <ul>
+            {
+                payload.map((entry, index) => (
+                    <li key={`item-${index}`} style={{ color: entry.color }}>
+                        {`${entry.payload.name} (${entry.payload.apy.toFixed(2)}% APY)`}
+                    </li>
+                ))
+            }
+        </ul>
+    );
+};
 
 
 export const Piechart = ({ data, title, index }) => {
     const renderData = data.length !== 0 ? data : tempData
     const totalValue = renderData.reduce((acc, item) => acc + item.value, 0);
+    // Calculate the weighted average APY
+    const weightedApy = data.reduce((total, entry) => total + ((entry.value / totalValue) * entry.apy), 0);
+
+    console.log(data);
 
     return (
         <div>
             <h4>{title}</h4>
             {totalValue === 0 ? <p>Total: ...</p> : <p>Total: {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {title.split(" ")[0]}</p>}
+            {totalValue === 0 ? <p>Weighted APY: ...</p> : <p>Weighted APY: {weightedApy.toFixed(2)}%</p>}
 
             <ResponsiveContainer height={500}>
                 <PieChart>
@@ -65,7 +85,7 @@ export const Piechart = ({ data, title, index }) => {
                         }
                     </Pie>
                     <Tooltip />
-                    <Legend verticalAlign="bottom" height={36} />
+                    <Legend verticalAlign="bottom" height={36} content={renderLegend} />
                 </PieChart>
             </ResponsiveContainer>
         </div>

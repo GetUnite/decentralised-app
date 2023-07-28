@@ -18,7 +18,7 @@ export const StrategyDashboard = ({ ...rest }) => {
         let isMounted = true;  // add this line
         const updateUSDInfo = async () => {
             let polygonBuffer = await getBufferAmountForAssetPolygon(0)
-            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer }
+            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer, apy: 0 }
             let otherSTuff = await getAllLiquidityDirectionInformation(0);
             let legacyDirection = await getLegacyLiquidityDirectionValue(0);
             let tempData = [polygonBufferInfo, ...legacyDirection, ...otherSTuff]
@@ -29,7 +29,7 @@ export const StrategyDashboard = ({ ...rest }) => {
 
         const updateEURInfo = async () => {
             let polygonBuffer = await getBufferAmountForAssetPolygon(1)
-            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer }
+            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer, apy: 0 }
             let otherSTuff = await getAllLiquidityDirectionInformation(1);
             let legacyDirection = await getLegacyLiquidityDirectionValue(1);
             let tempData = [polygonBufferInfo, ...legacyDirection, ...otherSTuff]
@@ -40,7 +40,7 @@ export const StrategyDashboard = ({ ...rest }) => {
 
         const updateETHInfo = async () => {
             let polygonBuffer = await getBufferAmountForAssetPolygon(2)
-            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer }
+            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer, apy: 0 }
             let otherSTuff = await getAllLiquidityDirectionInformation(2);
             let legacyDirection = await getLegacyLiquidityDirectionValue(2);
             let tempData = [polygonBufferInfo, ...legacyDirection, ...otherSTuff]
@@ -51,7 +51,7 @@ export const StrategyDashboard = ({ ...rest }) => {
 
         const updateBTCInfo = async () => {
             let polygonBuffer = await getBufferAmountForAssetPolygon(3)
-            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer }
+            let polygonBufferInfo = { name: "Polygon Buffer", value: polygonBuffer, apy: 0 }
             let otherSTuff = await getAllLiquidityDirectionInformation(3);
             let legacyDirection = await getLegacyLiquidityDirectionValue(3);
             let tempData = [polygonBufferInfo, ...legacyDirection, ...otherSTuff]
@@ -72,17 +72,23 @@ export const StrategyDashboard = ({ ...rest }) => {
         <ResponsiveContext.Consumer>
             {size => (
                 <Layout>
-
-
                     <Background heading={"Strategy Dashboard"}>
-                        <Piechart data={usdData} title="USD Liquidity Direction" index={0} />
-                        <Piechart data={eurData} title="EUR Liquidity Direction" index={1} />
-                        <Piechart data={ethData} title="ETH Liquidity Direction" index={2} />
-                        <Piechart data={btcData} title="BTC Liquidity Direction" index={3} />
-
+                        <div style={{ marginBottom: '100px' }}>
+                            <Piechart data={usdData} title="USD Liquidity Direction" index={0} />
+                        </div>
+                        <div style={{ marginBottom: '100px' }}>
+                            <Piechart data={eurData} title="EUR Liquidity Direction" index={1} />
+                        </div>
+                        <div style={{ marginBottom: '100px' }}>
+                            <Piechart data={ethData} title="ETH Liquidity Direction" index={2} />
+                        </div>
+                        <div style={{ marginBottom: '100px' }}>
+                            <Piechart data={btcData} title="BTC Liquidity Direction" index={3} />
+                        </div>
                     </Background>
                 </Layout>
             )}
         </ResponsiveContext.Consumer>
+
     );
 };

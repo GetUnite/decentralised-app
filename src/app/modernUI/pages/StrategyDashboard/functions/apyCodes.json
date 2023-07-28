@@ -1,0 +1,78 @@
+[
+    {
+        "name": "Curve/Convex hBTC+WBTC",
+        "code": "7b9503c2-4955-40e7-991b-deb6b5461b21"
+    },
+    {
+        "name": "Alluo/Yearn TopOmnivaultETH",
+        "code": "YEARN-0x4eC3177F5c2500AAABE56DDbD8907d41d17Fc2E9"
+    },
+    {
+        "name": "Alluo/Yearn Top3OmnivaultETH",
+        "code": "YEARN-0xDd7ebC54b851E629E61bc49DFcAed41C13fc67Da"
+    },
+    {
+        "name": "Alluo/Beefy TopOmnivaultETH",
+        "code": "BEEFY-0xA430432eEf5C062D34e4078540b91C2ec7DBe0c9"
+    },
+    {
+        "name": "Alluo/Beefy Top3OmnivaultETH",
+        "code": "BEEFY-0x2EC847395B6247Ab72b7B37432989f4547A0e947"
+    },
+    {
+        "name": "Curve/Convex cEUR+agEUR+EUROC",
+        "code": "f6fcc53a-ae62-403c-8511-45c0798cc227"
+    },
+    {
+        "name": "Curve/Convex agEUR+EURT+EURS",
+        "code": "7dd11dd0-ce13-4cd2-bc1e-230224289337"
+    },
+    {
+        "name": "Alluo/Yearn TopOmnivaultUSD",
+        "code": "YEARN-0x306Df6b5D50abeD3f7bCbe7399C4b8e6BD55cB81"
+    },
+    {
+        "name": "Alluo/Yearn Top3OmnivaultUSD",
+        "code": "YEARN-0x2682c8057426FE5c462237eb3bfcfEDFb9539004"
+    },
+    {
+        "name": "Alluo/Beefy TopOmnivaultUSD",
+        "code": "BEEFY-0xAf332f4d7A82854cB4B6345C4c133eC60c4eAd87"
+    },
+    {
+        "name": "Alluo/Beefy Top3OmnivaultUSD",
+        "code": "BEEFY-0x75862d2fEdb1c6a9123F3b5d5E36D614570B404d"
+    },
+    {
+        "name": "Curve/FraxConvex ETH+frxETH",
+        "code": "77020688-e1f9-443c-9388-e51ace15cc32"
+    },
+    {
+        "name": "Curve/Convex stETH+ETH",
+        "code": "5ce23e7e-3800-4c9c-ad30-6db3db0515a1"
+    },
+    {
+        "name": "Curve/Convex alETH+ETH",
+        "code": "ec2c823c-a136-4677-b581-c2ff9807602c"
+    },
+    {
+        "name": "Curve/Convex ETH+pETH",
+        "code": "d2adb884-776b-49ef-993c-6f7475fa99bd"
+    },
+    {
+        "name": "Curve/Convex Mim+3CRV",
+        "code": "8a20c472-142c-4442-b724-40f2183c073e"
+    },
+    {
+        "name": "Curve/FraxConvex Frax+USDC",
+        "code": "bd072651-d99c-4154-aeae-51f12109c054-1.00"
+    },
+    {
+        "name": "Curve/Convex Frax+USDC",
+        "code": "bd072651-d99c-4154-aeae-51f12109c054"
+    },
+    {
+        "name": "Curve/Convex agEUR+EUROC",
+        "code": "e360745b-cd16-449d-99f7-600c929ef589"
+    }
+]
