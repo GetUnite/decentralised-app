@@ -6,4 +6,5 @@ export * from './Main';
 export * from './Mobile';
 export * from './Stake';
 export * from './Transfer';
+export * from './StrategyDashboard';
 
