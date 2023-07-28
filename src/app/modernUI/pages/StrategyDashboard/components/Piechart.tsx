@@ -30,14 +30,15 @@ const renderCustomizedLabel = ({
 };
 
 
-export const Piechart = ({ data, title }) => {
+export const Piechart = ({ data, title, index }) => {
     const renderData = data.length !== 0 ? data : tempData
     const totalValue = renderData.reduce((acc, item) => acc + item.value, 0);
 
     return (
         <div>
             <h4>{title}</h4>
-            <p>Total: {totalValue} {title.split(" ")[0]}</p>
+            {totalValue === 0 ? <p>Total: ...</p> : <p>Total: {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {title.split(" ")[0]}</p>}
+
             <ResponsiveContainer height={500}>
                 <PieChart>
                     <Pie
@@ -54,15 +55,14 @@ export const Piechart = ({ data, title }) => {
                         }}
                     >
                         {
-                            renderData.map((entry, index) => {
+                            renderData.map((entry, pieIndex) => {
                                 // Select a color class in order
-                                const colorClass = Object.keys(colorArrays)[index % 6];
-                                // Randomly select a color from the chosen class
-                                const color = colorArrays[colorClass][Math.floor(Math.random() * colorArrays[colorClass].length)];
-                                return <Cell key={`cell-${index}`} fill={color} />
+                                const colorClass = Object.keys(colorArrays)[pieIndex % Object.keys(colorArrays).length];
+                                // Select a color from the chosen class based on the index prop
+                                const color = colorArrays[colorClass][index % colorArrays[colorClass].length];
+                                return <Cell key={`cell-${pieIndex}`} fill={color} />
                             })
                         }
-
                     </Pie>
                     <Tooltip />
                     <Legend verticalAlign="bottom" height={36} />

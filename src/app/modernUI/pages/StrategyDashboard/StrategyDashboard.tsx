@@ -75,10 +75,10 @@ export const StrategyDashboard = ({ ...rest }) => {
 
 
                     <Background heading={"Strategy Dashboard"}>
-                        <Piechart data={usdData} title="USD Liquidity Direction" />
-                        <Piechart data={eurData} title="EUR Liquidity Direction" />
-                        <Piechart data={ethData} title="ETH Liquidity Direction" />
-                        <Piechart data={btcData} title="BTC Liquidity Direction" />
+                        <Piechart data={usdData} title="USD Liquidity Direction" index={0} />
+                        <Piechart data={eurData} title="EUR Liquidity Direction" index={1} />
+                        <Piechart data={ethData} title="ETH Liquidity Direction" index={2} />
+                        <Piechart data={btcData} title="BTC Liquidity Direction" index={3} />
 
                     </Background>
                 </Layout>
