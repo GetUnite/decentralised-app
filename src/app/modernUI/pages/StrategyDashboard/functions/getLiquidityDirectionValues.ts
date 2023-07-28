@@ -12,7 +12,8 @@ import ILiquidityHandler from "./abis/ILiquidityHandler.json"
 import IAlluoStrategyHandlder from "./abis/IAlluoStrategyHandler.json"
 import IStrategyHandler from "./abis/IStrategyHandler.json"
 import IAlluoStrategy from "./abis/IAlluoStrategy.json"
-
+import { getOptimisedFarmInterest } from 'app/common/functions/optimisedFarm';
+import apyCodes from "./apyCodes.json";
 
 const curves: string[] = [
     '', // Placeholder for zero index
@@ -29,7 +30,7 @@ const curves: string[] = [
     'Curve/FraxConvex ETH+frxETH',
     'Curve/Convex ETH+pETH',
     'Curve/Convex multiBTC',
-    'Curve/Convex agEUR+EURT'
+    'Curve/Convex agEUR+EUROC'
 ];
 
 // const USDStrategies = [1, 2, 9, 10]
@@ -45,6 +46,66 @@ function getStrategyNameById(id: number): string | undefined {
 }
 
 
+let omnivaultCodes = [
+    "Alluo/Yearn TopOmnivaultUSD",
+    "Alluo/Yearn Top3OmnivaultUSD",
+    "Alluo/Beefy TopOmnivaultUSD",
+    "Alluo/Beefy Top3OmnivaultUSD",
+    "Alluo/Yearn TopOmnivaultETH",
+    "Alluo/Yearn Top3OmnivaultETH",
+    "Alluo/Beefy TopOmnivaultETH",
+    "Alluo/Beefy Top3OmnivaultETH"
+]
+
+let omnivaultAddresses = [
+    "0x306Df6b5D50abeD3f7bCbe7399C4b8e6BD55cB81", "0x2682c8057426FE5c462237eb3bfcfEDFb9539004", "0xAf332f4d7A82854cB4B6345C4c133eC60c4eAd87", "0x75862d2fEdb1c6a9123F3b5d5E36D614570B404d",
+    "0x4eC3177F5c2500AAABE56DDbD8907d41d17Fc2E9", "0xDd7ebC54b851E629E61bc49DFcAed41C13fc67Da", "0xA430432eEf5C062D34e4078540b91C2ec7DBe0c9", "0x2EC847395B6247Ab72b7B37432989f4547A0e947"
+]
+async function getAPYForDirection(name: string): Promise<number> {
+    if (name == "Polygon Buffer") {
+        return 0
+    }
+    if (name.startsWith("Null")) {
+        return 0;
+    }
+
+    let llamaCode = apyCodes.find((x) => x.name == name)?.code
+    if (llamaCode == undefined) {
+        throw Error("No llama code found for " + name)
+    }
+    let apy = await getAPY(llamaCode)
+    return Number(apy);
+}
+
+
+async function getAPY(llamaAPICode: string): Promise<string> {
+    let estimatedFactorAbove = 0;
+    if (llamaAPICode.split("-")[0] == "YEARN" || llamaAPICode.split("-")[0] == "BEEFY") {
+        let apy = await getOptimisedFarmInterest(llamaAPICode.split("-")[1], llamaAPICode.split("-")[0].toLowerCase());
+        return apy
+    }
+
+    else if (llamaAPICode.length > 36) {
+        // Estimated margin from FraxConvex yield above convexfinance yields
+        let splitted = llamaAPICode.split("-")
+        estimatedFactorAbove = Number(splitted[splitted.length - 1]);
+        llamaAPICode = llamaAPICode.slice(0, -5)
+    }
+
+    let requestURL = "https://yields.llama.fi/chart/" + llamaAPICode;
+    try {
+        const response = await fetch(requestURL);
+        const data = await response.json();
+        let latestData = data.data[data.data.length - 1];
+        let latestAPY = latestData["apy"] + estimatedFactorAbove;
+        return latestAPY;
+    } catch (error) {
+        console.error(error);
+        return String(error);
+    }
+}
+
+
 async function getTotalLiquidityDirectionValue(assetId: number, chainId: number): Promise<any[]> {
     let activeDirectionsForAsset = await callContract(IAlluoStrategyHandlder, "0xca3708d709f1324d21ad2c0fb551cc4a0882fd29", "getActiveDirectionsForAssetId(uint256)", [assetId], chainId);
     let returnType = [];
@@ -52,7 +113,8 @@ async function getTotalLiquidityDirectionValue(assetId: number, chainId: number)
         let value = await callContract(IAlluoStrategyHandlder, "0xca3708d709f1324d21ad2c0fb551cc4a0882fd29", "markDirectionToMarket(uint256)", [Number(activeDirectionsForAsset[i])], chainId);
         let name = await callContract(IAlluoStrategyHandlder, "0xca3708d709f1324d21ad2c0fb551cc4a0882fd29", "directionIdToName(uint256)", [Number(activeDirectionsForAsset[i])], chainId);
         value = Number(ethers.utils.formatUnits(value, 18))
-        returnType.push({ name: name, value: value })
+        let apy = await getAPYForDirection(name)
+        returnType.push({ name: name, value: value, apy: apy })
     }
     return returnType;
 }
@@ -70,8 +132,9 @@ export async function getLegacyLiquidityDirectionValue(assetId: number): Promise
             let name = getStrategyNameById(Number(relevantActiveStrategyIds[i]));
 
             value = Number(ethers.utils.formatUnits(value, 18))
-            returnType.push({ name: name, value: value })
-        } catch {
+            let apy = await getAPYForDirection(name)
+            returnType.push({ name: name, value: value, apy: apy })
+        } catch (error) {
             console.log("Failed to fetch for direction, most likely because of it being deprecated", Number(relevantActiveStrategyIds[i]))
         }
 
