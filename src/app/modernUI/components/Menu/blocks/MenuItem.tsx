@@ -10,6 +10,7 @@ export const MenuItem = ({ ...rest }) => {
     isBuyPage,
     isTransferPage,
     isAutoInvestPage,
+    isStrategyDashboardPage
   } = useCurrentPath();
 
   const selectedStyle = {
@@ -61,6 +62,15 @@ export const MenuItem = ({ ...rest }) => {
             '_blank',
             'noopener,noreferrer',
           )
+        }
+      />
+
+      <Anchor
+        label="strategy dashboard"
+        size="medium"
+        weight={isStrategyDashboardPage ? 700 : 'normal'}
+        style={isStrategyDashboardPage ? selectedStyle : {}}
+        onClick={() => navigate(modernUiPaths.strategyDashboard)
         }
       />
     </Box>

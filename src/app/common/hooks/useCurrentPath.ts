@@ -16,6 +16,7 @@ export const useCurrentPath = () => {
   const isBuyPage = modernUiPaths.BUY === location.pathname;
   const isTransferPage = modernUiPaths.TRANSFER === location.pathname;
   const isAutoInvestPage = location.pathname.includes(modernUiPaths.AUTOINVEST);
+  const isStrategyDashboardPage = location.pathname.includes(modernUiPaths.strategyDashboard);
   const goToMainPage = () => navigate(modernUiPaths.MAIN);
   return {
     path: location.pathname,
@@ -24,6 +25,7 @@ export const useCurrentPath = () => {
     isTransferPage,
     isBuyPage,
     isAutoInvestPage,
+    isStrategyDashboardPage,
     navigate,
     goToMainPage,
   };

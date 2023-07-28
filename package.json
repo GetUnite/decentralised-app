@@ -53,6 +53,7 @@
     "react-tooltip": "^4.2.21",
     "react-use-intercom": "^2.0.0",
     "react95": "^3.10.0",
+    "recharts": "^2.7.2",
     "recoil": "^0.5.2",
     "recoil-persist": "^4.1.0",
     "styled-components": "^5.3.6",

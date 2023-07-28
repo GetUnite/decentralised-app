@@ -7,7 +7,8 @@ import {
   Farm,
   Main,
   Stake,
-  Transfer
+  Transfer,
+  StrategyDashboard
 } from 'app/modernUI/pages';
 import { theme as modernUITheme } from 'app/modernUI/theme';
 import { Grommet } from 'grommet';
@@ -39,6 +40,7 @@ export const Router = () => {
             <Route path="/boostfarm/:id" element={<BoostFarm />} />
             <Route path="/optimisedfarm/:id" element={<OptimisedFarm />} />
             <Route path="/autoinvest/*" element={<AutoInvestRoutes />} />
+            <Route path="/strategydashboard/*" element={<StrategyDashboard />} />
             <Route path="*" element={<Main />} />
           </Routes>
         </SkeletonTheme>
