@@ -188,7 +188,7 @@ export const getUserOptimisedFarmDepositedAmount = async (
 };
 
 const optimisedYearnFarmInterestApiUrl =
-  'https://api.yearn.fi/v1/chains/10/vaults/all';
+  'https://ydaemon.yearn.fi/10/vaults/all';
 const optimisedBeefyFarmInterestApiUrl = 'https://api.beefy.finance/';
 
 const compoundingApy = (baseApy, rewardApy, fee, vaultPercentage) => {
