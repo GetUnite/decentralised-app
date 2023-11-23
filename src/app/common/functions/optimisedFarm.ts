@@ -321,9 +321,10 @@ export const getOptimisedFarmInterest = async (
           ajr => ajr.address == activeUnderlyingVault,
         );
 
-        const activeUnderlyingVaultApy = activeUnderlyingVaultInfo.apy;
-        baseApy = activeUnderlyingVaultApy.net_apy;
-        rewardsApy = activeUnderlyingVaultApy.staking_rewards_apr;
+        const activeUnderlyingVaultApy = activeUnderlyingVaultInfo.apr;
+        baseApy = activeUnderlyingVaultApy.netAPR;
+
+        rewardsApy = activeUnderlyingVaultApy.extra.stakingRewardsAPR;
       }
 
       return compoundingApy(
