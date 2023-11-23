@@ -325,8 +325,6 @@ export const getOptimisedFarmInterest = async (
         baseApy = activeUnderlyingVaultApy.netAPR;
 
         rewardsApy = activeUnderlyingVaultApy.extra.stakingRewardsAPR;
-        console.log("baseApy", baseApy)
-        console.log("rewardsApy", rewardsApy)
       }
 
       return compoundingApy(
